@@ -1,11 +1,11 @@
 // We are careful here to only accept a valid timeline ad
-module.exports = function(node){
+module.exports = function(node, sponsor){
   // First we check that it does have a valid class
   if(!node.classList.value.startsWith("fbUserContent")) return false;
 
   // Then we see if it is actually a sponsored post
   if(!Array.from(node.querySelectorAll("a")).some((it) => {
-    return it.innerText == chrome.i18n.getMessage("sponsor_text");
+    return it.innerText == sponsor;
   })) return false;
 
   // And then we try to grab the parent container that has a hyperfeed id
