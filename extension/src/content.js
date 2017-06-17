@@ -2,11 +2,13 @@ import parser from "parser";
 
 let sendAds = function(){
   let posts = Array.from(document.querySelectorAll(".fbUserContent"));
-  let ads = posts.map((i) => {
-    return parser(i, chrome.i18n.getMessage("sponsor_text"));
-  }).filter((i) => { return i; });
+
+  let sponsor = chrome.i18n.getMessage("sponsor_text");
+
+  let ads = posts.map((i) =>  parser(i, sponsor)).filter((i) => i);
+
   chrome.runtime.sendMessage(ads, function() {
-    console.log("sent");
+    console.log("Reported " + ads.length + "ads.");
   });
 };
 
