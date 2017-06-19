@@ -5,7 +5,7 @@ module.exports = function(node, sponsor){
 
   // Then we see if it is actually a sponsored post
   if(!Array.from(node.querySelectorAll("a")).some((it) => {
-    return it.innerText == sponsor;
+    return it.textContent == sponsor;
   })) return false;
 
   // And then we try to grab the parent container that has a hyperfeed id
