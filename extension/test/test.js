@@ -1,5 +1,6 @@
 const parser = require('../src/parser.js');
 const JSDOM = require('jsdom').JSDOM;
+const fs = require('fs');
 const HTML = fs.readFileSync(__dirname + "/test.html");
 const dom = new JSDOM(HTML);
 const assert = require('assert');
