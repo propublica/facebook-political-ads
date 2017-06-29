@@ -5,13 +5,25 @@
   "main": "index.js",
   "scripts": {
     "test": "node test/test.js",
-    "build": "webpack",
-    "watch": "webpack -w"
+    "build": "./node_modules/.bin/webpack",
+    "watch": "./node_modules/.bin/webpack -w"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "babel-core": "^6.25.0",
+    "babel-loader": "^7.1.1",
+    "babel-plugin-jsx-pragmatic": "^1.0.2",
+    "babel-plugin-transform-react-constant-elements": "^6.23.0",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
     "jsdom": "^11.0.0",
+    "redux": "^3.7.1",
+    "source-map-loader": "^0.2.1",
     "webpack": "^2.6.1"
+  },
+  "dependencies": {
+    "preact": "^8.1.0",
+    "preact-redux": "^2.0.1",
+    "proptypes": "^1.1.0"
   }
 }
