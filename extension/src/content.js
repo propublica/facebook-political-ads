@@ -7,7 +7,7 @@ let sendAds = function(){
 
   let ads = posts.map((i) =>  parser(i, sponsor)).filter((i) => i);
 
-  chrome.runtime.sendMessage(ads, function() {
+  chrome.runtime.sendMessage(ads, () => {
     console.log("Reported " + ads.length + "ads.");
   });
 };
