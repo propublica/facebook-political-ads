@@ -1,6 +1,7 @@
 import { h, render } from 'preact';
 import { PropTypes } from 'proptypes';
-import { combineReducers, createStore } from 'redux';
+import { combineReducers, createStore, connect } from 'redux';
+import { Provider } from 'preact-redux';
 
 const getMessage = chrome.i18n.getMessage;
 
@@ -22,17 +23,17 @@ const NEW_RATINGS = "new_ratings";
 const ASSIGN_RATING = "assign_rating";
 
 // Actions
-const toggle = (value) => {
-  return {type: TOGGLE_TAB, value};
-};
+const toggle = (value) => ({type: TOGGLE_TAB, value});
+const rateAd = () => ({type: ASSIGN_RATING, value: RatingType.POLITICAL});
+
 
 // Reducers
 const active = (state = ToggleType.ADS, action) => {
   switch(action.type) {
-    case TOGGLE_TAB:
-      return action.value;
-    default:
-      return state;
+  case TOGGLE_TAB:
+    return action.value;
+  default:
+    return state;
   }
 };
 
@@ -45,53 +46,90 @@ const ratings = (state = [], action) => {
 };
 
 // The main app!
-const app = combineReducers({
+const reducer = combineReducers({
   active,
   ads,
   ratings
 });
 
-let store = createStore(app);
+let store = createStore(reducer);
 
 // Views
 const Ad = ({ad}) => {
-  return <div class="ad" />;
+  return <div className="ad" />;
 };
 
 const Ads = ({ads}) => {
   return <div id="ads">
-    {ads.map((ad) => <Ad ad=ad />)}
+    {ads.map(ad => <Ad key={ad.id} {...ad} />)}
   </div>;
 };
 
-const Rating = ({rating}) => {
-  return <div class="rating" />;
-};
+const Rating = ({action, rating}) => (
+  <div className="rating" onClick={() => action(rating.id, true)}/>
+);
 
-const Ratings = ({ratings}) => {
+const Ratings = ({ratings, onRatingClick}) => {
   return <div id="ratings">
-    {ratings.map((rating) => <Rating rating=rating />)}
-  </div>
+    {ratings.map(rating => <Rating {...rating} action={onRatingClick} />)}
+  </div>;
 };
 
-const Toggler = ({active_tab, ads, ratings}) => {
+const getUnratedRatings = (ratings) => (
+  ratings.filter(rating => !("rated" in rating))
+);
+
+const ratingStateToProps = (state) => ({
+  ratings: getUnratedRatings(state.ratings)
+});
+
+const ratingDispatchToProps = (dispatch) => ({
+  onRatingClick: (id, rating) => {
+    dispatch(rateAd(id, rating));
+  }
+});
+
+const UnratedRatings = connect(
+  ratingStateToProps,
+  ratingDispatchToProps
+)(Ratings);
+
+const Toggle = ({type, message, active_tab, onToggleClick}) => (
+  <span className="toggle {active_tab == type}"
+    onClick={() => onToggleClick(type)}
+    id="rate-toggle">
+    {getMessage(message)}
+  </span>
+);
+
+let Toggler = ({ads, ratings, active_tab, onToggleClick}) => {
   return <div id="toggler">
     <div id="toggles">
-      <span class="toggle {active_tab == ToggleType.ADS}" id="rate-toggle">
-        {getMessage("rate_ads")}
-      </span>
-      <span class="toggle {active_tab == ToggleType.RATER}" id="seeads-toggle">
-        {getMessage("see_ads")}
-      </span>
+      <Toggle type={ToggleType.ADS} active_tab={active_tab} message="see_ads" onToggleClick />
+      <Toggle type={ToggleType.RATER} active_tab={active_tab} message="rate_ads" onToggleClick />
     </div>
     <div id="ads">
-      {active_tab == ToggleType.ADS ? <Ads ads=ads /> : <Ratings ratings=ratings />}
+      {active_tab == ToggleType.ADS ? <Ads ads={ads} /> : <UnratedRatings ratings={ratings}/>}
     </div>
-  </div>
+  </div>;
 };
 
+const togglerDispatchToProps = (dispatch) => ({
+  onToggleClick: (type) => {
+    dispatch(toggle(type));
+  }
+});
+
+Toggler = connect(
+  (state) => state,
+  togglerDispatchToProps
+)(Toggler);
+
 render(
-  <div id="popup">
-    <Toggler />
-  </div>,
-document.body);
+  <Provider store={store}>
+    <div id="popup">
+      <Toggler />
+    </div>
+  </Provider>,
+  document.body
+);
