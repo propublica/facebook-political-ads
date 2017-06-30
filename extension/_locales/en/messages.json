@@ -1,5 +1,7 @@
 {
   "extension_name": "Facebook Ad Listener",
   "extension_description": "",
-  "sponsor_text": "Sponsored"
+  "sponsor_text": "Sponsored",
+  "rate_ads": "Rate Ads",
+  "see_ads": "See Ads"
 }
