@@ -118,8 +118,9 @@ const UnratedRatings = connect(
   ratingDispatchToProps
 )(Ratings);
 
+// Controls which section of tabs to show, defaults to the
 const Toggle = ({type, message, active_tab, onToggleClick}) => (
-  <span className="toggle {active_tab == type}"
+  <span className={'toggle' + (active_tab == type ? ' active' : '')}
     onClick={() => onToggleClick(type)}
     id="rate-toggle">
     {getMessage(message)}
@@ -134,6 +135,7 @@ Toggle.propTypes = {
   onToggleClick: PropTypes.func.isRequired
 };
 
+// Our Main container.
 let Toggler = ({ads, ratings, active_tab, onToggleClick}) => (
   <div id="toggler">
     <div id="toggles">
@@ -158,7 +160,6 @@ Toggler.propTypes = {
   active_tab: Toggle.propTypes.active_tab,
   onToggleClick: Toggle.propTypes.onToggleClick
 };
-
 
 const togglerDispatchToProps = (dispatch) => ({
   onToggleClick: (type) => {

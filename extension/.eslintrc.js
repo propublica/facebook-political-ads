@@ -2,8 +2,12 @@ module.exports = {
   "env": {
     "browser": true,
     "commonjs": true,
+    "node": true,
     "es6": true,
-    "node": true
+    "webextensions": true
+  },
+  "globals":{
+    "chrome": true
   },
   "extends": ["eslint:recommended", "plugin:react/recommended"],
   "parserOptions": {
@@ -17,6 +21,7 @@ module.exports = {
     "react"
   ],
   "rules": {
+    "no-console":0,
     "indent": [
       "error",
       2
