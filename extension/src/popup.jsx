@@ -55,25 +55,49 @@ const reducer = combineReducers({
 let store = createStore(reducer);
 
 // Views
-const Ad = ({ad}) => {
-  return <div className="ad" />;
+const Ad = ({id, html}) => (
+  <div className="ad" />
+);
+
+Ad.propTypes = {
+  id: PropTypes.string.isRequired,
+  html: PropTypes.string.isRequired
 };
 
-const Ads = ({ads}) => {
-  return <div id="ads">
+// Ads from the server to show
+const Ads = ({ads}) => (
+  <div id="ads">
     {ads.map(ad => <Ad key={ad.id} {...ad} />)}
-  </div>;
+  </div>
+);
+
+Ads.propTypes = {
+  ads: PropTypes.arrayOf(PropTypes.shape(Ad.propTypes))
 };
 
+// Ads to be rated and sent to the server
 const Rating = ({action, rating}) => (
   <div className="rating" onClick={() => action(rating.id, true)}/>
 );
 
-const Ratings = ({ratings, onRatingClick}) => {
-  return <div id="ratings">
-    {ratings.map(rating => <Rating {...rating} action={onRatingClick} />)}
-  </div>;
+Rating.proptypes = Object.assign({}, Ad.propTypes, {
+  rating: PropTypes.oneOf(Object.values(RatingType)).isRequired,
+  action: PropTypes.func.isRequired
+});
+
+const Ratings = ({onRatingClick, ratings}) => (
+  <div id="ratings">
+    {ratings.map(rating => (
+      <Rating key={rating.id} {...rating} action={onRatingClick} />)
+    )}
+  </div>
+);
+
+Ratings.propTypes = {
+  ratings: PropTypes.arrayOf(PropTypes.shape(Rating.propTypes)).isRequired,
+  onRatingClick: PropTypes.func.isRequired
 };
+
 
 const getUnratedRatings = (ratings) => (
   ratings.filter(rating => !("rated" in rating))
@@ -102,17 +126,39 @@ const Toggle = ({type, message, active_tab, onToggleClick}) => (
   </span>
 );
 
-let Toggler = ({ads, ratings, active_tab, onToggleClick}) => {
-  return <div id="toggler">
+const TogglePropType = PropTypes.oneOf(Object.values(ToggleType)).isRequired;
+Toggle.propTypes = {
+  type: TogglePropType,
+  message: PropTypes.string.isRequired,
+  active_tab: TogglePropType,
+  onToggleClick: PropTypes.func.isRequired
+};
+
+let Toggler = ({ads, ratings, active_tab, onToggleClick}) => (
+  <div id="toggler">
     <div id="toggles">
-      <Toggle type={ToggleType.ADS} active_tab={active_tab} message="see_ads" onToggleClick />
-      <Toggle type={ToggleType.RATER} active_tab={active_tab} message="rate_ads" onToggleClick />
+      <Toggle type={ToggleType.ADS}
+        active_tab={active_tab}
+        message="see_ads" onToggleClick={onToggleClick} />
+      <Toggle type={ToggleType.RATER}
+        active_tab={active_tab}
+        message="rate_ads" onToggleClick={onToggleClick} />
     </div>
     <div id="ads">
-      {active_tab == ToggleType.ADS ? <Ads ads={ads} /> : <UnratedRatings ratings={ratings}/>}
+      {active_tab == ToggleType.ADS ?
+        <Ads ads={ads} /> :
+        <UnratedRatings ratings={ratings} />}
     </div>
-  </div>;
+  </div>
+);
+
+Toggler.propTypes = {
+  ads: Ads.propTypes.ads,
+  ratings: Ratings.propTypes.ratings,
+  active_tab: Toggle.propTypes.active_tab,
+  onToggleClick: Toggle.propTypes.onToggleClick
 };
+
 
 const togglerDispatchToProps = (dispatch) => ({
   onToggleClick: (type) => {
@@ -124,6 +170,7 @@ Toggler = connect(
   (state) => state,
   togglerDispatchToProps
 )(Toggler);
+
 
 render(
   <Provider store={store}>
