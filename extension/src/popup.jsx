@@ -2,6 +2,7 @@ import { h, render } from 'preact';
 import { PropTypes } from 'proptypes';
 import { combineReducers, createStore, connect } from 'redux';
 import { Provider } from 'preact-redux';
+import { uniqBy } from 'lodash/uniqBy';
 
 const getMessage = chrome.i18n.getMessage;
 
@@ -24,8 +25,19 @@ const ASSIGN_RATING = "assign_rating";
 
 // Actions
 const toggle = (value) => ({type: TOGGLE_TAB, value});
-const rateAd = () => ({type: ASSIGN_RATING, value: RatingType.POLITICAL});
-
+const rateAd = (id, rating) => ({
+  type: ASSIGN_RATING,
+  id: id,
+  value: rating
+});
+const newAds = (ads) => ({
+  type: NEW_ADS,
+  value: ads
+});
+const newRatings = (ratings) => ({
+  type: NEW_RATINGS,
+  value: ratings
+});
 
 // Reducers
 const active = (state = ToggleType.ADS, action) => {
@@ -37,12 +49,32 @@ const active = (state = ToggleType.ADS, action) => {
   }
 };
 
+const uniqueAds = (new_ads, ads) => uniqBy(new_ads.concat(ads), 'id');
 const ads = (state = [], action) => {
-  return state;
+  switch(action.type) {
+  case NEW_ADS:
+    return uniqueAds(action.value, state);
+  default:
+    return state;
+  }
 };
 
 const ratings = (state = [], action) => {
-  return state;
+  switch(action.type) {
+  case NEW_RATINGS:
+    return uniqueAds(action.value, state);
+  case ASSIGN_RATING:
+    return state.map(rating => {
+      if(rating.id == action.id) {
+        return Object.assign({}, rating, {
+          rating: action.value
+        });
+      }
+      return rating;
+    });
+  default:
+    return state;
+  }
 };
 
 // The main app!
@@ -54,11 +86,22 @@ const reducer = combineReducers({
 
 let store = createStore(reducer);
 
+// Utilities
+const getTitle = (html) => {
+  let node = document.creatElement("div");
+  node.innerHTML = html;
+  return node.querySelectorAll(".userContent")[0].innerText;
+};
+
 // Views
 const Ad = ({id, html}) => (
-  <div className="ad" />
+  <div className="ad" id={id}>
+    <h2>{getTitle(html)}</h2>
+    <div>
+      {html}
+    </div>
+  </div>
 );
-
 Ad.propTypes = {
   id: PropTypes.string.isRequired,
   html: PropTypes.string.isRequired
@@ -70,7 +113,6 @@ const Ads = ({ads}) => (
     {ads.map(ad => <Ad key={ad.id} {...ad} />)}
   </div>
 );
-
 Ads.propTypes = {
   ads: PropTypes.arrayOf(PropTypes.shape(Ad.propTypes))
 };
@@ -79,7 +121,6 @@ Ads.propTypes = {
 const Rating = ({action, rating}) => (
   <div className="rating" onClick={() => action(rating.id, true)}/>
 );
-
 Rating.proptypes = Object.assign({}, Ad.propTypes, {
   rating: PropTypes.oneOf(Object.values(RatingType)).isRequired,
   action: PropTypes.func.isRequired
@@ -92,7 +133,6 @@ const Ratings = ({onRatingClick, ratings}) => (
     )}
   </div>
 );
-
 Ratings.propTypes = {
   ratings: PropTypes.arrayOf(PropTypes.shape(Rating.propTypes)).isRequired,
   onRatingClick: PropTypes.func.isRequired
@@ -126,7 +166,6 @@ const Toggle = ({type, message, active_tab, onToggleClick}) => (
     {getMessage(message)}
   </span>
 );
-
 const TogglePropType = PropTypes.oneOf(Object.values(ToggleType)).isRequired;
 Toggle.propTypes = {
   type: TogglePropType,
@@ -153,7 +192,6 @@ let Toggler = ({ads, ratings, active_tab, onToggleClick}) => (
     </div>
   </div>
 );
-
 Toggler.propTypes = {
   ads: Ads.propTypes.ads,
   ratings: Ratings.propTypes.ratings,

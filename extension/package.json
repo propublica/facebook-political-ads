@@ -16,6 +16,7 @@
     "babel-plugin-jsx-pragmatic": "^1.0.2",
     "babel-plugin-transform-react-constant-elements": "^6.23.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.5.2",
     "eslint": "^4.1.1",
     "eslint-plugin-react": "^7.1.0",
     "jsdom": "^11.0.0",
@@ -24,8 +25,10 @@
     "webpack": "^2.6.1"
   },
   "dependencies": {
+    "lodash": "^4.17.4",
     "preact": "^8.1.0",
     "preact-redux": "^2.0.2",
-    "proptypes": "^1.1.0"
+    "proptypes": "^1.1.0",
+    "redux-thunk": "^2.2.0"
   }
 }
