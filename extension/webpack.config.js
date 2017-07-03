@@ -29,18 +29,15 @@ module.exports = [{
     }
   },
   module: {
-    rules: [
-      {
-	test: /\.jsx?$/,
-	enforce: 'pre',
-	use: 'source-map-loader'
-      },
-      {
-	test: /\.jsx?$/,
-	exclude: /node_modules/,
-	use: 'babel-loader'
-      }
-    ]
+    rules: [{
+      test: /\.jsx?$/,
+      enforce: 'pre',
+      use: 'source-map-loader'
+    },{
+      test: /\.jsx?$/,
+      exclude: /node_modules/,
+      use: 'babel-loader'
+    }]
   },
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),
