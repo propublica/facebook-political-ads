@@ -7,9 +7,7 @@ let sendAds = function(){
 
   let ads = posts.map((i) =>  parser(i, sponsor)).filter((i) => i);
 
-  chrome.runtime.sendMessage(ads, () => {
-    console.log("Reported " + ads.length + "ads.");
-  });
+  chrome.runtime.sendMessage(ads);
 };
 
 let observer = new MutationObserver(sendAds);

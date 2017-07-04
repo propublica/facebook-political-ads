@@ -1,8 +1,10 @@
 import { h, render } from 'preact';
 import { PropTypes } from 'proptypes';
-import { combineReducers, createStore, connect } from 'redux';
+import { compose, combineReducers, createStore, connect } from 'redux';
 import { Provider } from 'preact-redux';
 import { uniqBy } from 'lodash/uniqBy';
+import { persistState } from 'redux-localstorage';
+
 
 const getMessage = chrome.i18n.getMessage;
 
@@ -84,7 +86,9 @@ const reducer = combineReducers({
   ratings
 });
 
-let store = createStore(reducer);
+const enhancer = compose(persistState());
+
+let store = createStore(reducer, enhancer);
 
 // Utilities
 const getTitle = (html) => {
@@ -210,7 +214,6 @@ Toggler = connect(
   togglerDispatchToProps
 )(Toggler);
 
-
 render(
   <Provider store={store}>
     <div id="popup">
@@ -219,3 +222,6 @@ render(
   </Provider>,
   document.body
 );
+
+// connect to the ratings channel
+chrome.runtime.onMessage(newAds);
