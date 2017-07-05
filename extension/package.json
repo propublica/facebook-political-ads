@@ -20,12 +20,14 @@
     "babel-preset-latest": "^6.24.1",
     "eslint": "^4.1.1",
     "eslint-plugin-react": "^7.1.0",
+    "html-webpack-plugin": "^2.29.0",
     "jsdom": "^11.0.0",
     "redux": "^3.7.1",
     "source-map-loader": "^0.2.1",
     "webpack": "^2.6.1"
   },
   "dependencies": {
+    "copy-webpack-plugin": "^4.0.1",
     "lodash": "^4.17.4",
     "preact": "^8.1.0",
     "preact-redux": "^2.0.2",

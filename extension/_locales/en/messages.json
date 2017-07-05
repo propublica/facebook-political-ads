@@ -1,7 +1,22 @@
 {
-  "extension_name": "Facebook Ad Listener",
-  "extension_description": "",
-  "sponsor_text": "Sponsored",
-  "rate_ads": "Rate Ads",
-  "see_ads": "See Ads"
+  "extension_name": {
+    "message": "Facebook Ad Listener",
+    "description": "Extension name"
+  },
+  "extension_description": {
+    "message":"Tracking ads on Facebook",
+    "description": "Description of the extenstion"
+  },
+  "sponsor_text": {
+    "message": "Sponsored",
+    "description": "The text identifying sponsored ads in a user's timeline."
+  },
+  "rate_ads": {
+    "message": "Rate Ads",
+    "description": "Text for the 'rate ads' button in the extension."
+  },
+  "see_ads": {
+    "message": "See Ads",
+    "description": "Text for the 'see ads' button in the extension."
+  }
 }

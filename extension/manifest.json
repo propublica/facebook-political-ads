@@ -2,12 +2,14 @@
   "manifest_version": 2,
   "name":"__MSG_extension_name__",
   "description":"__MSG_extension_description__",
-  "version": 1.0,
+  "version": "1.0",
   "default_locale": "en",
   "permissions": [],
-  "browser_actions": [],
-  "content_scripts": {
-    "js": "dist/content.js",
-    "matches": ["https://www.facebook.com/*"]
-  }
+  "browser_action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [{
+    "js": ["content.js"],
+    "matches": ["*://*.facebook.com/*"]
+  }]
 }

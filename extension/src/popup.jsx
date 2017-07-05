@@ -224,4 +224,4 @@ render(
 );
 
 // connect to the ratings channel
-chrome.runtime.onMessage(newAds);
+chrome.runtime.onMessage(newRatings);
