@@ -31,7 +31,7 @@
     "lodash": "^4.17.4",
     "preact": "^8.1.0",
     "preact-redux": "^2.0.2",
-    "proptypes": "^1.1.0",
+    "prop-types": "^15.5.10",
     "redux-localstorage": "^0.4.1",
     "redux-thunk": "^2.2.0"
   }

@@ -1,10 +1,9 @@
 import { h, render } from 'preact';
-import { PropTypes } from 'proptypes';
-import { compose, combineReducers, createStore, connect } from 'redux';
-import { Provider } from 'preact-redux';
+import { PropTypes } from 'prop-types';
+import { compose, combineReducers, createStore } from 'redux';
+import { Provider, connect } from 'preact-redux';
 import { uniqBy } from 'lodash/uniqBy';
-import { persistState } from 'redux-localstorage';
-
+import persistState from 'redux-localstorage';
 
 const getMessage = chrome.i18n.getMessage;
 
@@ -224,4 +223,4 @@ render(
 );
 
 // connect to the ratings channel
-chrome.runtime.onMessage(newRatings);
+chrome.runtime.onMessage.addListener(newRatings);

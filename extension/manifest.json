@@ -6,7 +6,7 @@
   "default_locale": "en",
   "permissions": [],
   "browser_action": {
-    "default_popup": "popup.html"
+    "default_popup": "index.html"
   },
   "content_scripts": [{
     "js": ["content.js"],
