@@ -4,6 +4,8 @@ const HTML = fs.readFileSync(__dirname + "/test.html");
 const dom = new JSDOM(HTML);
 const assert = require('assert');
 
+// Not ideal, but we slot in document for the parsers use.
+// It is the easiest way.
 global.document = dom.window.document;
 
 const parser = require('../src/parser.js');
