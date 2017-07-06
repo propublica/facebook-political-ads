@@ -68,9 +68,7 @@ const ratings = (state = [], action) => {
   case ASSIGN_RATING:
     return state.map(rating => {
       if(rating.id == action.id) {
-        return Object.assign({}, rating, {
-          rating: action.value
-        });
+        return { ...rating, rating: action.value };
       }
       return rating;
     });
@@ -131,10 +129,11 @@ const Rating = ({action, id, html}) => (
     </div>
   </div>
 );
-Rating.propTypes = Object.assign({}, Ad.propTypes, {
+Rating.propTypes = {
+  ...Ad.propTypes,
   action: PropTypes.func.isRequired,
   rating: PropTypes.oneOf(Object.values(RatingType)).isRequired,
-});
+};
 
 const Ratings = ({onRatingClick, ratings}) => (
   <div id="ratings">
