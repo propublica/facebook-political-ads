@@ -1,9 +1,12 @@
-const parser = require('../src/parser.js');
 const JSDOM = require('jsdom').JSDOM;
 const fs = require('fs');
 const HTML = fs.readFileSync(__dirname + "/test.html");
 const dom = new JSDOM(HTML);
 const assert = require('assert');
+
+global.document = dom.window.document;
+
+const parser = require('../src/parser.js');
 
 let posts = Array.from(dom.window.document.querySelectorAll(".fbUserContent"))
   .concat(Array.from(dom.window.document.querySelectorAll(".ego_section")));

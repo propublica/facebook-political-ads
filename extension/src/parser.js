@@ -76,18 +76,22 @@ const sidebar = (node, sponsor) => {
   // As before check to see that it actually sponsored
   if(!checkSponsor(node, sponsor)) return false;
 
+  // It is also much easier to grab an id
+  let id = node.querySelector('.ego_unit');
+  if(!id) return false;
+
   // Then we just need to sent the cleaned ad and the ego-fbid
   return {
-    id: node.getAttribute('data-ego-fbid'),
+    id: id.getAttribute("data-ego-fbid"),
     html: cleanAd(node.outerHTML)
   };
 };
 
 // We are careful here to only accept a valid timeline ad or sidebar ad
-module.exports = function(node, sponsor){
-  if(node.classList.contains("fbUserContent")){
+module.exports = function(node, sponsor) {
+  if(node.classList.contains("fbUserContent")) {
     return timeline(node, sponsor);
-  } else if(node.classList.contains('ego_unit')){
+  } else if(node.classList.contains('ego_section')) {
     return sidebar(node, sponsor);
   } else {
     return false;
