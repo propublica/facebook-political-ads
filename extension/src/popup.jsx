@@ -2,7 +2,7 @@ import { h, render } from 'preact';
 import { PropTypes } from 'prop-types';
 import { compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
-import { uniqBy } from 'lodash/uniqBy';
+import uniqBy from 'lodash/uniqBy';
 import persistState from 'redux-localstorage';
 
 const getMessage = chrome.i18n.getMessage;
@@ -31,6 +31,7 @@ const rateAd = (id, rating) => ({
   id: id,
   value: rating
 });
+
 const newAds = (ads) => ({
   type: NEW_ADS,
   value: ads
@@ -91,9 +92,9 @@ let store = createStore(reducer, enhancer);
 
 // Utilities
 const getTitle = (html) => {
-  let node = document.creatElement("div");
+  let node = document.createElement("div");
   node.innerHTML = html;
-  return node.querySelectorAll(".userContent")[0].innerText;
+  return ''; //node.querySelectorAll(".userContent")[0].innerText;
 };
 
 // Views
@@ -106,9 +107,10 @@ const Ad = ({id, html}) => (
   </div>
 );
 Ad.propTypes = {
-  id: PropTypes.string.isRequired,
-  html: PropTypes.string.isRequired
+  html: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired
 };
+
 
 // Ads from the server to show
 const Ads = ({ads}) => (
@@ -117,16 +119,21 @@ const Ads = ({ads}) => (
   </div>
 );
 Ads.propTypes = {
-  ads: PropTypes.arrayOf(PropTypes.shape(Ad.propTypes))
+  ads: PropTypes.arrayOf(PropTypes.shape(Ad.propTypes)).isRequired
 };
 
 // Ads to be rated and sent to the server
-const Rating = ({action, rating}) => (
-  <div className="rating" onClick={() => action(rating.id, true)}/>
+const Rating = ({action, id, html}) => (
+  <div className="rating" onClick={function(){ return action(id, true); }}>
+    <h2>{getTitle(html)}</h2>
+    <div className="ad-container">
+      {html}
+    </div>
+  </div>
 );
-Rating.proptypes = Object.assign({}, Ad.propTypes, {
+Rating.propTypes = Object.assign({}, Ad.propTypes, {
+  action: PropTypes.func.isRequired,
   rating: PropTypes.oneOf(Object.values(RatingType)).isRequired,
-  action: PropTypes.func.isRequired
 });
 
 const Ratings = ({onRatingClick, ratings}) => (
@@ -137,8 +144,8 @@ const Ratings = ({onRatingClick, ratings}) => (
   </div>
 );
 Ratings.propTypes = {
-  ratings: PropTypes.arrayOf(PropTypes.shape(Rating.propTypes)).isRequired,
-  onRatingClick: PropTypes.func.isRequired
+  onRatingClick: PropTypes.func.isRequired,
+  ratings: PropTypes.arrayOf(PropTypes.shape(Rating.propTypes)).isRequired
 };
 
 
@@ -163,32 +170,38 @@ const UnratedRatings = connect(
 
 // Controls which section of tabs to show, defaults to the
 const Toggle = ({type, message, active_tab, onToggleClick}) => (
-  <span className={'toggle' + (active_tab == type ? ' active' : '')}
-    onClick={() => onToggleClick(type)}
-    id="rate-toggle">
+  <span
+    className={'toggle' + (active_tab == type ? ' active' : '')}
+    id="rate-toggle"
+    onClick={function() { onToggleClick(type); }}
+  >
     {getMessage(message)}
   </span>
 );
 const TogglePropType = PropTypes.oneOf(Object.values(ToggleType)).isRequired;
 Toggle.propTypes = {
-  type: TogglePropType,
-  message: PropTypes.string.isRequired,
   active_tab: TogglePropType,
-  onToggleClick: PropTypes.func.isRequired
+  message: PropTypes.string.isRequired,
+  onToggleClick: PropTypes.func.isRequired,
+  type: TogglePropType
 };
 
 // Our Main container.
 let Toggler = ({ads, ratings, active_tab, onToggleClick}) => (
   <div id="toggler">
     <div id="toggles">
-      <Toggle type={ToggleType.ADS}
+      <Toggle
         active_tab={active_tab}
-        message="see_ads" onToggleClick={onToggleClick} />
-      <Toggle type={ToggleType.RATER}
+        message="see_ads" onToggleClick={onToggleClick}
+        type={ToggleType.ADS}
+      />
+      <Toggle
         active_tab={active_tab}
-        message="rate_ads" onToggleClick={onToggleClick} />
+        message="rate_ads" onToggleClick={onToggleClick}
+        type={ToggleType.RATER}
+      />
     </div>
-    <div id="ads">
+    <div id="container">
       {active_tab == ToggleType.ADS ?
         <Ads ads={ads} /> :
         <UnratedRatings ratings={ratings} />}
@@ -196,10 +209,10 @@ let Toggler = ({ads, ratings, active_tab, onToggleClick}) => (
   </div>
 );
 Toggler.propTypes = {
-  ads: Ads.propTypes.ads,
-  ratings: Ratings.propTypes.ratings,
   active_tab: Toggle.propTypes.active_tab,
-  onToggleClick: Toggle.propTypes.onToggleClick
+  ads: Ads.propTypes.ads,
+  onToggleClick: Toggle.propTypes.onToggleClick,
+  ratings: Ratings.propTypes.ratings
 };
 
 const togglerDispatchToProps = (dispatch) => ({
@@ -223,4 +236,4 @@ render(
 );
 
 // connect to the ratings channel
-chrome.runtime.onMessage.addListener(newRatings);
+chrome.runtime.onMessage.addListener((ads) => store.dispatch(newRatings(ads)));

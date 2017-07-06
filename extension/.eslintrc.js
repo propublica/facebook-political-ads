@@ -9,7 +9,10 @@ module.exports = {
   "globals":{
     "chrome": true
   },
-  "extends": ["eslint:recommended", "plugin:react/recommended"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/all"
+  ],
   "parserOptions": {
     "ecmaFeatures": {
       "experimentalObjectRestSpread": true,
@@ -22,10 +25,8 @@ module.exports = {
   ],
   "rules": {
     "no-console":0,
-    "indent": [
-      "error",
-      2
-    ],
+    "indent": ["error", 2],
+    "react/jsx-indent": ["error", 2],
     "linebreak-style": [
       "error",
       "unix"
@@ -33,7 +34,11 @@ module.exports = {
     "semi": [
       "error",
       "always"
-    ]
+    ],
+    "react/no-multi-comp":0,
+    "react/jsx-max-props-per-line":0,
+    "react/forbid-foreign-prop-types":0,
+    "react/jsx-indent-props": ["error", 2]
   },
   "settings":{
     "react":{

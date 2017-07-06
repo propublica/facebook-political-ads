@@ -1,7 +1,7 @@
 // This function cleans all the elements that could leak user data
 // before sending to the server. It also removes any attributes that
 // could have personal data so we end up with a clean dom tree.
-let cleanAd = (html) => {
+const cleanAd = (html) => {
   let node = document.createElement("div");
   node.innerHTML = html;
   // remove likes and shares
@@ -40,15 +40,15 @@ let cleanAd = (html) => {
   return node.innerHTML.replace('&amp;', '&');
 };
 
-// We are careful here to only accept a valid timeline ad
-module.exports = function(node, sponsor){
-  // First we check that it does have a valid class
-  if(!node.classList.value.startsWith("fbUserContent")) return false;
-
-  // Then we see if it is actually a sponsored post
-  if(!Array.from(node.querySelectorAll("a")).some((it) => {
+const checkSponsor = (node, sponsor) => {
+  return Array.from(node.querySelectorAll("a")).some((it) => {
     return it.textContent == sponsor;
-  })) return false;
+  });
+};
+
+const timeline = (node, sponsor) => {
+  // First we check if it is actually a sponsored post
+  if(!checkSponsor(node, sponsor)) return false;
 
   // And then we try to grab the parent container that has a hyperfeed id
   let parent = node;
@@ -67,6 +67,29 @@ module.exports = function(node, sponsor){
   // Finally we have something to save.
   return {
     id: parent.getAttribute("id"),
-    ad: cleanAd(node.children[0].outerHTML)
+    html: cleanAd(node.children[0].outerHTML)
   };
+};
+
+// Sidebar ads are much simpler
+const sidebar = (node, sponsor) => {
+  // As before check to see that it actually sponsored
+  if(!checkSponsor(node, sponsor)) return false;
+
+  // Then we just need to sent the cleaned ad and the ego-fbid
+  return {
+    id: node.getAttribute('data-ego-fbid'),
+    html: cleanAd(node.outerHTML)
+  };
+};
+
+// We are careful here to only accept a valid timeline ad or sidebar ad
+module.exports = function(node, sponsor){
+  if(node.classList.contains("fbUserContent")){
+    return timeline(node, sponsor);
+  } else if(node.classList.contains('ego_unit')){
+    return sidebar(node, sponsor);
+  } else {
+    return false;
+  }
 };
