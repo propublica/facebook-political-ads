@@ -18,5 +18,13 @@
   "see_ads": {
     "message": "See Ads",
     "description": "Text for the 'see ads' button in the extension."
+  },
+  "political": {
+    "message": "Political Ad",
+    "description": "Label for political radio button"
+  },
+  "normal": {
+    "message": "Normal Ad",
+    "description": "Label for normal radio button"
   }
 }

@@ -37,6 +37,7 @@
     "preact-redux": "^2.0.2",
     "prop-types": "^15.5.10",
     "redux-localstorage": "^0.4.1",
+    "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0"
   }
 }
