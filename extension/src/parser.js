@@ -1,15 +1,25 @@
 // This function cleans all the elements that could leak user data
 // before sending to the server. It also removes any attributes that
 // could have personal data so we end up with a clean dom tree.
+const selectors = [
+  'video',
+  'input',
+  'button',
+  'a[href=""]',
+  '.accessible_elem',
+  '.uiLikePagebutton',
+  '.uiPopOver'
+].join(', ');
+
 const cleanAd = (html) => {
   let node = document.createElement("div");
   node.innerHTML = html;
-  // remove likes and shares
-  Array.from(node.querySelectorAll(".commentable_item"))
-    .forEach(i => i.parentElement.removeChild(i));
-  // remove like buttons
-  Array.from(node.querySelectorAll("button"))
-    .forEach(i => i.parentElement.removeChild(i));
+
+  // We're not saving video ads for now, we don't need buttons, hidden forms,
+  // or like links
+  Array.from(node.querySelectorAll(selectors))
+    .forEach((i) => i.parentElement.removeChild(i));
+
   // remove attributes
   const killAttrs = (node) => {
     Array.from(node.attributes).forEach(attr => {
@@ -64,6 +74,11 @@ const timeline = (node, sponsor) => {
   // Also if there's nothing to save that's an error
   if(!node.children) return false;
 
+  // Check to see that we have the innermost fbUserContent, this cuts out like's
+  // and shares.
+  if(node.querySelector('.fbUserContent'))
+    node = node.querySelector('.fbUserContent');
+
   // Finally we have something to save.
   return {
     id: parent.getAttribute("id"),
@@ -96,4 +111,5 @@ module.exports = function(node, sponsor) {
   } else {
     return false;
   }
+
 };
