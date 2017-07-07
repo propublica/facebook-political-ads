@@ -1,9 +1,12 @@
 import { h, render } from 'preact';
 import { PropTypes } from 'prop-types';
-import { compose, combineReducers, createStore } from 'redux';
+import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
 import uniqBy from 'lodash/uniqBy';
 import persistState from 'redux-localstorage';
+import { createLogger } from 'redux-logger';
+
+
 // styles
 import "../css/styles.css";
 
@@ -28,6 +31,7 @@ const ASSIGN_RATING = "assign_rating";
 
 // Actions
 const toggle = (value) => ({type: TOGGLE_TAB, value});
+
 const rateAd = (id, rating) => ({
   type: ASSIGN_RATING,
   id: id,
@@ -38,6 +42,7 @@ const newAds = (ads) => ({
   type: NEW_ADS,
   value: ads
 });
+
 const newRatings = (ratings) => ({
   type: NEW_RATINGS,
   value: ratings
@@ -86,7 +91,8 @@ const reducer = combineReducers({
   ratings
 });
 
-const enhancer = compose(persistState());
+const logger = createLogger();
+const enhancer = compose(persistState(), applyMiddleware(logger));
 let store = createStore(reducer, enhancer);
 
 // Ad utilities
@@ -164,30 +170,34 @@ Ads.propTypes = {
 
 
 // Ads to be rated and sent to the server
-const Rating = ({action, advertiser, id, image, content, rating = RatingType.NORMAL}) => (
-  <div className="rating" onClick={function(){ return action(id, rating); }}>
+const Rating = ({action, advertiser, id, image, content}) => (
+  <div className="rating">
     <Ad advertiser={advertiser} content={content} id={id} image={image} />
-    <div className="rater">
+    <form className="rater">
       <input
-        id={'political_' + id}
+        id={'normal' + id}
+        name="political"
+        onClick={function(){ return action(id, RatingType.NORMAL); }}
+        type="radio"
+      />
+      <label htmlFor={'normal' + id}>
+        {getMessage('normal')}
+      </label>
+      <input
+        id={'political' + id}
+        name="political"
         onClick={function(){ return action(id, RatingType.POLITICAL); }}
         type="radio"
       />
-      <input
-        onClick={function(){ return action(id, RatingType.POLITICAL); }}
-        text="Normal"
-        type="radio"
-      />
-    </div>
+      <label htmlFor={'political' + id}>
+        {getMessage('political')}
+      </label>
+    </form>
   </div>
 );
-Rating.defaultProps = {
-  rating: RatingType.NORMAL
-};
 Rating.propTypes = {
   ...Ad.propTypes,
-  action: PropTypes.func.isRequired,
-  rating: PropTypes.oneOf(Object.values(RatingType))
+  action: PropTypes.func.isRequired
 };
 
 
@@ -204,7 +214,7 @@ Ratings.propTypes = {
 };
 
 const getUnratedRatings = (ratings) => (
-  ratings.filter(rating => !("rated" in rating))
+  ratings.filter(rating => !("rating" in rating))
 );
 
 const ratingsStateToProps = (state) => ({
@@ -223,51 +233,44 @@ const UnratedRatings = connect(
 )(Ratings);
 
 // Controls which section of tabs to show, defaults to the
-const Toggle = ({type, message, active_tab, onToggleClick}) => (
-  <span
-    className={'toggle' + (active_tab == type ? ' active' : '')}
-    id="rate-toggle"
+const Toggle = ({type, message, active, onToggleClick}) => (
+  <div
+    className={'toggle' + (active === type ? ' active' : '')}
     onClick={function() { onToggleClick(type); }}
   >
     {getMessage(message)}
-  </span>
+  </div>
 );
 const TogglePropType = PropTypes.oneOf(Object.values(ToggleType));
 Toggle.propTypes = {
-  active_tab: TogglePropType.isRequired,
+  active: TogglePropType.isRequired,
   message: PropTypes.string.isRequired,
   onToggleClick: PropTypes.func.isRequired,
   type: TogglePropType.isRequired
 };
 
 // Our Main container.
-let Toggler = ({ads, ratings, active_tab, onToggleClick}) => (
+let Toggler = ({ads, ratings, active, onToggleClick}) => (
   <div id="toggler">
-    <div id="toggles">
+    <div id="tabs">
       <Toggle
-        active_tab={active_tab}
+        active={active}
         message="see_ads" onToggleClick={onToggleClick}
         type={ToggleType.ADS}
       />
       <Toggle
-        active_tab={active_tab}
+        active={active}
         message="rate_ads" onToggleClick={onToggleClick}
         type={ToggleType.RATER}
       />
     </div>
     <div id="container">
-      {active_tab == ToggleType.ADS ?
+      {active === ToggleType.ADS ?
         <Ads ads={ads} /> :
         <UnratedRatings ratings={ratings} />}
     </div>
   </div>
 );
-Toggler.propTypes = {
-  active_tab: Toggle.propTypes.active_tab,
-  ads: Ads.propTypes.ads,
-  onToggleClick: Toggle.propTypes.onToggleClick,
-  ratings: Ratings.propTypes.ratings
-};
 
 const togglerDispatchToProps = (dispatch) => ({
   onToggleClick: (type) => {
@@ -276,9 +279,15 @@ const togglerDispatchToProps = (dispatch) => ({
 });
 
 Toggler = connect(
-  null,
+  (state) => (state),
   togglerDispatchToProps
 )(Toggler);
+Toggler.propTypes = {
+  active: TogglePropType,
+  ads: Ads.propTypes.ads,
+  onToggleClick: Toggle.propTypes.onToggleClick,
+  ratings: Ratings.propTypes.ratings
+};
 
 render(
   <Provider store={store}>
