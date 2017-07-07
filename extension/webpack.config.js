@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const outdir = path.resolve(__dirname, 'dist');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const ENV = process.env.NODE_ENV || 'development';
 
 module.exports = [{
@@ -39,9 +40,16 @@ module.exports = [{
       test: /\.jsx?$/,
       exclude: /node_modules/,
       use: 'babel-loader'
+    },{
+      test: /\.css$/,
+      use: ExtractTextPlugin.extract({
+        fallback: "style-loader",
+        use: "css-loader"
+      })
     }]
   },
   plugins: [
+    new ExtractTextPlugin("styles.css"),
     new webpack.NoEmitOnErrorsPlugin(),
     new HTMLWebpackPlugin({
       title: "__MSG_extension_name__"

@@ -4,6 +4,8 @@ import { compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
 import uniqBy from 'lodash/uniqBy';
 import persistState from 'redux-localstorage';
+// styles
+import "../css/styles.css";
 
 const getMessage = chrome.i18n.getMessage;
 
@@ -85,55 +87,109 @@ const reducer = combineReducers({
 });
 
 const enhancer = compose(persistState());
-
 let store = createStore(reducer, enhancer);
 
-// Utilities
-const getTitle = (html) => {
-  let node = document.createElement("div");
-  node.innerHTML = html;
-  return ''; //node.querySelectorAll(".userContent")[0].innerText;
+// Ad utilities
+
+let div = document.createElement('div');
+const query = (html, selector) => {
+  div.innerHTML = html;
+  return div.querySelector(selector);
 };
 
+const getImage = (html) => {
+  let img = query(html, 'img');
+  if(img)
+    return img.getAttribute('src');
+};
+
+const getContent = (html) => {
+  let p = query(html, '.userContent p');
+  if(p)
+    return p.innerHTML;
+};
+
+const getAdvertiser = (html) => {
+  let a = query(html, 'h5 a') || query(html, 'h6 a');
+  if(a)
+    return a.innerText;
+};
+
+const insertAdFields = (ads) => (
+  ads.map((ad) => ({
+    ...ad,
+    image: getImage(ad.html),
+    content: getContent(ad.html),
+    advertiser: getAdvertiser(ad.html)
+  }))
+);
+
 // Views
-const Ad = ({id, html}) => (
+const Ad = ({advertiser, bigImage, content, id, image}) => (
   <div className="ad" id={id}>
-    <h2>{getTitle(html)}</h2>
-    <div>
-      {html}
+    <div className="chiclet">
+      {image ? <img src={image} /> : ''}
     </div>
+    <div className="ad-display">
+      <div className="advertiser">{advertiser}</div>
+      <div className="ad-content" dangerouslySetInnerHTML={{__html:content}} />
+    </div>
+    {bigImage ? <img className="" src={bigImage} /> : ''}
   </div>
 );
+Ad.defaultProps = {
+  bigImage: null
+};
 Ad.propTypes = {
-  html: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired
+  advertiser: PropTypes.string.isRequired,
+  bigImage: PropTypes.string,
+  content: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  image: PropTypes.string.isRequired
 };
 
 
 // Ads from the server to show
-const Ads = ({ads}) => (
+let Ads = ({ads}) => (
   <div id="ads">
     {ads.map(ad => <Ad key={ad.id} {...ad} />)}
   </div>
 );
+Ads = connect((state) => ({
+  ads: insertAdFields(state.ads)
+}))(Ads);
 Ads.propTypes = {
   ads: PropTypes.arrayOf(PropTypes.shape(Ad.propTypes)).isRequired
 };
 
+
 // Ads to be rated and sent to the server
-const Rating = ({action, id, html}) => (
-  <div className="rating" onClick={function(){ return action(id, true); }}>
-    <h2>{getTitle(html)}</h2>
-    <div className="ad-container">
-      {html}
+const Rating = ({action, advertiser, id, image, content, rating = RatingType.NORMAL}) => (
+  <div className="rating" onClick={function(){ return action(id, rating); }}>
+    <Ad advertiser={advertiser} content={content} id={id} image={image} />
+    <div className="rater">
+      <input
+        id={'political_' + id}
+        onClick={function(){ return action(id, RatingType.POLITICAL); }}
+        type="radio"
+      />
+      <input
+        onClick={function(){ return action(id, RatingType.POLITICAL); }}
+        text="Normal"
+        type="radio"
+      />
     </div>
   </div>
 );
+Rating.defaultProps = {
+  rating: RatingType.NORMAL
+};
 Rating.propTypes = {
   ...Ad.propTypes,
   action: PropTypes.func.isRequired,
-  rating: PropTypes.oneOf(Object.values(RatingType)).isRequired,
+  rating: PropTypes.oneOf(Object.values(RatingType))
 };
+
 
 const Ratings = ({onRatingClick, ratings}) => (
   <div id="ratings">
@@ -147,24 +203,23 @@ Ratings.propTypes = {
   ratings: PropTypes.arrayOf(PropTypes.shape(Rating.propTypes)).isRequired
 };
 
-
 const getUnratedRatings = (ratings) => (
   ratings.filter(rating => !("rated" in rating))
 );
 
-const ratingStateToProps = (state) => ({
-  ratings: getUnratedRatings(state.ratings)
+const ratingsStateToProps = (state) => ({
+  ratings: insertAdFields(getUnratedRatings(state.ratings))
 });
 
-const ratingDispatchToProps = (dispatch) => ({
+const ratingsDispatchToProps = (dispatch) => ({
   onRatingClick: (id, rating) => {
     dispatch(rateAd(id, rating));
   }
 });
 
 const UnratedRatings = connect(
-  ratingStateToProps,
-  ratingDispatchToProps
+  ratingsStateToProps,
+  ratingsDispatchToProps
 )(Ratings);
 
 // Controls which section of tabs to show, defaults to the
@@ -177,12 +232,12 @@ const Toggle = ({type, message, active_tab, onToggleClick}) => (
     {getMessage(message)}
   </span>
 );
-const TogglePropType = PropTypes.oneOf(Object.values(ToggleType)).isRequired;
+const TogglePropType = PropTypes.oneOf(Object.values(ToggleType));
 Toggle.propTypes = {
-  active_tab: TogglePropType,
+  active_tab: TogglePropType.isRequired,
   message: PropTypes.string.isRequired,
   onToggleClick: PropTypes.func.isRequired,
-  type: TogglePropType
+  type: TogglePropType.isRequired
 };
 
 // Our Main container.
@@ -221,7 +276,7 @@ const togglerDispatchToProps = (dispatch) => ({
 });
 
 Toggler = connect(
-  (state) => state,
+  null,
   togglerDispatchToProps
 )(Toggler);
 
