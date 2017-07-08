@@ -1,0 +1,153 @@
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol, ul {
+  list-style: none;
+}
+
+blockquote, q {
+  quotes: none;
+}
+
+blockquote::before, blockquote::after,
+q::before, q::after {
+  content: '';
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+body {
+  width: 400px;
+  height: 600px;
+  font-family: -apple-system, BlinkMacSystemFont,
+    'avenir next', avenir,
+    helvetica, 'helvetica neue',
+    ubuntu,
+    roboto, noto,
+    'segoe ui', arial,
+    sans-serif;
+  font-size: 100%;
+  line-height: 1.5;
+  font-weight: 200;
+  background-color: #eceff1;
+}
+
+#tabs {
+  background-color: #1976d2;
+  color: #e3f2fd;
+  position: sticky;
+  width: 100%;
+  display: flex;
+  top: 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.26);
+}
+
+.toggle {
+  box-sizing: border-box;
+  cursor: pointer;
+  flex-grow: 1;
+  padding: 0.6rem 0.6rem 0.4rem;
+  height: 100%;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  font-weight: normal;
+}
+
+.toggle:hover {
+  background-color: #90caf9;
+  color: #212121;
+  border-bottom: 0.2rem solid #90caf9;
+}
+
+.toggle.active {
+  border-bottom: 0.2rem solid #ffeb3b;
+}
+
+.rating {
+  font-size: 0.7rem;
+  background-color: #fff;
+  margin: 0.4rem;
+  padding: 0.2rem;
+  border: 1px solid #efefef;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.rating:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+}
+
+.rating input:focus {
+  outline: none;
+}
+
+.ad {
+  background-color: #fff;
+  border-bottom: 1px solid #efefef;
+  font-size: 0.75rem;
+  display: flow-root;
+  transition: box-shadow 1s;
+}
+
+.ad-content a {
+  pointer-events: none;
+  cursor: default;
+  color: #1f5881;
+}
+
+.ad .advertiser {
+  font-weight: 500;
+}
+
+.ad .chiclet {
+  float: left;
+  margin-right: 0.4rem;
+  height: 100%;
+}
+
+.ad .chiclet img {
+  min-width: 50px;
+}
+
+a:focus {
+  outline: none;
+}
