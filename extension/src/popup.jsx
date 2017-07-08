@@ -6,6 +6,8 @@ import uniqBy from 'lodash/uniqBy';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
 
+import { mergeAds, getUnratedRatings} from 'utils';
+
 
 // styles
 import "../css/styles.css";
@@ -58,11 +60,10 @@ const active = (state = ToggleType.ADS, action) => {
   }
 };
 
-const uniqueAds = (new_ads, ads) => uniqBy(new_ads.concat(ads), 'id');
 const ads = (state = [], action) => {
   switch(action.type) {
   case NEW_ADS:
-    return uniqueAds(action.value, state);
+    return mergeAds(state, action.value);
   default:
     return state;
   }
@@ -71,7 +72,7 @@ const ads = (state = [], action) => {
 const ratings = (state = [], action) => {
   switch(action.type) {
   case NEW_RATINGS:
-    return uniqueAds(action.value, state);
+    return uniqBy(state.concat(action.value), 'id');
   case ASSIGN_RATING:
     return state.map(rating => {
       if(rating.id == action.id) {
@@ -84,19 +85,21 @@ const ratings = (state = [], action) => {
   }
 };
 
-// The main app!
+// The main reducer!
 const reducer = combineReducers({
   active,
   ads,
   ratings
 });
 
-const logger = createLogger();
-const enhancer = compose(persistState(), applyMiddleware(logger));
+let middleware = [persistState()];
+if(process.env.NODE_ENV === 'development') {
+  middleware.push(applyMiddleware(createLogger()));
+}
+const enhancer = compose(...middleware);
 let store = createStore(reducer, enhancer);
 
 // Ad utilities
-
 let div = document.createElement('div');
 const query = (html, selector) => {
   div.innerHTML = html;
@@ -110,13 +113,13 @@ const getImage = (html) => {
 };
 
 const getContent = (html) => {
-  let p = query(html, '.userContent p');
+  let p = query(html, '.userContent p') || query(html, 'span');
   if(p)
     return p.innerHTML;
 };
 
 const getAdvertiser = (html) => {
-  let a = query(html, 'h5 a') || query(html, 'h6 a');
+  let a = query(html, 'h5 a') || query(html, 'h6 a') || query(html, 'strong');
   if(a)
     return a.innerText;
 };
@@ -131,7 +134,7 @@ const insertAdFields = (ads) => (
 );
 
 // Views
-const Ad = ({advertiser, bigImage, content, id, image}) => (
+const Ad = ({advertiser, content, id, image}) => (
   <div className="ad" id={id}>
     <div className="chiclet">
       {image ? <img src={image} /> : ''}
@@ -140,15 +143,10 @@ const Ad = ({advertiser, bigImage, content, id, image}) => (
       <div className="advertiser">{advertiser}</div>
       <div className="ad-content" dangerouslySetInnerHTML={{__html:content}} />
     </div>
-    {bigImage ? <img className="" src={bigImage} /> : ''}
   </div>
 );
-Ad.defaultProps = {
-  bigImage: null
-};
 Ad.propTypes = {
   advertiser: PropTypes.string.isRequired,
-  bigImage: PropTypes.string,
   content: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   image: PropTypes.string.isRequired
@@ -174,9 +172,9 @@ const Rating = ({action, advertiser, id, image, content}) => (
   <div className="rating">
     <Ad advertiser={advertiser} content={content} id={id} image={image} />
     <form className="rater">
+      {getMessage('rating_question')}
       <input
         id={'normal' + id}
-        name="political"
         onClick={function(){ return action(id, RatingType.NORMAL); }}
         type="radio"
       />
@@ -185,7 +183,6 @@ const Rating = ({action, advertiser, id, image, content}) => (
       </label>
       <input
         id={'political' + id}
-        name="political"
         onClick={function(){ return action(id, RatingType.POLITICAL); }}
         type="radio"
       />
@@ -213,9 +210,6 @@ Ratings.propTypes = {
   ratings: PropTypes.arrayOf(PropTypes.shape(Rating.propTypes)).isRequired
 };
 
-const getUnratedRatings = (ratings) => (
-  ratings.filter(rating => !("rating" in rating))
-);
 
 const ratingsStateToProps = (state) => ({
   ratings: insertAdFields(getUnratedRatings(state.ratings))
@@ -300,3 +294,6 @@ render(
 
 // connect to the ratings channel
 chrome.runtime.onMessage.addListener((ads) => store.dispatch(newRatings(ads)));
+store.subscribe(() => {
+  chrome.runtime.sendMessage(store.getState().ratings);
+});

@@ -8,7 +8,9 @@ const selectors = [
   'a[href=""]',
   '.accessible_elem',
   '.uiLikePagebutton',
-  '.uiPopOver'
+  '.uiPopOver',
+  '.uiCloseButton',
+  '.uiChevronSelectorButton'
 ].join(', ');
 
 const cleanAd = (html) => {
@@ -87,17 +89,13 @@ const timeline = (node, sponsor) => {
 };
 
 // Sidebar ads are much simpler
-const sidebar = (node, sponsor) => {
-  // As before check to see that it actually sponsored
-  if(!checkSponsor(node, sponsor)) return false;
-
-  // It is also much easier to grab an id
-  let id = node.querySelector('.ego_unit');
-  if(!id) return false;
+const sidebar = (node) => {
+  // TODO:  we still need to make sure we are in a sponsored box;
+  return false;
 
   // Then we just need to sent the cleaned ad and the ego-fbid
   return {
-    id: id.getAttribute("data-ego-fbid"),
+    id: node.getAttribute("data-ego-fbid"),
     html: cleanAd(node.outerHTML)
   };
 };
@@ -106,8 +104,8 @@ const sidebar = (node, sponsor) => {
 module.exports = function(node, sponsor) {
   if(node.classList.contains("fbUserContent")) {
     return timeline(node, sponsor);
-  } else if(node.classList.contains('ego_section')) {
-    return sidebar(node, sponsor);
+  } else if(node.classList.contains('ego_unit')) {
+    return sidebar(node);
   } else {
     return false;
   }

@@ -17,6 +17,16 @@ module.exports = [{
   },
   devtool: 'source-map'
 },{
+  entry: "./src/background.js",
+  output: {
+    filename: "background.js",
+    path: outdir
+  },
+  resolve: {
+    modules: ["src", "node_modules"]
+  },
+  devtool: 'source-map'
+},{
   context: path.resolve(__dirname, "src"),
   entry: "./popup.jsx",
   output: {
