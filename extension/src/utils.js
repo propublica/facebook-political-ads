@@ -9,5 +9,4 @@ const getUnratedRatings = (ratings) => (
   ratings.filter(rating => !("rating" in rating))
 );
 
-
 export {mergeAds, getUnratedRatings};
