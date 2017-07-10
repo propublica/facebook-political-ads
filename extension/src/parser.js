@@ -53,8 +53,8 @@ const cleanAd = (html) => {
 };
 
 const checkSponsor = (node, sponsor) => {
-  return Array.from(node.querySelectorAll("a")).some((it) => {
-    return it.textContent == sponsor;
+  return Array.from(node.querySelectorAll("a")).some((a) => {
+    return a.textContent == sponsor;
   });
 };
 
@@ -74,7 +74,7 @@ const timeline = (node, sponsor) => {
   if(!parent) return false;
 
   // Also if there's nothing to save that's an error
-  if(!node.children) return false;
+  if(node.children.length === 0) return false;
 
   // Check to see that we have the innermost fbUserContent, this cuts out like's
   // and shares.
@@ -88,10 +88,23 @@ const timeline = (node, sponsor) => {
   };
 };
 
-// Sidebar ads are much simpler
-const sidebar = (node) => {
-  // TODO:  we still need to make sure we are in a sponsored box;
-  return false;
+// Sidebar ads are a bit more complicated.
+const sidebar = (node, sponsor) => {
+  // Although first we still need to make sure we are in a sponsored box;
+  let parent = node;
+  while(parent) {
+    if(checkSponsor(parent, sponsor)) break;
+    parent = parent.parentElement;
+  }
+
+  // As before it is an error if we haven't found a sponsor node.
+  if(!parent.classList.contains("ego_section")) return false;
+
+  // Sanity check to make sure we have a salvageable id
+  if(!node.hasAttribute("data-ego-fbid")) return false;
+
+  // and we have childnodes
+  if(!node.children.length === 0) return false;
 
   // Then we just need to sent the cleaned ad and the ego-fbid
   return {
@@ -105,7 +118,7 @@ module.exports = function(node, sponsor) {
   if(node.classList.contains("fbUserContent")) {
     return timeline(node, sponsor);
   } else if(node.classList.contains('ego_unit')) {
-    return sidebar(node);
+    return sidebar(node, sponsor);
   } else {
     return false;
   }

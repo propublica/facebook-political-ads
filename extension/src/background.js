@@ -1,5 +1,5 @@
-chrome.runtime.onMessage.addListener((ads) => {
-  chrome.browserAction.setBadgeText({
-    text: ads.filter(rating => !("rating" in rating)).length + ''
+chrome.runtime.onMessage.addListener(() => {
+  chrome.browserAction.setBadgeBackgroundColor({
+    color: "#1976d2"
   });
 });
