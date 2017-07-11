@@ -6,9 +6,6 @@ import uniqBy from 'lodash/uniqBy';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
 
-import { mergeAds, getUnratedRatings} from 'utils';
-
-
 // styles
 import "../css/styles.css";
 
@@ -100,6 +97,26 @@ const enhancer = compose(...middleware);
 let store = createStore(reducer, enhancer);
 
 // Ad utilities
+const mergeAds = (ads, newAds) => {
+  let ids = new Map(ads.map(ad => [ad.id, ad]));
+  let merged = newAds.map(ad => {
+    if(ids.has(ad.id)) {
+      let old = ids.get(ad.id);
+      ids.delete(ad.id);
+      return Object.assign({}, old, ad);
+    } else {
+      return ad;
+    }
+  });
+  return merged.concat(ids.values());
+};
+
+const getUnratedRatings = (ratings) => (
+  ratings.filter(rating => !("rating" in rating))
+);
+
+
+
 let div = document.createElement('div');
 const query = (html, selector) => {
   div.innerHTML = html;
@@ -294,3 +311,4 @@ render(
 
 // connect to the ratings channel
 chrome.runtime.onMessage.addListener((ads) => store.dispatch(newRatings(ads)));
+store.addListener(() => chrome.runtime.sendMessage(store.getState().ads));

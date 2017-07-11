@@ -1,16 +1,11 @@
 import parser from 'parser';
 import throttle from 'lodash/throttle';
-import {mergeAds} from 'utils';
-
-
-let ads = [];
 
 const sendAds = function(){
   let posts = Array.from(document.querySelectorAll(".fbUserContent"))
     .concat(Array.from(document.querySelectorAll(".ego_unit")));
   let sponsor = chrome.i18n.getMessage("sponsor_text");
-  let newAds = posts.map((i) =>  parser(i, sponsor)).filter((i) => i);
-  ads = mergeAds(newAds, ads);
+  let ads = posts.map((i) => parser(i, sponsor)).filter((i) => i);
   chrome.runtime.sendMessage(ads);
 };
 

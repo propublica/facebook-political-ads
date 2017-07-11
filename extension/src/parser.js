@@ -98,7 +98,9 @@ const sidebar = (node, sponsor) => {
   }
 
   // As before it is an error if we haven't found a sponsor node.
-  if(!parent.classList.contains("ego_section")) return false;
+  if(!(parent &&
+       parent.classList &&
+       parent.classList.contains("ego_section"))) return false;
 
   // Sanity check to make sure we have a salvageable id
   if(!node.hasAttribute("data-ego-fbid")) return false;
