@@ -1,6 +1,6 @@
 use super::schema::ads;
 
-#[derive(Queryable)]
+#[derive(Queryable, Debug)]
 pub struct Ad {
     pub id: String,
     pub html: String,
