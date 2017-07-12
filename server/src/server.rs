@@ -1,7 +1,7 @@
 use diesel;
 use dotenv::dotenv;
 use futures::future;
-use futures_cpupool::CpuFuture;
+use futures_cpupool::{CpuFuture, CpuPool};
 use futures::future::{FutureResult, BoxFuture, Either};
 use futures::{Future, Stream};
 use hyper;
@@ -12,16 +12,19 @@ use pretty_env_logger;
 use serde_json;
 use r2d2;
 use std::env;
+use std::io;
 use std::string;
-use super::{DB_POOL, THREAD_POOL};
 
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 
 use r2d2_diesel::ConnectionManager;
-use r2d2::Pool;
+use r2d2::{Pool, Config};
 
-pub struct AdServer;
+pub struct AdServer {
+    db_pool: Pool<ConnectionManager<PgConnection>>,
+    pool: CpuPool,
+}
 
 #[derive(Deserialize)]
 struct AdPost<'a> {
@@ -30,13 +33,13 @@ struct AdPost<'a> {
     political: bool,
 }
 
-
 #[derive(Debug)]
 pub enum InsertError {
     Timeout(r2d2::GetTimeout),
     DataBase(diesel::result::Error),
     JSON(serde_json::Error),
     String(string::FromUtf8Error),
+    Hyper(hyper::Error),
 }
 
 impl Service for AdServer {
@@ -63,24 +66,31 @@ impl Service for AdServer {
 
 impl AdServer {
     fn process_ad(&self, req: Request) -> BoxFuture<Response, hyper::Error> {
-        let save = req.body().concat2().map(move |msg| AdServer::save_ad(msg));
-        save.map(|_| {
-            warn!("wat");
-            Response::new()
-        }).boxed()
+        let db_pool = self.db_pool.clone();
+        let pool = self.pool.clone();
+        req.body()
+            .concat2()
+            .then(move |msg| {
+                pool.spawn_fn(move || match AdServer::save_ad(msg, db_pool) {
+                    Ok(r) => Ok(r),
+                    Err(e) => {
+                        warn!("{:?}", e);
+                        Ok(Response::new().with_status(StatusCode::BadRequest))
+                    }
+                })
+            })
+            .boxed()
     }
 
-    fn save_ad(msg: Chunk) -> CpuFuture<Ad, InsertError> {
-        THREAD_POOL.spawn_fn(move || AdServer::create_ad(msg, DB_POOL.clone()))
-    }
-
-    fn create_ad(
-        msg: Chunk,
-        pool: Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<Ad, InsertError> {
+    fn save_ad(
+        msg: Result<Chunk, hyper::Error>,
+        db_pool: Pool<ConnectionManager<PgConnection>>,
+    ) -> Result<Response, InsertError> {
         use schema::ads;
-        warn!("Inserting ad {:?}", String::from_utf8(msg.to_vec()));
-        let string = String::from_utf8(msg.to_vec()).map_err(InsertError::String)?;
+        let bytes = msg.map_err(InsertError::Hyper)?;
+        let string = String::from_utf8(bytes.to_vec()).map_err(
+            InsertError::String,
+        )?;
 
         let ad: AdPost = serde_json::from_str(&string).map_err(InsertError::JSON)?;
 
@@ -91,13 +101,13 @@ impl AdServer {
             not_political: if !ad.political { 1 } else { 0 },
         };
 
-        let connection = pool.get().map_err(InsertError::Timeout)?;
-        let ad: Ad = diesel::insert(&ad)
+        let connection = db_pool.get().map_err(InsertError::Timeout)?;
+        let _: Ad = diesel::insert(&ad)
             .into(ads::table)
             .get_result(&*connection)
             .map_err(InsertError::DataBase)?;
 
-        Ok(ad)
+        Ok(Response::new())
     }
 
     pub fn start() {
@@ -106,7 +116,23 @@ impl AdServer {
         let addr = env::var("HOST").expect("HOST must be set").parse().expect(
             "Error parsing HOST",
         );
-        let server = Http::new().bind(&addr, || Ok(AdServer)).unwrap();
+
+        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let config = Config::default();
+        let manager = ConnectionManager::<PgConnection>::new(database_url);
+        let db_pool = Pool::new(config, manager).expect("Failed to create pool.");
+
+        let pool = CpuPool::new_num_cpus();
+
+        let server = Http::new()
+            .bind(&addr, move || {
+                Ok(AdServer {
+                    pool: pool.clone(),
+                    db_pool: db_pool.clone(),
+                })
+            })
+            .unwrap();
+
         println!(
             "Listening on http://{} with 1 thread.",
             server.local_addr().unwrap()
@@ -119,6 +145,6 @@ impl AdServer {
 mod tests {
     #[test]
     fn it_inserts_an_ad() {
-        AdServer::create_ad(Chunk::new)
+        //   AdServer::create_ad(Chunk::new)
     }
 }
