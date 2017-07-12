@@ -27,6 +27,7 @@ const TOGGLE_TAB = "toggle_tab";
 const NEW_ADS = "new_ads";
 const NEW_RATINGS = "new_ratings";
 const ASSIGN_RATING = "assign_rating";
+const PROCESS_RATING = "process_rating";
 
 // Actions
 const toggle = (value) => ({type: TOGGLE_TAB, value});
@@ -115,8 +116,6 @@ const getUnratedRatings = (ratings) => (
   ratings.filter(rating => !("rating" in rating))
 );
 
-
-
 let div = document.createElement('div');
 const query = (html, selector) => {
   div.innerHTML = html;
@@ -190,22 +189,16 @@ const Rating = ({action, advertiser, id, image, content}) => (
     <Ad advertiser={advertiser} content={content} id={id} image={image} />
     <form className="rater">
       {getMessage('rating_question')}
-      <input
+      <button
         id={'normal' + id}
         onClick={function(){ return action(id, RatingType.NORMAL); }}
-        type="radio"
+        text={getMessage('normal')}
       />
-      <label htmlFor={'normal' + id}>
-        {getMessage('normal')}
-      </label>
-      <input
+      <button
         id={'political' + id}
         onClick={function(){ return action(id, RatingType.POLITICAL); }}
-        type="radio"
+        text={getMessage('political')}
       />
-      <label htmlFor={'political' + id}>
-        {getMessage('political')}
-      </label>
     </form>
   </div>
 );
