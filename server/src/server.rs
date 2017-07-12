@@ -1,7 +1,7 @@
 use diesel;
 use dotenv::dotenv;
 use futures::future;
-use futures_cpupool::{CpuFuture, CpuPool};
+use futures_cpupool::CpuPool;
 use futures::future::{FutureResult, BoxFuture, Either};
 use futures::{Future, Stream};
 use hyper;
@@ -12,7 +12,6 @@ use pretty_env_logger;
 use serde_json;
 use r2d2;
 use std::env;
-use std::io;
 use std::string;
 
 use diesel::prelude::*;
@@ -138,13 +137,5 @@ impl AdServer {
             server.local_addr().unwrap()
         );
         server.run().unwrap();
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_inserts_an_ad() {
-        //   AdServer::create_ad(Chunk::new)
     }
 }
