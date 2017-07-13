@@ -76,7 +76,7 @@ body {
 }
 
 #tabs {
-  background-color: #e3f2fd;
+  background-color: #fff;
   position: sticky;
   width: 100%;
   display: flex;
@@ -116,7 +116,7 @@ body {
 }
 
 .rating:hover {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
 }
 
 .rating input:focus {
@@ -152,5 +152,25 @@ body {
 }
 
 a:focus {
+  outline: none;
+}
+
+.rater {
+  padding: 0.2rem 0.2rem 0;
+}
+
+.rater button {
+  margin: 0 0.2rem;
+  border: 1px solid #efefef;
+  background-color: #fff;
+  box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+}
+
+.rater button:hover {
+  background-color: #90caf9;
+}
+
+.rater button:focus {
   outline: none;
 }

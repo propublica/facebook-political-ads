@@ -25,16 +25,16 @@ const cleanAd = (html) => {
   // remove attributes
   const killAttrs = (node) => {
     Array.from(node.attributes).forEach(attr => {
-      if(attr.name != "id" &&
-         attr.name != "class" &&
-         attr.name != "src" &&
-         attr.name != "href")
+      if(attr.name !== "id" &&
+         attr.name !== "class" &&
+         attr.name !== "src" &&
+         attr.name !== "href")
         node.removeAttribute(attr.name);
       // remove tracking get variables from links and l.facebook.com
-      if(attr.name == "href") {
+      if(attr.name === "href") {
         try {
           let url = new URL(attr.value);
-          if(url.host == 'l.facebook.com') {
+          if(url.host === 'l.facebook.com') {
             node.removeAttribute(attr.name);
           } else {
             node.setAttribute(attr.name, url.origin + url.pathname);
@@ -54,7 +54,7 @@ const cleanAd = (html) => {
 
 const checkSponsor = (node, sponsor) => {
   return Array.from(node.querySelectorAll("a")).some((a) => {
-    return a.textContent == sponsor;
+    return a.textContent === sponsor;
   });
 };
 
@@ -124,5 +124,4 @@ module.exports = function(node, sponsor) {
   } else {
     return false;
   }
-
 };

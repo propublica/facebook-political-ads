@@ -1,4 +1,7 @@
 use diesel;
+use diesel::prelude::*;
+use diesel::pg::PgConnection;
+use diesel::pg::upsert::*;
 use dotenv::dotenv;
 use futures::future;
 use futures_cpupool::CpuPool;
@@ -9,16 +12,13 @@ use hyper::{Method, StatusCode, Chunk};
 use hyper::server::{Http, Request, Response, Service};
 use models::{Ad, NewAd};
 use pretty_env_logger;
-use serde_json;
 use r2d2;
+use r2d2_diesel::ConnectionManager;
+use r2d2::{Pool, Config};
+use serde_json;
 use std::env;
 use std::string;
 
-use diesel::prelude::*;
-use diesel::pg::PgConnection;
-
-use r2d2_diesel::ConnectionManager;
-use r2d2::{Pool, Config};
 
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
@@ -26,9 +26,9 @@ pub struct AdServer {
 }
 
 #[derive(Deserialize)]
-struct AdPost<'a> {
-    id: &'a str,
-    html: &'a str,
+struct AdPost {
+    id: String,
+    html: String,
     political: bool,
 }
 
@@ -86,6 +86,7 @@ impl AdServer {
         db_pool: Pool<ConnectionManager<PgConnection>>,
     ) -> Result<Response, InsertError> {
         use schema::ads;
+        use schema::ads::dsl::*;
         let bytes = msg.map_err(InsertError::Hyper)?;
         let string = String::from_utf8(bytes.to_vec()).map_err(
             InsertError::String,
@@ -94,15 +95,23 @@ impl AdServer {
         let ad: AdPost = serde_json::from_str(&string).map_err(InsertError::JSON)?;
 
         let ad = NewAd {
-            id: ad.id,
-            html: ad.html,
+            id: &ad.id,
+            html: &ad.html,
             political: if ad.political { 1 } else { 0 },
             not_political: if !ad.political { 1 } else { 0 },
         };
 
         let connection = db_pool.get().map_err(InsertError::Timeout)?;
-        let _: Ad = diesel::insert(&ad)
-            .into(ads::table)
+
+        let _: Ad = diesel::insert(&ad.on_conflict(
+            id,
+            do_update().set((
+                political.eq(political + ad.political),
+                not_political.eq(
+                    not_political + ad.not_political,
+                ),
+            )),
+        )).into(ads::table)
             .get_result(&*connection)
             .map_err(InsertError::DataBase)?;
 

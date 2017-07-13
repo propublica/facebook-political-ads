@@ -35,18 +35,10 @@ module.exports = [{
   },
   resolve: {
     extensions: ['.jsx', '.js'],
-    modules: ["src", "node_modules"],
-    alias: {
-      react: 'preact-compat',
-      'react-dom': 'preact-compat'
-    }
+    modules: ["src", "node_modules"]
   },
   module: {
     rules: [{
-      test: /\.jsx?$/,
-      enforce: 'pre',
-      use: 'source-map-loader'
-    },{
       test: /\.jsx?$/,
       exclude: /node_modules/,
       use: 'babel-loader'
@@ -60,6 +52,7 @@ module.exports = [{
   },
   plugins: [
     new ExtractTextPlugin("styles.css"),
+    new webpack.optimize.ModuleConcatenationPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new HTMLWebpackPlugin({
       title: "__MSG_extension_name__"

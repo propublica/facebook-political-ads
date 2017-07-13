@@ -1,8 +1,7 @@
 import { h, render } from 'preact';
-import { PropTypes } from 'prop-types';
+import thunkMiddleware from 'redux-thunk';
 import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
-import uniqBy from 'lodash/uniqBy';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
 
@@ -10,6 +9,8 @@ import { createLogger } from 'redux-logger';
 import "../css/styles.css";
 
 const getMessage = chrome.i18n.getMessage;
+
+const endpoint = "http://0.0.0.0:8080/ads";
 
 // Constants
 const ToggleType = {
@@ -26,17 +27,44 @@ const RatingType = {
 const TOGGLE_TAB = "toggle_tab";
 const NEW_ADS = "new_ads";
 const NEW_RATINGS = "new_ratings";
+
+// Action fired after we recieve a response from the server
+const PROCESSING_RATING = "processing_rating";
+// Action fired before we recieve a response from the server
 const ASSIGN_RATING = "assign_rating";
-const PROCESS_RATING = "process_rating";
 
 // Actions
 const toggle = (value) => ({type: TOGGLE_TAB, value});
 
-const rateAd = (id, rating) => ({
+const processingRating = (id) => ({
+  type: PROCESSING_RATING,
+  id: id
+});
+
+const assignRating = (id, rating) => ({
   type: ASSIGN_RATING,
   id: id,
   value: rating
 });
+
+const rateAd = (ad, rating) => {
+  return (dispatch) => {
+    let body = {
+      id: ad.id,
+      html: ad.html,
+      political: rating === RatingType.POLITICAL
+    };
+    dispatch(processingRating(body));
+    return fetch(endpoint, {
+      method: "POST",
+      mode: 'no-cors',
+      body: JSON.stringify(body)
+    }).then(
+      () => dispatch(assignRating(ad.id, rating)),
+      error => console.log('An error occured.', error)
+    );
+  };
+};
 
 const newAds = (ads) => ({
   type: NEW_ADS,
@@ -70,10 +98,17 @@ const ads = (state = [], action) => {
 const ratings = (state = [], action) => {
   switch(action.type) {
   case NEW_RATINGS:
-    return uniqBy(state.concat(action.value), 'id');
+    return mergeAds(state, action.value);
+  case PROCESSING_RATING:
+    return state.map(rating => {
+      if(rating.id === action.id) {
+        return { ...rating, processing: true };
+      }
+      return rating;
+    });
   case ASSIGN_RATING:
     return state.map(rating => {
-      if(rating.id == action.id) {
+      if(rating.id === action.id) {
         return { ...rating, rating: action.value };
       }
       return rating;
@@ -90,11 +125,11 @@ const reducer = combineReducers({
   ratings
 });
 
-let middleware = [persistState()];
+let middleware = [thunkMiddleware];
 if(process.env.NODE_ENV === 'development') {
-  middleware.push(applyMiddleware(createLogger()));
+  middleware.push(createLogger());
 }
-const enhancer = compose(...middleware);
+const enhancer = compose(...[persistState(), applyMiddleware(...middleware)]);
 let store = createStore(reducer, enhancer);
 
 // Ad utilities
@@ -161,13 +196,6 @@ const Ad = ({advertiser, content, id, image}) => (
     </div>
   </div>
 );
-Ad.propTypes = {
-  advertiser: PropTypes.string.isRequired,
-  content: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
-  image: PropTypes.string.isRequired
-};
-
 
 // Ads from the server to show
 let Ads = ({ads}) => (
@@ -178,48 +206,40 @@ let Ads = ({ads}) => (
 Ads = connect((state) => ({
   ads: insertAdFields(state.ads)
 }))(Ads);
-Ads.propTypes = {
-  ads: PropTypes.arrayOf(PropTypes.shape(Ad.propTypes)).isRequired
-};
 
-
-// Ads to be rated and sent to the server
-const Rating = ({action, advertiser, id, image, content}) => (
-  <div className="rating">
-    <Ad advertiser={advertiser} content={content} id={id} image={image} />
-    <form className="rater">
-      {getMessage('rating_question')}
-      <button
-        id={'normal' + id}
-        onClick={function(){ return action(id, RatingType.NORMAL); }}
-        text={getMessage('normal')}
-      />
-      <button
-        id={'political' + id}
-        onClick={function(){ return action(id, RatingType.POLITICAL); }}
-        text={getMessage('political')}
-      />
-    </form>
+const RatingForm = ({rating, action})=> (
+  <div className="rater">
+    {getMessage('rating_question')}
+    <button
+      id={'normal' + rating.id}
+      onClick={function(){ return action(rating, RatingType.NORMAL); }}
+    >
+      {getMessage('normal')}
+    </button>
+    <button
+      id={'political' + rating.id}
+      onClick={function(){ return action(rating, RatingType.POLITICAL); }}
+    >
+      {getMessage('political')}
+    </button>
   </div>
 );
-Rating.propTypes = {
-  ...Ad.propTypes,
-  action: PropTypes.func.isRequired
-};
 
+// Ads to be rated and sent to the server
+const Rating = ({rating, action}) => (
+  <div className="rating">
+    <Ad advertiser={rating.advertiser} content={rating.content} id={rating.id} image={rating.image} />
+    {rating.processing ? '' : <RatingForm action={action} rating={rating} /> }
+  </div>
+);
 
 const Ratings = ({onRatingClick, ratings}) => (
   <div id="ratings">
     {ratings.map(rating => (
-      <Rating key={rating.id} {...rating} action={onRatingClick} />)
+      <Rating key={rating.id} rating={rating} action={onRatingClick} />)
     )}
   </div>
 );
-Ratings.propTypes = {
-  onRatingClick: PropTypes.func.isRequired,
-  ratings: PropTypes.arrayOf(PropTypes.shape(Rating.propTypes)).isRequired
-};
-
 
 const ratingsStateToProps = (state) => ({
   ratings: insertAdFields(getUnratedRatings(state.ratings))
@@ -245,13 +265,7 @@ const Toggle = ({type, message, active, onToggleClick}) => (
     {getMessage(message)}
   </div>
 );
-const TogglePropType = PropTypes.oneOf(Object.values(ToggleType));
-Toggle.propTypes = {
-  active: TogglePropType.isRequired,
-  message: PropTypes.string.isRequired,
-  onToggleClick: PropTypes.func.isRequired,
-  type: TogglePropType.isRequired
-};
+
 
 // Our Main container.
 let Toggler = ({ads, ratings, active, onToggleClick}) => (
@@ -286,12 +300,7 @@ Toggler = connect(
   (state) => (state),
   togglerDispatchToProps
 )(Toggler);
-Toggler.propTypes = {
-  active: TogglePropType,
-  ads: Ads.propTypes.ads,
-  onToggleClick: Toggle.propTypes.onToggleClick,
-  ratings: Ratings.propTypes.ratings
-};
+
 
 render(
   <Provider store={store}>
@@ -304,4 +313,4 @@ render(
 
 // connect to the ratings channel
 chrome.runtime.onMessage.addListener((ads) => store.dispatch(newRatings(ads)));
-store.addListener(() => chrome.runtime.sendMessage(store.getState().ads));
+store.subscribe(() => chrome.runtime.sendMessage(store.getState().ads));
