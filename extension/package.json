@@ -20,22 +20,22 @@
     "babel-preset-env": "^1.6.0",
     "babel-preset-latest": "^6.24.1",
     "css-loader": "^0.28.4",
-    "eslint": "^4.1.1",
+    "eslint": "^4.2.0",
     "eslint-plugin-react": "^7.1.0",
-    "extract-text-webpack-plugin": "^2.1.2",
+    "extract-text-webpack-plugin": "^3.0.0",
     "html-webpack-plugin": "^2.29.0",
     "jsdom": "^11.1.0",
+    "preact-compat": "^3.16.0",
     "redux": "^3.7.1",
     "source-map-loader": "^0.2.1",
     "style-loader": "^0.18.2",
-    "webpack": "^2.6.1"
+    "webpack": "^3.2.0",
+    "copy-webpack-plugin": "^4.0.1"
   },
   "dependencies": {
-    "copy-webpack-plugin": "^4.0.1",
     "lodash": "^4.17.4",
-    "preact": "^8.1.0",
+    "preact": "^8.2.1",
     "preact-redux": "^2.0.2",
-    "prop-types": "^15.5.10",
     "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0"

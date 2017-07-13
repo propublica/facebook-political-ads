@@ -1,4 +1,5 @@
 module.exports = {
+  "parser": "babel-eslint",
   "env": {
     "browser": true,
     "commonjs": true,
@@ -11,7 +12,7 @@ module.exports = {
   },
   "extends": [
     "eslint:recommended",
-    "plugin:react/all"
+    "plugin:react/recommended"
   ],
   "parserOptions": {
     "ecmaFeatures": {
@@ -37,8 +38,9 @@ module.exports = {
     ],
     "react/no-multi-comp":0,
     "react/jsx-max-props-per-line":0,
-    "react/forbid-foreign-prop-types":0,
-    "react/jsx-indent-props": ["error", 2]
+    "react/jsx-indent-props": ["error", 2],
+    "react/prop-types": 0,
+    "eqeqeq": 1
   },
   "settings":{
     "react":{
