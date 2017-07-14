@@ -86,6 +86,21 @@ const active = (state = ToggleType.ADS, action) => {
   }
 };
 
+const mergeAds = (ads, newAds) => {
+  let ids = new Map(ads.map(ad => [ad.id, ad]));
+  newAds.forEach(ad => {
+    if(!ids.has(ad.id)) {
+      let old = ids.get(ad.id);
+      ids.delete(ad.id);
+      let newAd = Object.assign({}, old, ad);
+      ids.set(newAd.id, newAd);
+    } else {
+      ids.set(ad.id, ad);
+    }
+  });
+  return Array.from(ids.values());
+};
+
 const ads = (state = [], action) => {
   switch(action.type) {
   case NEW_ADS:
@@ -133,20 +148,6 @@ const enhancer = compose(...[persistState(), applyMiddleware(...middleware)]);
 let store = createStore(reducer, enhancer);
 
 // Ad utilities
-const mergeAds = (ads, newAds) => {
-  let ids = new Map(ads.map(ad => [ad.id, ad]));
-  let merged = newAds.map(ad => {
-    if(ids.has(ad.id)) {
-      let old = ids.get(ad.id);
-      ids.delete(ad.id);
-      return Object.assign({}, old, ad);
-    } else {
-      return ad;
-    }
-  });
-  return merged.concat(ids.values());
-};
-
 const getUnratedRatings = (ratings) => (
   ratings.filter(rating => !("rating" in rating))
 );
@@ -229,8 +230,8 @@ const RatingForm = ({rating, action})=> (
 const Rating = ({rating, action}) => (
   <div className="rating">
     <Ad
-      advertiser={rating.advertiser}
-      content={rating.content}
+      title={rating.title}
+      message={rating.message}
       id={rating.id}
       image={rating.image}
     />
