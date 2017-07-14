@@ -163,13 +163,13 @@ const getImage = (html) => {
     return img.getAttribute('src');
 };
 
-const getContent = (html) => {
+const getAdMessage = (html) => {
   let p = query(html, '.userContent p') || query(html, 'span');
   if(p)
     return p.innerHTML;
 };
 
-const getAdvertiser = (html) => {
+const getTitle = (html) => {
   let a = query(html, 'h5 a') || query(html, 'h6 a') || query(html, 'strong');
   if(a)
     return a.innerText;
@@ -179,20 +179,20 @@ const insertAdFields = (ads) => (
   ads.map((ad) => ({
     ...ad,
     image: getImage(ad.html),
-    content: getContent(ad.html),
-    advertiser: getAdvertiser(ad.html)
+    message: getAdMessage(ad.html),
+    title: getTitle(ad.html)
   }))
 );
 
 // Views
-const Ad = ({advertiser, content, id, image}) => (
+const Ad = ({title, message, id, image}) => (
   <div className="ad" id={id}>
     <div className="chiclet">
       {image ? <img src={image} /> : ''}
     </div>
     <div className="ad-display">
-      <div className="advertiser">{advertiser}</div>
-      <div className="ad-content" dangerouslySetInnerHTML={{__html:content}} />
+      <div className="advertiser">{title}</div>
+      <div className="ad-content" dangerouslySetInnerHTML={{__html:message}} />
     </div>
   </div>
 );
@@ -228,7 +228,12 @@ const RatingForm = ({rating, action})=> (
 // Ads to be rated and sent to the server
 const Rating = ({rating, action}) => (
   <div className="rating">
-    <Ad advertiser={rating.advertiser} content={rating.content} id={rating.id} image={rating.image} />
+    <Ad
+      advertiser={rating.advertiser}
+      content={rating.content}
+      id={rating.id}
+      image={rating.image}
+    />
     {rating.processing ? '' : <RatingForm action={action} rating={rating} /> }
   </div>
 );

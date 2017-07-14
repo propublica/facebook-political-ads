@@ -1,7 +1,4 @@
-use diesel;
-use diesel::prelude::*;
 use diesel::pg::PgConnection;
-use diesel::pg::upsert::*;
 use dotenv::dotenv;
 use futures::future;
 use futures_cpupool::CpuPool;
@@ -19,6 +16,7 @@ use serde_json;
 use std::env;
 use std::string;
 
+use super::InsertError;
 
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
@@ -26,19 +24,10 @@ pub struct AdServer {
 }
 
 #[derive(Deserialize)]
-struct AdPost {
-    id: String,
-    html: String,
-    political: bool,
-}
-
-#[derive(Debug)]
-pub enum InsertError {
-    Timeout(r2d2::GetTimeout),
-    DataBase(diesel::result::Error),
-    JSON(serde_json::Error),
-    String(string::FromUtf8Error),
-    Hyper(hyper::Error),
+pub struct AdPost {
+    pub id: String,
+    pub html: String,
+    pub political: bool,
 }
 
 impl Service for AdServer {
@@ -70,7 +59,7 @@ impl AdServer {
         req.body()
             .concat2()
             .then(move |msg| {
-                pool.spawn_fn(move || match AdServer::save_ad(msg, db_pool) {
+                pool.spawn_fn(move || match AdServer::save_ad(&msg, &db_pool) {
                     Ok(r) => Ok(r),
                     Err(e) => {
                         warn!("{:?}", e);
@@ -82,38 +71,16 @@ impl AdServer {
     }
 
     fn save_ad(
-        msg: Result<Chunk, hyper::Error>,
-        db_pool: Pool<ConnectionManager<PgConnection>>,
+        msg: &Result<Chunk, hyper::Error>,
+        db_pool: &Pool<ConnectionManager<PgConnection>>,
     ) -> Result<Response, InsertError> {
-        use schema::ads;
-        use schema::ads::dsl::*;
         let bytes = msg.map_err(InsertError::Hyper)?;
         let string = String::from_utf8(bytes.to_vec()).map_err(
             InsertError::String,
         )?;
 
         let ad: AdPost = serde_json::from_str(&string).map_err(InsertError::JSON)?;
-
-        let ad = NewAd {
-            id: &ad.id,
-            html: &ad.html,
-            political: if ad.political { 1 } else { 0 },
-            not_political: if !ad.political { 1 } else { 0 },
-        };
-
-        let connection = db_pool.get().map_err(InsertError::Timeout)?;
-
-        let _: Ad = diesel::insert(&ad.on_conflict(
-            id,
-            do_update().set((
-                political.eq(political + ad.political),
-                not_political.eq(
-                    not_political + ad.not_political,
-                ),
-            )),
-        )).into(ads::table)
-            .get_result(&*connection)
-            .map_err(InsertError::DataBase)?;
+        NewAd::new(&ad)?.save(&db_pool)?;
 
         Ok(Response::new())
     }
