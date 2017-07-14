@@ -6,6 +6,7 @@ extern crate diesel_codegen;
 extern crate hyper;
 extern crate futures;
 extern crate futures_cpupool;
+extern crate kuchiki;
 #[macro_use]
 extern crate log;
 extern crate pretty_env_logger;
@@ -19,8 +20,14 @@ pub mod schema;
 pub mod models;
 pub mod server;
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {}
+use std::string;
+
+#[derive(Debug)]
+pub enum InsertError {
+    Timeout(r2d2::GetTimeout),
+    DataBase(diesel::result::Error),
+    JSON(serde_json::Error),
+    String(string::FromUtf8Error),
+    Hyper(hyper::Error),
+    HTML(()),
 }
