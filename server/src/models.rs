@@ -3,7 +3,7 @@ use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
 use r2d2_diesel::ConnectionManager;
-use r2d2::{Pool, Config};
+use r2d2::Pool;
 use super::InsertError;
 use super::schema::ads;
 use super::server::AdPost;

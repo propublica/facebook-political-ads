@@ -7,14 +7,12 @@ use futures::{Future, Stream};
 use hyper;
 use hyper::{Method, StatusCode, Chunk};
 use hyper::server::{Http, Request, Response, Service};
-use models::{Ad, NewAd};
+use models::NewAd;
 use pretty_env_logger;
-use r2d2;
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
 use serde_json;
 use std::env;
-use std::string;
 
 use super::InsertError;
 
@@ -59,7 +57,7 @@ impl AdServer {
         req.body()
             .concat2()
             .then(move |msg| {
-                pool.spawn_fn(move || match AdServer::save_ad(&msg, &db_pool) {
+                pool.spawn_fn(move || match AdServer::save_ad(msg, &db_pool) {
                     Ok(r) => Ok(r),
                     Err(e) => {
                         warn!("{:?}", e);
@@ -71,7 +69,7 @@ impl AdServer {
     }
 
     fn save_ad(
-        msg: &Result<Chunk, hyper::Error>,
+        msg: Result<Chunk, hyper::Error>,
         db_pool: &Pool<ConnectionManager<PgConnection>>,
     ) -> Result<Response, InsertError> {
         let bytes = msg.map_err(InsertError::Hyper)?;
@@ -96,7 +94,6 @@ impl AdServer {
         let config = Config::default();
         let manager = ConnectionManager::<PgConnection>::new(database_url);
         let db_pool = Pool::new(config, manager).expect("Failed to create pool.");
-
         let pool = CpuPool::new_num_cpus();
 
         let server = Http::new()
