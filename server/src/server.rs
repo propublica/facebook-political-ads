@@ -40,7 +40,12 @@ impl Service for AdServer {
 
     fn call(&self, req: Request) -> Self::Future {
         match (req.method(), req.path()) {
-            (&Method::Post, "/ads") => Either::B(self.process_ad(req)),
+            (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ad(req)),
+            (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
+                future::ok(Response::new().with_status(
+                    StatusCode::Ok,
+                )),
+            ),
             _ => {
                 Either::A(future::ok(
                     Response::new().with_status(StatusCode::NotFound),

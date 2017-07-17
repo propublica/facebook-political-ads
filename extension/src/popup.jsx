@@ -10,7 +10,9 @@ import "../css/styles.css";
 
 const getMessage = chrome.i18n.getMessage;
 
-const endpoint = "http://0.0.0.0:8080/ads";
+const endpoint = process.env.NODE_ENV === 'production' ?
+  "https://projects.propublica.org/facebook-ads/" :
+  "http://0.0.0.0:8080/ads";
 
 // Constants
 const ToggleType = {
