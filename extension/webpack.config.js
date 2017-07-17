@@ -1,10 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
-const outdir = path.resolve(__dirname, 'dist');
 const HTMLWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const ENV = process.env.NODE_ENV || 'development';
+
+const outdir = ENV === 'production' ?
+  path.resolve(__dirname, 'dist') :
+  path.resolve(__dirname, 'build');
 
 module.exports = [{
   entry: "./src/content.js",
@@ -15,6 +18,13 @@ module.exports = [{
   resolve: {
     modules: ["src", "node_modules"]
   },
+  module: {
+    rules:[{
+      test: /\.jsx?$/,
+      exclude: /node_modules/,
+      use: 'babel-loader'
+    }]
+  },
   devtool: 'source-map'
 },{
   entry: "./src/background.js",
@@ -24,6 +34,13 @@ module.exports = [{
   },
   resolve: {
     modules: ["src", "node_modules"]
+  },
+  module: {
+    rules:[{
+      test: /\.jsx?$/,
+      exclude: /node_modules/,
+      use: 'babel-loader'
+    }]
   },
   devtool: 'source-map'
 },{

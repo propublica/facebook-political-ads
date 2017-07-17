@@ -14,7 +14,7 @@ use kuchiki::traits::*;
 
 
 #[derive(Queryable, Debug)]
-struct Ad {
+pub struct Ad {
     id: String,
     html: String,
     political: i32,
@@ -34,7 +34,7 @@ struct Ad {
 
 #[derive(Insertable)]
 #[table_name = "ads"]
-struct NewAd<'a> {
+pub struct NewAd<'a> {
     id: &'a str,
     html: &'a str,
     political: i32,

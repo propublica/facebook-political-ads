@@ -6,7 +6,8 @@
   "scripts": {
     "test": "node test/test.js",
     "build": "./node_modules/.bin/webpack --progress",
-    "watch": "./node_modules/.bin/webpack -w --progress"
+    "watch": "./node_modules/.bin/webpack -w --progress",
+    "dist": "NODE_ENV=production ./node_modules/.bin/webpack --progress -p"
   },
   "author": "Jeff Larson <jeff.larson@propublica.org>",
   "license": "ISC",
@@ -32,10 +33,10 @@
     "webpack": "^3.2.0"
   },
   "dependencies": {
-    "redux": "^3.7.2",
     "lodash": "^4.17.4",
     "preact": "^8.2.1",
     "preact-redux": "^2.0.2",
+    "redux": "^3.7.2",
     "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0"
