@@ -1,3 +1,5 @@
+use chrono::DateTime;
+use chrono::offset::Utc;
 use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
@@ -10,30 +12,39 @@ use super::server::AdPost;
 use kuchiki;
 use kuchiki::traits::*;
 
-#[derive(Queryable, Debug)]
-pub struct Ad {
-    pub id: String,
-    pub html: String,
-    pub political: i32,
-    pub not_political: i32,
 
-    pub fuzzy_id: Option<i32>,
-    pub title: Option<String>,
-    pub message: Option<String>,
-    pub image: Option<String>,
-    pub big_image: Option<String>,
+#[derive(Queryable, Debug)]
+struct Ad {
+    id: String,
+    html: String,
+    political: i32,
+    not_political: i32,
+
+    fuzzy_id: Option<i32>,
+    title: Option<String>,
+    message: Option<String>,
+    image: Option<String>,
+    big_image: Option<String>,
+
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+
+    browser_lang: String,
 }
 
 #[derive(Insertable)]
 #[table_name = "ads"]
-pub struct NewAd<'a> {
-    pub id: &'a str,
-    pub html: &'a str,
-    pub political: i32,
-    pub not_political: i32,
-    pub title: Option<String>,
-    pub message: Option<String>,
-    pub image: Option<String>,
+struct NewAd<'a> {
+    id: &'a str,
+    html: &'a str,
+    political: i32,
+    not_political: i32,
+
+    title: Option<String>,
+    message: Option<String>,
+    image: Option<String>,
+
+    browser_lang: &'a str,
 }
 
 impl<'a> NewAd<'a> {
@@ -73,6 +84,7 @@ impl<'a> NewAd<'a> {
             title: title,
             message: message,
             image: img,
+            browser_lang: &ad.browser_lang,
         })
     }
 
@@ -88,6 +100,7 @@ impl<'a> NewAd<'a> {
                     not_political +
                         self.not_political,
                 ),
+                updated_at.eq(Utc::now()),
             )),
         )).into(ads::table)
             .get_result(&*connection)

@@ -8,7 +8,7 @@
     "build": "./node_modules/.bin/webpack --progress",
     "watch": "./node_modules/.bin/webpack -w --progress"
   },
-  "author": "",
+  "author": "Jeff Larson <jeff.larson@propublica.org>",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.25.0",
@@ -19,6 +19,7 @@
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.0",
     "babel-preset-latest": "^6.24.1",
+    "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.4",
     "eslint": "^4.2.0",
     "eslint-plugin-react": "^7.1.0",
@@ -26,13 +27,12 @@
     "html-webpack-plugin": "^2.29.0",
     "jsdom": "^11.1.0",
     "preact-compat": "^3.16.0",
-    "redux": "^3.7.1",
     "source-map-loader": "^0.2.1",
     "style-loader": "^0.18.2",
-    "webpack": "^3.2.0",
-    "copy-webpack-plugin": "^4.0.1"
+    "webpack": "^3.2.0"
   },
   "dependencies": {
+    "redux": "^3.7.2",
     "lodash": "^4.17.4",
     "preact": "^8.2.1",
     "preact-redux": "^2.0.2",

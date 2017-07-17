@@ -89,7 +89,7 @@ const active = (state = ToggleType.ADS, action) => {
 const mergeAds = (ads, newAds) => {
   let ids = new Map(ads.map(ad => [ad.id, ad]));
   newAds.forEach(ad => {
-    if(!ids.has(ad.id)) {
+    if(ids.has(ad.id)) {
       let old = ids.get(ad.id);
       ids.delete(ad.id);
       let newAd = Object.assign({}, old, ad);
@@ -181,7 +181,8 @@ const insertAdFields = (ads) => (
     ...ad,
     image: getImage(ad.html),
     message: getAdMessage(ad.html),
-    title: getTitle(ad.html)
+    title: getTitle(ad.html),
+    browser_lang: chrome.i18n.getUILanguage()
   }))
 );
 
