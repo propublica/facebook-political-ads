@@ -23,13 +23,14 @@ pub struct Ad {
     fuzzy_id: Option<i32>,
     title: Option<String>,
     message: Option<String>,
-    image: Option<String>,
-    big_image: Option<String>,
+    thumbnail: Option<String>,
 
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
 
     browser_lang: String,
+
+    images: Option<Vec<String>>,
 }
 
 #[derive(Insertable)]
@@ -42,39 +43,77 @@ pub struct NewAd<'a> {
 
     title: Option<String>,
     message: Option<String>,
-    image: Option<String>,
+    thumbnail: Option<String>,
 
     browser_lang: &'a str,
+    images: Option<Vec<String>>,
+}
+
+#[derive(AsChangeset)]
+#[table_name = "ads"]
+pub struct Images {
+    thumbnail: Option<String>,
+    images: Option<Vec<String>>,
 }
 
 impl<'a> NewAd<'a> {
+    fn get_title(document: &kuchiki::NodeRef) -> Result<Option<String>, InsertError> {
+        Ok(
+            document
+                .select("h5 a, h6 a, strong")
+                .map_err(InsertError::HTML)?
+                .nth(0)
+                .and_then(|a| Some(a.text_contents())),
+        )
+    }
+
+    fn get_image(document: &kuchiki::NodeRef) -> Result<Option<String>, InsertError> {
+        Ok(
+            document
+                .select("img")
+                .map_err(InsertError::HTML)?
+                .nth(0)
+                .and_then(|a| {
+                    a.attributes.borrow().get("src").and_then(
+                        |src| Some(src.to_string()),
+                    )
+                }),
+        )
+    }
+
+    fn get_message(document: &kuchiki::NodeRef) -> Result<Option<String>, InsertError> {
+        Ok(Some(
+            document
+                .select(".userContent p, span")
+                .map_err(InsertError::HTML)?
+                .map(|a| a.as_node().to_string())
+                .collect::<Vec<String>>()
+                .join(""),
+        ))
+    }
+
+    fn get_images(document: &kuchiki::NodeRef) -> Result<Option<Vec<String>>, InsertError> {
+        Ok(
+            document
+                .select("img")
+                .map_err(InsertError::HTML)?
+                .skip(1)
+                .map(|a| {
+                    a.attributes.borrow().get("src").and_then(
+                        |s| Some(s.to_string()),
+                    )
+                })
+                .collect::<Option<Vec<String>>>(),
+        )
+    }
+
     pub fn new(ad: &'a AdPost) -> Result<NewAd<'a>, InsertError> {
         let document = kuchiki::parse_html().one(ad.html.clone());
 
-        let message = document
-            .select(".userContent p")
-            .or(document.select("span"))
-            .map_err(InsertError::HTML)?
-            .nth(0)
-            .and_then(|a| Some(a.as_node().to_string()));
-
-        let title = document
-            .select("h5 a")
-            .or(document.select("h6 a"))
-            .or(document.select("strong"))
-            .map_err(InsertError::HTML)?
-            .nth(0)
-            .and_then(|a| Some(a.text_contents()));
-
-        let img = document
-            .select("img")
-            .map_err(InsertError::HTML)?
-            .nth(0)
-            .and_then(|a| {
-                a.attributes.borrow().get("src").and_then(
-                    |src| Some(src.to_string()),
-                )
-            });
+        let message = NewAd::get_message(&document)?;
+        let title = NewAd::get_title(&document)?;
+        let thumb = NewAd::get_image(&document)?;
+        let images = NewAd::get_images(&document)?;
 
         Ok(NewAd {
             id: &ad.id,
@@ -83,8 +122,9 @@ impl<'a> NewAd<'a> {
             not_political: if !ad.political { 1 } else { 0 },
             title: title,
             message: message,
-            image: img,
+            thumbnail: thumb,
             browser_lang: &ad.browser_lang,
+            images: images,
         })
     }
 
@@ -106,5 +146,27 @@ impl<'a> NewAd<'a> {
             .get_result(&*connection)
             .map_err(InsertError::DataBase)?;
         Ok(ad)
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn internal() {
+        let ad = include_str!("./html-test.txt");
+        let post = AdPost {
+            id: "test".to_string(),
+            html: ad.to_string(),
+            political: true,
+            browser_lang: "en-US".to_string(),
+        };
+        let new_ad = NewAd::new(&post).unwrap();
+        assert!(new_ad.thumbnail.is_some());
+        assert_eq!(new_ad.images.unwrap().len(), 3);
+        assert!(new_ad.message.is_some());
+        assert!(new_ad.title.is_some());
     }
 }

@@ -275,18 +275,18 @@ const Toggle = ({type, message, active, onToggleClick}) => (
 
 
 // Our Main container.
-let Toggler = ({ads, ratings, active, onToggleClick}) => (
+let Toggler = ({ads, ratings, active = ToggleType.RATER, onToggleClick}) => (
   <div id="toggler">
     <div id="tabs">
       <Toggle
         active={active}
-        message="see_ads" onToggleClick={onToggleClick}
-        type={ToggleType.ADS}
+        message="rate_ads" onToggleClick={onToggleClick}
+        type={ToggleType.RATER}
       />
       <Toggle
         active={active}
-        message="rate_ads" onToggleClick={onToggleClick}
-        type={ToggleType.RATER}
+        message="see_ads" onToggleClick={onToggleClick}
+        type={ToggleType.ADS}
       />
     </div>
     <div id="container">

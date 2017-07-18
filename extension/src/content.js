@@ -14,5 +14,4 @@ observer.observe(document.body, {childList: true, subtree:true});
 
 if(document.readyState === 'complete')
   sendAds();
-
 document.addEventListener('interactive', sendAds, false);
