@@ -12,12 +12,12 @@
     "description": "The text identifying sponsored ads in a user's timeline."
   },
   "rate_ads": {
-    "message": "Rate Ads",
-    "description": "Text for the 'rate ads' button in the extension."
+    "message": "Ads I'm Seeing",
+    "description": "Text for the 'Ads I'm Seeing' button in the extension."
   },
   "see_ads": {
-    "message": "See Ads",
-    "description": "Text for the 'see ads' button in the extension."
+    "message": "Ads I Didn't See",
+    "description": "Text for the 'Ads I Didn't See' button in the extension."
   },
   "political": {
     "message": "Political Ad",
