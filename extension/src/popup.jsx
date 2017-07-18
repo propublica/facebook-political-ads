@@ -57,15 +57,13 @@ const rateAd = (ad, rating) => {
       political: rating === RatingType.POLITICAL,
       browser_lang: chrome.i18n.getUILanguage()
     };
+    let cb = () => dispatch(assignRating(ad.id, rating));
     dispatch(processingRating(body.id));
     return fetch(endpoint, {
       method: "POST",
       mode: 'no-cors',
       body: JSON.stringify(body)
-    }).then(
-      () => dispatch(assignRating(ad.id, rating)),
-      error => console.log('An error occured.', error)
-    );
+    }).then(cb, cb);
   };
 };
 
