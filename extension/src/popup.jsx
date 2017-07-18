@@ -12,7 +12,7 @@ const getMessage = chrome.i18n.getMessage;
 
 const endpoint = process.env.NODE_ENV === 'production' ?
   "https://projects.propublica.org/facebook-ads/" :
-  "http://0.0.0.0:8080/ads";
+  "http://0.0.0.0:8080/facebook-ads/ads";
 
 // Constants
 const ToggleType = {
@@ -54,9 +54,10 @@ const rateAd = (ad, rating) => {
     let body = {
       id: ad.id,
       html: ad.html,
-      political: rating === RatingType.POLITICAL
+      political: rating === RatingType.POLITICAL,
+      browser_lang: chrome.i18n.getUILanguage()
     };
-    dispatch(processingRating(body));
+    dispatch(processingRating(body.id));
     return fetch(endpoint, {
       method: "POST",
       mode: 'no-cors',
@@ -183,8 +184,7 @@ const insertAdFields = (ads) => (
     ...ad,
     image: getImage(ad.html),
     message: getAdMessage(ad.html),
-    title: getTitle(ad.html),
-    browser_lang: chrome.i18n.getUILanguage()
+    title: getTitle(ad.html)
   }))
 );
 
