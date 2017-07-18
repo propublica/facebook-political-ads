@@ -4,4 +4,6 @@ node_modules
 dist
 .#*
 server/target
-/extension/build/_locales/en/messages.json
+extension/build/
+extension/dist/
+extension/*.zip
