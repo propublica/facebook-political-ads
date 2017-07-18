@@ -49,7 +49,7 @@ const cleanAd = (html) => {
     Array.from(node.children).forEach(killAttrs);
   };
   Array.from(node.children).forEach(killAttrs);
-  return node.innerHTML.replace('&amp;', '&');
+  return node.innerHTML.replace(/&amp;/g, '&');
 };
 
 const checkSponsor = (node, sponsor) => {
