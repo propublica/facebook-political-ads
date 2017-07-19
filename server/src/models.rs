@@ -80,16 +80,19 @@ impl<'a> NewAd<'a> {
                 }),
         )
     }
-
+    // Video ads make this a bit messy
     fn get_message(document: &kuchiki::NodeRef) -> Result<Option<String>, InsertError> {
-        Ok(Some(
-            document
-                .select(".userContent p, span")
-                .map_err(InsertError::HTML)?
-                .map(|a| a.as_node().to_string())
-                .collect::<Vec<String>>()
-                .join(""),
-        ))
+        let selectors = vec![".userContent p", "span"];
+        let iters = selectors.iter().map(|s| document.select(s)).flat_map(|a| a);
+
+        Ok(
+            iters
+                .map(|i| {
+                    i.fold(String::new(), |m, a| m + &a.as_node().to_string())
+                })
+                .filter(|i| i.len() > 0)
+                .nth(0),
+        )
     }
 
     fn get_images(document: &kuchiki::NodeRef) -> Result<Option<Vec<String>>, InsertError> {
@@ -100,9 +103,17 @@ impl<'a> NewAd<'a> {
                 .skip(1)
                 .map(|a| {
                     a.attributes.borrow().get("src").and_then(
-                        |s| Some(s.to_string()),
+                        |s| if !s.contains(
+                            "rsrc.php",
+                        )
+                        {
+                            Some(s.to_string())
+                        } else {
+                            None
+                        },
                     )
                 })
+                .filter(|s| s.is_some())
                 .collect::<Option<Vec<String>>>(),
         )
     }
@@ -165,8 +176,11 @@ mod tests {
         };
         let new_ad = NewAd::new(&post).unwrap();
         assert!(new_ad.thumbnail.is_some());
-        assert_eq!(new_ad.images.unwrap().len(), 3);
-        assert!(new_ad.message.is_some());
+        assert_eq!(new_ad.images.unwrap().len(), 1);
+        assert_eq!(
+            new_ad.message.unwrap(),
+            "<p><a class=\"_58cn\" href=\"https://www.facebook.com/hashtag/valerian\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>"
+        );
         assert!(new_ad.title.is_some());
     }
 }
