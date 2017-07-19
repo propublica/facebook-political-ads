@@ -4,13 +4,13 @@ use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
-use r2d2_diesel::ConnectionManager;
-use r2d2::Pool;
-use super::InsertError;
-use super::schema::ads;
-use super::server::AdPost;
+use InsertError;
 use kuchiki;
 use kuchiki::traits::*;
+use r2d2_diesel::ConnectionManager;
+use r2d2::Pool;
+use schema::ads;
+use server::AdPost;
 
 
 #[derive(Queryable, Debug)]
@@ -21,16 +21,16 @@ pub struct Ad {
     not_political: i32,
 
     fuzzy_id: Option<i32>,
-    title: Option<String>,
-    message: Option<String>,
-    thumbnail: Option<String>,
+    title: String,
+    message: String,
+    thumbnail: String,
 
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
 
     browser_lang: String,
 
-    images: Option<Vec<String>>,
+    images: Vec<String>,
 }
 
 #[derive(Insertable)]
@@ -41,61 +41,58 @@ pub struct NewAd<'a> {
     political: i32,
     not_political: i32,
 
-    title: Option<String>,
-    message: Option<String>,
-    thumbnail: Option<String>,
+    title: String,
+    message: String,
+    thumbnail: String,
 
     browser_lang: &'a str,
-    images: Option<Vec<String>>,
+    images: Vec<String>,
 }
 
 #[derive(AsChangeset)]
 #[table_name = "ads"]
 pub struct Images {
-    thumbnail: Option<String>,
-    images: Option<Vec<String>>,
+    thumbnail: String,
+    images: Vec<String>,
 }
 
 impl<'a> NewAd<'a> {
-    fn get_title(document: &kuchiki::NodeRef) -> Result<Option<String>, InsertError> {
-        Ok(
-            document
-                .select("h5 a, h6 a, strong")
-                .map_err(InsertError::HTML)?
-                .nth(0)
-                .and_then(|a| Some(a.text_contents())),
-        )
+    fn get_title(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
+        document
+            .select("h5 a, h6 a, strong")
+            .map_err(InsertError::HTML)?
+            .nth(0)
+            .and_then(|a| Some(a.text_contents()))
+            .ok_or(InsertError::HTML(()))
     }
 
-    fn get_image(document: &kuchiki::NodeRef) -> Result<Option<String>, InsertError> {
-        Ok(
-            document
-                .select("img")
-                .map_err(InsertError::HTML)?
-                .nth(0)
-                .and_then(|a| {
-                    a.attributes.borrow().get("src").and_then(
-                        |src| Some(src.to_string()),
-                    )
-                }),
-        )
+    fn get_image(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
+        document
+            .select("img")
+            .map_err(InsertError::HTML)?
+            .nth(0)
+            .and_then(|a| {
+                a.attributes.borrow().get("src").and_then(
+                    |src| Some(src.to_string()),
+                )
+            })
+            .ok_or(InsertError::HTML(()))
     }
     // Video ads make this a bit messy
-    fn get_message(document: &kuchiki::NodeRef) -> Result<Option<String>, InsertError> {
+    fn get_message(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
         let selectors = vec![".userContent p", "span"];
         let iters = selectors.iter().map(|s| document.select(s)).flat_map(|a| a);
 
-        Ok(
-            iters
-                .map(|i| {
-                    i.fold(String::new(), |m, a| m + &a.as_node().to_string())
-                })
-                .filter(|i| i.len() > 0)
-                .nth(0),
-        )
+        iters
+            .map(|i| {
+                i.fold(String::new(), |m, a| m + &a.as_node().to_string())
+            })
+            .filter(|i| i.len() > 0)
+            .nth(0)
+            .ok_or(InsertError::HTML(()))
     }
 
-    fn get_images(document: &kuchiki::NodeRef) -> Result<Option<Vec<String>>, InsertError> {
+    fn get_images(document: &kuchiki::NodeRef) -> Result<Vec<String>, InsertError> {
         Ok(
             document
                 .select("img")
@@ -114,7 +111,8 @@ impl<'a> NewAd<'a> {
                     )
                 })
                 .filter(|s| s.is_some())
-                .collect::<Option<Vec<String>>>(),
+                .map(|s| s.unwrap())
+                .collect::<Vec<String>>(),
         )
     }
 
@@ -166,7 +164,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn internal() {
+    fn ad_parsing() {
         let ad = include_str!("./html-test.txt");
         let post = AdPost {
             id: "test".to_string(),
@@ -175,12 +173,12 @@ mod tests {
             browser_lang: "en-US".to_string(),
         };
         let new_ad = NewAd::new(&post).unwrap();
-        assert!(new_ad.thumbnail.is_some());
-        assert_eq!(new_ad.images.unwrap().len(), 1);
+        assert!(new_ad.thumbnail.len() > 0);
+        assert_eq!(new_ad.images.len(), 1);
         assert_eq!(
-            new_ad.message.unwrap(),
-            "<p><a class=\"_58cn\" href=\"https://www.facebook.com/hashtag/valerian\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>"
+            new_ad.message,
+            "<p><a href=\"https://www.facebook.com/hashtag/valerian\" class=\"_58cn\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>"
         );
-        assert!(new_ad.title.is_some());
+        assert!(new_ad.title.len() > 0);
     }
 }
