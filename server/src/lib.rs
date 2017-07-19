@@ -5,6 +5,7 @@ extern crate dotenv;
 #[macro_use]
 extern crate diesel_codegen;
 extern crate hyper;
+extern crate hyper_tls;
 extern crate futures;
 extern crate futures_cpupool;
 extern crate kuchiki;
@@ -17,8 +18,9 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 
-pub mod schema;
+pub mod image_getter;
 pub mod models;
+pub mod schema;
 pub mod server;
 
 use std::string;
