@@ -4,6 +4,12 @@ use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
+use futures::stream;
+use futures::Stream;
+use futures_cpupool::CpuPool;
+use hyper::{Client, Body};
+use hyper::client::HttpConnector;
+use hyper_tls::HttpsConnector;
 use InsertError;
 use kuchiki;
 use kuchiki::traits::*;
@@ -31,6 +37,24 @@ pub struct Ad {
     browser_lang: String,
 
     images: Vec<String>,
+}
+
+impl Ad {
+    // This will asynchronously save the images to s3
+    pub fn grab_and_store(
+        &self,
+        client: Client<HttpsConnector<HttpConnector>, Body>,
+        db: &Pool<ConnectionManager<PgConnection>>,
+        pool: CpuPool,
+    ) {
+        let images = [self.images.clone(), vec![self.thumbnail.clone()]]
+            .concat()
+            .iter()
+            .map(|a| Ok(a.clone()))
+            .collect::<Vec<Result<String, ()>>>();
+        let ad = self.clone();
+        stream::iter(images).map(|img| {});
+    }
 }
 
 #[derive(Insertable)]
