@@ -28,6 +28,8 @@ pub mod server;
 
 use std::string;
 
+// This is basically a catch all for all the Errors we think we'll ever see to
+// combat type restrictions on all of the hyper/futures function calls.
 #[derive(Debug)]
 pub enum InsertError {
     Timeout(r2d2::GetTimeout),
@@ -38,4 +40,6 @@ pub enum InsertError {
     Uri(hyper::error::UriError),
     HTML(()),
     TLS(rusoto_core::TlsError),
+    S3(rusoto_s3::PutObjectError),
+    AWS(rusoto_credential::CredentialsError),
 }

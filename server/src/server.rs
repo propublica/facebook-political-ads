@@ -2,23 +2,29 @@ use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use futures::future;
 use futures_cpupool::CpuPool;
-use futures::future::{FutureResult, BoxFuture, Either};
+use futures::future::{Either, FutureResult};
 use futures::{Future, Stream};
 use hyper;
-use hyper::{Method, StatusCode, Chunk};
+use hyper::{Client, Chunk, Method, StatusCode};
+use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
-use models::NewAd;
+use hyper_tls::HttpsConnector;
+use models::{NewAd, Ad};
 use pretty_env_logger;
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
 use serde_json;
 use std::env;
+use tokio_core::net::TcpListener;
+use tokio_core::reactor::{Core, Handle};
 
 use super::InsertError;
 
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
     pool: CpuPool,
+    handle: Handle,
+    client: Client<HttpsConnector<HttpConnector>>,
 }
 
 #[derive(Deserialize)]
@@ -35,7 +41,7 @@ impl Service for AdServer {
     type Error = hyper::Error;
     type Future = Either<
         FutureResult<Self::Response, Self::Error>,
-        BoxFuture<Self::Response, Self::Error>,
+        Box<Future<Item = Self::Response, Error = Self::Error>>,
     >;
 
     fn call(&self, req: Request) -> Self::Future {
@@ -55,38 +61,46 @@ impl Service for AdServer {
     }
 }
 
-
 impl AdServer {
-    fn process_ad(&self, req: Request) -> BoxFuture<Response, hyper::Error> {
+    fn process_ad(&self, req: Request) -> Box<Future<Item = Response, Error = hyper::Error>> {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
-        req.body()
+        let image_pool = self.pool.clone();
+        let image_db = self.db_pool.clone();
+        let handle = self.handle.clone();
+        let client = self.client.clone();
+        let future = req.body()
             .concat2()
             .then(move |msg| {
-                pool.spawn_fn(move || match AdServer::save_ad(msg, &db_pool) {
-                    Ok(r) => Ok(r),
-                    Err(e) => {
-                        warn!("{:?}", e);
-                        Ok(Response::new().with_status(StatusCode::BadRequest))
-                    }
-                })
+                pool.spawn_fn(move || AdServer::save_ad(msg, &db_pool))
             })
-            .boxed()
+            .and_then(move |ad| {
+                handle.spawn(ad.grab_and_store(client, &image_db, image_pool));
+                Ok(Response::new())
+            })
+            .then(|r| match r {
+                Ok(r) => Ok(r),
+                Err(e) => {
+                    warn!("{:?}", e);
+                    Ok(Response::new().with_status(StatusCode::BadRequest))
+                }
+            });
+        Box::new(future)
     }
 
     fn save_ad(
         msg: Result<Chunk, hyper::Error>,
         db_pool: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<Response, InsertError> {
+    ) -> Result<Ad, InsertError> {
         let bytes = msg.map_err(InsertError::Hyper)?;
         let string = String::from_utf8(bytes.to_vec()).map_err(
             InsertError::String,
         )?;
 
-        let ad: AdPost = serde_json::from_str(&string).map_err(InsertError::JSON)?;
-        NewAd::new(&ad)?.save(&db_pool)?;
+        let post: AdPost = serde_json::from_str(&string).map_err(InsertError::JSON)?;
+        let ad = NewAd::new(&post)?.save(&db_pool)?;
 
-        Ok(Response::new())
+        Ok(ad)
     }
 
     pub fn start() {
@@ -102,19 +116,28 @@ impl AdServer {
         let db_pool = Pool::new(config, manager).expect("Failed to create pool.");
         let pool = CpuPool::new_num_cpus();
 
-        let server = Http::new()
-            .bind(&addr, move || {
-                Ok(AdServer {
-                    pool: pool.clone(),
-                    db_pool: db_pool.clone(),
-                })
-            })
-            .unwrap();
-
-        println!(
-            "Listening on http://{} with 1 thread.",
-            server.local_addr().unwrap()
+        let mut core = Core::new().unwrap();
+        let handle = core.handle();
+        let listener = TcpListener::bind(&addr, &handle).expect("Couldn't start server.");
+        let connector =
+            HttpsConnector::new(4, &core.handle()).expect("Couldn't build HttpSconnector");
+        let client = Client::configure().connector(connector).build(
+            &core.handle(),
         );
-        server.run().unwrap();
+
+        let server = listener.incoming().for_each(|(sock, addr)| {
+            let s = AdServer {
+                pool: pool.clone(),
+                db_pool: db_pool.clone(),
+                handle: handle.clone(),
+                client: client.clone(),
+            };
+            Http::new().bind_connection(&handle, sock, addr, s);
+
+            Ok(())
+        });
+
+        println!("Listening on http://{} with 1 thread.", addr);
+        core.run(server).unwrap();
     }
 }

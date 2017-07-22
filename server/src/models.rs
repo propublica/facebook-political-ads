@@ -4,30 +4,23 @@ use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
-use futures::future;
-use futures::future::Executor;
-use futures::stream;
-use futures::{Stream, Future};
+use futures::{Future, stream, Stream};
 use futures_cpupool::CpuPool;
-use hyper::{Client, Body, Uri};
+use hyper::{Body, Client, Uri};
 use hyper::client::HttpConnector;
-use hyper::error::UriError;
 use hyper_tls::HttpsConnector;
 use InsertError;
 use kuchiki;
 use kuchiki::traits::*;
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
-use rusoto_core::{Region, default_tls_client};
-use rusoto_credential::DefaultCredentialsProvider;
-use rusoto_s3::S3Client;
+use rusoto_core::{default_tls_client, Region};
+use rusoto_credential::ProfileProvider;
+use rusoto_s3::{PutObjectRequest, S3Client, S3};
 use schema::ads;
 use server::AdPost;
-use tokio_core::reactor::Core;
 
-
-
-#[derive(Queryable, Debug)]
+#[derive(Queryable, Debug, Clone)]
 pub struct Ad {
     id: String,
     html: String,
@@ -47,33 +40,50 @@ pub struct Ad {
     images: Vec<String>,
 }
 
+#[derive(AsChangeset)]
+#[table_name = "ads"]
+pub struct Images {
+    thumbnail: Option<String>,
+    images: Vec<String>,
+}
+
 impl Ad {
     // This will asynchronously save the images to s3 we may very well end up
     // with broken images. but I can't see any way around it right now.  Also we
     // should think about splitting this up, but I'm fine -- if a little
-    // embarassed about it right now.
+    // embarassed about it right now. This function swallows errors, and there's
+    // a chance we'll end up with no images at the end, but I think we can
+    // handle that in the extension's UI.
     pub fn grab_and_store(
         &self,
-        core: &mut Core,
+        client: Client<HttpsConnector<HttpConnector>, Body>,
         db: &Pool<ConnectionManager<PgConnection>>,
         pool: CpuPool,
-    ) {
-        let images = [vec![self.thumbnail.clone()], self.images.clone()]
-            .concat()
-            .iter()
-            .map(|a| {
-                let a: Uri = a.parse().map_err(InsertError::Uri)?;
-                Ok(a.clone())
-            })
-            .collect::<Vec<Result<Uri, InsertError>>>();
+    ) -> Box<Future<Item = (), Error = ()>> {
         let ad = self.clone();
         let pool_s3 = pool.clone();
         let pool_db = pool.clone();
         let db = db.clone();
-        let client = Client::new(&core.handle());
-        let future = stream::iter(images)
-            // grab the images
-            .map(move |img| {
+
+        let images = [vec![self.thumbnail.clone()], self.images.clone()];
+        let urls = images
+            .concat()
+            .iter()
+            .map(|a| {
+                let a: Uri = a.parse().map_err(InsertError::Uri)?;
+                Ok(a)
+            })
+            .collect::<Vec<Result<Uri, InsertError>>>();
+        let future = stream::iter(urls)
+            // filter ones we already have in the db and ones we can verify as
+            // coming from fb, we don't want to become a malware vector :)
+            .filter(|u| match u.host() {
+                Some(h) => h != "pp-facebook-ads.s3.amazonaws.com" || !h.ends_with("fbcdn.net"),
+                None => false
+            })
+            // grab image
+            .and_then(move |img| {
+                info!("getting {:?}", img);
                 let cloned = img.clone();
                 client
                     .get(img)
@@ -83,32 +93,71 @@ impl Ad {
                     .map_err(InsertError::Hyper)
             })
             // upload them to s3
-            .and_then(move |future| {
+            .and_then(move |tuple| {
                 let pool = pool_s3.clone();
-                future.and_then(move |tuple| {
-                    pool.spawn_fn(move || {
-                        let client = S3Client::new(default_tls_client().map_err(InsertError::TLS)?,
-                                                   DefaultCredentialsProvider::new().unwrap(),
-                                                   Region::UsEast1);
-                        
-                        Ok(tuple.1)
-                    })
+                // we do this in a worker thread because rusoto isn't on
+                // Hyper async yet.
+                pool.spawn_fn(move || {
+                    let client =
+                        S3Client::new(default_tls_client().map_err(InsertError::TLS)?,
+                                      ProfileProvider::new().map_err(InsertError::AWS)?,
+                                      Region::UsEast1);
+                    let req = PutObjectRequest {
+                        bucket: "pp-facebook-ads".to_string(),
+                        key: tuple.1.path().trim_left_matches("/").to_string(),
+                        acl: Some("public-read".to_string()),
+                        body: Some(tuple.0.to_vec()),
+                        ..PutObjectRequest::default()
+                    };
+
+                    client.put_object(&req).map_err(InsertError::S3)?;
+                    Ok(tuple.1)
                 })
             })
-            .collect()
-            // save the new urls to the database the images variable will
-            // include only those that we've successfully saved, so we have to
-            // do a funky merge here.
-            .and_then(move |images| {
-                pool_db.spawn_fn(|| Ok(()))
-            }).map_err(|e| {
+            .map_err(|e| {
                 warn!("{:?}", e);
                 ()
+            })
+            .collect()
+            // save the new urls to the database. the images variable will
+            // include only those that we've successfully saved to s3, so we
+            // have to do a funky merge here.
+            .and_then(move |images| {
+                let imgs = images.clone();
+                pool_db.spawn_fn(move || {
+                    use schema::ads::dsl::*;
+                    let thumb = imgs
+                        .iter()
+                        .filter(|i| ad.thumbnail.contains(i.path()))
+                        .map(|i| "https://pp-facebook-ads.s3.amazonaws.com/".to_string() + i.path())
+                        .nth(0);
+
+                    let mut rest = imgs.clone();
+                    if let Some(thumb) = thumb.clone() {
+                      rest.retain(|x| !thumb.contains(x.path()))  
+                    };
+
+                    let collection = rest
+                        .iter()
+                        .filter(|i| ad.images.iter().any(|a| a.contains(i.path())))
+                        .map(|i| "https://pp-facebook-ads.s3.amazonaws.com/".to_string() + i.path())
+                        .collect::<Vec<String>>();
+                    
+                    let update = Images {
+                        thumbnail: thumb,
+                        images: collection
+                    };
+                    // I don't understand why we're zeroing out the errors here
+                    // but ok.
+                    let connection = db.get().map_err(|_| ())?;
+                    diesel::update(ads.filter(id.eq(ad.id)))
+                        .set(&update)
+                        .execute(&*connection)
+                        .map_err(|_| ())?;
+                    Ok(())
+                })
             });
-        let result = core.execute(future);
-        if result.is_err() {
-            warn!("Tokio Core error: {:?}", result);
-        }
+        Box::new(future)
     }
 }
 
@@ -125,13 +174,6 @@ pub struct NewAd<'a> {
     thumbnail: String,
 
     browser_lang: &'a str,
-    images: Vec<String>,
-}
-
-#[derive(AsChangeset)]
-#[table_name = "ads"]
-pub struct Images {
-    thumbnail: String,
     images: Vec<String>,
 }
 
