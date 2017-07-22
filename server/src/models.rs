@@ -129,7 +129,7 @@ impl Ad {
                     let thumb = imgs
                         .iter()
                         .filter(|i| ad.thumbnail.contains(i.path()))
-                        .map(|i| "https://pp-facebook-ads.s3.amazonaws.com/".to_string() + i.path())
+                        .map(|i| "https://pp-facebook-ads.s3.amazonaws.com/".to_string() + i.path().trim_left_matches("/"))
                         .nth(0);
 
                     let mut rest = imgs.clone();
@@ -140,7 +140,7 @@ impl Ad {
                     let collection = rest
                         .iter()
                         .filter(|i| ad.images.iter().any(|a| a.contains(i.path())))
-                        .map(|i| "https://pp-facebook-ads.s3.amazonaws.com/".to_string() + i.path())
+                        .map(|i| "https://pp-facebook-ads.s3.amazonaws.com/".to_string() + i.path().trim_left_matches("/"))
                         .collect::<Vec<String>>();
                     
                     let update = Images {
@@ -149,11 +149,12 @@ impl Ad {
                     };
                     // I don't understand why we're zeroing out the errors here
                     // but ok.
-                    let connection = db.get().map_err(|_| ())?;
+                    let connection = db.get().map_err(|e| {warn!("{:?}", e); ()})?;
                     diesel::update(ads.filter(id.eq(ad.id)))
                         .set(&update)
                         .execute(&*connection)
-                        .map_err(|_| ())?;
+                        .map_err(|e| {warn!("{:?}", e); ()})?;
+                    info!("saved {:?}", imgs);
                     Ok(())
                 })
             });
