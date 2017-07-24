@@ -120,7 +120,7 @@ impl AdServer {
         let handle = core.handle();
         let listener = TcpListener::bind(&addr, &handle).expect("Couldn't start server.");
         let connector =
-            HttpsConnector::new(4, &core.handle()).expect("Couldn't build HttpSconnector");
+            HttpsConnector::new(4, &core.handle()).expect("Couldn't build HttpsConnector");
         let client = Client::configure().connector(connector).build(
             &core.handle(),
         );
