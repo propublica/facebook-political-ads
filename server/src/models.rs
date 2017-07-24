@@ -150,11 +150,12 @@ impl Ad {
                     // I don't understand why we're zeroing out the errors here
                     // but ok.
                     let connection = db.get().map_err(|e| {warn!("{:?}", e); ()})?;
+                    let adid = ad.id.clone();
                     diesel::update(ads.filter(id.eq(ad.id)))
                         .set(&update)
                         .execute(&*connection)
                         .map_err(|e| {warn!("{:?}", e); ()})?;
-                    info!("saved {:?}", imgs);
+                    info!("saved {:?}", adid);
                     Ok(())
                 })
             });

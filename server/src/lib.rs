@@ -11,7 +11,7 @@ extern crate futures_cpupool;
 extern crate kuchiki;
 #[macro_use]
 extern crate log;
-extern crate pretty_env_logger;
+extern crate log4rs;
 extern crate r2d2;
 extern crate r2d2_diesel;
 extern crate rusoto_core;
