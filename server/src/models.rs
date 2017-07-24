@@ -15,7 +15,7 @@ use kuchiki::traits::*;
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::{default_tls_client, Region};
-use rusoto_credential::DefaultProvider;
+use rusoto_credential::DefaultCredentialsProvider;
 use rusoto_s3::{PutObjectRequest, S3Client, S3};
 use schema::ads;
 use server::AdPost;
@@ -100,7 +100,7 @@ impl Ad {
                 pool.spawn_fn(move || {
                     let client =
                         S3Client::new(default_tls_client().map_err(InsertError::TLS)?,
-                                      DefaultProvider::new().map_err(InsertError::AWS)?,
+                                      DefaultCredentialsProvider::new().map_err(InsertError::AWS)?,
                                       Region::UsEast1);
                     let req = PutObjectRequest {
                         bucket: "pp-facebook-ads".to_string(),
