@@ -9,8 +9,11 @@ use hyper::{Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper_tls::HttpsConnector;
+use log::LogLevelFilter;
+use log4rs;
+use log4rs::append::console::ConsoleAppender;
+use log4rs::config::{Appender, Config as LogConfig, Logger, Root};
 use models::{NewAd, Ad};
-use pretty_env_logger;
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
 use serde_json;
@@ -105,7 +108,19 @@ impl AdServer {
 
     pub fn start() {
         dotenv().ok();
-        pretty_env_logger::init().unwrap();
+
+        let stdout = ConsoleAppender::builder().build();
+        let config = LogConfig::builder()
+            .appender(Appender::builder().build("stdout", Box::new(stdout)))
+            .logger(Logger::builder().build("hyper", LogLevelFilter::Info))
+            .logger(Logger::builder().build("server", LogLevelFilter::Info))
+            .build(Root::builder().appender("stdout").build(
+                LogLevelFilter::Error,
+            ))
+            .expect("Log config didn't work");
+        log4rs::init_config(config).expect("Logging encountered an error.");
+
+
         let addr = env::var("HOST").expect("HOST must be set").parse().expect(
             "Error parsing HOST",
         );
