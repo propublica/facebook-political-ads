@@ -30,7 +30,8 @@
     "preact-compat": "^3.16.0",
     "source-map-loader": "^0.2.1",
     "style-loader": "^0.18.2",
-    "webpack": "^3.3.0"
+    "webpack": "^3.3.0",
+    "uglifyjs-webpack-plugin": "^0.4.6"
   },
   "dependencies": {
     "lodash": "^4.17.4",
