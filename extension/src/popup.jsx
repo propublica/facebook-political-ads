@@ -78,7 +78,7 @@ const newRatings = (ratings) => ({
 });
 
 // Reducers
-const active = (state = ToggleType.ADS, action) => {
+const active = (state = ToggleType.RATER, action) => {
   switch(action.type) {
   case TOGGLE_TAB:
     return action.value;
@@ -275,7 +275,7 @@ const Toggle = ({type, message, active, onToggleClick}) => (
 
 
 // Our Main container.
-let Toggler = ({ads, ratings, active = ToggleType.RATER, onToggleClick}) => (
+let Toggler = ({ads, ratings, active, onToggleClick}) => (
   <div id="toggler">
     <div id="tabs">
       <Toggle
