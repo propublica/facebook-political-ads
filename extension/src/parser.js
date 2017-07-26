@@ -5,6 +5,7 @@ const selectors = [
   'video',
   'input',
   'button',
+  'iframe',
   'a[href=""]',
   '.accessible_elem',
   '.uiLikePagebutton',
