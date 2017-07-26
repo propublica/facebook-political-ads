@@ -53,15 +53,15 @@ const cleanAd = (html) => {
   return node.innerHTML.replace(/&amp;/g, '&');
 };
 
-const checkSponsor = (node, sponsor) => {
+const checkSponsor = (node) => {
   return Array.from(node.querySelectorAll("a")).some((a) => {
-    return a.textContent === sponsor;
+    return ['Sponsored','Gesponsert'].some((sponsor) => a.textContent === sponsor);
   });
 };
 
-const timeline = (node, sponsor) => {
+const timeline = (node) => {
   // First we check if it is actually a sponsored post
-  if(!checkSponsor(node, sponsor)) return false;
+  if(!checkSponsor(node)) return false;
 
   // And then we try to grab the parent container that has a hyperfeed id
   let parent = node;
@@ -117,11 +117,11 @@ const sidebar = (node, sponsor) => {
 };
 
 // We are careful here to only accept a valid timeline ad or sidebar ad
-module.exports = function(node, sponsor) {
+module.exports = function(node) {
   if(node.classList.contains("fbUserContent")) {
-    return timeline(node, sponsor);
+    return timeline(node);
   } else if(node.classList.contains('ego_unit')) {
-    return sidebar(node, sponsor);
+    return sidebar(node);
   } else {
     return false;
   }
