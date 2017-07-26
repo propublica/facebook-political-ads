@@ -4,8 +4,7 @@ import throttle from 'lodash/throttle';
 const sendAds = function(){
   let posts = Array.from(document.querySelectorAll(".fbUserContent"))
     .concat(Array.from(document.querySelectorAll(".ego_unit")));
-  let sponsor = chrome.i18n.getMessage("sponsor_text");
-  let ads = posts.map((i) => parser(i, sponsor)).filter((i) => i);
+  let ads = posts.map((i) => parser(i)).filter((i) => i);
   chrome.runtime.sendMessage(ads);
 };
 
