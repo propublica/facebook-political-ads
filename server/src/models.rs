@@ -20,6 +20,8 @@ use rusoto_s3::{PutObjectRequest, S3Client, S3};
 use schema::ads;
 use server::AdPost;
 
+const ENDPOINT: &'static str = "https://pp-facebook-ads.s3.amazonaws.com/";
+
 #[derive(Queryable, Debug, Clone)]
 pub struct Ad {
     id: String,
@@ -129,7 +131,7 @@ impl Ad {
                     let thumb = imgs
                         .iter()
                         .filter(|i| ad.thumbnail.contains(i.path()))
-                        .map(|i| "https://pp-facebook-ads.s3.amazonaws.com/".to_string() + i.path().trim_left_matches("/"))
+                        .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches("/"))
                         .nth(0);
 
                     let mut rest = imgs.clone();
@@ -140,7 +142,7 @@ impl Ad {
                     let collection = rest
                         .iter()
                         .filter(|i| ad.images.iter().any(|a| a.contains(i.path())))
-                        .map(|i| "https://pp-facebook-ads.s3.amazonaws.com/".to_string() + i.path().trim_left_matches("/"))
+                        .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches("/"))
                         .collect::<Vec<String>>();
                     
                     let update = Images {
@@ -167,7 +169,7 @@ impl Ad {
 #[table_name = "ads"]
 pub struct NewAd<'a> {
     id: &'a str,
-    html: &'a str,
+    html: String,
     political: i32,
     not_political: i32,
 
@@ -232,6 +234,19 @@ impl<'a> NewAd<'a> {
         )
     }
 
+    fn rewrite_images(document: &kuchiki::NodeRef) -> Result<&kuchiki::NodeRef, InsertError> {
+        // rewrite
+        for a in document.select("img").map_err(InsertError::HTML)? {
+            if let Some(x) = a.attributes.borrow_mut().get_mut("src") {
+                if let Ok(u) = x.parse::<Uri>() {
+                    *x = ENDPOINT.to_string() + u.path().trim_left_matches("/");
+                }
+            };
+        }
+
+        Ok(&document)
+    }
+
     pub fn new(ad: &'a AdPost) -> Result<NewAd<'a>, InsertError> {
         let document = kuchiki::parse_html().one(ad.html.clone());
 
@@ -239,10 +254,12 @@ impl<'a> NewAd<'a> {
         let title = NewAd::get_title(&document)?;
         let thumb = NewAd::get_image(&document)?;
         let images = NewAd::get_images(&document)?;
+        let doc = NewAd::rewrite_images(&document)?;
+        let html = doc.to_string();
 
         Ok(NewAd {
             id: &ad.id,
-            html: &ad.html,
+            html: html,
             political: if ad.political { 1 } else { 0 },
             not_political: if !ad.political { 1 } else { 0 },
             title: title,
@@ -290,11 +307,14 @@ mod tests {
         };
         let new_ad = NewAd::new(&post).unwrap();
         assert!(new_ad.thumbnail.len() > 0);
-        assert_eq!(new_ad.images.len(), 1);
+        assert_eq!(new_ad.images.len(), 2);
+        assert!(new_ad.title.len() > 0);
+        assert!(new_ad.html != post.html);
+        println!("{:?}", new_ad.html);
+        assert!(!new_ad.html.contains("fbcdn"));
         assert_eq!(
             new_ad.message,
-            "<p><a href=\"https://www.facebook.com/hashtag/valerian\" class=\"_58cn\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>"
+            "<p><a class=\"_58cn\" href=\"https://www.facebook.com/hashtag/valerian\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>"
         );
-        assert!(new_ad.title.len() > 0);
     }
 }
