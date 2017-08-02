@@ -8,8 +8,11 @@ const sendAds = function(){
   chrome.runtime.sendMessage(ads);
 };
 
-let observer = new MutationObserver(throttle(sendAds, 250));
+const throttled = throttle(sendAds, 250);
+
+let observer = new MutationObserver(throttled);
 observer.observe(document.body, {childList: true, subtree:true});
+setInterval(throttled, 500);
 
 if(document.readyState === 'complete')
   sendAds();

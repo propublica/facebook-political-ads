@@ -223,14 +223,7 @@ impl<'a> NewAd<'a> {
                 .skip(1)
                 .map(|a| {
                     a.attributes.borrow().get("src").and_then(
-                        |s| if !s.contains(
-                            "rsrc.php",
-                        )
-                        {
-                            Some(s.to_string())
-                        } else {
-                            None
-                        },
+                        |s| Some(s.to_string()),
                     )
                 })
                 .filter(|s| s.is_some())

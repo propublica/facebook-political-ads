@@ -7,3 +7,4 @@ server/target
 extension/build/
 extension/dist/
 extension/*.zip
+memos
