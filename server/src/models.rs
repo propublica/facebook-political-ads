@@ -310,11 +310,10 @@ mod tests {
         assert_eq!(new_ad.images.len(), 2);
         assert!(new_ad.title.len() > 0);
         assert!(new_ad.html != post.html);
-        println!("{:?}", new_ad.html);
         assert!(!new_ad.html.contains("fbcdn"));
         assert_eq!(
             new_ad.message,
-            "<p><a class=\"_58cn\" href=\"https://www.facebook.com/hashtag/valerian\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>"
+            "<p><a href=\"https://www.facebook.com/hashtag/valerian\" class=\"_58cn\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>"
         );
     }
 }
