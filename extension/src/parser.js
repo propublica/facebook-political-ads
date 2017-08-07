@@ -35,11 +35,9 @@ const cleanAd = (html) => {
       if(attr.name === "href") {
         try {
           let url = new URL(attr.value);
-          if(url.host === 'l.facebook.com') {
-            node.removeAttribute(attr.name);
-          } else {
-            node.setAttribute(attr.name, url.origin + url.pathname);
-          }
+          if(url.host === 'l.facebook.com')
+            url = new URLSearchParams(url.search).get("u");
+          node.setAttribute(attr.name, url.origin + url.pathname);
         } catch(e) {
           node.removeAttribute(attr.name);
         }
