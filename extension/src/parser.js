@@ -14,6 +14,9 @@ const selectors = [
   '.uiChevronSelectorButton'
 ].join(', ');
 
+const TIMELINE_SELECTOR = '.fbUserContent, .fbUserPost, ._5pcr';
+const SIDEBAR_SELECTOR = '.ego_unit';
+
 const cleanAd = (html) => {
   let node = document.createElement("div");
   node.innerHTML = html;
@@ -81,8 +84,8 @@ const timeline = (node) => {
 
   // Check to see that we have the innermost fbUserContent, this cuts out like's
   // and shares.
-  if(node.querySelector('.fbUserContent, .fbUserPost, ._5pcr'))
-    node = node.querySelector('.fbUserContent, .fbUserPost, ._5pcr');
+  if(node.querySelector(TIMELINE_SELECTOR))
+    node = node.querySelector(TIMELINE_SELECTOR);
 
   // Finally we have something to save.
   return {
@@ -103,7 +106,7 @@ const sidebar = (node, sponsor) => {
   // As before it is an error if we haven't found a sponsor node.
   if(!(parent &&
        parent.classList &&
-       parent.classList.contains("ego_section"))) return false;
+       parent.classList.contains('ego_section'))) return false;
 
   // Sanity check to make sure we have a salvageable id
   if(!node.hasAttribute("data-ego-fbid")) return false;
@@ -119,14 +122,20 @@ const sidebar = (node, sponsor) => {
 };
 
 // We are careful here to only accept a valid timeline ad or sidebar ad
-module.exports = function(node) {
+const parser = function(node) {
   if(node.classList.contains("fbUserContent") ||
      node.classList.contains("fbUserPost") ||
-     node.classList.contains("._5pcr")) {
+     node.classList.contains("_5pcr")) {
     return timeline(node);
   } else if(node.classList.contains('ego_unit')) {
     return sidebar(node);
   } else {
     return false;
   }
+};
+
+module.exports = {
+  parser,
+  TIMELINE_SELECTOR,
+  SIDEBAR_SELECTOR,
 };
