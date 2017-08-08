@@ -1,9 +1,9 @@
-import parser from 'parser';
+import { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR } from 'parser';
 import throttle from 'lodash/throttle';
 
 const sendAds = function(){
-  let posts = Array.from(document.querySelectorAll(".fbUserContent, .fbUserPost, ._5pcr"))
-    .concat(Array.from(document.querySelectorAll(".ego_unit")));
+  let posts = Array.from(document.querySelectorAll(TIMELINE_SELECTOR))
+    .concat(Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)));
   let ads = posts.map((i) => parser(i)).filter((i) => i);
   chrome.runtime.sendMessage(ads);
 };
