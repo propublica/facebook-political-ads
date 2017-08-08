@@ -5,6 +5,8 @@ import { Provider, connect } from 'preact-redux';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
 
+import { adForRequest } from 'utils.js';
+
 // styles
 import "../css/styles.css";
 
@@ -52,17 +54,15 @@ const assignRating = (id, rating) => ({
 const rateAd = (ad, rating) => {
   return (dispatch) => {
     let body = {
-      id: ad.id,
-      html: ad.html,
+      ...adForRequest(ad),
       political: rating === RatingType.POLITICAL,
-      browser_lang: chrome.i18n.getUILanguage()
     };
     let cb = () => dispatch(assignRating(ad.id, rating));
     dispatch(processingRating(body.id));
     return fetch(endpoint, {
       method: "POST",
       mode: 'no-cors',
-      body: JSON.stringify(body)
+      body: JSON.stringify([body])
     }).then(cb, cb);
   };
 };

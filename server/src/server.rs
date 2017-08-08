@@ -76,10 +76,17 @@ impl AdServer {
         let future = req.body()
             .concat2()
             .then(move |msg| {
-                pool.spawn_fn(move || AdServer::save_ad(msg, &db_pool))
+                pool.spawn_fn(move || AdServer::save_ads(msg, &db_pool))
             })
-            .and_then(move |ad| {
-                handle.spawn(ad.grab_and_store(client, &image_db, image_pool));
+            .and_then(move |ads| {
+                for ad in ads {
+                    handle.spawn(ad.grab_and_store(
+                        client.clone(),
+                        &image_db,
+                        image_pool.clone(),
+                    ))
+                }
+
                 Ok(Response::new())
             })
             .then(|r| match r {
@@ -92,19 +99,22 @@ impl AdServer {
         Box::new(future)
     }
 
-    fn save_ad(
+    fn save_ads(
         msg: Result<Chunk, hyper::Error>,
         db_pool: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<Ad, InsertError> {
+    ) -> Result<Vec<Ad>, InsertError> {
         let bytes = msg.map_err(InsertError::Hyper)?;
         let string = String::from_utf8(bytes.to_vec()).map_err(
             InsertError::String,
         )?;
 
-        let post: AdPost = serde_json::from_str(&string).map_err(InsertError::JSON)?;
-        let ad = NewAd::new(&post)?.save(&db_pool)?;
+        let posts: Vec<AdPost> = serde_json::from_str(&string).map_err(InsertError::JSON)?;
+        let ads = posts.iter().map(|post| {
+            let ad = NewAd::new(&post)?.save(&db_pool)?;
+            Ok(ad)
+        });
 
-        Ok(ad)
+        ads.collect::<Result<Vec<Ad>, InsertError>>()
     }
 
     pub fn start() {
