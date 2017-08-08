@@ -110,7 +110,7 @@ impl AdServer {
 
         let posts: Vec<AdPost> = serde_json::from_str(&string).map_err(InsertError::JSON)?;
         let ads = posts.iter().map(|post| {
-            let ad = NewAd::new(&post)?.save(&db_pool)?;
+            let ad = NewAd::new(post)?.save(db_pool)?;
             Ok(ad)
         });
 
