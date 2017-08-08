@@ -52,7 +52,7 @@ fn get_message(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
         .map(|i| {
             i.fold(String::new(), |m, a| m + &a.as_node().to_string())
         })
-        .filter(|i| i.len() > 0)
+        .filter(|i| !i.is_empty())
         .nth(0)
         .ok_or(InsertError::HTML(()))
 }
@@ -89,7 +89,7 @@ impl Images {
         let thumb = images
             .iter()
             .filter(|i| ad.thumbnail.contains(i.path()))
-            .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches("/"))
+            .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches('/'))
             .nth(0);
 
         let mut rest = images.clone();
@@ -99,7 +99,7 @@ impl Images {
 
         let collection = rest.iter()
             .filter(|i| ad.images.iter().any(|a| a.contains(i.path())))
-            .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches("/"))
+            .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches('/'))
             .collect::<Vec<String>>();
 
         let document = kuchiki::parse_html().one(ad.html.clone());
@@ -107,7 +107,7 @@ impl Images {
             if let Some(x) = a.attributes.borrow_mut().get_mut("src") {
                 if let Ok(u) = x.parse::<Uri>() {
                     if let Some(i) = images.iter().find(|i| i.path() == u.path()) {
-                        *x = ENDPOINT.to_string() + i.path().trim_left_matches("/");
+                        *x = ENDPOINT.to_string() + i.path().trim_left_matches('/');
                     } else {
                         *x = "".to_string();
                     }
@@ -194,7 +194,7 @@ impl Ad {
                                       Region::UsEast1);
                     let req = PutObjectRequest {
                         bucket: "pp-facebook-ads".to_string(),
-                        key: tuple.1.path().trim_left_matches("/").to_string(),
+                        key: tuple.1.path().trim_left_matches('/').to_string(),
                         acl: Some("public-read".to_string()),
                         body: Some(tuple.0.to_vec()),
                         ..PutObjectRequest::default()
