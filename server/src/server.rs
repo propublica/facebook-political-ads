@@ -72,6 +72,7 @@ impl AdServer {
         let image_db = self.db_pool.clone();
         let handle = self.handle.clone();
         let client = self.client.clone();
+
         let future = req.body()
             .concat2()
             .then(move |msg| {

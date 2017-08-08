@@ -43,7 +43,7 @@ fn get_image(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
         })
         .ok_or(InsertError::HTML(()))
 }
-// Video ads make this a bit messy
+
 fn get_message(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
     let selectors = vec![".userContent p", "span"];
     let iters = selectors.iter().map(|s| document.select(s)).flat_map(|a| a);
@@ -149,11 +149,11 @@ pub struct Ad {
 
 impl Ad {
     // This will asynchronously save the images to s3 we may very well end up
-    // dropping images. but I can't see any way around it right now. Also we
+    // dropping images, but I can't see any way around it right now. Also we
     // should think about splitting this up, but I'm fine -- if a little
-    // embarassed about it right now. This function swallows errors, and there's
-    // a chance we'll end up with no images at the end, but I think we can
-    // handle that in the extension's UI.
+    // embarassed about it -- right now. This function swallows errors, and
+    // there's a chance we'll end up with no images at the end, but I think we
+    // can handle that in the extension's UI.
     pub fn grab_and_store(
         &self,
         client: Client<HttpsConnector<HttpConnector>, Body>,
@@ -199,7 +199,6 @@ impl Ad {
                         body: Some(tuple.0.to_vec()),
                         ..PutObjectRequest::default()
                     };
-
                     client.put_object(&req).map_err(InsertError::S3)?;
                     Ok(tuple.1)
                 })

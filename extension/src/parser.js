@@ -81,8 +81,8 @@ const timeline = (node) => {
 
   // Check to see that we have the innermost fbUserContent, this cuts out like's
   // and shares.
-  if(node.querySelector('.fbUserContent'))
-    node = node.querySelector('.fbUserContent');
+  if(node.querySelector('.fbUserContent, .fbUserPost, ._5pcr'))
+    node = node.querySelector('.fbUserContent, .fbUserPost, ._5pcr');
 
   // Finally we have something to save.
   return {
@@ -120,7 +120,9 @@ const sidebar = (node, sponsor) => {
 
 // We are careful here to only accept a valid timeline ad or sidebar ad
 module.exports = function(node) {
-  if(node.classList.contains("fbUserContent")) {
+  if(node.classList.contains("fbUserContent") ||
+     node.classList.contains("fbUserPost") ||
+     node.classList.contains("._5pcr")) {
     return timeline(node);
   } else if(node.classList.contains('ego_unit')) {
     return sidebar(node);
