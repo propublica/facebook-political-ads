@@ -5,7 +5,7 @@ import { Provider, connect } from 'preact-redux';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
 
-import { adForRequest } from 'utils.js';
+import { adForRequest, sendAds } from 'utils.js';
 
 // styles
 import "../css/styles.css";
@@ -66,7 +66,7 @@ const newAds = (ads) => ({
 
 const newRatings = (ratings) => ({
   type: NEW_RATINGS,
-t   value: ratings
+  value: ratings
 });
 
 // Reducers
