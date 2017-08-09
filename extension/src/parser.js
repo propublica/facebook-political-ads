@@ -64,6 +64,30 @@ const checkSponsor = (node) => {
   });
 };
 
+let getTimelineId = (parent) => {
+  const control = parent.querySelector(".uiPopover");
+  if(!control && control.id === "") return null;
+  const toggle = control.querySelector("a");
+  if(!toggle) return null;
+  // this is async
+  let promise = new Promise((resolve, reject) => {
+    new MutationObserver((record, self) => {
+      const endpoint = document.querySelector("li[data-feed-option-name=FeedAdSeenReasonOption] a");
+      if(!endpoint) return null;
+      const url = "https://facebook.com" + endpoint.getAttribute("ajaxify");
+      toggle.click();
+      self.disconnect();
+      try {
+        resolve(new URL(url).searchParams.get("ad_id"));
+      } catch(e) {
+        reject(e);
+      }
+    }).observe(document.body, {childList: true, subtree:true});
+  });
+  toggle.click();
+  return promise;
+};
+
 const timeline = (node) => {
   // First we check if it is actually a sponsored post
   if(!checkSponsor(node)) return false;
