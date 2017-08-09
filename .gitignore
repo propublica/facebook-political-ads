@@ -7,7 +7,7 @@ extension/build/
 extension/dist/
 extension/*.zip
 memos
-backend/server/target
+target
 backend/server/.dockerignore
 backend/server/Dockerfile
 deploy.sh

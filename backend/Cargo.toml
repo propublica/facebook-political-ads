@@ -1,6 +1,6 @@
 [workspace]
-members = {
+members = [
      "classifier",
      "server",
      "tools"
-}
+]
