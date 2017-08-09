@@ -12,7 +12,7 @@ const throttled = throttle(sendAds, 250);
 
 let observer = new MutationObserver(throttled);
 observer.observe(document.body, {childList: true, subtree:true});
-setInterval(throttled, 500);
+setInterval(throttled, 5000);
 
 if(document.readyState === 'complete')
   sendAds();

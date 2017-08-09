@@ -10,7 +10,7 @@ const endpoint = process.env.NODE_ENV === 'production' ?
 const sendAds = (body) => fetch(endpoint, {
   method: "POST",
   mode: 'no-cors',
-  body: JSON.stringify([body])
+  body: JSON.stringify(body)
 });
 
 export { adForRequest, sendAds };
