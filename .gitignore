@@ -10,5 +10,5 @@ memos
 backend/server/target
 backend/server/.dockerignore
 backend/server/Dockerfile
-/deploy.sh
-/papers/fuzzy.pdf
+deploy.sh
+papers
