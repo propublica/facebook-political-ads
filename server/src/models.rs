@@ -121,7 +121,13 @@ impl Images {
             thumbnail: thumb,
             images: collection,
             title: title,
-            html: document.to_string(),
+            html: document
+                .select("div")
+                .map_err(InsertError::HTML)?
+                .nth(0)
+                .ok_or(InsertError::HTML(()))?
+                .as_node()
+                .to_string(),
             message: message,
         })
     }
@@ -133,18 +139,15 @@ pub struct Ad {
     html: String,
     political: i32,
     not_political: i32,
-
     fuzzy_id: Option<i32>,
     title: String,
     message: String,
     thumbnail: String,
-
     created_at: DateTime<Utc>,
     updated_at: DateTime<Utc>,
-
     browser_lang: String,
-
     images: Vec<String>,
+    impressions: i32,
 }
 
 impl Ad {
@@ -257,6 +260,7 @@ pub struct NewAd<'a> {
 
     browser_lang: &'a str,
     images: Vec<String>,
+    impressions: i32,
 }
 
 impl<'a> NewAd<'a> {
@@ -271,13 +275,14 @@ impl<'a> NewAd<'a> {
         Ok(NewAd {
             id: &ad.id,
             html: &ad.html,
-            political: if ad.political { 1 } else { 0 },
-            not_political: if !ad.political { 1 } else { 0 },
+            political: if ad.political.unwrap_or(false) { 1 } else { 0 },
+            not_political: if !ad.political.unwrap_or(true) { 1 } else { 0 },
             title: title,
             message: message,
             thumbnail: thumb,
             browser_lang: &ad.browser_lang,
             images: images,
+            impressions: if !ad.political.is_some() { 1 } else { 0 },
         })
     }
 
@@ -285,6 +290,7 @@ impl<'a> NewAd<'a> {
         use schema::ads;
         use schema::ads::dsl::*;
         let connection = pool.get().map_err(InsertError::Timeout)?;
+        // increment impressions if this is a background save
         let ad: Ad = diesel::insert(&self.on_conflict(
             id,
             do_update().set((
@@ -292,6 +298,9 @@ impl<'a> NewAd<'a> {
                 not_political.eq(
                     not_political +
                         self.not_political,
+                ),
+                impressions.eq(
+                    impressions + self.impressions,
                 ),
                 updated_at.eq(Utc::now()),
             )),
@@ -313,7 +322,7 @@ mod tests {
         let post = AdPost {
             id: "test".to_string(),
             html: ad.to_string(),
-            political: true,
+            political: None,
             browser_lang: "en-US".to_string(),
         };
         let new_ad = NewAd::new(&post).unwrap();
@@ -322,8 +331,8 @@ mod tests {
         assert!(new_ad.title.len() > 0);
 
         assert_eq!(
-            new_ad.message,
-            "<p><a class=\"_58cn\" href=\"https://www.facebook.com/hashtag/valerian\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>"
+            kuchiki::parse_html().one(new_ad.message).text_contents(),
+            kuchiki::parse_html().one("<p><a class=\"_58cn\" href=\"https://www.facebook.com/hashtag/valerian\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>").text_contents()
         );
     }
 
@@ -346,6 +355,7 @@ mod tests {
             updated_at: Utc::now(),
             browser_lang: "en-US".to_string(),
             images: get_images(&document).unwrap(),
+            impressions: 1,
         };
         let urls = saved_ad
             .image_urls()
@@ -355,7 +365,7 @@ mod tests {
         let images = Images::from_ad(&saved_ad, urls).unwrap();
         assert!(images.html != saved_ad.html);
         assert!(!images.html.contains("fbcdn"));
+        assert!(!images.html.contains("html"));
         assert!(images.images.len() == saved_ad.images.len());
-        println!("{:?}", images);
     }
 }

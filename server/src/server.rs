@@ -34,7 +34,7 @@ pub struct AdServer {
 pub struct AdPost {
     pub id: String,
     pub html: String,
-    pub political: bool,
+    pub political: Option<bool>,
     pub browser_lang: String,
 }
 
