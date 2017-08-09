@@ -171,9 +171,8 @@ impl Ad {
             // filter ones we already have in the db and ones we can verify as
             // coming from fb, we don't want to become a malware vector :)
             .filter(|u| {
-                info!("{:?}", u.host().unwrap() == "pp-facebook-ads.s3.amazonaws.com");
                 match u.host() {
-                    Some(h) => h != "pp-facebook-ads.s3.amazonaws.com" || !h.ends_with("fbcdn.net"),
+                    Some(h) => !(h == "pp-facebook-ads.s3.amazonaws.com" || h.ends_with("fbcdn.net")),
                     None => false
                 }
             })

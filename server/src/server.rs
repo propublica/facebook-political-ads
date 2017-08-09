@@ -109,7 +109,7 @@ impl AdServer {
         )?;
 
         let posts: Vec<AdPost> = serde_json::from_str(&string).map_err(InsertError::JSON)?;
-        let ads = posts.iter().map(|post| {
+        let ads = posts.iter().map(move |post| {
             let ad = NewAd::new(post)?.save(db_pool)?;
             Ok(ad)
         });
@@ -140,7 +140,7 @@ impl AdServer {
         let config = Config::default();
         let manager = ConnectionManager::<PgConnection>::new(database_url);
         let db_pool = Pool::new(config, manager).expect("Failed to create pool.");
-        let pool = CpuPool::new_num_cpus();
+        let pool = CpuPool::new(1); // CpuPool::new_num_cpus();
 
         let mut core = Core::new().unwrap();
         let handle = core.handle();
