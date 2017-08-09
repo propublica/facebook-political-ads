@@ -3,8 +3,12 @@
 node_modules
 dist
 .#*
-server/target
 extension/build/
 extension/dist/
 extension/*.zip
 memos
+backend/server/target
+backend/server/.dockerignore
+backend/server/Dockerfile
+/deploy.sh
+/papers/fuzzy.pdf

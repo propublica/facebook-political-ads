@@ -1,0 +1,6 @@
+[package]
+name = "classifier"
+version = "0.1.0"
+authors = ["Jeff Larson <thejefflarson@gmail.com>"]
+
+[dependencies]
