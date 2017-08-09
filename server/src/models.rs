@@ -277,6 +277,8 @@ impl<'a> NewAd<'a> {
         Ok(NewAd {
             id: &ad.id,
             html: &ad.html,
+            // we try unwrapping or we chose the false branch in both of these
+            // cases to count impressions
             political: if ad.political.unwrap_or(false) { 1 } else { 0 },
             not_political: if !ad.political.unwrap_or(true) { 1 } else { 0 },
             title: title,
@@ -292,7 +294,8 @@ impl<'a> NewAd<'a> {
         use schema::ads;
         use schema::ads::dsl::*;
         let connection = pool.get().map_err(InsertError::Timeout)?;
-        // increment impressions if this is a background save
+        // increment impressions if this is a background save,
+        // otherwise increment political counters
         let ad: Ad = diesel::insert(&self.on_conflict(
             id,
             do_update().set((
