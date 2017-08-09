@@ -12,10 +12,6 @@ import "../css/styles.css";
 
 const getMessage = chrome.i18n.getMessage;
 
-const endpoint = process.env.NODE_ENV === 'production' ?
-  "https://projects.propublica.org/facebook-ads/ads" :
-  "http://0.0.0.0:8080/facebook-ads/ads";
-
 // Constants
 const ToggleType = {
   ADS: "ads",
@@ -59,11 +55,7 @@ const rateAd = (ad, rating) => {
     };
     let cb = () => dispatch(assignRating(ad.id, rating));
     dispatch(processingRating(body.id));
-    return fetch(endpoint, {
-      method: "POST",
-      mode: 'no-cors',
-      body: JSON.stringify([body])
-    }).then(cb, cb);
+    return sendAds([body]).then(cb, cb);
   };
 };
 
@@ -74,7 +66,7 @@ const newAds = (ads) => ({
 
 const newRatings = (ratings) => ({
   type: NEW_RATINGS,
-  value: ratings
+t   value: ratings
 });
 
 // Reducers
