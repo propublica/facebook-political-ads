@@ -64,7 +64,7 @@ const checkSponsor = (node) => {
   });
 };
 
-let getTimelineId = (parent) => {
+let getTimelineId = (parent, ad) => {
   const control = parent.querySelector(".uiPopover");
   if(!control && control.id === "") return null;
   const toggle = control.querySelector("a");
@@ -72,20 +72,27 @@ let getTimelineId = (parent) => {
   // this is async
   let promise = new Promise((resolve, reject) => {
     let cb = (record, self) => {
-      const endpoint = document.querySelector("li[data-feed-option-name=FeedAdSeenReasonOption] a");
+      const layer = Array.from(document.querySelectorAll(".uiLayer"))
+        .filter((a) => {
+          return a.dataset.ownerid === toggle.id;
+        })[0];
+      if(!layer) return null;
+      const endpoint = layer.querySelector("li[data-feed-option-name=FeedAdSeenReasonOption] a");
       if(!endpoint) return null;
       const url = "https://facebook.com" + endpoint.getAttribute("ajaxify");
       toggle.click();
       self.disconnect();
+      console.log(new URL(url).searchParams.get("ad_id"));
       try {
-        resolve(new URL(url).searchParams.get("ad_id"));
+        resolve({
+          ...ad,
+          id: new URL(url).searchParams.get("ad_id"),
+        });
       } catch(e) {
         reject(e);
       }
     };
-    // Maybe it's already there?
-    cb();
-    // Sigh, we have to wait.
+
     new MutationObserver(cb).observe(document.body, {childList: true, subtree:true});
   });
   toggle.click();
@@ -94,7 +101,7 @@ let getTimelineId = (parent) => {
 
 const timeline = (node) => {
   // First we check if it is actually a sponsored post
-  if(!checkSponsor(node)) return false;
+  if(!checkSponsor(node)) return Promise.resolve(false);
 
   // And then we try to grab the parent container that has a hyperfeed id
   let parent = node;
@@ -105,10 +112,10 @@ const timeline = (node) => {
   }
 
   // If we've walked off the top of the parent heirarchy that's an error
-  if(!parent) return false;
+  if(!parent) return Promise.resolve(false);
 
   // Also if there's nothing to save that's an error
-  if(node.children.length === 0) return false;
+  if(node.children.length === 0) return Promise.resolve(false);
 
   // Check to see that we have the innermost fbUserContent, this cuts out like's
   // and shares.
@@ -116,41 +123,41 @@ const timeline = (node) => {
     node = node.querySelector(TIMELINE_SELECTOR);
 
   // Finally we have something to save.
-  return {
-    id: parent.getAttribute("id"),
+  return getTimelineId(parent, {
     html: cleanAd(node.children[0].outerHTML)
-  };
+  });
 };
 
 // Sidebar ads are a bit more complicated.
-const sidebar = (node, sponsor) => {
+const sidebar = (node) => {
   // Although first we still need to make sure we are in a sponsored box;
   let parent = node;
   while(parent) {
-    if(checkSponsor(parent, sponsor)) break;
+    if(checkSponsor(parent)) break;
     parent = parent.parentElement;
   }
 
   // As before it is an error if we haven't found a sponsor node.
   if(!(parent &&
        parent.classList &&
-       parent.classList.contains('ego_section'))) return false;
+       parent.classList.contains('ego_section'))) return Promise.resolve(false);
 
   // Sanity check to make sure we have a salvageable id
-  if(!node.hasAttribute("data-ego-fbid")) return false;
+  if(!node.hasAttribute("data-ego-fbid")) return Promise.resolve(false);
 
   // and we have childnodes
-  if(!node.children.length === 0) return false;
+  if(!node.children.length === 0) return Promise.resolve(false);
 
   // Then we just need to sent the cleaned ad and the ego-fbid
-  return {
+  return Promise.resolve({
     id: node.getAttribute("data-ego-fbid"),
     html: cleanAd(node.outerHTML)
-  };
+  });
 };
 
 // We are careful here to only accept a valid timeline ad or sidebar ad
 const parser = function(node) {
+  console.log('heyo');
   if(node.classList.contains("fbUserContent") ||
      node.classList.contains("fbUserPost") ||
      node.classList.contains("_5pcr")) {
@@ -158,7 +165,7 @@ const parser = function(node) {
   } else if(node.classList.contains('ego_unit')) {
     return sidebar(node);
   } else {
-    return false;
+    return Promise.resolve(false);
   }
 };
 

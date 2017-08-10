@@ -1,18 +1,26 @@
 import { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR } from 'parser';
 import throttle from 'lodash/throttle';
 
-const sendAds = function(){
+let seen = new Set();
+// our lock so we don't stomp all over facebook by overparsing.
+let running = false;
+const sendAds = function() {
+  if(running) return;
+  running = true;
+  console.time('parsing');
   let posts = Array.from(document.querySelectorAll(TIMELINE_SELECTOR))
     .concat(Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)));
-  let ads = posts.map((i) => parser(i)).filter((i) => i);
-  chrome.runtime.sendMessage(ads);
+  let results = [];
+  posts.reduce((p, i) => p.then(() => {
+    return parser(i, seen).then((it) => results.push(it));
+  }), Promise.resolve(null)).then(() => {
+    running = false;
+    console.timeEnd('parsing');
+    chrome.runtime.sendMessage(results.filter((i) => i));
+  });
 };
 
-const throttled = throttle(sendAds, 250);
-
-let observer = new MutationObserver(throttled);
-observer.observe(document.body, {childList: true, subtree:true});
-setInterval(throttled, 5000);
+setInterval(sendAds, 1000);
 
 if(document.readyState === 'complete')
   sendAds();
