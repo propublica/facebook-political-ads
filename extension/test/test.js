@@ -3,17 +3,49 @@ const fs = require('fs');
 const HTML = fs.readFileSync(__dirname + "/test.html");
 const dom = new JSDOM(HTML);
 const assert = require('assert');
+const { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR } = require('../src/parser.js');
 
 // Not ideal, but we slot in document for the parser's use.
 // It is the easiest way.
 global.document = dom.window.document;
 
-const { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR } = require('../src/parser.js');
+// Mock mutation observer for this test
+class MutationObserver {
+  constructor(cb) {
+    this.cb = cb;
+  }
 
-let posts = Array.from(dom.window.document.querySelectorAll(TIMELINE_SELECTOR))
-  .concat(Array.from(dom.window.document.querySelectorAll(SIDEBAR_SELECTOR)));
-let ads = posts.map((i) => parser(i)).filter((i) => i);
+  observe() {
+    this.cb(document.body, this);
+  }
 
-assert.equal(ads.length, 9, "Found eight ads");
-assert.equal(ads[0].id, "hyperfeed_story_id_5944756a18bdf2794599305", "Got an ad");
-assert.equal(ads[1].id, "hyperfeed_story_id_594474fe329fb7047789758", "Found the other.");
+  disconnect() {
+
+  }
+}
+
+global.MutationObserver = MutationObserver;
+global.URL = require('url').URL;
+
+const doit = () => {
+  let posts = Array.from(document.querySelectorAll(TIMELINE_SELECTOR))
+    .concat(Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)));
+  let results = [];
+  return posts.reduce((p, i) => p.then(() => {
+    return parser(i).then((it) => results.push(it));
+  }), Promise.resolve(null)).then(() => results.filter((i) => i));
+};
+
+console.time();
+doit().then((ads) => {
+  assert.equal(ads.length, 9, "Found nine ads");
+  assert.equal(ads[0].id, "6072446206112", "Got an ad");
+  assert.equal(ads[7].id, "23842581173480600", "Found the other.");
+  console.timeEnd();
+});
+
+process.on('unhandledRejection', error => {
+  // Will print "unhandledRejection err is not defined"
+  console.log('unhandledRejection', error);
+  throw error;
+});
