@@ -71,7 +71,7 @@ let getTimelineId = (parent) => {
   if(!toggle) return null;
   // this is async
   let promise = new Promise((resolve, reject) => {
-    new MutationObserver((record, self) => {
+    let cb = (record, self) => {
       const endpoint = document.querySelector("li[data-feed-option-name=FeedAdSeenReasonOption] a");
       if(!endpoint) return null;
       const url = "https://facebook.com" + endpoint.getAttribute("ajaxify");
@@ -82,7 +82,11 @@ let getTimelineId = (parent) => {
       } catch(e) {
         reject(e);
       }
-    }).observe(document.body, {childList: true, subtree:true});
+    };
+    // Maybe it's already there?
+    cb();
+    // Sigh, we have to wait.
+    new MutationObserver(cb).observe(document.body, {childList: true, subtree:true});
   });
   toggle.click();
   return promise;
