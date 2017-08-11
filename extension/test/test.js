@@ -44,8 +44,9 @@ const doit = () => {
     .concat(Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)));
   let results = [];
   let scraper = posts.reduce((p, i) => p.then(() => {
-    return parser(i).then((it) => { results.push(it); });
-  }), Promise.resolve(null));
+    return parser(i)
+      .then((it) => { results.push(it); });
+  }).then(new Promise((resolve) => setTimeout(resolve, 100))), Promise.resolve(null));
   return scraper.then(() => results.filter((i) => i));
 };
 
@@ -53,7 +54,7 @@ console.time('test time');
 doit().then((ads) => {
   assert.equal(ads.length, 10, "Found 10 ads");
   assert.equal(ads[0].id, "6072446206112", "Got an ad");
-  assert.equal(ads[7].id, "23842581173480600", "Found the other.");
+  assert.equal(ads[7].id, "6073538939883", "Found the other.");
   console.timeEnd('test time');
 });
 
