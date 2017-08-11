@@ -51,7 +51,7 @@ const doit = () => {
 
 console.time('test time');
 doit().then((ads) => {
-  assert.equal(ads.length, 9, "Found nine ads");
+  assert.equal(ads.length, 10, "Found 10 ads");
   assert.equal(ads[0].id, "6072446206112", "Got an ad");
   assert.equal(ads[7].id, "23842581173480600", "Found the other.");
   console.timeEnd('test time');
