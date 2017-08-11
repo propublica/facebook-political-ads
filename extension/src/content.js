@@ -5,13 +5,18 @@ let running = false;
 const sendAds = function() {
   if(running) return;
   running = true;
-  let posts = Array.from(document.querySelectorAll(TIMELINE_SELECTOR))
-    .concat(Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)));
+  let posts = Array.from(document.querySelectorAll(SIDEBAR_SELECTOR))
+    .concat(Array.from(document.querySelectorAll(TIMELINE_SELECTOR)));
   let results = [];
   let scraper = posts.reduce((p, i) => p.then(() => {
     return parser(i).then((it) => results.push(it));
   }), Promise.resolve(null));
-  let timeout = new Promise((resolve) => setTimeout(resolve, 5000));
+  let timeout = new Promise((resolve) =>
+    setTimeout(() => {
+      console.log("failed!");
+      resolve();
+    }, 5000)
+  );
   Promise.race([scraper, timeout]).then(() => {
     chrome.runtime.sendMessage(results.filter((i) => i));
     running = false;
