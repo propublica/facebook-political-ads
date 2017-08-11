@@ -170,7 +170,7 @@ impl Ad {
         let future = stream::iter(self.image_urls())
             // filter ones we already have in the db and ones we can verify as
             // coming from fb, we don't want to become a malware vector :)
-            // currently we recache images we already have, but ok.
+            // currently we redownload images we already have, but ok.
             .filter(|u| {
                 info!("testing {:?}", u.host());
                 match u.host() {
@@ -195,18 +195,20 @@ impl Ad {
                 // we do this in a worker thread because rusoto isn't on
                 // Hyper async yet.
                 pool.spawn_fn(move || {
-                    let client =
-                        S3Client::new(default_tls_client().map_err(InsertError::TLS)?,
-                                      DefaultCredentialsProvider::new().map_err(InsertError::AWS)?,
-                                      Region::UsEast1);
-                    let req = PutObjectRequest {
-                        bucket: "pp-facebook-ads".to_string(),
-                        key: tuple.1.path().trim_left_matches('/').to_string(),
-                        acl: Some("public-read".to_string()),
-                        body: Some(tuple.0.to_vec()),
-                        ..PutObjectRequest::default()
-                    };
-                    client.put_object(&req).map_err(InsertError::S3)?;
+                    if tuple.1.host().unwrap() != "pp-facebook-ads.s3.amazonaws.com" {
+                        let client =
+                            S3Client::new(default_tls_client().map_err(InsertError::TLS)?,
+                                          DefaultCredentialsProvider::new().map_err(InsertError::AWS)?,
+                                          Region::UsEast1);
+                        let req = PutObjectRequest {
+                            bucket: "pp-facebook-ads".to_string(),
+                            key: tuple.1.path().trim_left_matches('/').to_string(),
+                            acl: Some("public-read".to_string()),
+                            body: Some(tuple.0.to_vec()),
+                            ..PutObjectRequest::default()
+                        };
+                        client.put_object(&req).map_err(InsertError::S3)?;
+                    }
                     Ok(tuple.1)
                 })
             })
