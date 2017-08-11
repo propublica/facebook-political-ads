@@ -74,10 +74,13 @@ let getTimelineId = (parent, ad) => {
     let cb = (record, self) => {
       const layer = Array.from(document.querySelectorAll(".uiLayer"))
         .filter((a) => {
-          return a.dataset.ownerid === toggle.id;
+          return a.getAttribute("data-ownerid") === toggle.id;
         })[0];
       if(!layer) return null;
-      const endpoint = layer.querySelector("li[data-feed-option-name=FeedAdSeenReasonOption] a");
+      const li = Array.from(layer.querySelectorAll("li"))
+        .filter((it) => it.getAttribute("data-feed-option-name") === "FeedAdSeenReasonOption")[0];
+      if(!li) return null;
+      const endpoint = li.querySelector("a");
       if(!endpoint) return null;
       const url = "https://facebook.com" + endpoint.getAttribute("ajaxify");
       toggle.click();
