@@ -20,28 +20,41 @@ class MutationObserver {
   }
 
   disconnect() {
-
   }
 }
 
 global.MutationObserver = MutationObserver;
 global.URL = require('url').URL;
 
+const timelinePosts = Array.from(document.body.children)
+  .filter((it) => it.id.startsWith("hyperfeed"));
+
+const layer = document.querySelector(".uiLayer");
+timelinePosts.forEach((it) => {
+  let node = layer.cloneNode(true);
+  node.setAttribute(
+    "data-ownerid",
+    it.querySelector(".uiPopover a").id
+  );
+  document.body.appendChild(node);
+});
+
 const doit = () => {
   let posts = Array.from(document.querySelectorAll(TIMELINE_SELECTOR))
     .concat(Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)));
   let results = [];
-  return posts.reduce((p, i) => p.then(() => {
-    return parser(i).then((it) => results.push(it));
-  }), Promise.resolve(null)).then(() => results.filter((i) => i));
+  let scraper = posts.reduce((p, i) => p.then(() => {
+    return parser(i).then((it) => { results.push(it); });
+  }), Promise.resolve(null));
+  return scraper.then(() => results.filter((i) => i));
 };
 
-console.time();
+console.time('test time');
 doit().then((ads) => {
   assert.equal(ads.length, 9, "Found nine ads");
   assert.equal(ads[0].id, "6072446206112", "Got an ad");
   assert.equal(ads[7].id, "23842581173480600", "Found the other.");
-  console.timeEnd();
+  console.timeEnd('test time');
 });
 
 process.on('unhandledRejection', error => {
