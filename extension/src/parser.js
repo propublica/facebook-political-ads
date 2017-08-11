@@ -82,7 +82,6 @@ let getTimelineId = (parent, ad) => {
       const url = "https://facebook.com" + endpoint.getAttribute("ajaxify");
       toggle.click();
       self.disconnect();
-      console.log(new URL(url).searchParams.get("ad_id"));
       try {
         resolve({
           ...ad,
@@ -157,7 +156,6 @@ const sidebar = (node) => {
 
 // We are careful here to only accept a valid timeline ad or sidebar ad
 const parser = function(node) {
-  console.log('heyo');
   if(node.classList.contains("fbUserContent") ||
      node.classList.contains("fbUserPost") ||
      node.classList.contains("_5pcr")) {
