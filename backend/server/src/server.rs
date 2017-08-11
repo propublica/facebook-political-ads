@@ -132,7 +132,6 @@ impl AdServer {
             .expect("Log config didn't work");
         log4rs::init_config(config).expect("Logging encountered an error.");
 
-
         let addr = env::var("HOST").expect("HOST must be set").parse().expect(
             "Error parsing HOST",
         );
