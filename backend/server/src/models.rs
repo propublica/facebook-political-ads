@@ -374,5 +374,6 @@ mod tests {
         assert!(!images.html.contains("fbcdn"));
         assert!(!images.html.contains("html"));
         assert!(images.images.len() == saved_ad.images.len());
+        assert!(images.thumbnail.unwrap() != saved_ad.thumbnail);
     }
 }
