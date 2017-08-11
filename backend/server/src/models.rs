@@ -170,9 +170,11 @@ impl Ad {
         let future = stream::iter(self.image_urls())
             // filter ones we already have in the db and ones we can verify as
             // coming from fb, we don't want to become a malware vector :)
+            // currently we recache images we already have, but ok.
             .filter(|u| {
+                info!("testing {:?}", u.host());
                 match u.host() {
-                    Some(h) => !(h == "pp-facebook-ads.s3.amazonaws.com" || h.ends_with("fbcdn.net")),
+                    Some(h) => (h == "pp-facebook-ads.s3.amazonaws.com" || h.ends_with("fbcdn.net")),
                     None => false
                 }
             })
@@ -208,10 +210,6 @@ impl Ad {
                     Ok(tuple.1)
                 })
             })
-            .map_err(|e| {
-                warn!("{:?}", e);
-                ()
-            })
             .collect()
             // save the new urls to the database. the images variable will
             // include only those that we've successfully saved to s3, so we
@@ -220,17 +218,19 @@ impl Ad {
                 let imgs = images.clone();
                 pool_db.spawn_fn(move || {
                     use schema::ads::dsl::*;
-                    // I don't understand why we're zeroing out the errors here
-                    // but ok.
-                    let update = Images::from_ad(&ad, imgs).map_err(|e| {warn!("{:?}", e); ()})?;
-                    let connection = db.get().map_err(|e| {warn!("{:?}", e); ()})?;
+                    let update = Images::from_ad(&ad, imgs)?;
+                    let connection = db.get().map_err(InsertError::Timeout)?;
                     diesel::update(ads.filter(id.eq(&ad.id)))
                         .set(&update)
                         .execute(&*connection)
-                        .map_err(|e| {warn!("{:?}", e); ()})?;
+                        .map_err(InsertError::DataBase)?;
                     info!("saved {:?}", ad.id);
                     Ok(())
                 })
+            })
+            .map_err(|e| {
+                warn!("{:?}", e);
+                ()
             });
         Box::new(future)
     }

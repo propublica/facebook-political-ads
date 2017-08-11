@@ -91,7 +91,7 @@ const mergeAds = (ads, newAds) => {
       ids.set(ad.id, ad);
     }
   });
-  return Array.from(ids.values().sort((a, b) => a.id > b.id ? 1 : -1));
+  return Array.from(ids.values()).sort((a, b) => a.id > b.id ? 1 : -1);
 };
 
 const ads = (state = [], action) => {

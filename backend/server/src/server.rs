@@ -80,6 +80,7 @@ impl AdServer {
             })
             .and_then(move |ads| {
                 for ad in ads {
+                    warn!("yo");
                     handle.spawn(ad.grab_and_store(
                         client.clone(),
                         &image_db,
