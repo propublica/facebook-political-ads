@@ -20,7 +20,9 @@ const sendAds = function() {
   });
 };
 
-setInterval(sendAds, 1000);
+
+new MutationObserver(throttle(sendAds, 10000))
+  .observe(document.body, {childList: true, subtree:true});
 
 if(document.readyState === 'complete')
   sendAds();
