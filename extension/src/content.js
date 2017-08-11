@@ -13,7 +13,6 @@ const sendAds = function() {
   }), Promise.resolve(null));
   let timeout = new Promise((resolve) =>
     setTimeout(() => {
-      console.log("failed!");
       resolve();
     }, 5000)
   );
