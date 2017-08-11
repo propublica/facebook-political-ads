@@ -9,16 +9,11 @@ const sendAds = function() {
     .concat(Array.from(document.querySelectorAll(TIMELINE_SELECTOR)));
   let results = [];
   let scraper = posts.reduce((p, i) => p.then(() => {
-    return parser(i)
-      .then((it) => results.push(it))
-      .then(new Promise((resolve) => setTimeout(resolve, 250)));
+    let timeout = new Promise((resolve) => setTimeout(() => resolve(false), 1000));
+    return Promise.race([parser(i).then((it) => results.push(it)), timeout]);
   }), Promise.resolve(null));
-  let timeout = new Promise((resolve) =>
-    setTimeout(() => {
-      resolve();
-    }, 10000)
-  );
-  Promise.race([scraper, timeout]).then(() => {
+
+  scraper.then(() => {
     chrome.runtime.sendMessage(results.filter((i) => i));
     running = false;
   });
