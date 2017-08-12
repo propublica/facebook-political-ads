@@ -36,11 +36,6 @@ const ASSIGN_RATING = "assign_rating";
 // Actions
 const toggle = (value) => ({type: TOGGLE_TAB, value});
 
-const processingRating = (id) => ({
-  type: PROCESSING_RATING,
-  id: id
-});
-
 const assignRating = (id, rating) => ({
   type: ASSIGN_RATING,
   id: id,
@@ -53,8 +48,8 @@ const rateAd = (ad, rating) => {
       ...adForRequest(ad),
       political: rating === RatingType.POLITICAL,
     };
-    let cb = () => dispatch(assignRating(ad.id, rating));
-    dispatch(processingRating(body.id));
+    let cb = () => ({});
+    dispatch(assignRating(ad.id, rating));
     return sendAds([body]).then(cb, cb);
   };
 };
@@ -107,13 +102,6 @@ const ratings = (state = [], action) => {
   switch(action.type) {
   case NEW_RATINGS:
     return mergeAds(state, action.value);
-  case PROCESSING_RATING:
-    return state.map(rating => {
-      if(rating.id === action.id) {
-        return { ...rating, processing: true };
-      }
-      return rating;
-    });
   case ASSIGN_RATING:
     return state.map(rating => {
       if(rating.id === action.id) {
@@ -142,7 +130,7 @@ let store = createStore(reducer, enhancer);
 
 // Ad utilities
 const getUnratedRatings = (ratings) => (
-  ratings.filter(rating => !("rating" in rating))
+  ratings.filter(rating => rating.rating === RatingType.POLITICAL || !("rating" in rating))
 );
 
 let div = document.createElement('div');
@@ -228,7 +216,7 @@ const Rating = ({rating, action}) => (
       id={rating.id}
       image={rating.image}
     />
-    {rating.processing ? '' : <RatingForm action={action} rating={rating} /> }
+    {("rating" in rating) ? '' : <RatingForm action={action} rating={rating} /> }
   </div>
 );
 
