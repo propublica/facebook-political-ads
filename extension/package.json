@@ -36,6 +36,7 @@
     "webpack": "^3.5.3"
   },
   "dependencies": {
+    "locale-code": "^1.1.1",
     "lodash": "^4.17.4",
     "preact": "^8.2.1",
     "preact-redux": "^2.0.2",
