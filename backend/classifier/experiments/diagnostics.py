@@ -2,7 +2,6 @@ from sklearn.naive_bayes import MultinomialNB, BernoulliNB, GaussianNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import HashingVectorizer
 import json
-import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, roc_auc_score
 import matplotlib.pyplot as plt

@@ -24,18 +24,15 @@ const RatingType = {
 };
 
 // Action Types
+const ACCEPT_TERMS = "accept_terms";
 const TOGGLE_TAB = "toggle_tab";
 const NEW_ADS = "new_ads";
 const NEW_RATINGS = "new_ratings";
-
-// Action fired after we recieve a response from the server
-const PROCESSING_RATING = "processing_rating";
-// Action fired before we recieve a response from the server
 const ASSIGN_RATING = "assign_rating";
 
 // Actions
-const toggle = (value) => ({type: TOGGLE_TAB, value});
-
+const acceptTerms = () => ({ type: ACCEPT_TERMS });
+const toggle = (value) => ({ type: TOGGLE_TAB, value });
 const assignRating = (id, rating) => ({
   type: ASSIGN_RATING,
   id: id,
@@ -114,11 +111,21 @@ const ratings = (state = [], action) => {
   }
 };
 
+const terms = (state = false, action) => {
+  switch(action.type) {
+  case ACCEPT_TERMS:
+    return true;
+  default:
+    return state;
+  }
+};
+
 // The main reducer!
 const reducer = combineReducers({
   active,
   ads,
-  ratings
+  ratings,
+  terms
 });
 
 let middleware = [thunkMiddleware];
@@ -288,11 +295,37 @@ Toggler = connect(
   togglerDispatchToProps
 )(Toggler);
 
+const Onboarding = ({onAcceptClick}) => (
+  <div id="tos">
+    <button id="accept" onClick={function(){ return onAcceptClick(); }}>
+      Accept
+    </button>
+  </div>
+);
+
+let Dispatcher = ({terms, onAcceptClick}) => {
+  if(terms) {
+    return <Toggler />;
+  } else {
+    return <Onboarding onAcceptClick={onAcceptClick}/>;
+  }
+};
+
+const dispatchToProps = (dispatch) => ({
+  onAcceptClick: () => {
+    dispatch(acceptTerms());
+  }
+});
+
+Dispatcher = connect(
+  (state) => ({terms: state.terms}),
+  dispatchToProps
+)(Dispatcher);
 
 render(
   <Provider store={store}>
     <div id="popup">
-      <Toggler />
+      <Dispatcher />
     </div>
   </Provider>,
   document.body
