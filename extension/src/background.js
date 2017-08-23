@@ -1,5 +1,6 @@
 import { adForRequest, sendAds } from "utils.js";
 
+
 chrome.runtime.onMessage.addListener((ads) => {
   let saved = new Set();
   if(localStorage.getItem("saved")) {
@@ -10,10 +11,9 @@ chrome.runtime.onMessage.addListener((ads) => {
     }
   }
   const saving = ads.filter((ad) => !saved.has(ad.id));
-  const success = () => {
-    saving.forEach((ad) => saved.add(ad.id));
-    localStorage.setItem('saved', JSON.stringify(Array.from(saved)));
-  };
+  saving.forEach((ad) => saved.add(ad.id));
+  localStorage.setItem('saved', JSON.stringify(Array.from(saved)));
+  const success = () => {};
   const failure = (e) => console.log(e);
   if(saving.length > 0) sendAds(saving.map(adForRequest)).then(success, failure);
 });

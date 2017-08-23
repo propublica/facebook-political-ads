@@ -27,7 +27,7 @@
     "message": "Normal Ad",
     "description": "Label for normal radio button"
   },
-  "rating_question": {
+  "rating_question_political": {
     "message": "What type of ad is this?",
     "description": "Question to ask for rating an ad"
   }
