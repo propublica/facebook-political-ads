@@ -297,9 +297,27 @@ Toggler = connect(
 
 const Onboarding = ({onAcceptClick}) => (
   <div id="tos">
-    <button id="accept" onClick={function(){ return onAcceptClick(); }}>
-      Accept
-    </button>
+    <h1>Terms and Conditions</h1>
+    <div>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas
+        consectetur porttitor risus. Ut ut leo turpis. Nulla auctor varius
+        magna, a pellentesque sem porttitor cursus. Vestibulum efficitur nibh
+        quis lacinia dignissim. In eget nibh orci. Mauris in ultricies eros, ac
+        hendrerit risus. Cras ultricies scelerisque mi eget ultricies. Ut felis
+        erat, luctus sed malesuada interdum, viverra in turpis. Nunc ac ornare
+        velit. Sed sed odio id nulla fermentum euismod. Duis felis augue,
+        venenatis quis mauris non, consectetur finibus est. Phasellus eget
+        egestas mi, ultricies pulvinar mi. Pellentesque luctus, nibh at rutrum
+        laoreet, nunc enim faucibus turpis, non sodales justo nunc suscipit
+        mauris.
+      </p>
+    </div>
+    <div>
+      <button id="accept" onClick={function(){ return onAcceptClick(); }}>
+        Accept
+      </button>
+    </div>
   </div>
 );
 
