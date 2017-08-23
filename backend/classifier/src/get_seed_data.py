@@ -58,8 +58,8 @@ if __name__ == '__main__':
                                 for x in fetch_last_n_posts(pagename, 
                                                             config['messages_per_page'],
                                                             graph)]
-    messages['non_political'] = [x.replace('\n', ' ') 
-                                    for pagename in config['non_political_fb_pages'] 
+    messages['not_political'] = [x.replace('\n', ' ') 
+                                    for pagename in config['not_political_fb_pages'] 
                                     for x in fetch_last_n_posts(pagename,
                                                                 config['messages_per_page'],
                                                                 graph)]
