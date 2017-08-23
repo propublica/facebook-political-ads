@@ -19,5 +19,6 @@ const sendAds = function() {
   });
 };
 
-let a = new MutationObserver(throttle(sendAds, 5000));
+let a = new MutationObserver(throttle(sendAds, 30000));
 a.observe(document.body, {childList: true, subtree:true});
+sendAds();
