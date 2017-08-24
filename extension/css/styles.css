@@ -75,6 +75,11 @@ body {
   background-color: #eceff1;
 }
 
+#popup {
+  width: 100%;
+  height: 100%;
+}
+
 #tabs {
   background-color: #fff;
   position: sticky;
@@ -98,11 +103,11 @@ body {
 }
 
 .toggle:hover {
-  border-bottom: 0.2rem solid #90caf9;
+  border-bottom: 0.2rem solid #0099e6;
 }
 
 .toggle.active {
-  border-bottom: 0.2rem solid #ffeb3b;
+  border-bottom: 0.2rem solid #d0021b;
 }
 
 .rating {
@@ -159,18 +164,61 @@ a:focus {
   padding: 0.2rem 0.2rem 0;
 }
 
-.rater button {
+.rater button, #tos button {
   margin: 0 0.2rem;
   border: 1px solid #efefef;
   background-color: #fff;
   box-shadow: 0 1px 1.5px rgba(0, 0, 0, 0.12);
   cursor: pointer;
+  border-radius: 0.2rem;
 }
 
-.rater button:hover {
-  background-color: #90caf9;
+#tos button {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.rater button:hover, #tos button:hover {
+  background-color: #0099e6;
+  color: white;
+  border-color: #0099e6;
+}
+
+#tos button {
+  font-size: 1.1rem;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #0099e6;
+  border-color: #0099e6;
+  color: #efefef;
+  margin-top: 1rem;
+  width: 5rem;
+  display: block;
 }
 
 .rater button:focus {
   outline: none;
+}
+
+#tos button:hover {
+  background-color: #d0021b;
+  border-color: #d0021b;
+}
+
+#tos {
+  width: 100%;
+  height: 100%;
+  background-color: #304154;
+  color: #efefef;
+  padding: 1.2rem;
+  box-sizing: border-box;
+}
+
+#tos div {
+  width: 100%;
+}
+
+#tos h1 {
+  text-align: center;
+  font-size: 1.5rem;
 }

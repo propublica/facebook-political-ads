@@ -2,6 +2,12 @@ import { adForRequest, sendAds } from "utils.js";
 
 
 chrome.runtime.onMessage.addListener((ads) => {
+  if(!localStorage.getItem("redux")) return;
+  try {
+    if(!JSON.parse(localStorage.getItem("redux"))["terms"]) return;
+  } catch(e) {
+    return;
+  }
   let saved = new Set();
   if(localStorage.getItem("saved")) {
     try {
