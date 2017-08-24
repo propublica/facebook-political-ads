@@ -64,12 +64,67 @@ const checkSponsor = (node) => {
   });
 };
 
-let getTimelineId = (parent, ad) => {
+// Getting the targeting routine. We use XMLHttpRequest here because facebook
+// bans fetch.
+let targetingCache = new Map();
+const getTargeting = (ad) => {
+  if(ad.targeting) {
+    if(targetingCache.has(ad.targeting)) return {
+      ...ad,
+      targeting: targetingCache.get(ad.targeting)
+    };
+    const url = ad.targeting;
+    delete ad.targeting;
+    return new Promise((resolve) => {
+      let req = new XMLHttpRequest();
+      req.onreadystatechange = function() {
+        if(req.readyState === 4) {
+          try {
+            const targeting = JSON.parse(req.response.replace('for (;;);', ''))["jsmods"][0][1]["__html"];
+            if(!targeting) {
+              targetingCache.set(url, true);
+              return resolve(ad);
+            }
+
+            targetingCache.set(url, targeting);
+            resolve({
+              ...ad,
+              targeting
+            });
+          } catch(e) {
+            targetingCache.set(url, true);
+            resolve(ad);
+          }
+        }
+      };
+      req.open('GET', url, true);
+      req.send();
+    });
+  } else {
+    return Promise.resolve(ad);
+  }
+};
+
+const refocus = (cb) => {
+  const focus = document.activeElement;
+  cb();
+  focus.focus();
+};
+
+let timelineCache = new Map();
+const getTimelineId = (parent, ad) => {
   const control = parent.querySelector(".uiPopover");
-  if(!control && control.id === "") return null;
+  if(!control && control.id === "")
+    return null;
+
   const toggle = control.querySelector("a");
-  if(!toggle) return null;
-  // this is async
+  if(!toggle)
+    return null;
+
+  if(timelineCache.has(toggle.id))
+    return Promise.resolve(timelineCache.get(toggle.id));
+
+  // this is async, we have to wait until our popup shows up.
   let promise = new Promise((resolve, reject) => {
     let cb = (record, self) => {
       const layer = Array.from(document.querySelectorAll(".uiLayer"))
@@ -83,21 +138,29 @@ let getTimelineId = (parent, ad) => {
       const endpoint = li.querySelector("a");
       if(!endpoint) return null;
       const url = "https://facebook.com" + endpoint.getAttribute("ajaxify");
-      toggle.click();
+      refocus(() => toggle.click());
       self.disconnect();
       try {
-        resolve({
+        const resolved = {
           ...ad,
           id: new URL(url).searchParams.get("ad_id"),
-        });
+          targeting: url
+        };
+
+        if(resolved.id) {
+          timelineCache.set(toggle.id, resolved);
+          resolve(resolved);
+        } else {
+          reject("No ad id");
+        }
       } catch(e) {
         reject(e);
       }
     };
 
     new MutationObserver(cb).observe(document.body, {childList: true, subtree:true});
-  });
-  toggle.click();
+  }).then(getTargeting);
+  refocus(() => toggle.click());
   return promise;
 };
 
