@@ -30,10 +30,14 @@ def fetch_last_n_posts(pagename, total_posts, graph):
                 if len(post_bodies) >= total_posts:
                     break
         if 'paging' in posts and len(post_bodies) < total_posts:
-            posts = requests.get(posts['paging']['next']).json()
-            page_count += 1
+            if 'next' in posts['paging']:
+                posts = requests.get(posts['paging']['next']).json()
+                page_count += 1
+            else:
+                break
         else :
             break
+    print(pagename + '  ' + str(len(post_bodies)))
     return post_bodies    
 
 if __name__ == '__main__':
@@ -56,12 +60,12 @@ if __name__ == '__main__':
     messages['political'] = [x.replace('\n', ' ') 
                                 for pagename in config['political_fb_pages'] 
                                 for x in fetch_last_n_posts(pagename, 
-                                                            config['messages_per_page'],
+                                                            config['political_messages_per_page'],
                                                             graph)]
     messages['not_political'] = [x.replace('\n', ' ') 
                                     for pagename in config['not_political_fb_pages'] 
                                     for x in fetch_last_n_posts(pagename,
-                                                                config['messages_per_page'],
+                                                                config['not_political_messages_per_page'],
                                                                 graph)]
     with open(config['output_file'], 'w') as f:
         json.dump(messages, f)
