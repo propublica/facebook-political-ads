@@ -4,5 +4,7 @@ version = "0.1.0"
 authors = ["Jeff Larson <thejefflarson@gmail.com>"]
 
 [dependencies]
+murmurhash3 = "*"
+regex = "0.2"
 rusty-machine = "0.5.4"
 server = { path = "../server" }
