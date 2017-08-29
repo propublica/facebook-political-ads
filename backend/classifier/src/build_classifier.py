@@ -1,6 +1,6 @@
 """build_classifier.py
 
-Usage: python build_classifier.py [config_file] 
+Usage: python build_classifier.py [config_file]
 
 Builds and writes model for classifying political vs. not-political.
 
@@ -48,7 +48,6 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
     Currently supported:
     MultinomialNB, BernoulliNB, GaussianNB, LogisticRegression
     """
-
     for name, classifier in classifiers.items():
         classifier.fit(X_train.todense(), Y_train)
         preds = classifier.predict_proba(X_test.todense())[:, 1]
@@ -80,7 +79,7 @@ if __name__ == '__main__':
     npol = [(item, 0) for item in posts['not_political']]
 
     data = pol + npol
-    
+
     train, test = train_test_split(data, test_size=0.5)
 
     if config['equalize_classes']:
@@ -88,7 +87,6 @@ if __name__ == '__main__':
 
     X_train, Y_train = zip(*train)
     X_test, Y_test = zip(*test)
-
 
     vectorizer = HashingVectorizer(alternate_sign=False, n_features=config['n_features'])
     X_train = vectorizer.transform(X_train)
@@ -103,7 +101,7 @@ if __name__ == '__main__':
         print('Currently supported:')
         print('MultinomialNB, BernoulliNB, GaussianNB, LogisticRegression')
         exit()
-    
+
     classifier = classifiers[config['classifier_type']]
     classifier.fit(X_train.todense(), Y_train)
     preds = classifier.predict(X_test.todense())
