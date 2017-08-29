@@ -1,6 +1,6 @@
 """get_seed_data.py
 
-Usage: python get_seed_data.py [config_file] 
+Usage: python get_seed_data.py [config_file]
 
 Writes a json file of facebook posts to use as seed to
 political/non-political classifier
@@ -19,7 +19,8 @@ graph_token_url = 'https://graph.facebook.com/oauth/access_token?' \
 def fetch_last_n_posts(pagename, total_posts, graph):
     try:
         posts = graph.request('/'+pagename+'/posts')
-    except:
+    except facebook.GraphAPIError as err:
+        print("%s" % err)
         return []
     page_count = 0
     post_bodies = []
@@ -38,7 +39,7 @@ def fetch_last_n_posts(pagename, total_posts, graph):
         else :
             break
     print(pagename + '  ' + str(len(post_bodies)))
-    return post_bodies    
+    return post_bodies
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -57,17 +58,15 @@ if __name__ == '__main__':
     graph = facebook.GraphAPI(access_token, version=2.7)
 
     messages = dict()
-    messages['political'] = [x.replace('\n', ' ') 
-                                for pagename in config['political_fb_pages'] 
-                                for x in fetch_last_n_posts(pagename, 
+    messages['political'] = [x.replace('\n', ' ')
+                                for pagename in config['political_fb_pages']
+                                for x in fetch_last_n_posts(pagename,
                                                             config['political_messages_per_page'],
                                                             graph)]
-    messages['not_political'] = [x.replace('\n', ' ') 
-                                    for pagename in config['not_political_fb_pages'] 
+    messages['not_political'] = [x.replace('\n', ' ')
+                                    for pagename in config['not_political_fb_pages']
                                     for x in fetch_last_n_posts(pagename,
                                                                 config['not_political_messages_per_page'],
                                                                 graph)]
     with open(config['output_file'], 'w') as f:
         json.dump(messages, f)
-
-
