@@ -1,6 +1,5 @@
 import { adForRequest, sendAds } from "utils.js";
 
-
 chrome.runtime.onMessage.addListener((ads) => {
   if(!localStorage.getItem("redux")) return;
   try {
