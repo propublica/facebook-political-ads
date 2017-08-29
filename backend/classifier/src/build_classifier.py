@@ -16,7 +16,6 @@ from sklearn.feature_extraction.text import HashingVectorizer
 
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import roc_curve, roc_auc_score, classification_report
-import matplotlib.pyplot as plt
 
 classifiers = {
     "MultinomialNB" : MultinomialNB(),
@@ -48,6 +47,7 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
     Currently supported:
     MultinomialNB, BernoulliNB, GaussianNB, LogisticRegression
     """
+    import matplotlib.pyplot as plt
     for name, classifier in classifiers.items():
         classifier.fit(X_train.todense(), Y_train)
         preds = classifier.predict_proba(X_test.todense())[:, 1]
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     model['feature_log_prob'] = classifier.feature_log_prob_.tolist()
     model['class_log_prior'] = classifier.class_log_prior_.tolist()
 
-    model_filename = config['output_filename'] + '.json'
+    model_filename = config['output_filename']
     with open(model_filename, 'w') as f:
         json.dump(model, f)
     print('Dumped model to file ' + model_filename)
