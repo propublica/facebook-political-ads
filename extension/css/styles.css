@@ -207,8 +207,8 @@ a:focus {
   display: grid;
   width: 100%;
   height: 100%;
-  background-color: #304154;
-  color: #efefef;
+  background-color: #fff;
+  color: #304154;
   grid-template-areas:
     "header"
     "main"
