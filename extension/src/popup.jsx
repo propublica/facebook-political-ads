@@ -4,9 +4,7 @@ import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
-
 import { adForRequest, sendAds } from 'utils.js';
-
 // styles
 import "../css/styles.css";
 
@@ -260,7 +258,6 @@ const Toggle = ({type, message, active, onToggleClick}) => (
   </div>
 );
 
-
 // Our Main container.
 let Toggler = ({ads, ratings, active, onToggleClick}) => (
   <div id="toggler">
@@ -297,23 +294,48 @@ Toggler = connect(
 
 const Onboarding = ({onAcceptClick}) => (
   <div id="tos">
-    <h1>Terms and Conditions</h1>
-    <div>
+    <div id="terms">
+      <h2>May we have your consent?</h2>
       <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas
-        consectetur porttitor risus. Ut ut leo turpis. Nulla auctor varius
-        magna, a pellentesque sem porttitor cursus. Vestibulum efficitur nibh
-        quis lacinia dignissim. In eget nibh orci. Mauris in ultricies eros, ac
-        hendrerit risus. Cras ultricies scelerisque mi eget ultricies. Ut felis
-        erat, luctus sed malesuada interdum, viverra in turpis. Nunc ac ornare
-        velit. Sed sed odio id nulla fermentum euismod. Duis felis augue,
-        venenatis quis mauris non, consectetur finibus est. Phasellus eget
-        egestas mi, ultricies pulvinar mi. Pellentesque luctus, nibh at rutrum
-        laoreet, nunc enim faucibus turpis, non sodales justo nunc suscipit
-        mauris.
+        ProPublica believes in providing transparency about what we do. So
+        before you agree to this download, please take a minute to understand
+        what the extension will do.
+      </p>
+      <h2>What the Extension Does</h2>
+      <p>
+        The extension places content script on every Facebook page you
+        visit. That script scans for ads, which it then stores on your computer.
+      </p>
+      <h2>How You Can Help</h2>
+      <p>
+        Whenever you feel like supporting our mission, you can click on the
+        ProPublica icon on your browser bar and a pop-up window will appear. It
+        will contain all the ads saved on your computer. You can “teach” the
+        Extension by classifying the ads as either Political or Not Political.
+      </p>
+      <h2>Information We Will Receive</h2>
+      <p>
+        Our server, which may be located outside of Germany, will receive clean,
+        identifier-free html of the ads, the ads’ Facebook identifiers and
+        demographic targeting parameters (e.g., people ages 18 and over residing
+        in Germany), their classification (Political or Non Political), and your
+        browser’s language setting. We have otherwise made every effort to
+        ensure the extension will not collect data that could be used to
+        identify you individually.
+      </p>
+      <h2>What We Will Do With the Information</h2>
+      <p>
+        We will feed the information to our algorithm to help it learn to
+        identify political ads. Once it has had enough training, we will be able
+        to send you ads you have not already seen. When you want to know what
+        ads others are seeing, you can click on the “Ads I’m not Seeing” icon on
+        your browser and we will send a batch of about 100 ads. The extension
+        will then compare those to the ads stored locally on your computer and
+        show you only new ads. We will never receive information about what ads
+        you have or have not seen.
       </p>
     </div>
-    <div>
+    <div id="accept-box">
       <button id="accept" onClick={function(){ return onAcceptClick(); }}>
         Accept
       </button>
