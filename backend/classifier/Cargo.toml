@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Jeff Larson <thejefflarson@gmail.com>"]
 
 [dependencies]
+error-chain = "0.11.0-rc.2"
 murmurhash3 = "^0.0.5"
 regex = "^0.2"
 rusty-machine = "^0.5.4"

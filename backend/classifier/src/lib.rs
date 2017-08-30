@@ -1,7 +1,13 @@
+#[macro_use]
+extern crate error_chain;
 extern crate murmurhash3;
 extern crate regex;
 extern crate rusty_machine;
+extern crate serde;
 extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
+extern crate server;
 
 use murmurhash3::murmurhash3_x86_32;
 use regex::Regex;
@@ -9,14 +15,29 @@ use rusty_machine::prelude::BaseMatrix;
 use rusty_machine::linalg::Vector;
 use rusty_machine::linalg::Matrix;
 use rusty_machine::linalg::Metric;
+use std::fs::File;
 
 static TOKEN_PATTERN: &'static str = r"\b\w\w+\b";
 
+#[derive(Deserialize)]
+pub struct JSONClassifier {
+    feature_log_prob: Vec<f64>,
+    class_log_prior: Vec<f64>,
+    n_features: i32,
+    n_classes: i32,
+}
 
 pub struct Classifier {
     n_features: i32,
     feature_log_prob: Matrix<f64>,
     class_log_prior: Matrix<f64>,
+}
+
+error_chain! {
+    foreign_links {
+        JSON(serde_json::Error);
+        Io(::std::io::Error);
+    }
 }
 
 impl Classifier {
@@ -32,11 +53,11 @@ impl Classifier {
 
         let class_prior_mat = Matrix::new(1, n_classes as usize, class_log_prior);
 
-        return Classifier {
+        Classifier {
             n_features: n_features,
             feature_log_prob: feature_log_mat,
             class_log_prior: class_prior_mat,
-        };
+        }
     }
 
     pub fn predict(&self, doc: &str) -> usize {
@@ -54,7 +75,18 @@ impl Classifier {
                 cur_max = x;
             }
         }
-        return class;
+        class
+    }
+
+    pub fn from_json(file: &str) -> Result<Classifier> {
+        let file = File::open(file)?;
+        let read: JSONClassifier = serde_json::from_reader(file)?;
+        Ok(Classifier::new(
+            read.feature_log_prob,
+            read.class_log_prior,
+            read.n_features,
+            read.n_classes,
+        ))
     }
 }
 
@@ -96,13 +128,8 @@ pub fn create_feature_vec(doc: &str, n_features: i32) -> Vec<f64> {
 
 #[cfg(test)]
 mod tests {
-    use super::get_feature_idx;
-    use super::create_feature_vec;
-    use super::tokenize_string;
-    use super::Classifier;
-    use std::fs::File;
-    extern crate serde_json;
-    use serde_json::Value;
+    use super::*;
+
     #[test]
     fn test_get_feature_idx() {
         let idx = get_feature_idx("Harold", 10);
@@ -164,31 +191,9 @@ mod tests {
 
     #[test]
     fn test_prediction() {
-        let model_path = "src/German-20170829.json";
         let test_pol_string = "Die Wähler sollten bei der Wahl abstimmen.";
         let test_non_pol_string = "This is nothing important, just watch netflix";
-        let file = File::open(&model_path).unwrap();
-        let model: Value = serde_json::from_reader(file).unwrap();
-
-        let feature_log_prob: Vec<f64> = model["feature_log_prob"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .map(|x| x.as_f64().unwrap())
-            .collect();
-        let class_log_prior: Vec<f64> = model["class_log_prior"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .map(|x| x.as_f64().unwrap())
-            .collect();
-
-        let clf = Classifier::new(
-            feature_log_prob,
-            class_log_prior,
-            model["n_features"].as_i64().unwrap() as i32,
-            model["n_classes"].as_i64().unwrap() as i32,
-        );
+        let clf = Classifier::from_json("src/German-20170829.json").unwrap();
         assert_eq!(1, clf.predict(test_pol_string));
         assert_eq!(0, clf.predict(test_non_pol_string));
 
