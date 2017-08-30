@@ -135,8 +135,8 @@ impl Images {
 
 #[derive(Queryable, Debug, Clone)]
 pub struct Ad {
-    id: String,
-    html: String,
+    pub id: String,
+    pub html: String,
     political: i32,
     not_political: i32,
     fuzzy_id: Option<i32>,
@@ -199,10 +199,11 @@ impl Ad {
                 // Hyper async yet.
                 pool.spawn_fn(move || {
                     if tuple.1.host().unwrap() != "pp-facebook-ads.s3.amazonaws.com" {
-                        let client =
-                            S3Client::new(default_tls_client().map_err(InsertError::TLS)?,
-                                          DefaultCredentialsProvider::new().map_err(InsertError::AWS)?,
-                                          Region::UsEast1);
+                        let credentials = DefaultCredentialsProvider::new()
+                            .map_err(InsertError::AWS)?;
+                        let tls = default_tls_client()
+                            .map_err(InsertError::TLS)?;
+                        let client = S3Client::new(tls, credentials, Region::UsEast1);
                         let req = PutObjectRequest {
                             bucket: "pp-facebook-ads".to_string(),
                             key: tuple.1.path().trim_left_matches('/').to_string(),

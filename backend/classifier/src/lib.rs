@@ -228,5 +228,6 @@ mod tests {
         assert!(likelihoods[0] > likelihoods[1]);
         let likelihoods = clf.predict_likelihoods(test_non_pol_string_2);
         assert!(likelihoods[0] > likelihoods[1]);
+        assert!(((likelihoods[0] + likelihoods[1]) - 1.0) < 0.0000001);
     }
 }
