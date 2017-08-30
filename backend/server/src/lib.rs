@@ -1,4 +1,4 @@
-#![recursion_limit="128"]
+#![recursion_limit="256"]
 extern crate chrono;
 #[macro_use]
 extern crate diesel;
