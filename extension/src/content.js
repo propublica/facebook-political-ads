@@ -9,8 +9,14 @@ const sendAds = function() {
     .concat(Array.from(document.querySelectorAll(TIMELINE_SELECTOR)));
   let results = [];
   let scraper = posts.reduce((p, i) => p.then(() => {
-    let timeout = new Promise((resolve) => setTimeout(() => resolve(false), 1000));
-    return Promise.race([parser(i).then((it) => results.push(it)), timeout]);
+    let timeout = new Promise((resolve) => setTimeout(() => resolve(false), 10000));
+    return Promise.race([
+      parser(i).then(
+        (it) => results.push(it),
+        (e) => console.log(e)
+      ),
+      timeout
+    ]);
   }), Promise.resolve(null));
 
   scraper.then(() => {
@@ -19,5 +25,5 @@ const sendAds = function() {
   });
 };
 
-let a = new MutationObserver(throttle(sendAds, 30000));
+let a = new MutationObserver(throttle(sendAds, 5000));
 a.observe(document.body, {childList: true, subtree:true});

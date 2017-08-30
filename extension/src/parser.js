@@ -64,6 +64,15 @@ const checkSponsor = (node) => {
   });
 };
 
+// We have to do this because content scripts can't read window variables
+const grabVariable = (fn, args)  => {
+  let script = document.createElement("script");
+  script.textContent = 'localStorage.setItem("pageVariable", (' + fn + ').apply(this, ' + JSON.stringify(args) + '));';
+  (document.head||document.documentElement).appendChild(script);
+  script.remove();
+  return localStorage.getItem("pageVariable");
+};
+
 // Getting the targeting routine. We use XMLHttpRequest here because facebook
 // bans fetch.
 let targetingCache = new Map();
@@ -75,11 +84,13 @@ const getTargeting = (ad) => {
     };
     const url = ad.targeting;
     delete ad.targeting;
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       let req = new XMLHttpRequest();
+
       req.onreadystatechange = function() {
         if(req.readyState === 4) {
           try {
+            console.log(req);
             const targeting = JSON.parse(req.response.replace('for (;;);', ''))["jsmods"][0][1]["__html"];
             if(!targeting) {
               targetingCache.set(url, true);
@@ -93,11 +104,21 @@ const getTargeting = (ad) => {
             });
           } catch(e) {
             targetingCache.set(url, true);
-            resolve(ad);
+            reject(ad);
           }
         }
       };
-      req.open('GET', url, true);
+      // AsyncRequest builds out the correct targeting url
+      req.open('GET', grabVariable((url) => {
+        let parsed = new URL(url);
+        localStorage.setItem('url', url);
+        return new window.AsyncRequest()
+          .setURI(url)
+          .setData(parsed.searchParams)
+          .setMethod('GET')
+          .setReadOnly(true)
+          .getURI();
+      }, [url]), true);
       req.send();
     });
   } else {
@@ -108,7 +129,7 @@ const getTargeting = (ad) => {
 const refocus = (cb) => {
   const focus = document.activeElement;
   cb();
-  focus.focus();
+  if(focus) focus.focus();
 };
 
 let timelineCache = new Map();
@@ -143,7 +164,7 @@ const getTimelineId = (parent, ad) => {
       try {
         const resolved = {
           ...ad,
-          id: new URL(url).searchParams.get("ad_id"),
+          id: new URL(url).searchParams.get("id"),
           targeting: url
         };
 
@@ -158,7 +179,7 @@ const getTimelineId = (parent, ad) => {
       }
     };
 
-    new MutationObserver(cb).observe(document.body, {childList: true, subtree:true});
+    new MutationObserver(cb).observe(document, {childList: true, subtree:true});
   }).then(getTargeting);
   refocus(() => toggle.click());
   return promise;
