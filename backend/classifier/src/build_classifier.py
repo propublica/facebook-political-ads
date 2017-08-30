@@ -7,6 +7,7 @@ Builds and writes model for classifying political vs. not-political.
 When run with "run_eval" option, compares performance of
 several different models.
 """
+import itertools
 import json
 import sys
 
@@ -108,8 +109,10 @@ if __name__ == '__main__':
     print(classification_report(Y_test, preds))
 
     model = {}
-    model['feature_log_prob'] = classifier.feature_log_prob_.tolist()
+    model['feature_log_prob'] = list(itertools.chain(*classifier.feature_log_prob_.tolist()))
     model['class_log_prior'] = classifier.class_log_prior_.tolist()
+    model['n_features'] = config['n_features']
+    model['n_classes'] = 2
 
     model_filename = config['output_filename']
     with open(model_filename, 'w') as f:

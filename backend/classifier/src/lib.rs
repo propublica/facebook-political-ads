@@ -193,7 +193,7 @@ mod tests {
     fn test_prediction() {
         let test_pol_string = "Die Wähler sollten bei der Wahl abstimmen.";
         let test_non_pol_string = "This is nothing important, just watch netflix";
-        let clf = Classifier::from_json("src/German-20170829.json").unwrap();
+        let clf = Classifier::from_json("data/de/classifier.json").unwrap();
         assert_eq!(1, clf.predict(test_pol_string));
         assert_eq!(0, clf.predict(test_non_pol_string));
 
