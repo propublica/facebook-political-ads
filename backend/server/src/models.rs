@@ -337,6 +337,7 @@ mod tests {
             html: ad.to_string(),
             political: None,
             browser_lang: "en-US".to_string(),
+            targeting: None,
         };
         let new_ad = NewAd::new(&post).unwrap();
         assert!(new_ad.thumbnail.len() > 0);
@@ -369,6 +370,8 @@ mod tests {
             browser_lang: "en-US".to_string(),
             images: get_images(&document).unwrap(),
             impressions: 1,
+            targeting: None,
+            political_probability: 0.0,
         };
         let urls = saved_ad
             .image_urls()
