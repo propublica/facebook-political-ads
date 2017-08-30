@@ -148,6 +148,8 @@ pub struct Ad {
     browser_lang: String,
     images: Vec<String>,
     impressions: i32,
+    political_probability: f64,
+    targeting: Option<String>,
 }
 
 impl Ad {
@@ -167,7 +169,8 @@ impl Ad {
         let pool_s3 = pool.clone();
         let pool_db = pool.clone();
         let db = db.clone();
-        let future = stream::iter(self.image_urls())
+        let future = stream::iter_ok(self.image_urls())
+            .map(|u| u.unwrap())
             // filter ones we already have in the db and ones we can verify as
             // coming from fb, we don't want to become a malware vector :)
             // currently we redownload images we already have, but ok.
@@ -265,6 +268,8 @@ pub struct NewAd<'a> {
     browser_lang: &'a str,
     images: Vec<String>,
     impressions: i32,
+
+    targeting: Option<&'a str>,
 }
 
 impl<'a> NewAd<'a> {
@@ -289,6 +294,7 @@ impl<'a> NewAd<'a> {
             browser_lang: &ad.browser_lang,
             images: images,
             impressions: if !ad.political.is_some() { 1 } else { 0 },
+            targeting: None,
         })
     }
 

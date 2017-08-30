@@ -5,7 +5,7 @@ authors = ["Jeff Larson <thejefflarson@gmail.com>"]
 
 [dependencies]
 chrono = "^0.4.0"
-diesel = { version = "^0.16", postgres = ["features", "chrono"] }
+diesel = { version = "^0.16", features = ["postgres", "chrono"] }
 diesel_codegen = { version = "^0.16", features = ["postgres"] }
 dotenv = "^0.10.1"
 futures = "^0.1.15"

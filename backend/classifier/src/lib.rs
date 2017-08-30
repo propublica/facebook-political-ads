@@ -7,7 +7,6 @@ extern crate serde;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
-extern crate server;
 
 use murmurhash3::murmurhash3_x86_32;
 use regex::Regex;
