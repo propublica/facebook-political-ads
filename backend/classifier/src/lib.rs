@@ -60,22 +60,40 @@ impl Classifier {
         }
     }
 
-    pub fn predict(&self, doc: &str) -> usize {
+    fn joint_log_likelihood(&self, doc: &str) -> Matrix<f64> {
         let feature_vec = Matrix::new(
             1,
             self.n_features as usize,
             create_feature_vec(doc, self.n_features),
         );
         let res = (feature_vec * self.feature_log_prob.transpose()) + &(self.class_log_prior);
+        res
+    }
+
+    pub fn predict(&self, doc: &str) -> usize {
+        let jll = self.joint_log_likelihood(doc);
         let mut class = 0;
         let mut cur_max = -1.0f64 / 0.0f64; // NEG_INFINITY
-        for (i, &x) in res.into_vec().iter().enumerate() {
+        for (i, &x) in jll.into_vec().iter().enumerate() {
             if x > cur_max {
                 class = i;
                 cur_max = x;
             }
         }
         class
+    }
+
+    pub fn predict_likelihoods(&self, doc:&str) -> Vec<f64> {
+        let e = 1.0f64.exp();
+        let jll = self.joint_log_likelihood(doc);
+        let mut acc = 0.0;
+        for &x in jll.clone().into_vec().iter() {
+            acc += x.exp();
+        }
+        acc = acc.ln();
+        //let log_prob_x = Matrix::new(1, 1, vec![acc]);
+        let likelihoods = jll.into_vec().iter().map(|x| (x - acc).exp()).collect();
+        likelihoods
     }
 
     pub fn from_json(file: &str) -> Result<Classifier> {
@@ -196,6 +214,22 @@ mod tests {
         let clf = Classifier::from_json("data/de/classifier.json").unwrap();
         assert_eq!(1, clf.predict(test_pol_string));
         assert_eq!(0, clf.predict(test_non_pol_string));
+    }
 
+    #[test]
+    fn test_predict_likelihoods() {
+        let clf = Classifier::from_json("data/de/classifier.json").unwrap();   
+        let test_pol_string_1 = "Die Wähler sollten bei der Wahl abstimmen.";
+        let test_pol_string_2 = "Die Wahl ist im September. Denken Sie daran, Ihren Kandidaten zu wählen.";
+        let test_non_pol_string_1 = "This is nothing important, just watch netflix";
+        let test_non_pol_string_2 = "Kaufen Sie Ihr Lieblingsessen. Das ist eine langweilige Werbung.";
+        let likelihoods = clf.predict_likelihoods(test_pol_string_1);
+        assert!(likelihoods[1] > likelihoods[0]);
+        let likelihoods = clf.predict_likelihoods(test_pol_string_2);
+        assert!(likelihoods[1] > likelihoods[0]);
+        let likelihoods = clf.predict_likelihoods(test_non_pol_string_1);
+        assert!(likelihoods[0] > likelihoods[1]);
+        let likelihoods = clf.predict_likelihoods(test_non_pol_string_2);
+        assert!(likelihoods[0] > likelihoods[1]);
     }
 }
