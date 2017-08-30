@@ -82,15 +82,13 @@ impl Classifier {
         class
     }
 
-    pub fn predict_likelihoods(&self, doc:&str) -> Vec<f64> {
-        let e = 1.0f64.exp();
+    pub fn predict_likelihoods(&self, doc: &str) -> Vec<f64> {
         let jll = self.joint_log_likelihood(doc);
         let mut acc = 0.0;
         for &x in jll.clone().into_vec().iter() {
             acc += x.exp();
         }
         acc = acc.ln();
-        //let log_prob_x = Matrix::new(1, 1, vec![acc]);
         let likelihoods = jll.into_vec().iter().map(|x| (x - acc).exp()).collect();
         likelihoods
     }
@@ -217,7 +215,7 @@ mod tests {
 
     #[test]
     fn test_predict_likelihoods() {
-        let clf = Classifier::from_json("data/de/classifier.json").unwrap();   
+        let clf = Classifier::from_json("data/de/classifier.json").unwrap();
         let test_pol_string_1 = "Die Wähler sollten bei der Wahl abstimmen.";
         let test_pol_string_2 = "Die Wahl ist im September. Denken Sie daran, Ihren Kandidaten zu wählen.";
         let test_non_pol_string_1 = "This is nothing important, just watch netflix";
