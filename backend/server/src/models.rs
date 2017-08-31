@@ -275,6 +275,7 @@ pub struct NewAd<'a> {
 
 impl<'a> NewAd<'a> {
     pub fn new(ad: &'a AdPost) -> Result<NewAd<'a>, InsertError> {
+        info!("saving {}", ad.id);
         let document = kuchiki::parse_html().one(ad.html.clone());
 
         let thumb = get_image(&document)?;

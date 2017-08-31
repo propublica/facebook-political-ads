@@ -68,8 +68,9 @@ const checkSponsor = (node) => {
 const grabVariable = (fn, args)  => {
   let script = document.createElement("script");
   script.textContent = 'localStorage.setItem("pageVariable", (' + fn + ').apply(this, ' + JSON.stringify(args) + '));';
+  script.setAttribute('id', 'pageVariable');
   (document.head||document.documentElement).appendChild(script);
-  script.remove();
+  //script.remove();
   return localStorage.getItem("pageVariable");
 };
 
@@ -108,17 +109,26 @@ const getTargeting = (ad) => {
           }
         }
       };
-      // AsyncRequest builds out the correct targeting url
-      req.open('GET', grabVariable((url) => {
-        let parsed = new URL(url);
+
+      let built = grabVariable((url) => {
+        let parsed = new (window.require('URI'))(url);
         localStorage.setItem('url', url);
-        return new window.AsyncRequest()
+        let req = new window.AsyncRequest()
           .setURI(url)
-          .setData(parsed.searchParams)
+          .setData(parsed)
           .setMethod('GET')
-          .setReadOnly(true)
-          .getURI();
-      }, [url]), true);
+          .setRelativeTo(document.body)
+          .setNectarModuleDataSafe(document.body)
+          .setReadOnly(true);
+        Object.assign(req.data, {__asyncDialog: 1});
+        Object.assign(req.data, window.require('getAsyncParams')(req.method));
+        req._setUserActionID();
+        req.setNewSerial();
+        console.log(req.data);
+        return req.getURI();
+      }, [url]);
+      // AsyncRequest builds out the correct targeting url
+      req.open('GET', "https://www.facebook.com" + built, true);
       req.send();
     });
   } else {
@@ -158,13 +168,13 @@ const getTimelineId = (parent, ad) => {
       if(!li) return null;
       const endpoint = li.querySelector("a");
       if(!endpoint) return null;
-      const url = "https://facebook.com" + endpoint.getAttribute("ajaxify");
+      const url =  endpoint.getAttribute("ajaxify");
       refocus(() => toggle.click());
       self.disconnect();
       try {
         const resolved = {
           ...ad,
-          id: new URL(url).searchParams.get("id"),
+          id: new URL("https://facebook.com" + url).searchParams.get("id"),
           targeting: url
         };
 
