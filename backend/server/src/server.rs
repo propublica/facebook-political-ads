@@ -17,9 +17,11 @@ use models::{NewAd, Ad};
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
 use serde_json;
+use std::collections::HashMap;
 use std::env;
 use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
+use url::form_urlencoded;
 
 use super::InsertError;
 
@@ -50,7 +52,8 @@ impl Service for AdServer {
 
     fn call(&self, req: Request) -> Self::Future {
         match (req.method(), req.path()) {
-            (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ad(req)),
+            (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
+            (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
                 future::ok(Response::new().with_status(
                     StatusCode::Ok,
@@ -66,7 +69,25 @@ impl Service for AdServer {
 }
 
 impl AdServer {
-    fn process_ad(&self, req: Request) -> Box<Future<Item = Response, Error = hyper::Error>> {
+    fn get_ads(&self, req: Request) -> Box<Future<Item = Response, Error = hyper::Error>> {
+        use schema::ads;
+            use schema::ads::
+        let db_pool = self.db_pool.clone();
+        let pool = self.pool.clone();
+
+        let future = pool.spawn(move || {
+            if Some(languages) = req.headers.get::<AcceptLanguage>() {
+                if Some(code) = languages.iter().find(|language| language.region.is_some()) {
+                    
+                    Ok(Response::new().with_header())
+                };
+            };
+            Ok(Response::new().with_status(StatusCode::BadRequest))
+        });
+        Box::new(future)
+    }
+
+    fn process_ads(&self, req: Request) -> Box<Future<Item = Response, Error = hyper::Error>> {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
         let image_pool = self.pool.clone();

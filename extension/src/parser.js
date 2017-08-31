@@ -91,8 +91,8 @@ const getTargeting = (ad) => {
       req.onreadystatechange = function() {
         if(req.readyState === 4) {
           try {
-            console.log(req);
-            const targeting = JSON.parse(req.response.replace('for (;;);', ''))["jsmods"][0][1]["__html"];
+            console.log(JSON.parse(req.response.replace('for (;;);', '')));
+            const targeting = JSON.parse(req.response.replace('for (;;);', ''))["jsmods"][0][1]["markup"];
             if(!targeting) {
               targetingCache.set(url, true);
               return resolve(ad);
@@ -124,7 +124,6 @@ const getTargeting = (ad) => {
         Object.assign(req.data, window.require('getAsyncParams')(req.method));
         req._setUserActionID();
         req.setNewSerial();
-        console.log(req.data);
         return req.uri.addQueryData(req.data).toString();
       }, [url]);
       // AsyncRequest builds out the correct targeting url

@@ -137,9 +137,8 @@ impl Images {
 pub struct Ad {
     pub id: String,
     pub html: String,
-    political: i32,
-    not_political: i32,
-    fuzzy_id: Option<i32>,
+    pub political: i32,
+    pub not_political: i32,
     title: String,
     message: String,
     thumbnail: String,
