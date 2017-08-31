@@ -30,7 +30,7 @@ pub struct AdServer {
     client: Client<HttpsConnector<HttpConnector>>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct AdPost {
     pub id: String,
     pub html: String,
@@ -50,12 +50,12 @@ impl Service for AdServer {
 
     fn call(&self, req: Request) -> Self::Future {
         match (req.method(), req.path()) {
-            (&Method::Post, "/facebook-ads/ads") => Either::B(
-                self.process_ad(req),
+            (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ad(req)),
+            (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
+                future::ok(Response::new().with_status(
+                    StatusCode::Ok,
+                )),
             ),
-            (&Method::Get, "/facebook-ads/heartbeat") => Either::A(future::ok(
-                Response::new().with_status(StatusCode::Ok),
-            )),
             _ => {
                 Either::A(future::ok(
                     Response::new().with_status(StatusCode::NotFound),
@@ -66,10 +66,7 @@ impl Service for AdServer {
 }
 
 impl AdServer {
-    fn process_ad(
-        &self,
-        req: Request,
-    ) -> Box<Future<Item = Response, Error = hyper::Error>> {
+    fn process_ad(&self, req: Request) -> Box<Future<Item = Response, Error = hyper::Error>> {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
         let image_pool = self.pool.clone();
@@ -112,8 +109,7 @@ impl AdServer {
             InsertError::String,
         )?;
 
-        let posts: Vec<AdPost> =
-            serde_json::from_str(&string).map_err(InsertError::JSON)?;
+        let posts: Vec<AdPost> = serde_json::from_str(&string).map_err(InsertError::JSON)?;
         let ads = posts.iter().map(move |post| {
             let ad = NewAd::new(post)?.save(db_pool)?;
             Ok(ad)
@@ -140,21 +136,17 @@ impl AdServer {
             "Error parsing HOST",
         );
 
-        let database_url =
-            env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
         let config = Config::default();
         let manager = ConnectionManager::<PgConnection>::new(database_url);
-        let db_pool =
-            Pool::new(config, manager).expect("Failed to create pool.");
+        let db_pool = Pool::new(config, manager).expect("Failed to create pool.");
         let pool = CpuPool::new_num_cpus();
 
         let mut core = Core::new().unwrap();
         let handle = core.handle();
-        let listener =
-            TcpListener::bind(&addr, &handle).expect("Couldn't start server.");
-        let connector = HttpsConnector::new(4, &core.handle()).expect(
-            "Couldn't build HttpsConnector",
-        );
+        let listener = TcpListener::bind(&addr, &handle).expect("Couldn't start server.");
+        let connector =
+            HttpsConnector::new(4, &core.handle()).expect("Couldn't build HttpsConnector");
         let client = Client::configure().connector(connector).build(
             &core.handle(),
         );
