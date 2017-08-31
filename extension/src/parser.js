@@ -125,7 +125,7 @@ const getTargeting = (ad) => {
         req._setUserActionID();
         req.setNewSerial();
         console.log(req.data);
-        return req.getURI();
+        return req.uri.addQueryData(req.data).toString();
       }, [url]);
       // AsyncRequest builds out the correct targeting url
       req.open('GET', "https://www.facebook.com" + built, true);
