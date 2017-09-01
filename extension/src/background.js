@@ -1,4 +1,4 @@
-import sendAds from "utils.js";
+import { sendAds } from "utils.js";
 
 chrome.runtime.onMessage.addListener((ads) => {
   if(!localStorage.getItem("redux")) return;
@@ -16,9 +16,10 @@ chrome.runtime.onMessage.addListener((ads) => {
     }
   }
   const saving = ads.filter((ad) => !saved.has(ad.id));
+  console.log(saving);
   saving.forEach((ad) => saved.add(ad.id));
   localStorage.setItem('saved', JSON.stringify(Array.from(saved)));
-  const success = () => {};
+  const success = () => { console.log('saved') };
   const failure = (e) => console.log(e);
   if(saving.length > 0) sendAds(saving).then(success, failure);
 });

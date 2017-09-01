@@ -4,7 +4,7 @@ import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
-import { adForRequest, sendAds } from 'utils.js';
+import { sendAds, getAds } from 'utils.js';
 // styles
 import "../css/styles.css";
 
