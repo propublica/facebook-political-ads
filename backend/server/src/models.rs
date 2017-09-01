@@ -4,6 +4,7 @@ use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
+use diesel::types;
 use futures::{Future, stream, Stream};
 use futures_cpupool::CpuPool;
 use hyper::{Body, Client, Uri};
@@ -283,8 +284,10 @@ pub struct NewAd<'a> {
     images: Vec<String>,
     impressions: i32,
 
-    targeting: Option<&'a str>,
+    targeting: Option<String>,
 }
+
+sql_function!(coalesce, coalesce_t, (x: types::Nullable<types::Text>, y: types::Nullable<types::Text>) -> types::Nullable<types::Text>);
 
 impl<'a> NewAd<'a> {
     pub fn new(ad: &'a AdPost, lang: &'a str) -> Result<NewAd<'a>, InsertError> {
@@ -309,7 +312,7 @@ impl<'a> NewAd<'a> {
             lang: lang,
             images: images,
             impressions: if !ad.political.is_some() { 1 } else { 0 },
-            targeting: None,
+            targeting: ad.targeting.clone(),
         })
     }
 
@@ -317,6 +320,7 @@ impl<'a> NewAd<'a> {
         use schema::ads;
         use schema::ads::dsl::*;
         let connection = pool.get().map_err(InsertError::Timeout)?;
+
         // increment impressions if this is a background save,
         // otherwise increment political counters
         let ad: Ad = diesel::insert(&self.on_conflict(
@@ -335,6 +339,7 @@ impl<'a> NewAd<'a> {
         )).into(ads::table)
             .get_result(&*connection)
             .map_err(InsertError::DataBase)?;
+
         Ok(ad)
     }
 }
