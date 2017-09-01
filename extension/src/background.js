@@ -1,4 +1,4 @@
-import { adForRequest, sendAds } from "utils.js";
+import sendAds from "utils.js";
 
 chrome.runtime.onMessage.addListener((ads) => {
   if(!localStorage.getItem("redux")) return;
@@ -20,5 +20,5 @@ chrome.runtime.onMessage.addListener((ads) => {
   localStorage.setItem('saved', JSON.stringify(Array.from(saved)));
   const success = () => {};
   const failure = (e) => console.log(e);
-  if(saving.length > 0) sendAds(saving.map(adForRequest)).then(success, failure);
+  if(saving.length > 0) sendAds(saving).then(success, failure);
 });
