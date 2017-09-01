@@ -4,7 +4,6 @@ use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
-use diesel::types;
 use futures::{Future, stream, Stream};
 use futures_cpupool::CpuPool;
 use hyper::{Body, Client, Uri};
@@ -287,7 +286,6 @@ pub struct NewAd<'a> {
     targeting: Option<String>,
 }
 
-sql_function!(coalesce, coalesce_t, (x: types::Nullable<types::Text>, y: types::Nullable<types::Text>) -> types::Nullable<types::Text>);
 
 impl<'a> NewAd<'a> {
     pub fn new(ad: &'a AdPost, lang: &'a str) -> Result<NewAd<'a>, InsertError> {

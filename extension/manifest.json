@@ -4,7 +4,7 @@
   "description":"__MSG_extension_description__",
   "version": "1.0.19",
   "default_locale": "en",
-  "permissions": [],
+  "permissions": ["https://projects.propublica.org/facebook-ads/*"],
   "background": {
     "scripts": ["background.js"],
     "persistent": false

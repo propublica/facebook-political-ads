@@ -1,7 +1,6 @@
 const adForRequest = (ad) => ({
   id: ad.id,
-  html: ad.html,
-  browser_lang: chrome.i18n.getUILanguage()
+  html: ad.html
 });
 
 const endpoint = process.env.NODE_ENV === 'production' ?
