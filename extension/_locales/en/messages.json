@@ -1,23 +1,19 @@
 {
   "extension_name": {
-    "message": "Facebook Ad Listener",
+    "message": "Political Ad Collector",
     "description": "Extension name"
   },
   "extension_description": {
-    "message":"Tracking ads on Facebook",
+    "message":"This extension collects political ads on facebook.",
     "description": "Description of the extension"
-  },
-  "sponsor_text": {
-    "message": "Sponsored",
-    "description": "The text identifying sponsored ads in a user's timeline."
   },
   "rate_ads": {
     "message": "Ads I'm Seeing",
     "description": "Text for the 'Ads I'm Seeing' button in the extension."
   },
   "see_ads": {
-    "message": "Ads I Didn't See",
-    "description": "Text for the 'Ads I Didn't See' button in the extension."
+    "message": "Ads Others are Seeing",
+    "description": "Text for the 'Ads Others are Seeing' button in the extension."
   },
   "political": {
     "message": "Political Ad",

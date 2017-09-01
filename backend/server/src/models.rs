@@ -182,7 +182,7 @@ impl Ad {
             })
             // grab image
             .and_then(move |img| {
-                info!("getting {:?}", img);
+                info!("getting {:?}", img.path());
                 let cloned = img.clone();
                 client
                     .get(img)

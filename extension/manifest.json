@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name":"__MSG_extension_name__",
   "description":"__MSG_extension_description__",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "default_locale": "en",
   "permissions": ["https://projects.propublica.org/facebook-ads/*"],
   "background": {

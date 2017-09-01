@@ -76,6 +76,7 @@ const grabVariable = (fn, args)  => {
 
 // Getting the targeting routine. We use XMLHttpRequest here because facebook
 // bans fetch.
+let targetingBlocked = false;
 let targetingCache = new Map();
 const getTargeting = (ad) => {
   if(ad.targeting) {
@@ -83,6 +84,7 @@ const getTargeting = (ad) => {
       ...ad,
       targeting: targetingCache.get(ad.targeting)
     };
+    if(targetingBlocked) return ad;
     const url = ad.targeting;
     delete ad.targeting;
     return new Promise((resolve, reject) => {
@@ -91,8 +93,7 @@ const getTargeting = (ad) => {
       req.onreadystatechange = function() {
         if(req.readyState === 4) {
           try {
-            console.log(JSON.parse(req.response.replace('for (;;);', '')));
-            const targeting = JSON.parse(req.response.replace('for (;;);', ''))["jsmods"][0][1]["markup"];
+            const targeting = JSON.parse(req.response.replace('for (;;);', ''))["jsmods"]["markup"][0][1]["__html"];
             if(!targeting) {
               targetingCache.set(url, true);
               return resolve(ad);
@@ -105,6 +106,8 @@ const getTargeting = (ad) => {
             });
           } catch(e) {
             targetingCache.set(url, true);
+            targetingBlocked = true;
+            setTimeout(() => targetingBlocked = false, 15 * 60 * 100);
             reject(ad);
           }
         }
