@@ -43,7 +43,7 @@ fn main() {
     let classifier =
         Classifier::from_json(&args.arg_path).expect(&format!("Could not open {}", args.arg_path));
 
-    let dbads: Vec<Ad> = ads.filter(browser_lang.eq(args.arg_language))
+    let dbads: Vec<Ad> = ads.filter(lang.eq(args.arg_language))
         .load::<Ad>(&conn)
         .expect("Couldn't get ads");
 

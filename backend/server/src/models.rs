@@ -133,22 +133,22 @@ impl Images {
     }
 }
 
-#[derive(Queryable, Debug, Clone)]
+#[derive(Serialize, Queryable, Debug, Clone)]
 pub struct Ad {
     pub id: String,
     pub html: String,
     pub political: i32,
     pub not_political: i32,
-    title: String,
-    message: String,
-    thumbnail: String,
-    created_at: DateTime<Utc>,
-    updated_at: DateTime<Utc>,
-    browser_lang: String,
-    images: Vec<String>,
-    impressions: i32,
-    political_probability: f64,
-    targeting: Option<String>,
+    pub title: String,
+    pub message: String,
+    pub thumbnail: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub lang: String,
+    pub images: Vec<String>,
+    pub impressions: i32,
+    pub political_probability: f64,
+    pub targeting: Option<String>,
 }
 
 impl Ad {
@@ -240,7 +240,7 @@ impl Ad {
         Box::new(future)
     }
 
-    pub fn image_urls(&self) -> Vec<Result<Uri, InsertError>> {
+    pub(self) fn image_urls(&self) -> Vec<Result<Uri, InsertError>> {
         let images = [vec![self.thumbnail.clone()], self.images.clone()];
         images
             .concat()
@@ -250,6 +250,20 @@ impl Ad {
                 Ok(a)
             })
             .collect()
+    }
+
+    pub fn get_ads_by_lang(
+        language: &str,
+        conn: &Pool<ConnectionManager<PgConnection>>,
+    ) -> Result<Vec<Ad>, InsertError> {
+        use schema::ads::dsl::*;
+        let connection = conn.get().map_err(InsertError::Timeout)?;
+        ads.filter(lang.eq(language))
+            .filter(political_probability.gt(0.70))
+            .order(updated_at.desc())
+            .limit(100)
+            .load::<Ad>(&*connection)
+            .map_err(InsertError::DataBase)
     }
 }
 
@@ -265,7 +279,7 @@ pub struct NewAd<'a> {
     message: String,
     thumbnail: String,
 
-    browser_lang: &'a str,
+    lang: &'a str,
     images: Vec<String>,
     impressions: i32,
 
@@ -273,7 +287,7 @@ pub struct NewAd<'a> {
 }
 
 impl<'a> NewAd<'a> {
-    pub fn new(ad: &'a AdPost) -> Result<NewAd<'a>, InsertError> {
+    pub fn new(ad: &'a AdPost, lang: &'a str) -> Result<NewAd<'a>, InsertError> {
         info!("saving {}", ad.id);
         let document = kuchiki::parse_html().one(ad.html.clone());
 
@@ -292,7 +306,7 @@ impl<'a> NewAd<'a> {
             title: title,
             message: message,
             thumbnail: thumb,
-            browser_lang: &ad.browser_lang,
+            lang: lang,
             images: images,
             impressions: if !ad.political.is_some() { 1 } else { 0 },
             targeting: None,
@@ -337,10 +351,9 @@ mod tests {
             id: "test".to_string(),
             html: ad.to_string(),
             political: None,
-            browser_lang: "en-US".to_string(),
             targeting: None,
         };
-        let new_ad = NewAd::new(&post).unwrap();
+        let new_ad = NewAd::new(&post, "en-US").unwrap();
         assert!(new_ad.thumbnail.len() > 0);
         assert_eq!(new_ad.images.len(), 2);
         assert!(new_ad.title.len() > 0);
@@ -362,13 +375,12 @@ mod tests {
             html: ad.to_string(),
             political: 1,
             not_political: 2,
-            fuzzy_id: None,
             title: get_title(&document).unwrap(),
             message: get_message(&document).unwrap(),
             thumbnail: get_image(&document).unwrap(),
             created_at: Utc::now(),
             updated_at: Utc::now(),
-            browser_lang: "en-US".to_string(),
+            lang: "US".to_string(),
             images: get_images(&document).unwrap(),
             impressions: 1,
             targeting: None,

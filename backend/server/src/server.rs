@@ -8,6 +8,8 @@ use hyper;
 use hyper::{Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
+use hyper::Headers;
+use hyper::header::{AcceptLanguage, ContentLength};
 use hyper_tls::HttpsConnector;
 use log::LogLevelFilter;
 use log4rs;
@@ -17,11 +19,9 @@ use models::{NewAd, Ad};
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
 use serde_json;
-use std::collections::HashMap;
 use std::env;
 use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
-use url::form_urlencoded;
 
 use super::InsertError;
 
@@ -37,7 +37,6 @@ pub struct AdPost {
     pub id: String,
     pub html: String,
     pub political: Option<bool>,
-    pub browser_lang: String,
     pub targeting: Option<String>,
 }
 
@@ -69,21 +68,48 @@ impl Service for AdServer {
 }
 
 impl AdServer {
+    fn get_lang_from_headers(headers: &Headers) -> Option<String> {
+        if let Some(langs) = headers.get::<AcceptLanguage>() {
+            if langs.len() == 0 {
+                return None;
+            }
+            let mut languages = langs.to_owned();
+            languages.sort_by(|a, b| b.quality.cmp(&a.quality));
+            let lang = languages.iter().find(|quality| {
+                quality.item.language.is_some() && quality.item.region.is_some()
+            });
+            if let Some(l) = lang {
+                Some(
+                    l.clone().item.language.unwrap() + "-" + &l.clone().item.region.unwrap(),
+                )
+            } else {
+                languages[0].clone().item.language
+            }
+        } else {
+            None
+        }
+    }
+
     fn get_ads(&self, req: Request) -> Box<Future<Item = Response, Error = hyper::Error>> {
-        use schema::ads;
-            use schema::ads::
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
 
-        let future = pool.spawn(move || {
-            if Some(languages) = req.headers.get::<AcceptLanguage>() {
-                if Some(code) = languages.iter().find(|language| language.region.is_some()) {
-                    
-                    Ok(Response::new().with_header())
-                };
-            };
-            Ok(Response::new().with_status(StatusCode::BadRequest))
-        });
+        let future = if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
+            pool.spawn_fn(move || {
+                if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool) {
+                    if let Ok(serialized) = serde_json::to_string(&ads) {
+                        return Ok(
+                            Response::new()
+                                .with_header(ContentLength(serialized.len() as u64))
+                                .with_body(serialized),
+                        );
+                    }
+                }
+                Ok(Response::new().with_status(StatusCode::BadRequest))
+            })
+        } else {
+            pool.spawn_fn(|| Ok(Response::new().with_status(StatusCode::BadRequest)))
+        };
         Box::new(future)
     }
 
@@ -94,11 +120,18 @@ impl AdServer {
         let image_db = self.db_pool.clone();
         let handle = self.handle.clone();
         let client = self.client.clone();
+        let maybe_lang = AdServer::get_lang_from_headers(req.headers());
+        if !maybe_lang.is_some() {
+            return Box::new(future::ok(
+                (Response::new().with_status(StatusCode::BadRequest)),
+            ));
+        };
+        let lang = maybe_lang.unwrap();
 
         let future = req.body()
             .concat2()
             .then(move |msg| {
-                pool.spawn_fn(move || AdServer::save_ads(msg, &db_pool))
+                pool.spawn_fn(move || AdServer::save_ads(msg, &db_pool, lang))
             })
             .and_then(move |ads| {
                 for ad in ads {
@@ -124,6 +157,7 @@ impl AdServer {
     fn save_ads(
         msg: Result<Chunk, hyper::Error>,
         db_pool: &Pool<ConnectionManager<PgConnection>>,
+        lang: String,
     ) -> Result<Vec<Ad>, InsertError> {
         let bytes = msg.map_err(InsertError::Hyper)?;
         let string = String::from_utf8(bytes.to_vec()).map_err(
@@ -132,7 +166,7 @@ impl AdServer {
 
         let posts: Vec<AdPost> = serde_json::from_str(&string).map_err(InsertError::JSON)?;
         let ads = posts.iter().map(move |post| {
-            let ad = NewAd::new(post)?.save(db_pool)?;
+            let ad = NewAd::new(post, &lang)?.save(db_pool)?;
             Ok(ad)
         });
 

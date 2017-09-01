@@ -22,7 +22,6 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 extern crate tokio_core;
-extern crate url;
 
 pub mod models;
 pub mod schema;
@@ -44,4 +43,5 @@ pub enum InsertError {
     TLS(rusoto_core::TlsError),
     S3(rusoto_s3::PutObjectError),
     AWS(rusoto_credential::CredentialsError),
+    Language(()),
 }
