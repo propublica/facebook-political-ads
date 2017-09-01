@@ -374,3 +374,7 @@ render(
 // connect to the ratings channel
 chrome.runtime.onMessage.addListener((ads) => store.dispatch(newRatings(ads)));
 store.subscribe(() => chrome.runtime.sendMessage(store.getState().ads));
+// kickoff our ads refresshing
+const refresh = () => getAds((resp) => newAds(resp));
+refresh();
+setInterval(refresh, 10000);

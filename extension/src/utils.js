@@ -1,7 +1,4 @@
-const adForRequest = (ad) => ({
-  id: ad.id,
-  html: ad.html
-});
+const adForRequest = (ad) => (ad);
 
 const endpoint = process.env.NODE_ENV === 'production' ?
   "https://projects.propublica.org/facebook-ads/ads" :
@@ -11,5 +8,7 @@ const sendAds = (body) => fetch(endpoint, {
   mode: 'no-cors',
   body: JSON.stringify(body)
 });
+
+const getAds = (cb) => fetch(endpoint).then((res) => res.json()).then(cb)
 
 export { adForRequest, sendAds };
