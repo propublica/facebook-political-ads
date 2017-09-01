@@ -6,7 +6,6 @@ chrome.runtime.onMessage.addListener((ads) => {
     const redux = JSON.parse(localStorage.getItem("redux"));
     if(!redux.terms) return;
   } catch(e) {
-    console.log(e);
     return;
   }
   let saved = new Set();
