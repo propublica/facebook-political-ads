@@ -154,7 +154,7 @@ body {
 
 .ad .chiclet img {
   min-width: 50px;
-  max-width: 100%;
+  max-width: 100px;
 }
 
 a:focus {

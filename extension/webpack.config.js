@@ -85,6 +85,8 @@ module.exports = [{
       from: '../manifest.json', to: outdir
     },{
       from: '../_locales', to: outdir + "/_locales"
+    },{
+      from: '../assets', to: outdir + "/assets"
     }]),
   ],
   devtool: 'source-map'

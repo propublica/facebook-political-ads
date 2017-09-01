@@ -4,7 +4,7 @@ import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
-import { sendAds, getAds } from 'utils.js';
+import { sendAds, getAds, updateBadge } from 'utils.js';
 // styles
 import "../css/styles.css";
 
@@ -40,7 +40,7 @@ const assignRating = (id, rating) => ({
 const rateAd = (ad, rating) => {
   return (dispatch) => {
     let body = {
-      ...adForRequest(ad),
+      ...ad,
       political: rating === RatingType.POLITICAL,
     };
     let cb = () => ({});
@@ -373,8 +373,8 @@ render(
 
 // connect to the ratings channel
 chrome.runtime.onMessage.addListener((ads) => store.dispatch(newRatings(ads)));
-store.subscribe(() => chrome.runtime.sendMessage(store.getState().ads));
-// kickoff our ads refresshing
+store.subscribe(() => updateBadge(store.getState().ratings || []));
+// kickoff our ads refreshing
 const refresh = () => getAds((resp) => newAds(resp));
 refresh();
 setInterval(refresh, 10000);
