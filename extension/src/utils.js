@@ -9,6 +9,6 @@ const sendAds = (body) => fetch(endpoint, {
   body: JSON.stringify(body)
 });
 
-const getAds = (cb) => fetch(endpoint).then((res) => res.json()).then(cb)
+const getAds = (cb) => fetch(endpoint).then((res) => res.json()).then(cb);
 
 export { adForRequest, sendAds };
