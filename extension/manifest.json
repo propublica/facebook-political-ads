@@ -1,8 +1,9 @@
 {
   "manifest_version": 2,
-  "name":"__MSG_extension_name__",
-  "description":"__MSG_extension_description__",
-  "version": "1.0.23",
+  "name":"__MSG_name__",
+  "short_name": "__MSG_short_name__",
+  "description":"__MSG_description__",
+  "version": "1.0.24",
   "default_locale": "en",
   "permissions": [
     "https://projects.propublica.org/facebook-ads/*"
@@ -13,7 +14,7 @@
   },
   "browser_action": {
     "default_icon": "assets/icon128.png",
-    "default_title": "__MSG_extension_name__",
+    "default_title": "__MSG_name__",
     "default_popup": "index.html"
   },
   "content_scripts": [{

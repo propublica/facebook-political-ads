@@ -1,9 +1,13 @@
 {
-  "extension_name": {
-    "message": "Political Ad Collector",
+  "name": {
+    "message": "Facebook Political Ad Collector",
     "description": "Extension name"
   },
-  "extension_description": {
+  "short_name": {
+    "message": "Facebook PAC",
+    "description": "Extension short name"
+  },
+  "description": {
     "message":"This extension collects political ads on facebook.",
     "description": "Description of the extension"
   },

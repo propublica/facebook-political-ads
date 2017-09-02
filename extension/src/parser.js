@@ -70,7 +70,7 @@ const grabVariable = (fn, args)  => {
   script.textContent = 'localStorage.setItem("pageVariable", (' + fn + ').apply(this, ' + JSON.stringify(args) + '));';
   script.setAttribute('id', 'pageVariable');
   (document.head||document.documentElement).appendChild(script);
-  //script.remove();
+  script.remove();
   return localStorage.getItem("pageVariable");
 };
 
@@ -84,9 +84,9 @@ const getTargeting = (ad) => {
       ...ad,
       targeting: targetingCache.get(ad.targeting)
     };
-    if(targetingBlocked) return ad;
     const url = ad.targeting;
     delete ad.targeting;
+    if(targetingBlocked) return ad;
     return new Promise((resolve, reject) => {
       let req = new XMLHttpRequest();
 
@@ -95,17 +95,14 @@ const getTargeting = (ad) => {
           try {
             const targeting = JSON.parse(req.response.replace('for (;;);', ''))["jsmods"]["markup"][0][1]["__html"];
             if(!targeting) {
-              targetingCache.set(url, true);
               return resolve(ad);
             }
-
             targetingCache.set(url, targeting);
             resolve({
               ...ad,
               targeting
             });
           } catch(e) {
-            targetingCache.set(url, true);
             targetingBlocked = true;
             setTimeout(() => targetingBlocked = false, 15 * 60 * 100);
             reject(ad);

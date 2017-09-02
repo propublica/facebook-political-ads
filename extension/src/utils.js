@@ -26,7 +26,6 @@ const mergeAds = (ads, newAds) => {
 
 const updateBadge = (ratings) => {
   const num = ratings.filter(rating => !("rating" in rating)).length;
-  console.log(num + " ads");
   if(num > 0) {
     chrome.browserAction.setBadgeText({text: num > 100 ? "100+" : "" + num});
   } else {

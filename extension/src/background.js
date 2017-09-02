@@ -23,3 +23,4 @@ chrome.runtime.onMessage.addListener((ads) => {
   const failure = (e) => console.log(e);
   if(saving.length > 0) sendAds(saving).then(success, failure);
 });
+chrome.browserAction.setBadgeBackgroundColor({color: "#0099E6"});
