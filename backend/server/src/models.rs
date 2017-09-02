@@ -337,7 +337,12 @@ impl<'a> NewAd<'a> {
         )).into(ads::table)
             .get_result(&*connection)
             .map_err(InsertError::DataBase)?;
-
+        if self.targeting.is_some() && !ad.targeting.is_some() {
+            diesel::update(ads.filter(id.eq(self.id)))
+                .set(targeting.eq(self.targeting.clone()))
+                .execute(&*connection)
+                .map_err(InsertError::DataBase)?;
+        };
         Ok(ad)
     }
 }
