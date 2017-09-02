@@ -131,7 +131,7 @@ const getTargeting = (ad) => {
       req.send();
     });
   } else {
-    return Promise.resolve(ad);
+    return ad;
   }
 };
 
