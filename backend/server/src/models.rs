@@ -259,8 +259,8 @@ impl Ad {
         use schema::ads::dsl::*;
         let connection = conn.get().map_err(InsertError::Timeout)?;
         ads.filter(lang.eq(language))
-            .filter(political_probability.gt(0.70))
-            .order(updated_at.desc())
+            .filter(political_probability.gt(0.90))
+            .order(created_at.desc())
             .limit(100)
             .load::<Ad>(&*connection)
             .map_err(InsertError::DataBase)
