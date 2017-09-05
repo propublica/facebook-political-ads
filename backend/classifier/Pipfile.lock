@@ -1,0 +1,66 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "f03bfc160e2c3e83716ee8496decf35c2344fc9a419d02c5beadb653353924d2"
+        },
+        "pipfile-spec": 1,
+        "requires": {},
+        "sources": [
+            {
+                "url": "https://pypi.python.org/simple",
+                "verify_ssl": true
+            }
+        ]
+    },
+    "default": {
+        "beautifulsoup4": {
+            "version": "==4.6.0"
+        },
+        "bs4": {
+            "version": "==0.0.1"
+        },
+        "certifi": {
+            "version": "==2017.7.27.1"
+        },
+        "chardet": {
+            "version": "==3.0.4"
+        },
+        "cycler": {
+            "version": "==0.10.0"
+        },
+        "facebook-sdk": {
+            "version": "==2.0.0"
+        },
+        "idna": {
+            "version": "==2.6"
+        },
+        "numpy": {
+            "version": "==1.13.1"
+        },
+        "python-dateutil": {
+            "version": "==2.6.1"
+        },
+        "pytz": {
+            "version": "==2017.2"
+        },
+        "requests": {
+            "version": "==2.18.4"
+        },
+        "scikit-learn": {
+            "version": "==0.19.0"
+        },
+        "scipy": {
+            "version": "==0.19.1"
+        },
+        "six": {
+            "version": "==1.10.0"
+        },
+        "sklearn": {
+            "version": "==0.0"
+        },
+        "urllib3": {
+            "version": "==1.22"
+        }
+    },
+    "develop": {}
+}

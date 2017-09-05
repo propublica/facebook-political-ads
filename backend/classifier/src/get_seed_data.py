@@ -36,7 +36,7 @@ def fetch_last_n_posts(pagename, total_posts, graph):
                 page_count += 1
             else:
                 break
-        else :
+        else:
             break
     print(pagename + '  ' + str(len(post_bodies)))
     return post_bodies

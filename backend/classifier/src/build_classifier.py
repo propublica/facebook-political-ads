@@ -9,16 +9,22 @@ several different models.
 """
 import itertools
 import json
+import os
 import sys
+import psycopg2
 
-from sklearn.naive_bayes import MultinomialNB,BernoulliNB,GaussianNB
+from bs4 import BeautifulSoup
+
+from html import parser
+
+from sklearn.naive_bayes import MultinomialNB, BernoulliNB, GaussianNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import HashingVectorizer
 
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, roc_auc_score, classification_report
 
-classifiers = {
+CLASSIFIERS = {
     "MultinomialNB" : MultinomialNB(),
     "BernoulliNB" : BernoulliNB(),
     "GaussianNB" : GaussianNB(),
@@ -48,19 +54,19 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
     Currently supported:
     MultinomialNB, BernoulliNB, GaussianNB, LogisticRegression
     """
-    import matplotlib.pyplot as plt
-    for name, classifier in classifiers.items():
+    #import matplotlib.pyplot as plt
+    for name, classifier in CLASSIFIERS.items():
         classifier.fit(X_train.todense(), Y_train)
         preds = classifier.predict_proba(X_test.todense())[:, 1]
         fpr, tpr, _ = roc_curve(Y_test, preds)
         print("******** %s: %s" % (name, roc_auc_score(Y_test, preds)))
-        plt.plot(fpr, tpr, label=name)
+        #plt.plot(fpr, tpr, label=name)
         preds = classifier.predict(X_test.todense())
         print(classification_report(Y_test, preds))
-    plt.xlabel('FPR')
-    plt.ylabel('TPR')
-    plt.legend()
-    plt.show()
+    #plt.xlabel('FPR')
+    #plt.ylabel('TPR')
+    #plt.legend()
+    #plt.show()
 
     return
 
@@ -78,8 +84,21 @@ if __name__ == '__main__':
 
     pol = [(item, 1) for item in posts['political']]
     npol = [(item, 0) for item in posts['not_political']]
-
     data = pol + npol
+    conn = psycopg2.connect(os.environ["DATABASE_URL"])
+    cur = conn.cursor()
+    cur.execute("""
+      select
+        html,
+        political / (political + not_political) as political
+      from ads
+        where lang = %s
+        and (political + not_political) > 0;
+     """, (config["language"], ))
+    for row in cur:
+        html, score = row
+        doc = BeautifulSoup(html, "html.parser")
+        data.append((doc.get_text(), score))
 
     train, test = train_test_split(data, test_size=0.5)
 
@@ -103,7 +122,7 @@ if __name__ == '__main__':
         print('MultinomialNB, BernoulliNB, GaussianNB, LogisticRegression')
         exit()
 
-    classifier = classifiers[config['classifier_type']]
+    classifier = CLASSIFIERS[config['classifier_type']]
     classifier.fit(X_train.todense(), Y_train)
     preds = classifier.predict(X_test.todense())
     print(classification_report(Y_test, preds))
