@@ -100,7 +100,7 @@ if __name__ == '__main__':
         doc = BeautifulSoup(html, "html.parser")
         data.append((doc.get_text(), score))
 
-    train, test = train_test_split(data, test_size=0.5)
+    train, test = train_test_split(data)
 
     if config['equalize_classes']:
         train = equalize_classes(train)
@@ -114,7 +114,6 @@ if __name__ == '__main__':
 
     if config['run_eval']:
         eval_classifiers(X_train, Y_train, X_test, Y_test)
-        exit()
 
     if not config['classifier_type']:
         print('Need to specify model class.')
