@@ -49,7 +49,6 @@ const cleanAd = (html) => {
           node.removeAttribute(attr.name);
         }
       }
-
     });
     // walk through the tree.
     Array.from(node.children).forEach(killAttrs);
@@ -93,7 +92,7 @@ const getTargeting = (ad) => {
       req.onreadystatechange = function() {
         if(req.readyState === 4) {
           try {
-            const targeting = JSON.parse(req.response.replace('for (;;);', ''))["jsmods"]["markup"][0][1]["__html"];
+            const targeting = cleanAd(JSON.parse(req.response.replace('for (;;);', ''))["jsmods"]["markup"][0][1]["__html"]);
             if(!targeting) {
               return resolve(ad);
             }
