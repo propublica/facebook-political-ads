@@ -1,15 +1,15 @@
 {
-  "extension_name": {
+  "name": {
     "message": "Facebook Political Ad Collector",
     "description": "Extension name"
   },
-  "extension_description": {
+  "short_name": {
+    "message": "Facebook PAC",
+    "description": "Extension short name"
+  },
+  "description": {
     "message":"Sucht nach Wahlwerbung auf Facebook",
     "description": "Description of the extension"
-  },
-  "sponsor_text": {
-    "message": "Gesponsert",
-    "description": "The text identifying sponsored ads in a user's timeline."
   },
   "rate_ads": {
     "message": "Gesehene Werbung",
