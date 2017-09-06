@@ -88,19 +88,17 @@ const mergeAds = (ads, newAds) => {
   return Array.from(ids.values()).sort((a, b) => a.id > b.id ? 1 : -1);
 };
 
-const updates = (collection, action) => (collection.map(ad => {
-  if(ad.id === action.id) {
-    return { ...ad, rating: action.value };
-  }
-  return ad;
-}));
-
 const buildUpdate = (type) => ((state = [], action) => {
   switch(action.type) {
   case "new_" + type + "s":
     return mergeAds(state, action.value);
   case "update_" + type:
-    return updates(state, action);
+    return state.map(ad => {
+      if(ad.id === action.id) {
+        return { ...ad, rating: action.value };
+      }
+      return ad;
+    });
   default:
     return state;
   }
