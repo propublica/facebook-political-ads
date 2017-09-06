@@ -27,6 +27,9 @@ pub mod models;
 pub mod schema;
 pub mod server;
 
+use log::LogLevelFilter;
+use log4rs::append::console::ConsoleAppender;
+use log4rs::config::{Appender, Config as LogConfig, Logger, Root};
 use std::string;
 
 // This is basically a catch all for all the Errors we think we'll ever see to
@@ -44,4 +47,17 @@ pub enum InsertError {
     S3(rusoto_s3::PutObjectError),
     AWS(rusoto_credential::CredentialsError),
     Language(()),
+}
+
+pub fn start_logging() {
+    let stdout = ConsoleAppender::builder().build();
+    let config = LogConfig::builder()
+        .appender(Appender::builder().build("stdout", Box::new(stdout)))
+        .logger(Logger::builder().build("hyper", LogLevelFilter::Info))
+        .logger(Logger::builder().build("server", LogLevelFilter::Info))
+        .build(Root::builder().appender("stdout").build(
+            LogLevelFilter::Error,
+        ))
+        .expect("Log config didn't work");
+    log4rs::init_config(config).expect("Logging encountered an error.");
 }
