@@ -90,7 +90,7 @@ if __name__ == '__main__':
     cur.execute("""
       select
         html,
-        political / (political + not_political) as political
+        political::float / (political::float + not_political::float) as political
       from ads
         where lang = %s
         and (political + not_political) > 0;
