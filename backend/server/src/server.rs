@@ -16,6 +16,8 @@ use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
 use start_logging;
 use serde_json;
+use std::fs::File;
+use std::io::Read;
 use std::env;
 use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
@@ -45,9 +47,14 @@ impl Service for AdServer {
         FutureResult<Self::Response, Self::Error>,
         Box<Future<Item = Self::Response, Error = Self::Error>>,
     >;
-
+    // This is not at all RESTful, but I'd rather not deal with regexes. Maybe soon
+    // someone will
+    // make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
         match (req.method(), req.path()) {
+            (&Method::Get, "/facebook-ads/admin") => Either::B(self.get_file("public/admin.html")),
+            (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file("public/admin.js")),
+            //(&Method::Post, "/facebook-ads/admin/ads") => Either::B(self.mark_ads()),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
@@ -64,7 +71,29 @@ impl Service for AdServer {
     }
 }
 
+// I'm not happy with the OK OK OKs here, but I can't quite find a Result
+// method that works. I should ask on stack overflow or something.
+type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
 impl AdServer {
+    fn get_file(&self, path: &str) -> ResponseFuture {
+        let pool = self.pool.clone();
+        let path = path.to_string();
+        let future = pool.spawn_fn(move || {
+            if let Ok(mut file) = File::open(path) {
+                let mut buf = String::new();
+                if let Ok(size) = file.read_to_string(&mut buf) {
+                    return Ok(
+                        Response::new()
+                            .with_header(ContentLength(size as u64))
+                            .with_body(buf),
+                    );
+                }
+            }
+            Ok(Response::new().with_status(StatusCode::NotFound))
+        });
+        Box::new(future)
+    }
+
     fn get_lang_from_headers(headers: &Headers) -> Option<String> {
         if let Some(langs) = headers.get::<AcceptLanguage>() {
             if langs.len() == 0 {
@@ -87,10 +116,9 @@ impl AdServer {
         }
     }
 
-    fn get_ads(&self, req: Request) -> Box<Future<Item = Response, Error = hyper::Error>> {
+    fn get_ads(&self, req: Request) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
-
         let future = if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
             pool.spawn_fn(move || {
                 if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool) {
@@ -110,7 +138,7 @@ impl AdServer {
         Box::new(future)
     }
 
-    fn process_ads(&self, req: Request) -> Box<Future<Item = Response, Error = hyper::Error>> {
+    fn process_ads(&self, req: Request) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
         let image_pool = self.pool.clone();
