@@ -116,7 +116,7 @@ impl Images {
         }
 
         let title = get_title(&document)?;
-        let message = get_title(&document)?;
+        let message = get_message(&document)?;
         Ok(Images {
             thumbnail: thumb,
             images: collection,
