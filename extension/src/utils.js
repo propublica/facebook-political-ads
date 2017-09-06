@@ -1,7 +1,6 @@
 const adForRequest = (ad) => ({
   id: ad.id,
   html: ad.html,
-  political: ad.political,
   targeting: ad.targeting
 });
 
