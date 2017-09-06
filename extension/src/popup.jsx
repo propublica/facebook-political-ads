@@ -4,7 +4,7 @@ import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
-import { sendAds, getAds, updateBadge } from 'utils.js';
+import { sendAds, getAds, updateBadge, adForRequest } from 'utils.js';
 // styles
 import "../css/styles.css";
 
@@ -26,38 +26,42 @@ const ACCEPT_TERMS = "accept_terms";
 const TOGGLE_TAB = "toggle_tab";
 const NEW_ADS = "new_ads";
 const NEW_RATINGS = "new_ratings";
-const ASSIGN_RATING = "assign_rating";
+const UPDATE_AD = "update_ad";
+const UPDATE_RATING = "update_rating";
 
 // Actions
 const acceptTerms = () => ({ type: ACCEPT_TERMS });
 const toggle = (value) => ({ type: TOGGLE_TAB, value });
-const assignRating = (id, rating) => ({
-  type: ASSIGN_RATING,
-  id: id,
-  value: rating
-});
-
-const rateAd = (ad, rating) => {
-  return (dispatch) => {
-    let body = {
-      ...ad,
-      political: rating === RatingType.POLITICAL,
-    };
-    let cb = () => ({});
-    dispatch(assignRating(ad.id, rating));
-    return sendAds([body]).then(cb, cb);
-  };
-};
-
 const newAds = (ads) => ({
   type: NEW_ADS,
   value: ads
 });
-
 const newRatings = (ratings) => ({
   type: NEW_RATINGS,
   value: ratings
 });
+const updateAd = (id, rating) => ({
+  type: UPDATE_AD,
+  id: id,
+  value: rating
+});
+const updateRating = (id, rating) => ({
+  type: UPDATE_RATING,
+  id: id,
+  value: rating
+});
+
+const rateAd = (ad, rating, update) => {
+  return (dispatch) => {
+    let body = {
+      ...adForRequest(ad),
+      political: rating === RatingType.POLITICAL,
+    };
+    dispatch(update(ad.id, rating));
+    let cb = () => ({});
+    return sendAds([body]).then(cb, cb);
+  };
+};
 
 // Reducers
 const active = (state = ToggleType.RATER, action) => {
@@ -84,30 +88,23 @@ const mergeAds = (ads, newAds) => {
   return Array.from(ids.values()).sort((a, b) => a.id > b.id ? 1 : -1);
 };
 
-const ads = (state = [], action) => {
-  switch(action.type) {
-  case NEW_ADS:
-    return mergeAds(state, action.value);
-  default:
-    return state;
+const updates = (collection, action) => (collection.map(ad => {
+  if(ad.id === action.id) {
+    return { ...ad, rating: action.value };
   }
-};
+  return ad;
+}));
 
-const ratings = (state = [], action) => {
+const buildUpdate = (type) => ((state = [], action) => {
   switch(action.type) {
-  case NEW_RATINGS:
+  case "new_" + type + "s":
     return mergeAds(state, action.value);
-  case ASSIGN_RATING:
-    return state.map(rating => {
-      if(rating.id === action.id) {
-        return { ...rating, rating: action.value };
-      }
-      return rating;
-    });
+  case "update_" + type:
+    return updates(state, action);
   default:
     return state;
   }
-};
+});
 
 const terms = (state = false, action) => {
   switch(action.type) {
@@ -121,8 +118,8 @@ const terms = (state = false, action) => {
 // The main reducer!
 const reducer = combineReducers({
   active,
-  ads,
-  ratings,
+  ads: buildUpdate("ad"),
+  ratings: buildUpdate("rating"),
   terms
 });
 
@@ -184,36 +181,26 @@ const Ad = ({title, message, id, image}) => (
   </div>
 );
 
-// Ads from the server to show
-let Ads = ({ads}) => (
-  <div id="ads">
-    {ads.map(ad => <Ad key={ad.id} {...ad} />)}
-  </div>
-);
-Ads = connect((state) => ({
-  ads: insertAdFields(state.ads)
-}))(Ads);
-
-const RatingForm = ({rating, action})=> (
+const RatingForm = ({rating, action, question})=> (
   <div className="rater">
-    {getMessage('rating_question')}
-    <button
-      id={'normal' + rating.id}
-      onClick={function(){ return action(rating, RatingType.NORMAL); }}
-    >
-      {getMessage('normal')}
-    </button>
+    {getMessage(question)}
     <button
       id={'political' + rating.id}
       onClick={function(){ return action(rating, RatingType.POLITICAL); }}
     >
       {getMessage('political')}
     </button>
+    <button
+      id={'normal' + rating.id}
+      onClick={function(){ return action(rating, RatingType.NORMAL); }}
+    >
+      {getMessage('normal')}
+    </button>
   </div>
 );
 
 // Ads to be rated and sent to the server
-const Rating = ({rating, action}) => (
+const Rating = ({rating, action, question}) => (
   <div className="rating">
     <Ad
       title={rating.title}
@@ -221,32 +208,52 @@ const Rating = ({rating, action}) => (
       id={rating.id}
       image={rating.image}
     />
-    {("rating" in rating) ? '' : <RatingForm action={action} rating={rating} /> }
+    {("rating" in rating) ? '' : <RatingForm action={action} rating={rating} question={question} /> }
   </div>
 );
 
 const Ratings = ({onRatingClick, ratings}) => (
   <div id="ratings">
-    {ratings.map(rating => (
-      <Rating key={rating.id} rating={rating} action={onRatingClick} />)
+    {ratings.map(rating =>
+      (<Rating key={rating.id} rating={rating} action={onRatingClick} question="rating_question" />)
     )}
   </div>
 );
-
 const ratingsStateToProps = (state) => ({
   ratings: insertAdFields(getUnratedRatings(state.ratings))
 });
-
 const ratingsDispatchToProps = (dispatch) => ({
   onRatingClick: (id, rating) => {
-    dispatch(rateAd(id, rating));
+    dispatch(rateAd(id, rating, updateRating));
   }
 });
-
 const UnratedRatings = connect(
   ratingsStateToProps,
   ratingsDispatchToProps
 )(Ratings);
+
+// Ads from the server to show
+let Ads = ({ads, onAdClick}) => (
+  <div id="ads">
+    {ads.map(ad =>
+      (<Rating key={ad.id} rating={ad} action={onAdClick} question="verify_question" />)
+    )}
+  </div>
+);
+const adStateToProps = (state) => ({
+  ads: getUnratedRatings(state.ads)
+});
+const adDispatchToProps = (dispatch) => ({
+  onAdClick: (id, rating) => {
+    dispatch(rateAd(id, rating, updateAd));
+  }
+});
+Ads = connect(
+  adStateToProps,
+  adDispatchToProps
+)(Ads);
+
+
 
 // Controls which section of tabs to show, defaults to the
 const Toggle = ({type, message, active, onToggleClick}) => (
@@ -294,47 +301,7 @@ Toggler = connect(
 
 const Onboarding = ({onAcceptClick}) => (
   <div id="tos">
-    <div id="terms">
-      <h2>May we have your consent?</h2>
-      <p>
-        ProPublica believes in providing transparency about what we do. So
-        before you agree to this download, please take a minute to understand
-        what the extension will do.
-      </p>
-      <h2>What the Extension Does</h2>
-      <p>
-        The extension places content script on every Facebook page you
-        visit. That script scans for ads, which it then stores on your computer.
-      </p>
-      <h2>How You Can Help</h2>
-      <p>
-        Whenever you feel like supporting our mission, you can click on the
-        ProPublica icon on your browser bar and a pop-up window will appear. It
-        will contain all the ads saved on your computer. You can “teach” the
-        Extension by classifying the ads as either Political or Not Political.
-      </p>
-      <h2>Information We Will Receive</h2>
-      <p>
-        Our server, which may be located outside of Germany, will receive clean,
-        identifier-free html of the ads, the ads’ Facebook identifiers and
-        demographic targeting parameters (e.g., people ages 18 and over residing
-        in Germany), their classification (Political or Non Political), and your
-        browser’s language setting. We have otherwise made every effort to
-        ensure the extension will not collect data that could be used to
-        identify you individually.
-      </p>
-      <h2>What We Will Do With the Information</h2>
-      <p>
-        We will feed the information to our algorithm to help it learn to
-        identify political ads. Once it has had enough training, we will be able
-        to send you ads you have not already seen. When you want to know what
-        ads others are seeing, you can click on the “Ads I’m not Seeing” icon on
-        your browser and we will send a batch of about 100 ads. The extension
-        will then compare those to the ads stored locally on your computer and
-        show you only new ads. We will never receive information about what ads
-        you have or have not seen.
-      </p>
-    </div>
+    <div id="terms" dangerouslySetInnerHTML={{__html:getMessage("terms_of_service")}} />
     <div id="accept-box">
       <button id="accept" onClick={function(){ return onAcceptClick(); }}>
         Accept

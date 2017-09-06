@@ -1,4 +1,4 @@
-import { sendAds, mergeAds, updateBadge } from "utils.js";
+import { sendAds, mergeAds, updateBadge, adForRequest } from "utils.js";
 
 chrome.runtime.onMessage.addListener((ads) => {
   if(!localStorage.getItem("redux")) return;
@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener((ads) => {
   } catch(e) {
     console.log(e);
   }
-  const saving = ads.filter((ad) => !saved.has(ad.id));
+  const saving = ads.filter((ad) => !saved.has(ad.id)).map(adForRequest);
   const success = () => console.log("saved");
   const failure = (e) => console.log(e);
   if(saving.length > 0) sendAds(saving).then(success, failure);
