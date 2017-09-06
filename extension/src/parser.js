@@ -73,8 +73,8 @@ const grabVariable = (fn, args)  => {
   return localStorage.getItem("pageVariable");
 };
 
-// Getting the targeting routine. We use XMLHttpRequest here because facebook
-// bans fetch.
+// Getting the targeting information. We're careful to cache any results so as to avoid being
+// blocked by facebook.
 let targetingBlocked = false;
 let targetingCache = new Map();
 const getTargeting = (ad) => {
@@ -88,7 +88,6 @@ const getTargeting = (ad) => {
     if(targetingBlocked) return ad;
     return new Promise((resolve) => {
       let req = new XMLHttpRequest();
-
       req.onreadystatechange = function() {
         if(req.readyState === 4) {
           try {
@@ -109,6 +108,7 @@ const getTargeting = (ad) => {
         }
       };
 
+      // This is all built out from a close reading of facebook's code.
       let built = grabVariable((url) => {
         let parsed = new (window.require('URI'))(url);
         localStorage.setItem('url', url);
@@ -134,12 +134,17 @@ const getTargeting = (ad) => {
   }
 };
 
+
+// We want to minimize the impact of a user's experience using facebook, so this function tries to
+// restore the state of the page when the extension clicks around.
 const refocus = (cb) => {
   const focus = document.activeElement;
   cb();
   if(focus) focus.focus();
 };
 
+// Getting the extension to show targeting information for timeline ads is hard, so we have this
+// gnarly function.
 let timelineCache = new Map();
 const getTimelineId = (parent, ad) => {
   const control = parent.querySelector(".uiPopover");
