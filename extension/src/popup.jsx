@@ -341,7 +341,5 @@ render(
 // connect to the ratings channel
 chrome.runtime.onMessage.addListener((ads) => store.dispatch(newRatings(ads)));
 store.subscribe(() => updateBadge(store.getState().ratings || []));
-// kickoff our ads refreshing
-const refresh = () => getAds((resp) => newAds(resp));
-refresh();
-setInterval(refresh, 10000);
+// Refresh our ads
+getAds((resp) => newAds(resp));
