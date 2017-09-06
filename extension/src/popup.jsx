@@ -85,7 +85,9 @@ const mergeAds = (ads, newAds) => {
       ids.set(ad.id, ad);
     }
   });
-  return Array.from(ids.values()).sort((a, b) => a.id > b.id ? 1 : -1);
+  return Array.from(ids.values())
+    .sort((a, b) => a.id > b.id ? 1 : -1)
+    .sort((a) => a.rating === RatingType.POLITICAL ? 1 : -1);
 };
 
 const buildUpdate = (type) => ((state = [], action) => {
@@ -206,7 +208,9 @@ const Rating = ({rating, action, question}) => (
       id={rating.id}
       image={rating.image}
     />
-    {("rating" in rating) ? '' : <RatingForm action={action} rating={rating} question={question} /> }
+    {("rating" in rating) ?
+      <b className="political">{getMessage('political')}</b> :
+      <RatingForm action={action} rating={rating} question={question} /> }
   </div>
 );
 
