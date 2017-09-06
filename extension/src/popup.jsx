@@ -50,7 +50,6 @@ const updateRating = (id, rating) => ({
   id: id,
   value: rating
 });
-
 const rateAd = (ad, rating, update) => {
   return (dispatch) => {
     let body = {
@@ -254,8 +253,6 @@ Ads = connect(
   adStateToProps,
   adDispatchToProps
 )(Ads);
-
-
 
 // Controls which section of tabs to show, defaults to the
 const Toggle = ({type, message, active, onToggleClick}) => (
