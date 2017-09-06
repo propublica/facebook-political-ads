@@ -340,5 +340,9 @@ render(
 // connect to the ratings channel
 chrome.runtime.onMessage.addListener((ads) => store.dispatch(newRatings(ads)));
 store.subscribe(() => updateBadge(store.getState().ratings || []));
-// Refresh our ads
-getAds((resp) => newAds(resp));
+// Refresh our ads filtering out ones the user has seen.
+getAds((resp) => {
+  const set = new Set();
+  getUnratedRatings(store.getState().ratings).map((rating) => set.add(rating.id));
+  newAds(resp.filter((ad) => set.has(ad.id)));
+});

@@ -6,7 +6,8 @@
   "version": "1.0.26",
   "default_locale": "en",
   "permissions": [
-    "https://projects.propublica.org/facebook-ads/*"
+    "https://projects.propublica.org/facebook-ads/*",
+    "unlimitedStorage"
   ],
   "background": {
     "scripts": ["background.js"],
