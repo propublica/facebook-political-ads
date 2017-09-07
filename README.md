@@ -50,6 +50,10 @@ So for example, to classify ads in the United States I'd run:
 
     cargo run --bin classify -p server en-US data/en_us/seeds.json
 
+## Stories
+
+* [Help Us Monitor Political Ads Online](https://www.propublica.org/article/help-us-monitor-political-ads-online)
+
 ## Where We Need Your Help
 
 In general, the project needs more tests. We've written a couple of tests for parsing the Facebook timeline in the extension directory, and a few for the tricky bits in the server, but any help here would be great!
