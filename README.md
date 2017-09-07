@@ -55,6 +55,7 @@ So for example, to classify ads in the United States I'd run:
 * [Help Us Monitor Political Ads Online](https://www.propublica.org/article/help-us-monitor-political-ads-online)
 * [Mehr Transparenz im Schatten-Wahlkampf](http://faktenfinder.tagesschau.de/wahlkampf-facebook-dark-ads-101.html)
 * [Bringen Sie Licht in den dunklen Facebook-Wahlkampf](http://www.sueddeutsche.de/digital/bundestagswahl-bringen-sie-licht-in-den-dunklen-facebook-wahlkampf-1.3656582)
+* [Wie werben die Parteien auf Facebook?](http://www.spiegel.de/netzwelt/games/facebook-political-ad-collector-plugin-sammelt-wahlwerbung-auf-facebook-ein-a-1166566.html)
 
 ## Where We Need Your Help
 
