@@ -9,8 +9,9 @@ use hyper::{Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
-use hyper::header::{AcceptLanguage, ContentLength, Authorization, Basic};
+use hyper::header::{AcceptLanguage, ContentLength, Authorization, Bearer};
 use hyper_tls::HttpsConnector;
+use jsonwebtoken::{decode, Validation};
 use models::{NewAd, Ad};
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
@@ -29,6 +30,7 @@ pub struct AdServer {
     pool: CpuPool,
     handle: Handle,
     client: Client<HttpsConnector<HttpConnector>>,
+    password: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -37,6 +39,12 @@ pub struct AdPost {
     pub html: String,
     pub political: Option<bool>,
     pub targeting: Option<String>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct Admin {
+    pub name: String,
+    pub email: String,
 }
 
 impl Service for AdServer {
@@ -51,14 +59,11 @@ impl Service for AdServer {
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
         match (req.method(), req.path()) {
-            (&Method::Get, "/facebook-ads/admin") => Either::B(self.auth(
-                req,
-                || self.get_file("public/admin.html"),
-            )),
-            (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.auth(
-                req,
-                || self.get_file("public/admin.js"),
-            )),
+            (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, || {
+                Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
+            })),
+            (&Method::Get, "/facebook-ads/admin") => Either::B(self.get_file("public/admin.html")),
+            (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file("public/admin.js")),
             //(&Method::Post, "/facebook-ads/admin/ads") => Either::B(self.mark_ads()),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
@@ -84,21 +89,23 @@ impl AdServer {
     where
         F: Fn() -> ResponseFuture,
     {
-        if let Some(auth) = req.headers().get::<Authorization<Basic>>() {
-            if auth ==
-                &Authorization(Basic {
-                    username: "propublica".to_string(),
-                    password: Some("I want to moderate the ads.".to_string()),
-                })
-            {
-                return callback();
+        if let Some(token) = req.headers().get::<Authorization<Bearer>>() {
+            match decode::<Admin>(
+                &token.token,
+                self.password.as_bytes(),
+                &Validation::default(),
+            ) {
+                Ok(auth) => {
+                    info!("Login from {:?}", auth);
+                    return callback();
+                }
+                _ => warn!("Bad token {}", token),
             }
         }
         Box::new(future::ok(
-            (Response::new().with_status(StatusCode::Unauthorized)),
+            Response::new().with_status(StatusCode::Unauthorized),
         ))
     }
-
 
     fn get_file(&self, path: &str) -> ResponseFuture {
         let pool = self.pool.clone();
@@ -229,7 +236,8 @@ impl AdServer {
         let addr = env::var("HOST").expect("HOST must be set").parse().expect(
             "Error parsing HOST",
         );
-        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
+        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
         let config = Config::default();
         let manager = ConnectionManager::<PgConnection>::new(database_url);
         let db_pool = Pool::new(config, manager).expect("Failed to create pool.");
@@ -250,6 +258,7 @@ impl AdServer {
                 db_pool: db_pool.clone(),
                 handle: handle.clone(),
                 client: client.clone(),
+                password: admin_password.clone(),
             };
             Http::new().bind_connection(&handle, sock, addr, s);
 

@@ -9,6 +9,7 @@ extern crate hyper;
 extern crate hyper_tls;
 extern crate futures;
 extern crate futures_cpupool;
+extern crate jsonwebtoken;
 extern crate kuchiki;
 #[macro_use]
 extern crate log;
