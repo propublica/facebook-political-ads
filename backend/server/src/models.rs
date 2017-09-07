@@ -145,6 +145,7 @@ pub struct Ad {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub lang: String,
+    #[serde(skip_serializing)]
     pub images: Vec<String>,
     pub impressions: i32,
     pub political_probability: f64,
@@ -251,7 +252,6 @@ impl Ad {
             })
             .collect()
     }
-
     pub fn get_ads_by_lang(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
@@ -262,6 +262,17 @@ impl Ad {
             .filter(political_probability.gt(0.75))
             .order(created_at.desc())
             .limit(100)
+            .load::<Ad>(&*connection)
+            .map_err(InsertError::DataBase)
+    }
+
+    pub fn get_all_ads(
+        conn: &Pool<ConnectionManager<PgConnection>>,
+    ) -> Result<Vec<Ad>, InsertError> {
+        use schema::ads::dsl::*;
+        let connection = conn.get().map_err(InsertError::Timeout)?;
+        ads.filter(political_probability.gt(0.75))
+            .order(created_at.desc())
             .load::<Ad>(&*connection)
             .map_err(InsertError::DataBase)
     }

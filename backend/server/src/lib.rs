@@ -1,4 +1,5 @@
 #![recursion_limit="256"]
+extern crate csv;
 extern crate chrono;
 #[macro_use]
 extern crate diesel;

@@ -1,3 +1,4 @@
+use csv::Writer;
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use futures::future;
@@ -67,6 +68,7 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file("public/admin.js")),
             //(&Method::Post, "/facebook-ads/admin/ads") => Either::B(self.mark_ads()),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
+            (&Method::Get, "/facebook-ads/ads.csv") => Either::B(self.get_ads_csv()),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
                 future::ok(Response::new().with_status(
@@ -172,6 +174,36 @@ impl AdServer {
         } else {
             pool.spawn_fn(|| Ok(Response::new().with_status(StatusCode::BadRequest)))
         };
+        Box::new(future)
+    }
+
+    fn get_ads_csv(&self) -> ResponseFuture {
+        let db_pool = self.db_pool.clone();
+        let pool = self.pool.clone();
+        let future = pool.spawn_fn(move || {
+            let err = Ok(Response::new().with_status(StatusCode::InternalServerError));
+            if let Ok(ads) = Ad::get_all_ads(&db_pool) {
+                let mut wtr = Writer::from_writer(vec![]);
+                for ad in ads {
+                    match wtr.serialize(ad) {
+                        Ok(()) => {}
+                        Err(e) => {
+                            return err;
+                        }
+                    };
+                }
+                if let Ok(inner) = wtr.into_inner() {
+                    if let Ok(csv) = String::from_utf8(inner) {
+                        return Ok(
+                            Response::new()
+                                .with_header(ContentLength(csv.len() as u64))
+                                .with_body(csv),
+                        );
+                    }
+                }
+            }
+            err
+        });
         Box::new(future)
     }
 
