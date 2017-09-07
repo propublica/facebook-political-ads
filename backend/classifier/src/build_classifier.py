@@ -88,6 +88,10 @@ if __name__ == '__main__':
         for row in cur:
             html, score = row
             doc = BeautifulSoup(html, "html.parser")
+            if score > 0.5:
+                score = 1.0
+            else:
+                score = 0.0
             data.append((doc.get_text(), score))
 
     train, test = train_test_split(data)
