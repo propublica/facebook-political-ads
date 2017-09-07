@@ -3,7 +3,7 @@
   "name":"__MSG_name__",
   "short_name": "__MSG_short_name__",
   "description":"__MSG_description__",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "default_locale": "en",
   "permissions": [
     "https://projects.propublica.org/facebook-ads/*",
@@ -21,10 +21,5 @@
   "content_scripts": [{
     "js": ["content.js"],
     "matches": ["*://*.facebook.com/*"]
-  }],
-  "applications": {
-    "gecko": {
-      "id": "{b73c39bb-a086-4964-8091-672c3dcf1bc9}"
-    }
-  }
+  }]
 }

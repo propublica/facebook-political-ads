@@ -242,7 +242,7 @@ let Ads = ({ads, onAdClick}) => (
   </div>
 );
 const adStateToProps = (state) => ({
-  ads: getUnratedRatings(state.ads)
+  ads: insertAdFields(getUnratedRatings(state.ads))
 });
 const adDispatchToProps = (dispatch) => ({
   onAdClick: (id, rating) => {
@@ -346,5 +346,6 @@ store.subscribe(() => updateBadge(store.getState().ratings || []));
 getAds((resp) => {
   const set = new Set();
   getUnratedRatings(store.getState().ratings).map((rating) => set.add(rating.id));
+  console.log(getImage(resp[0].html));
   store.dispatch(newAds(resp.filter((ad) => !set.has(ad.id))));
 });
