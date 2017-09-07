@@ -85,20 +85,21 @@ if __name__ == '__main__':
     pol = [(item, 1) for item in posts['political']]
     npol = [(item, 0) for item in posts['not_political']]
     data = pol + npol
-    conn = psycopg2.connect(os.environ["DATABASE_URL"])
-    cur = conn.cursor()
-    cur.execute("""
-      select
-        html,
-        political::float / (political::float + not_political::float) as political
-      from ads
-        where lang = %s
-        and (political + not_political) > 0;
-     """, (config["language"], ))
-    for row in cur:
-        html, score = row
-        doc = BeautifulSoup(html, "html.parser")
-        data.append((doc.get_text(), score))
+    if config["read_from_psql"]:
+        conn = psycopg2.connect(os.environ["DATABASE_URL"])
+        cur = conn.cursor()
+        cur.execute("""
+          select
+            html,
+            political::float / (political::float + not_political::float) as political
+          from ads
+            where lang = %s
+            and (political + not_political) > 0;
+         """, (config["language"], ))
+        for row in cur:
+            html, score = row
+            doc = BeautifulSoup(html, "html.parser")
+            data.append((doc.get_text(), score))
 
     train, test = train_test_split(data)
 
