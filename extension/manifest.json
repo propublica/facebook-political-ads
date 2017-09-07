@@ -3,7 +3,7 @@
   "name":"__MSG_name__",
   "short_name": "__MSG_short_name__",
   "description":"__MSG_description__",
-  "version": "1.0.28",
+  "version": "1.0.30",
   "default_locale": "en",
   "permissions": [
     "https://projects.propublica.org/facebook-ads/*",
@@ -14,12 +14,17 @@
     "persistent": false
   },
   "browser_action": {
-    "default_icon": "assets/pac-icon.png",
+    "default_icon": "assets/icon128.png",
     "default_title": "__MSG_name__",
     "default_popup": "index.html"
   },
   "content_scripts": [{
     "js": ["content.js"],
     "matches": ["*://*.facebook.com/*"]
-  }]
+  }],
+  "applications": {
+    "gecko": {
+      "id": "{b73c39bb-a086-4964-8091-672c3dcf1bc9}"
+    }
+  }
 }
