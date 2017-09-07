@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "node test/test.js",
-    "build": "./node_modules/.bin/webpack --progress",
-    "watch": "./node_modules/.bin/webpack -w --progress",
-    "dist": "NODE_ENV=production ./node_modules/.bin/webpack --progress -p && ./node_modules/.bin/web-ext build -s dist",
-    "ff": "./node_modules/.bin/web-ext run -s build"
+    "build": "webpack --progress",
+    "watch": "webpack -w --progress",
+    "dist": "NODE_ENV=production webpack --progress -p && web-ext build -s dist",
+    "ff": "web-ext run -s build"
   },
   "author": "Jeff Larson <jeff.larson@propublica.org>",
   "license": "ISC",
