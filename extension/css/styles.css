@@ -53,6 +53,10 @@ table {
   border-spacing: 0;
 }
 
+html {
+  overflow: auto;
+}
+
 body {
   width: 400px;
   height: 600px;
