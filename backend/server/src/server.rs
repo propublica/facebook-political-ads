@@ -187,7 +187,7 @@ impl AdServer {
                 for ad in ads {
                     match wtr.serialize(ad) {
                         Ok(()) => {}
-                        Err(e) => {
+                        Err(_) => {
                             return err;
                         }
                     };
