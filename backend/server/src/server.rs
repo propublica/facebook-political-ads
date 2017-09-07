@@ -9,7 +9,7 @@ use hyper::{Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
-use hyper::header::{AcceptLanguage, ContentLength};
+use hyper::header::{AcceptLanguage, ContentLength, Authorization, Basic};
 use hyper_tls::HttpsConnector;
 use models::{NewAd, Ad};
 use r2d2_diesel::ConnectionManager;
@@ -48,12 +48,17 @@ impl Service for AdServer {
         Box<Future<Item = Self::Response, Error = Self::Error>>,
     >;
     // This is not at all RESTful, but I'd rather not deal with regexes. Maybe soon
-    // someone will
-    // make a hyper router that's nice.
+    // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
         match (req.method(), req.path()) {
-            (&Method::Get, "/facebook-ads/admin") => Either::B(self.get_file("public/admin.html")),
-            (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file("public/admin.js")),
+            (&Method::Get, "/facebook-ads/admin") => Either::B(self.auth(
+                req,
+                || self.get_file("public/admin.html"),
+            )),
+            (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.auth(
+                req,
+                || self.get_file("public/admin.js"),
+            )),
             //(&Method::Post, "/facebook-ads/admin/ads") => Either::B(self.mark_ads()),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
@@ -75,6 +80,26 @@ impl Service for AdServer {
 // method that works. I should ask on stack overflow or something.
 type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
 impl AdServer {
+    fn auth<F>(&self, req: Request, callback: F) -> ResponseFuture
+    where
+        F: Fn() -> ResponseFuture,
+    {
+        if let Some(auth) = req.headers().get::<Authorization<Basic>>() {
+            if auth ==
+                &Authorization(Basic {
+                    username: "propublica".to_string(),
+                    password: Some("I want to moderate the ads.".to_string()),
+                })
+            {
+                return callback();
+            }
+        }
+        Box::new(future::ok(
+            (Response::new().with_status(StatusCode::Unauthorized)),
+        ))
+    }
+
+
     fn get_file(&self, path: &str) -> ResponseFuture {
         let pool = self.pool.clone();
         let path = path.to_string();
