@@ -9,7 +9,7 @@ use hyper::{Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
-use hyper::header::{AcceptLanguage, ContentLength, Authorization, Bearer};
+use hyper::header::{AcceptLanguage, ContentLength, Authorization, Bearer, Vary};
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
 use models::{NewAd, Ad};
@@ -22,6 +22,7 @@ use std::io::Read;
 use std::env;
 use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
+use unicase::Ascii;
 
 use super::InsertError;
 
@@ -158,6 +159,10 @@ impl AdServer {
                         return Ok(
                             Response::new()
                                 .with_header(ContentLength(serialized.len() as u64))
+                                .with_header(Vary::Items(vec![
+                                    Ascii::new("Accept-Encoding".to_owned()),
+                                    Ascii::new("Accept-Language".to_owned()),
+                                ]))
                                 .with_body(serialized),
                         );
                     }
