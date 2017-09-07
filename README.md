@@ -53,9 +53,11 @@ So for example, to classify ads in the United States I'd run:
 ## Stories
 
 * [Help Us Monitor Political Ads Online](https://www.propublica.org/article/help-us-monitor-political-ads-online)
+* [Mehr Transparenz im Schatten-Wahlkampf](http://faktenfinder.tagesschau.de/wahlkampf-facebook-dark-ads-101.html)
+* [Bringen Sie Licht in den dunklen Facebook-Wahlkampf](http://www.sueddeutsche.de/digital/bundestagswahl-bringen-sie-licht-in-den-dunklen-facebook-wahlkampf-1.3656582)
 
 ## Where We Need Your Help
 
 In general, the project needs more tests. We've written a couple of tests for parsing the Facebook timeline in the extension directory, and a few for the tricky bits in the server, but any help here would be great!
 
-Also, the rust backend needs a bit of love and care, and there is a bit of a mess in `backend\server\src\server.s` that could use cleaning up. It would be nice to move the classification to rust as well.
+Also, the rust backend needs a bit of love and care, and there is a bit of a mess in `backend\server\src\server.rs` that could use cleaning up. It would be nice to move the classification to rust as well.
