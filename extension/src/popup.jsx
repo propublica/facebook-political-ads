@@ -346,5 +346,5 @@ store.subscribe(() => updateBadge(store.getState().ratings || []));
 getAds((resp) => {
   const set = new Set();
   getUnratedRatings(store.getState().ratings).map((rating) => set.add(rating.id));
-  newAds(resp.filter((ad) => set.has(ad.id)));
+  store.dispatch(newAds(resp.filter((ad) => !set.has(ad.id))));
 });
