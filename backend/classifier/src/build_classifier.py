@@ -15,14 +15,12 @@ import psycopg2
 
 from bs4 import BeautifulSoup
 
-from html import parser
-
 from sklearn.naive_bayes import MultinomialNB, BernoulliNB, GaussianNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import HashingVectorizer
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_curve, roc_auc_score, classification_report
+from sklearn.metrics import roc_auc_score, classification_report
 
 CLASSIFIERS = {
     "MultinomialNB" : MultinomialNB(),
@@ -54,21 +52,12 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
     Currently supported:
     MultinomialNB, BernoulliNB, GaussianNB, LogisticRegression
     """
-    #import matplotlib.pyplot as plt
     for name, classifier in CLASSIFIERS.items():
         classifier.fit(X_train.todense(), Y_train)
         preds = classifier.predict_proba(X_test.todense())[:, 1]
-        fpr, tpr, _ = roc_curve(Y_test, preds)
         print("******** %s: %s" % (name, roc_auc_score(Y_test, preds)))
-        #plt.plot(fpr, tpr, label=name)
         preds = classifier.predict(X_test.todense())
         print(classification_report(Y_test, preds))
-    #plt.xlabel('FPR')
-    #plt.ylabel('TPR')
-    #plt.legend()
-    #plt.show()
-
-    return
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -137,4 +126,3 @@ if __name__ == '__main__':
     with open(model_filename, 'w') as f:
         json.dump(model, f)
     print('Dumped model to file ' + model_filename)
-    exit()

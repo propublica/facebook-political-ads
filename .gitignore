@@ -13,3 +13,7 @@ target
 deploy.sh
 /papers
 /extension/web-ext-artifacts/*
+classifier.json
+/backend/.dockerignore
+/backend/Dockerfile
+*.sql
