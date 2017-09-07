@@ -1,7 +1,7 @@
 {
   "sourceMaps": true,
   "presets": [
-    ["latest"]
+    ["env"]
   ],
   "plugins": [
     ["transform-react-jsx", { "pragma": "h" }],
