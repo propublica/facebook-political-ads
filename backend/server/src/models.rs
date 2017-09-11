@@ -145,7 +145,6 @@ pub struct Ad {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub lang: String,
-    #[serde(skip_serializing)]
     pub images: Vec<String>,
     pub impressions: i32,
     pub political_probability: f64,
