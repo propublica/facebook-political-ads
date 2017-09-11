@@ -1,4 +1,5 @@
 import { h, render } from 'preact';
+import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
@@ -31,14 +32,28 @@ const credentials = (state = {}, action) => {
   }
 };
 
+const createJWT = (username, password) = {
+  const header = {
+    alg: "HS256",
+    "typ": "JWT"
+  };
+  const payload = {
+    username, password
+  };
+
+  const token = `${btoa(JSON.stringify(header))}.${btoa(JSON.stringify(payload))}`;
+  cosnt buf = new TextEncoder("utf-8").encode(token);
+  return `${token}.${}`
+};
+
 const login = (username, password) => {
   // create jwt
   return (dispatch) => {
-    const token = { username, password };
+    const token = createJWT(username, password);
     return fetch("/facebook-ads/login", {
       method: "POST",
       headers: new Headers({
-        "Authorization": "Bearer " + token
+        "Authorization": `Bearer ${token}`
       }).then(() => dispatch(login(token)))
     });
   };
@@ -78,3 +93,10 @@ const suppressAd = (ad) => {
       .then((ads) => dispatch(newAds(ads)));
   };
 };
+
+const reducer = combineReducers({
+  credentials,
+  login
+});
+const middleware = [thunkMiddleware, createLogger()];
+const store = createStore(reducer, compose(...[persistState(), applyMiddleware(...middleware)]));
