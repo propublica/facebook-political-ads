@@ -152,26 +152,24 @@ impl AdServer {
     fn get_ads(&self, req: Request) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
-        let future =
-            pool.spawn_fn(move || {
-                if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-                    if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool) {
-                        if let Ok(serialized) = serde_json::to_string(&ads) {
-                            return Ok(
-                                Response::new()
-                                    .with_header(ContentLength(serialized.len() as u64))
-                                    .with_header(Vary::Items(vec![
-                                        Ascii::new("Accept-Encoding".to_owned()),
-                                        Ascii::new("Accept-Language".to_owned()),
-                                    ]))
-                                    .with_body(serialized),
-                            );
-                        }
+        let future = pool.spawn_fn(move || {
+            if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
+                if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool) {
+                    if let Ok(serialized) = serde_json::to_string(&ads) {
+                        return Ok(
+                            Response::new()
+                                .with_header(ContentLength(serialized.len() as u64))
+                                .with_header(Vary::Items(vec![
+                                    Ascii::new("Accept-Encoding".to_owned()),
+                                    Ascii::new("Accept-Language".to_owned()),
+                                ]))
+                                .with_body(serialized),
+                        );
                     }
                 }
-                Ok(Response::new().with_status(StatusCode::BadRequest))
-            })
-        }
+            }
+            Ok(Response::new().with_status(StatusCode::BadRequest))
+        });
         Box::new(future)
     }
 
