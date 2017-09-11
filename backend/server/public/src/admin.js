@@ -8,10 +8,50 @@ const NEW_ADS = "new_ads";
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
 
+const b64 = (thing) => btoa(thing).replace('+', '-').replace('_', '/').replace(/=+/, '');
+const createJWT = (username, password) => {
+  const encoder = new TextEncoder();
+  const header = {
+    alg: "HS256",
+    typ: "JWT"
+  };
+  const payload = {
+    username
+  };
+  const base = `${b64(JSON.stringify(header))}.${b64(JSON.stringify(payload))}`;
+  const encoded = encoder.encode(base);
+  return crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    {name: "HMAC", hash: {name: "SHA-256"}},
+    false,
+    ["sign"]
+  ).then(key => crypto.subtle.sign({name: 'HMAC'}, key, encoded))
+    .then(signature => `${base}.${b64(String.fromCharCode.apply(null, new Uint8Array(signature)))}`);
+};
+
 const hideAd = (ad) => ({
   type: HIDE_AD,
   value: ad
 });
+
+const suppressAd = (ad) => {
+  return (dispatch, getState) => {
+    let body = {
+      ...ad,
+      suppressed: true
+    };
+    dispatch(hideAd(ad));
+    return fetch("/facebook-ads/suppress", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: new Headers({
+        "Authorization": "Bearer " + getState().credentials
+      })
+    }).then((resp) => resp.json())
+      .then((ads) => dispatch(newAds(ads)));
+  };
+};
 
 const newAds = (ads) => ({
   type: NEW_ADS,
@@ -23,6 +63,17 @@ const login = (credentials) => ({
   value: credentials
 });
 
+const authorize = (username, password) => {
+  // create jwt
+  return (dispatch) => createJWT(username, password).then(token =>
+    fetch("/facebook-ads/login", {
+      method: "POST",
+      headers: new Headers({
+        "Authorization": `Bearer ${token}`
+      })
+    }).then(() => dispatch(login(token))));
+};
+
 const credentials = (state = {}, action) => {
   switch(action.type) {
   case LOGIN:
@@ -30,33 +81,6 @@ const credentials = (state = {}, action) => {
   default:
     return state;
   }
-};
-
-const createJWT = (username, password) = {
-  const header = {
-    alg: "HS256",
-    "typ": "JWT"
-  };
-  const payload = {
-    username, password
-  };
-
-  const token = `${btoa(JSON.stringify(header))}.${btoa(JSON.stringify(payload))}`;
-  cosnt buf = new TextEncoder("utf-8").encode(token);
-  return `${token}.${}`
-};
-
-const login = (username, password) => {
-  // create jwt
-  return (dispatch) => {
-    const token = createJWT(username, password);
-    return fetch("/facebook-ads/login", {
-      method: "POST",
-      headers: new Headers({
-        "Authorization": `Bearer ${token}`
-      }).then(() => dispatch(login(token)))
-    });
-  };
 };
 
 const ads = (state = [], action) => {
@@ -75,28 +99,9 @@ const ads = (state = [], action) => {
   }
 };
 
-const suppressAd = (ad) => {
-  return (dispatch, getState) => {
-    let body = {
-      ...ad,
-      suppressed: true
-    };
-    dispatch(hideAd(ad));
-
-    return fetch("/facebook-ads/suppress", {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: new Headers({
-        "Authorization": "Bearer " + getState().credentials
-      })
-    }).then((resp) => resp.json())
-      .then((ads) => dispatch(newAds(ads)));
-  };
-};
-
 const reducer = combineReducers({
   credentials,
-  login
+  ads,
 });
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(...[persistState(), applyMiddleware(...middleware)]));
