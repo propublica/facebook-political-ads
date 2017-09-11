@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --progress",
+    "watch": "webpack -w --progress"
   },
   "author": "Jeff Larson <jeff.larson@propublica.org>",
   "license": "MIT",
@@ -24,17 +26,18 @@
     "eslint-plugin-react": "^7.3.0",
     "extract-text-webpack-plugin": "^3.0.0",
     "html-webpack-plugin": "^2.30.1",
-    "jsdom": "^11.2.0",
     "preact-compat": "^3.17.0",
     "source-map-loader": "^0.2.1",
     "style-loader": "^0.18.2",
     "uglifyjs-webpack-plugin": "^0.4.6",
-    "web-ext": "^2.0.0",
     "webpack": "^3.5.6"
   },
   "dependencies": {
     "preact": "^8.2.5",
     "preact-redux": "^2.0.2",
-    "redux": "^3.7.2"
+    "redux": "^3.7.2",
+    "redux-localstorage": "^0.4.1",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.2.0"
   }
 }
