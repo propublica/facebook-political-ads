@@ -271,7 +271,7 @@ impl Ad {
     ) -> Result<Vec<Ad>, InsertError> {
         use schema::ads::dsl::*;
         let connection = conn.get().map_err(InsertError::Timeout)?;
-        ads.filter(political_probability.gt(0.75))
+        ads.filter(political_probability.gt(0.65))
             .order(created_at.desc())
             .load::<Ad>(&*connection)
             .map_err(InsertError::DataBase)
