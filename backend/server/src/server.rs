@@ -281,6 +281,9 @@ impl AdServer {
         let addr = env::var("HOST").expect("HOST must be set").parse().expect(
             "Error parsing HOST",
         );
+        if let Ok(root) = env::var("ROOT") {
+            env::set_current_dir(&root).expect(&format!("Couldn't change directory to {}", root));
+        }
         let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
         let config = Config::default();
