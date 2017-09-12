@@ -92,7 +92,7 @@ if __name__ == '__main__':
                 score = 1.0
             else:
                 score = 0.0
-            data.append((doc.get_text(), score))
+            data.append((doc.get_text(" "), score))
 
     train, test = train_test_split(data)
 
