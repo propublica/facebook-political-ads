@@ -13,14 +13,14 @@ const LOGOUT = "logout";
 const auth = (credentials) => credentials ? new Headers({"Authorization": `Bearer ${credentials.token}`}) : null;
 
 const b64 = (thing) => btoa(thing).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-const createJWT = (password) => {
+const createJWT = (username, password) => {
   const encoder = new TextEncoder();
   const header = {
     alg: "HS256",
     typ: "JWT"
   };
   const payload = {
-    username: "" // TODO: Fix me
+    username
   };
   const base = `${b64(JSON.stringify(header))}.${b64(JSON.stringify(payload))}`;
   const encoded = encoder.encode(base);
@@ -127,24 +127,6 @@ const reducer = combineReducers({
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(...[persistState(), applyMiddleware(...middleware)]));
 
-let Login = ({onLogin}) => (
-  <form id="login" onSubmit={onLogin} >
-    <input id="password" type="password" placeholder="password" />
-    <input id="submit" type="submit" value="login" />
-  </form>
-);
-Login = connect(
-  (state) => state,
-  (dispatch) => ({
-    onLogin: (e) => {
-      e.preventDefault();
-      dispatch(authorize(
-        e.target.querySelector("#password").value
-      ));
-    }
-  })
-)(Login);
-
 const Ad = ({ad, onClick}) => (
   <div className="ad">
     <table>
@@ -159,6 +141,10 @@ const Ad = ({ad, onClick}) => (
       <tr>
         <td>text</td>
         <td dangerouslySetInnerHTML={{__html: ad.html}} />
+      </tr>
+      <tr>
+        <td>targeting</td>
+        <td dangerouslySetInnerHTML={{__html: ad.targeting}} />
       </tr>
       <tr>
         <td colSpan="2">
@@ -192,6 +178,26 @@ let App = ({credentials}) => (
   </div>
 );
 App = connect((state) => state)(App);
+
+let Login = ({onLogin}) => (
+  <form id="login" onSubmit={onLogin} >
+    <input id="email" type="text" placeholder="email" />
+    <input id="password" type="password" placeholder="password" />
+    <input id="submit" type="submit" value="login" />
+  </form>
+);
+Login = connect(
+  (state) => state,
+  (dispatch) => ({
+    onLogin: (e) => {
+      e.preventDefault();
+      dispatch(authorize(
+        e.target.querySelector("#email").value,
+        e.target.querySelector("#password").value
+      ));
+    }
+  })
+)(Login);
 
 render(
   <Provider store={store}>
