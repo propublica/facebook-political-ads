@@ -49,7 +49,14 @@ fn main() {
 
     for ad in dbads {
         let parsed = kuchiki::parse_html().one(ad.html.clone());
-        let score = classifier.predict_likelihoods(&parsed.text_contents())[1];
+        let mut s = String::new();
+        // from: https://docs.rs/kuchiki/0.5.1/src/kuchiki/tree.rs.html#266
+        // We do this so that we can insert spaces between text nodes
+        for text_node in parsed.inclusive_descendants().text_nodes() {
+            s.push_str(" ");
+            s.push_str(&text_node.borrow());
+        }
+        let score = classifier.predict_likelihoods(&s)[1];
         println!("saving {} with score {}", ad.id, score);
         let aid = ad.id.clone();
         diesel::update(ads.find(ad.id))
