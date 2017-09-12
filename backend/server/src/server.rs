@@ -109,7 +109,15 @@ impl AdServer {
     {
         let auth = req.headers().get::<Authorization<Bearer>>().and_then(
             |token| {
-                decode::<Admin>(&token.token, self.password.as_ref(), &Validation::default()).ok()
+                let token = decode::<Admin>(
+                    &token.token,
+                    &self.password.as_ref(),
+                    &Validation::default(),
+                );
+                if !token.is_ok() {
+                    warn!("Bad Login {:?}", token);
+                }
+                token.ok()
             },
         );
 
@@ -117,7 +125,6 @@ impl AdServer {
             info!("Login {:?}", auth);
             callback(req)
         } else {
-            warn!("Bad login {:?}", auth);
             Box::new(future::ok(
                 Response::new().with_status(StatusCode::Unauthorized),
             ))
