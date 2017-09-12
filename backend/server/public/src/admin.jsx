@@ -9,7 +9,7 @@ const NEW_ADS = "new_ads";
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
 
-const auth = (credentials) => new Headers({"Authorization": `Bearer ${credentials.token}`});
+const auth = (credentials) => credentials ? new Headers({"Authorization": `Bearer ${credentials.token}`}) : null;
 
 const b64 = (thing) => btoa(thing).replace('+', '-').replace('_', '/').replace(/=+/, '');
 const createJWT = (password) => {
@@ -35,32 +35,29 @@ const createJWT = (password) => {
 
 const hideAd = (ad) => ({
   type: HIDE_AD,
-  value: ad
+  id: ad.id
 });
 
-const suppressAd = (ad) => {
-  return (dispatch, getState) => {
-    let body = {
-      ...ad,
-      suppressed: true
-    };
-    dispatch(hideAd(ad));
-    return fetch("/facebook-ads/admin/ads", {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: auth(getState().credentials)
-    }).then((resp) => resp.json())
-      .then((ads) => {
-        dispatch(newAds(ads));
-      });
-  };
-};
-
-const refresh = (getState) => fetch("/facebook-ads/admin/ads", {
+const refresh = (getState) => fetch("/facebook-ads/ads", {
   method: "GET",
   headers: auth(getState().credentials)
 }).then((res) => res.json())
   .then((ads) => store.dispatch(newAds(ads)));
+
+const suppressAd = (ad) => {
+  return (dispatch, getState) => {
+    dispatch(hideAd(ad));
+    return fetch("/facebook-ads/admin/ads", {
+      method: "POST",
+      body: ad.id,
+      headers: auth(getState().credentials)
+    }).then((resp) => {
+      if(resp.ok) {
+        console.log("suppressed");
+      }
+    });
+  };
+};
 
 const newAds = (ads) => ({
   type: NEW_ADS,
@@ -83,7 +80,6 @@ const authorize = (username, password) => {
     }).then((resp) => {
       if(resp.ok) {
         dispatch(login({token: token}));
-        refresh(getState);
       }
     });
   });
@@ -92,7 +88,6 @@ const authorize = (username, password) => {
 const credentials = (state = {}, action) => {
   switch(action.type) {
   case LOGIN:
-
     return action.value;
   default:
     return state;
@@ -106,7 +101,7 @@ const ads = (state = [], action) => {
   case HIDE_AD:
     return state.map(ad => {
       if(ad.id === action.id) {
-        return { ...ad, suppressed: action.value };
+        return { ...ad, suppressed: true };
       }
       return ad;
     });
@@ -124,8 +119,8 @@ const store = createStore(reducer, compose(...[persistState(), applyMiddleware(.
 
 let Login = ({onLogin}) => (
   <form id="login" onSubmit={onLogin} >
-    <input id="password" type="password" />
-    <input id="submit" type="submit" />
+    <input id="password" type="password" placeholder="password" />
+    <input id="submit" type="submit" value="login" />
   </form>
 );
 Login = connect(
@@ -152,43 +147,41 @@ const Ad = ({ad, onClick}) => (
         <td>{ad.title}</td>
       </tr>
       <tr>
-        <td>thumbnail</td>
-        <td>{ad.thumbnail}</td>
-      </tr>
-      <tr>
-        <td>images</td>
-        <td>{ad.images.map((src) => <img key={src} src={src} />)}</td>
-      </tr>
-      <tr>
         <td>text</td>
         <td dangerouslySetInnerHTML={{__html: ad.html}} />
       </tr>
       <tr>
         <td colSpan="2">
-          <input type="submit" onClick={onClick} />
+          {ad.suppressed ? "Suppressed" :
+            <button onClick={function() { return onClick(ad); }}>
+              Suppress
+            </button>}
         </td>
       </tr>
     </table>
   </div>
 );
 
-const Ads = ({ads, onClick}) => (
+let Ads = ({ads, onClick}) => (
   <div id="ads">
     {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} />)}
   </div>
 );
-
-let App = ({ads, credentials, onClick}) => (
-  <div id="app">
-    {credentials.token ? <Ads ads={ads} onClick={onClick} /> : <Login />}
-  </div>
-);
-App = connect(
-  (state) => (state),
+Ads = connect(
+  (state) => ({
+    ads: state.ads.filter((ad) => !ad.suppressed)
+  }),
   (dispatch) => ({
     onClick: (ad) => dispatch(suppressAd(ad))
   })
-)(App);
+)(Ads);
+
+let App = ({credentials}) => (
+  <div id="app">
+    {credentials && credentials.token ? <Ads /> : <Login />}
+  </div>
+);
+App = connect((state) => state)(App);
 
 render(
   <Provider store={store}>
