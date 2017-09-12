@@ -251,6 +251,7 @@ impl Ad {
             })
             .collect()
     }
+
     pub fn get_ads_by_lang(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
@@ -258,21 +259,23 @@ impl Ad {
         use schema::ads::dsl::*;
         let connection = conn.get().map_err(InsertError::Timeout)?;
         ads.filter(lang.eq(language))
-            .filter(political_probability.gt(0.70))
+            .filter(political_probability.gt(0.90))
+            .filter(suppressed.eq(false))
             .order(created_at.desc())
-            .limit(100)
+            .limit(200)
             .load::<Ad>(&*connection)
             .map_err(InsertError::DataBase)
     }
 
-    pub fn get_all_ads(
+    pub fn suppress(
+        id: String,
         conn: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<Vec<Ad>, InsertError> {
+    ) -> Result<(), InsertError> {
         use schema::ads::dsl::*;
         let connection = conn.get().map_err(InsertError::Timeout)?;
-        ads.filter(political_probability.gt(0.75))
-            .order(created_at.desc())
-            .load::<Ad>(&*connection)
+        diesel::update(ads.filter(id.eq(id)))
+            .set(suppressed.eq(true))
+            .execute(&*connection)
             .map_err(InsertError::DataBase)
     }
 }

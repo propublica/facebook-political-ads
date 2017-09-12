@@ -9,25 +9,27 @@ const NEW_ADS = "new_ads";
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
 
+const auth = (credentials) => new Headers({"Authorization": `Bearer ${credentials.token}`});
+
 const b64 = (thing) => btoa(thing).replace('+', '-').replace('_', '/').replace(/=+/, '');
-const createJWT = (username, password) => {
+const createJWT = (password) => {
   const encoder = new TextEncoder();
   const header = {
     alg: "HS256",
     typ: "JWT"
   };
   const payload = {
-    username
+    username: "" // TODO: Fix me
   };
   const base = `${b64(JSON.stringify(header))}.${b64(JSON.stringify(payload))}`;
   const encoded = encoder.encode(base);
-  return crypto.subtle.importKey(
+  return window.crypto.subtle.importKey(
     "raw",
     encoder.encode(password),
     {name: "HMAC", hash: {name: "SHA-256"}},
     false,
     ["sign"]
-  ).then(key => crypto.subtle.sign({name: 'HMAC'}, key, encoded))
+  ).then(key => window.crypto.subtle.sign({name: 'HMAC'}, key, encoded))
     .then(signature => `${base}.${b64(String.fromCharCode.apply(null, new Uint8Array(signature)))}`);
 };
 
@@ -43,16 +45,22 @@ const suppressAd = (ad) => {
       suppressed: true
     };
     dispatch(hideAd(ad));
-    return fetch("/facebook-ads/suppress", {
+    return fetch("/facebook-ads/admin/ads", {
       method: "POST",
       body: JSON.stringify(body),
-      headers: new Headers({
-        "Authorization": "Bearer " + getState().credentials
-      })
+      headers: auth(getState().credentials)
     }).then((resp) => resp.json())
-      .then((ads) => dispatch(newAds(ads)));
+      .then((ads) => {
+        dispatch(newAds(ads));
+      });
   };
 };
+
+const refresh = (getState) => fetch("/facebook-ads/admin/ads", {
+  method: "GET",
+  headers: auth(getState().credentials)
+}).then((res) => res.json())
+  .then((ads) => store.dispatch(newAds(ads)));
 
 const newAds = (ads) => ({
   type: NEW_ADS,
@@ -66,18 +74,25 @@ const login = (credentials) => ({
 
 const authorize = (username, password) => {
   // create jwt
-  return (dispatch) => createJWT(username, password).then(token =>
-    fetch("/facebook-ads/login", {
+  return (dispatch, getState) => createJWT(username, password).then(token => {
+    return fetch("/facebook-ads/login", {
       method: "POST",
       headers: new Headers({
         "Authorization": `Bearer ${token}`
       })
-    }).then(() => dispatch(login(token))));
+    }).then((resp) => {
+      if(resp.ok) {
+        dispatch(login({token: token}));
+        refresh(getState);
+      }
+    });
+  });
 };
 
 const credentials = (state = {}, action) => {
   switch(action.type) {
   case LOGIN:
+
     return action.value;
   default:
     return state;
@@ -107,11 +122,10 @@ const reducer = combineReducers({
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(...[persistState(), applyMiddleware(...middleware)]));
 
-let Login = (onLogin) => (
-  <form id="login">
-    <input id="username" type="text" />
+let Login = ({onLogin}) => (
+  <form id="login" onSubmit={onLogin} >
     <input id="password" type="password" />
-    <input id="submit" type="submit" onClick={onLogin} />
+    <input id="submit" type="submit" />
   </form>
 );
 Login = connect(
@@ -119,13 +133,14 @@ Login = connect(
   (dispatch) => ({
     onLogin: (e) => {
       e.preventDefault();
-      console.log(e);
-      dispatch(authorize('j', 'j'));
+      dispatch(authorize(
+        e.target.querySelector("#password").value
+      ));
     }
   })
-);
+)(Login);
 
-let Ad = (ad) => (
+const Ad = ({ad, onClick}) => (
   <div className="ad">
     <table>
       <tr>
@@ -148,28 +163,32 @@ let Ad = (ad) => (
         <td>text</td>
         <td dangerouslySetInnerHTML={{__html: ad.html}} />
       </tr>
+      <tr>
+        <td colSpan="2">
+          <input type="submit" onClick={onClick} />
+        </td>
+      </tr>
     </table>
   </div>
 );
-Ad = connect(
-  (state) => state,
+
+const Ads = ({ads, onClick}) => (
+  <div id="ads">
+    {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} />)}
+  </div>
+);
+
+let App = ({ads, credentials, onClick}) => (
+  <div id="app">
+    {credentials.token ? <Ads ads={ads} onClick={onClick} /> : <Login />}
+  </div>
+);
+App = connect(
+  (state) => (state),
   (dispatch) => ({
     onClick: (ad) => dispatch(suppressAd(ad))
   })
-);
-
-const Ads = (ads) => (
-  <div id="ads">
-    {ads.map((ad) => <Ad ad={ad} key={ad.id} />)}
-  </div>
-);
-
-const App = ({ads, credentials}) => (
-  <div id="app">
-    {credentials ? <Ads ads={ads} /> : <Login />}
-  </div>
-);
-
+)(App);
 
 render(
   <Provider store={store}>
@@ -177,3 +196,4 @@ render(
   </Provider>,
   document.body
 );
+refresh(store.getState);

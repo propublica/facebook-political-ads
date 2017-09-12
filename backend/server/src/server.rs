@@ -9,7 +9,8 @@ use hyper::{Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
-use hyper::header::{AcceptLanguage, ContentLength, Authorization, Bearer, Vary};
+use hyper::header::{AcceptLanguage, ContentLength, ContentType, Authorization, Bearer, Vary};
+use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
 use models::{NewAd, Ad};
@@ -44,8 +45,7 @@ pub struct AdPost {
 
 #[derive(Deserialize, Debug)]
 pub struct Admin {
-    pub name: String,
-    pub email: String,
+    pub username: String,
 }
 
 impl Service for AdServer {
@@ -63,9 +63,21 @@ impl Service for AdServer {
             (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, || {
                 Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
             })),
-            (&Method::Get, "/facebook-ads/admin") => Either::B(self.get_file("public/admin.html")),
-            (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file("public/admin.js")),
-            //(&Method::Post, "/facebook-ads/admin/ads") => Either::B(self.mark_ads()),
+            (&Method::Get, "/facebook-ads/admin") => Either::B(self.get_file(
+                "public/admin.html",
+                ContentType::html(),
+            )),
+            (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file(
+                "public/dist/admin.js",
+                ContentType(mime::TEXT_JAVASCRIPT),
+            )),
+            (&Method::Get, "/facebook-ads/admin.js.map") => Either::B(self.get_file(
+                "public/dist/admin.js.map",
+                ContentType::json(),
+            )),
+            (&Method::Post, "/facebook-ads/admin/ads") => Either::B(
+                 self.auth(req, || self.mark_ad(req)),
+            ),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
@@ -91,16 +103,12 @@ impl AdServer {
         F: Fn() -> ResponseFuture,
     {
         if let Some(token) = req.headers().get::<Authorization<Bearer>>() {
-            match decode::<Admin>(
-                &token.token,
-                self.password.as_bytes(),
-                &Validation::default(),
-            ) {
+            match decode::<Admin>(&token.token, self.password.as_ref(), &Validation::default()) {
                 Ok(auth) => {
                     info!("Login from {:?}", auth);
                     return callback();
                 }
-                _ => warn!("Bad token {}", token),
+                Err(e) => warn!("Bad token '{}' {:?}", token.token, e),
             }
         }
         Box::new(future::ok(
@@ -108,7 +116,7 @@ impl AdServer {
         ))
     }
 
-    fn get_file(&self, path: &str) -> ResponseFuture {
+    fn get_file(&self, path: &str, content_type: ContentType) -> ResponseFuture {
         let pool = self.pool.clone();
         let path = path.to_string();
         let future = pool.spawn_fn(move || {
@@ -118,6 +126,7 @@ impl AdServer {
                     return Ok(
                         Response::new()
                             .with_header(ContentLength(size as u64))
+                            .with_header(content_type)
                             .with_body(buf),
                     );
                 }
@@ -163,6 +172,7 @@ impl AdServer {
                                     Ascii::new("Accept-Encoding".to_owned()),
                                     Ascii::new("Accept-Language".to_owned()),
                                 ]))
+                                .with_header(ContentType::json())
                                 .with_body(serialized),
                         );
                     }
@@ -231,6 +241,25 @@ impl AdServer {
         });
 
         ads.collect::<Result<Vec<Ad>, InsertError>>()
+    }
+
+    fn mark_ad(&self, req: Request) -> ResponseFuture {
+        let db_pool = self.db_pool.clone();
+        let pool = self.pool.clone();
+        let future = req.body()
+            .concat2()
+            .then(move |msg| pool.spawn_fn(move || {
+                msg.and_then(|bytes| String::from_utf8(bytes.to_vec()))
+                   .and_then(|id| Ad::suppress(id, db_pool))
+            })
+            .then(|r| match r {
+                Ok(_) => Ok(Response::new().with_status(StatusCode::Ok)),
+                Err(e) => {
+                    warn!("{:?}", e);
+                    Ok(Response::new().with_status(StatusCode::BadRequest))
+                }
+            });
+        Box::new(future)
     }
 
     pub fn start() {
