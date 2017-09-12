@@ -12,7 +12,7 @@ const LOGOUT = "logout";
 
 const auth = (credentials) => credentials ? new Headers({"Authorization": `Bearer ${credentials.token}`}) : null;
 
-const b64 = (thing) => btoa(thing).replace('+', '-').replace('_', '/').replace(/=+/, '');
+const b64 = (thing) => btoa(thing).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 const createJWT = (password) => {
   const encoder = new TextEncoder();
   const header = {
