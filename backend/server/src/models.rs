@@ -149,6 +149,8 @@ pub struct Ad {
     pub impressions: i32,
     pub political_probability: f64,
     pub targeting: Option<String>,
+    #[serde(skip_serializing)]
+    pub suppressed: bool,
 }
 
 impl Ad {
@@ -268,15 +270,19 @@ impl Ad {
     }
 
     pub fn suppress(
-        id: String,
+        adid: String,
         conn: &Pool<ConnectionManager<PgConnection>>,
     ) -> Result<(), InsertError> {
         use schema::ads::dsl::*;
         let connection = conn.get().map_err(InsertError::Timeout)?;
-        diesel::update(ads.filter(id.eq(id)))
+        {
+            warn!("Suppressed {:?}", adid);
+        }
+        diesel::update(ads.filter(id.eq(adid)))
             .set(suppressed.eq(true))
             .execute(&*connection)
-            .map_err(InsertError::DataBase)
+            .map_err(InsertError::DataBase)?;
+        Ok(())
     }
 }
 

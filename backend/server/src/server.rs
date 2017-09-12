@@ -60,7 +60,7 @@ impl Service for AdServer {
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
         match (req.method(), req.path()) {
-            (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, || {
+            (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
                 Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
             })),
             (&Method::Get, "/facebook-ads/admin") => Either::B(self.get_file(
@@ -75,9 +75,14 @@ impl Service for AdServer {
                 "public/dist/admin.js.map",
                 ContentType::json(),
             )),
-            (&Method::Post, "/facebook-ads/admin/ads") => Either::B(
-                 self.auth(req, || self.mark_ad(req)),
-            ),
+            (&Method::Get, "/facebook-ads/styles.css") => Either::B(self.get_file(
+                "public/css/styles.css",
+                ContentType(mime::TEXT_PLAIN_UTF_8),
+            )),
+            (&Method::Post, "/facebook-ads/admin/ads") => Either::B(self.auth(
+                req,
+                |request| self.mark_ad(request),
+            )),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
@@ -100,20 +105,23 @@ type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
 impl AdServer {
     fn auth<F>(&self, req: Request, callback: F) -> ResponseFuture
     where
-        F: Fn() -> ResponseFuture,
+        F: Fn(Request) -> ResponseFuture,
     {
-        if let Some(token) = req.headers().get::<Authorization<Bearer>>() {
-            match decode::<Admin>(&token.token, self.password.as_ref(), &Validation::default()) {
-                Ok(auth) => {
-                    info!("Login from {:?}", auth);
-                    return callback();
-                }
-                Err(e) => warn!("Bad token '{}' {:?}", token.token, e),
-            }
+        let auth = req.headers().get::<Authorization<Bearer>>().and_then(
+            |token| {
+                decode::<Admin>(&token.token, self.password.as_ref(), &Validation::default()).ok()
+            },
+        );
+
+        if auth.is_some() {
+            info!("Login {:?}", auth);
+            callback(req)
+        } else {
+            warn!("Bad login {:?}", auth);
+            Box::new(future::ok(
+                Response::new().with_status(StatusCode::Unauthorized),
+            ))
         }
-        Box::new(future::ok(
-            Response::new().with_status(StatusCode::Unauthorized),
-        ))
     }
 
     fn get_file(&self, path: &str, content_type: ContentType) -> ResponseFuture {
@@ -248,9 +256,14 @@ impl AdServer {
         let pool = self.pool.clone();
         let future = req.body()
             .concat2()
-            .then(move |msg| pool.spawn_fn(move || {
-                msg.and_then(|bytes| String::from_utf8(bytes.to_vec()))
-                   .and_then(|id| Ad::suppress(id, db_pool))
+            .then(move |msg| {
+                pool.spawn_fn(move || {
+                    msg.and_then(|bytes| {
+                        String::from_utf8(bytes.to_vec()).map_err(|_| hyper::Error::Timeout)
+                    }).and_then(|id| {
+                            Ad::suppress(id, &db_pool).map_err(|_| hyper::Error::Timeout)
+                        })
+                })
             })
             .then(|r| match r {
                 Ok(_) => Ok(Response::new().with_status(StatusCode::Ok)),
