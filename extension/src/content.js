@@ -9,7 +9,7 @@ const sendAds = function() {
     .concat(Array.from(document.querySelectorAll(TIMELINE_SELECTOR)));
   let results = [];
   let scraper = posts.reduce((p, i) => p.then(() => {
-    let timeout = new Promise((resolve) => setTimeout(() => resolve(false), 10000));
+    let timeout = new Promise((resolve) => setTimeout(() => resolve(false), 5000));
     return Promise.race([
       parser(i).then(
         (it) => results.push(it),
