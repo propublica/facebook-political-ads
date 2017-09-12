@@ -79,7 +79,6 @@ const logout = () => ({
 const authorize = (username, password) => {
   // create jwt
   return (dispatch) => createJWT(username, password).then(token => {
-    console.log(token);
     return fetch("/facebook-ads/login", {
       method: "POST",
       headers: new Headers({
