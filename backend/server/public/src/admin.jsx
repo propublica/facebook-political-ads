@@ -8,6 +8,7 @@ import { createLogger } from 'redux-logger';
 const NEW_ADS = "new_ads";
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
+const LOGOUT = "logout";
 
 const auth = (credentials) => credentials ? new Headers({"Authorization": `Bearer ${credentials.token}`}) : null;
 
@@ -54,6 +55,8 @@ const suppressAd = (ad) => {
     }).then((resp) => {
       if(resp.ok) {
         console.log("suppressed");
+      } else {
+        dispatch(logout());
       }
     });
   };
@@ -69,9 +72,14 @@ const login = (credentials) => ({
   value: credentials
 });
 
+const logout = () => ({
+  type: LOGOUT
+});
+
 const authorize = (username, password) => {
   // create jwt
-  return (dispatch, getState) => createJWT(username, password).then(token => {
+  return (dispatch) => createJWT(username, password).then(token => {
+    console.log(token);
     return fetch("/facebook-ads/login", {
       method: "POST",
       headers: new Headers({
@@ -89,6 +97,8 @@ const credentials = (state = {}, action) => {
   switch(action.type) {
   case LOGIN:
     return action.value;
+  case LOGOUT:
+    return {};
   default:
     return state;
   }
