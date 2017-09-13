@@ -199,9 +199,8 @@ impl Ad {
             })
             // grab image
             .and_then(move |img| {
-                info!("url string {:?}", img);
                 let real_url = get_real_image_uri(img);
-                info!("getting {:?}", real_url);
+                info!("getting {:?}", real_url.path());
                 client
                     .get(real_url.clone())
                     .and_then(|res| {
