@@ -19,6 +19,7 @@ extern crate r2d2_diesel;
 extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_s3;
+extern crate reqwest;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
