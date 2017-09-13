@@ -76,6 +76,16 @@ fn get_images(document: &kuchiki::NodeRef) -> Result<Vec<String>, InsertError> {
     )
 }
 
+
+fn get_real_image_uri(uri: Uri) -> Uri {
+    let url = uri.to_string().parse::<Url>();
+    let query_map: HashMap<_, _> = url.unwrap().query_pairs().into_owned().collect();
+    query_map.get("url")
+        .map(|u| u.parse::<Uri>()) // Option<Result>
+        .unwrap_or(Ok(uri.clone())) // Result
+        .unwrap_or(uri) // Uri
+}
+
 #[derive(AsChangeset, Debug)]
 #[table_name = "ads"]
 pub struct Images {
@@ -108,7 +118,10 @@ impl Images {
         for a in document.select("img").map_err(InsertError::HTML)? {
             if let Some(x) = a.attributes.borrow_mut().get_mut("src") {
                 if let Ok(u) = x.parse::<Uri>() {
-                    if let Some(i) = images.iter().find(|i| i.path() == u.path()) {
+                    if let Some(i) = images.iter().find(|i| {
+                        i.path() == get_real_image_uri(u.clone()).path()
+                    })
+                    {
                         *x = ENDPOINT.to_string() + i.path().trim_left_matches('/');
                     } else {
                         *x = "".to_string();
@@ -186,15 +199,13 @@ impl Ad {
             })
             // grab image
             .and_then(move |img| {
-                info!("getting {:?}", img.path());
-                let cloned = img.clone();
-                // https://external.fsnc1-1.fna.fbcdn.net/safe_image.php?d=AQBBKC9NzDZIQi2j&w=90&h=90&url=https://cdn.shopify.com/s/files/1/1529/2383/products/GO-Front-Blush_1_480x480_crop_center.jpg?v=1504635569&cfs=1&upscale=1&_nc_hash=AQBld8Sbhs4x-MEE
-                let url = img.to_string().parse::<Url>();
-                let query_map: HashMap<_, _> = url.unwrap().query_pairs().into_owned().collect();
-                client                      // Option                  // Option         // Result
-                    .get(query_map.get("url").map(|u| u.parse::<Uri>()).unwrap_or(Ok(img.clone())).unwrap_or(img))
+                info!("url string {:?}", img);
+                let real_url = get_real_image_uri(img);
+                info!("getting {:?}", real_url);
+                client
+                    .get(real_url.clone())
                     .and_then(|res| {
-                        res.body().concat2().and_then(|chunk| Ok((chunk, cloned)))
+                        res.body().concat2().and_then(|chunk| Ok((chunk, real_url)))
                     })
                     .map_err(InsertError::Hyper)
             })
@@ -419,6 +430,7 @@ mod tests {
             impressions: 1,
             targeting: None,
             political_probability: 0.0,
+            suppressed: false,
         };
         let urls = saved_ad
             .image_urls()
