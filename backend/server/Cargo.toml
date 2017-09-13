@@ -28,5 +28,3 @@ serde_json = "^1.0.2"
 serde_derive = "^1.0.14"
 tokio-core = "^0.1.9"
 unicase = "^2.0.0"
-
-classifier = { path = "../classifier" }
