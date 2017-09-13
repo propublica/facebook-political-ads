@@ -12,12 +12,14 @@ use hyper_tls::HttpsConnector;
 use InsertError;
 use kuchiki;
 use kuchiki::traits::*;
+use reqwest::Url;
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::{default_tls_client, Region};
 use rusoto_credential::DefaultCredentialsProvider;
 use rusoto_s3::{PutObjectRequest, S3Client, S3};
 use schema::ads;
+use std::collections::HashMap;
 use server::AdPost;
 
 const ENDPOINT: &'static str = "https://pp-facebook-ads.s3.amazonaws.com/";
@@ -186,8 +188,11 @@ impl Ad {
             .and_then(move |img| {
                 info!("getting {:?}", img.path());
                 let cloned = img.clone();
-                client
-                    .get(img)
+                // https://external.fsnc1-1.fna.fbcdn.net/safe_image.php?d=AQBBKC9NzDZIQi2j&w=90&h=90&url=https://cdn.shopify.com/s/files/1/1529/2383/products/GO-Front-Blush_1_480x480_crop_center.jpg?v=1504635569&cfs=1&upscale=1&_nc_hash=AQBld8Sbhs4x-MEE
+                let url = img.to_string().parse::<Url>();
+                let query_map: HashMap<_, _> = url.unwrap().query_pairs().into_owned().collect();
+                client                      // Option                  // Option         // Result
+                    .get(query_map.get("url").map(|u| u.parse::<Uri>()).unwrap_or(Ok(img.clone())).unwrap_or(img))
                     .and_then(|res| {
                         res.body().concat2().and_then(|chunk| Ok((chunk, cloned)))
                     })
