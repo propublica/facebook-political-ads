@@ -108,11 +108,8 @@ impl AdServer {
     {
         let auth = req.headers().get::<Authorization<Bearer>>().and_then(
             |token| {
-                let token = decode::<Admin>(
-                    &token.token,
-                    &self.password.as_ref(),
-                    &Validation::default(),
-                );
+                let token =
+                    decode::<Admin>(&token.token, self.password.as_ref(), &Validation::default());
                 if !token.is_ok() {
                     warn!("Bad Login {:?}", token);
                 }
@@ -207,7 +204,7 @@ impl AdServer {
         let maybe_lang = AdServer::get_lang_from_headers(req.headers());
         if !maybe_lang.is_some() {
             return Box::new(future::ok(
-                (Response::new().with_status(StatusCode::BadRequest)),
+                Response::new().with_status(StatusCode::BadRequest),
             ));
         };
         let lang = maybe_lang.unwrap();
