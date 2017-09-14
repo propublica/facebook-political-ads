@@ -24,7 +24,12 @@ const cleanAd = (html) => {
   // We're not saving video ads for now, we don't need buttons, hidden forms,
   // or like links
   Array.from(node.querySelectorAll(selectors))
-    .forEach((i) => i.parentElement.removeChild(i));
+    .forEach((i) => i.remove());
+
+  // Kill profile links
+  Array.from(node.querySelectorAll('span.fcg'))
+    .filter((i) => ['gefällt das', 'liked this'].some((l) => i.textContent.includes(l)))
+    .forEach((i) => i.remove());
 
   // remove attributes
   const killAttrs = (node) => {
