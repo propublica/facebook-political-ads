@@ -10,7 +10,18 @@ const HIDE_AD = "hide_ad";
 const LOGIN = "login";
 const LOGOUT = "logout";
 
-const auth = (credentials) => credentials ? new Headers({"Authorization": `Bearer ${credentials.token}`}) : null;
+const auth = (credentials) => (credentials ?
+  {"Authorization": `Bearer ${credentials.token}`} :
+  {});
+
+const language = () => {
+  const params = new URLSearchParams(location.search);
+  if(params.get("lang")) {
+    return {"Accept-Language": params.get("lang") + ";q=1.0"};
+  } else {
+    return {};
+  }
+};
 
 const b64 = (thing) => btoa(thing).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 const createJWT = (username, password) => {
@@ -41,7 +52,7 @@ const hideAd = (ad) => ({
 
 const refresh = (getState) => fetch("/facebook-ads/ads", {
   method: "GET",
-  headers: auth(getState().credentials)
+  headers: new Headers(auth(getState().credentials))
 }).then((res) => res.json())
   .then((ads) => store.dispatch(newAds(ads)));
 
@@ -51,7 +62,7 @@ const suppressAd = (ad) => {
     return fetch("/facebook-ads/admin/ads", {
       method: "POST",
       body: ad.id,
-      headers: auth(getState().credentials)
+      headers: new Headers(Object.assign({}, auth(getState().credentials), language()))
     }).then((resp) => {
       if(resp.ok) {
         console.log("suppressed");

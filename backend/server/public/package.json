@@ -33,6 +33,7 @@
     "webpack": "^3.5.6"
   },
   "dependencies": {
+    "i18next": "^9.0.0",
     "preact": "^8.2.5",
     "preact-redux": "^2.0.2",
     "redux": "^3.7.2",

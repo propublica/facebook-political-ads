@@ -152,8 +152,7 @@ impl AdServer {
             if langs.len() == 0 {
                 return None;
             }
-            let mut languages = langs.to_owned();
-            languages.sort_by(|a, b| b.quality.cmp(&a.quality));
+            let languages = langs.to_owned();
             let lang = languages.iter().find(|quality| {
                 quality.item.language.is_some() && quality.item.region.is_some()
             });
