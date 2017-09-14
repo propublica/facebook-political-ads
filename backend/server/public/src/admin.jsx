@@ -23,6 +23,8 @@ const language = () => {
   }
 };
 
+const headers = (credentials) => Object.assign({}, auth(credentials), language());
+
 const b64 = (thing) => btoa(thing).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 const createJWT = (username, password) => {
   const encoder = new TextEncoder();
@@ -42,7 +44,7 @@ const createJWT = (username, password) => {
     false,
     ["sign"]
   ).then(key => window.crypto.subtle.sign({name: 'HMAC'}, key, encoded))
-    .then(signature => `${base}.${b64(String.fromCharCode.apply(null, new Uint8Array(signature)))}`);
+    .then(signature => ({token: `${base}.${b64(String.fromCharCode.apply(null, new Uint8Array(signature)))}`}));
 };
 
 const hideAd = (ad) => ({
@@ -52,7 +54,7 @@ const hideAd = (ad) => ({
 
 const refresh = (getState) => fetch("/facebook-ads/ads", {
   method: "GET",
-  headers: new Headers(auth(getState().credentials))
+  headers: headers(getState().credentials)
 }).then((res) => res.json())
   .then((ads) => store.dispatch(newAds(ads)));
 
@@ -62,7 +64,7 @@ const suppressAd = (ad) => {
     return fetch("/facebook-ads/admin/ads", {
       method: "POST",
       body: ad.id,
-      headers: new Headers(Object.assign({}, auth(getState().credentials), language()))
+      headers: headers(getState().credentials)
     }).then((resp) => {
       if(resp.ok) {
         console.log("suppressed");
@@ -92,12 +94,10 @@ const authorize = (username, password) => {
   return (dispatch) => createJWT(username, password).then(token => {
     return fetch("/facebook-ads/login", {
       method: "POST",
-      headers: new Headers({
-        "Authorization": `Bearer ${token}`
-      })
+      headers: headers(token)
     }).then((resp) => {
       if(resp.ok) {
-        dispatch(login({token: token}));
+        dispatch(login(token));
       }
     });
   });
