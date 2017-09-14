@@ -1,5 +1,6 @@
 use diesel::pg::PgConnection;
 use dotenv::dotenv;
+use errors::*;
 use futures::future;
 use futures_cpupool::CpuPool;
 use futures::future::{Either, FutureResult};
@@ -24,8 +25,6 @@ use std::env;
 use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
 use unicase::Ascii;
-
-use super::InsertError;
 
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
@@ -216,7 +215,13 @@ impl AdServer {
         let future = req.body()
             .concat2()
             .then(move |msg| {
-                pool.spawn_fn(move || AdServer::save_ads(msg, &db_pool, lang))
+                pool.spawn_fn(move || {
+                    AdServer::save_ads(
+                        msg.map_err(|e| Error::with_chain(e, "Can't get body")),
+                        &db_pool,
+                        lang,
+                    )
+                })
             })
             .and_then(move |ads| {
                 for ad in ads {
@@ -240,22 +245,18 @@ impl AdServer {
     }
 
     fn save_ads(
-        msg: Result<Chunk, hyper::Error>,
+        msg: Result<Chunk>,
         db_pool: &Pool<ConnectionManager<PgConnection>>,
         lang: String,
-    ) -> Result<Vec<Ad>, InsertError> {
-        let bytes = msg.map_err(InsertError::Hyper)?;
-        let string = String::from_utf8(bytes.to_vec()).map_err(
-            InsertError::String,
-        )?;
-
-        let posts: Vec<AdPost> = serde_json::from_str(&string).map_err(InsertError::JSON)?;
+    ) -> Result<Vec<Ad>> {
+        let bytes = msg?;
+        let string = String::from_utf8(bytes.to_vec())?;
+        let posts: Vec<AdPost> = serde_json::from_str(&string)?;
         let ads = posts.iter().map(move |post| {
             let ad = NewAd::new(post, &lang)?.save(db_pool)?;
             Ok(ad)
         });
-
-        ads.collect::<Result<Vec<Ad>, InsertError>>()
+        ads.collect::<Result<Vec<Ad>>>()
     }
 
     fn mark_ad(&self, req: Request) -> ResponseFuture {

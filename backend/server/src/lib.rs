@@ -5,6 +5,8 @@ extern crate diesel;
 extern crate dotenv;
 #[macro_use]
 extern crate diesel_codegen;
+#[macro_use]
+extern crate error_chain;
 extern crate hyper;
 extern crate hyper_tls;
 extern crate futures;
@@ -26,6 +28,7 @@ extern crate serde_derive;
 extern crate tokio_core;
 extern crate unicase;
 
+pub mod errors;
 pub mod models;
 pub mod schema;
 pub mod server;
@@ -34,23 +37,6 @@ use log::LogLevelFilter;
 use log4rs::append::console::ConsoleAppender;
 use log4rs::config::{Appender, Config as LogConfig, Logger, Root};
 use std::string;
-
-// This is basically a catch all for all the Errors we think we'll ever see to
-// combat type restrictions on all of the hyper/futures function calls.
-#[derive(Debug)]
-pub enum InsertError {
-    Timeout(r2d2::GetTimeout),
-    DataBase(diesel::result::Error),
-    JSON(serde_json::Error),
-    String(string::FromUtf8Error),
-    Hyper(hyper::Error),
-    Uri(hyper::error::UriError),
-    HTML(()),
-    TLS(rusoto_core::TlsError),
-    S3(rusoto_s3::PutObjectError),
-    AWS(rusoto_credential::CredentialsError),
-    Language(()),
-}
 
 pub fn start_logging() {
     let stdout = ConsoleAppender::builder().build();

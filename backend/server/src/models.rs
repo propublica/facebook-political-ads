@@ -4,13 +4,14 @@ use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
+use errors::*;
 use futures::{Future, stream, Stream};
 use futures_cpupool::CpuPool;
 use hyper::{Body, Client, Uri};
 use hyper::client::HttpConnector;
 use hyper_tls::HttpsConnector;
-use InsertError;
 use kuchiki;
+use kuchiki::iter::{Select, Elements, Descendants};
 use kuchiki::traits::*;
 use reqwest::Url;
 use r2d2_diesel::ConnectionManager;
@@ -24,31 +25,40 @@ use server::AdPost;
 
 const ENDPOINT: &'static str = "https://pp-facebook-ads.s3.amazonaws.com/";
 
-fn get_title(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
-    document
-        .select("h5 a, h6 a, strong")
-        .map_err(InsertError::HTML)?
-        .nth(0)
-        .and_then(|a| Some(a.text_contents()))
-        .ok_or(InsertError::HTML(()))
+fn document_select(
+    document: &kuchiki::NodeRef,
+    selector: &str,
+) -> Result<Select<Elements<Descendants>>> {
+    document.select(selector).map_err(|_| {
+        ErrorKind::HTML(format!("Selector compile error {}", selector)).into()
+    })
 }
 
-fn get_image(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
-    document
-        .select("img")
-        .map_err(InsertError::HTML)?
+fn get_title(document: &kuchiki::NodeRef) -> Result<String> {
+    document_select(document, "h5 a, h6 a, strong")?
+        .nth(0)
+        .and_then(|a| Some(a.text_contents()))
+        .ok_or("Couldn't find title.".into())
+}
+
+fn get_image(document: &kuchiki::NodeRef) -> Result<String> {
+    document_select(document, "img")
+        .map_err(|_| ErrorKind::HTML("Selector compile error".to_string()))?
         .nth(0)
         .and_then(|a| {
             a.attributes.borrow().get("src").and_then(
                 |src| Some(src.to_string()),
             )
         })
-        .ok_or(InsertError::HTML(()))
+        .ok_or("Couldn't find images.".into())
 }
 
-fn get_message(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
+fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
     let selectors = vec![".userContent p", "span"];
-    let iters = selectors.iter().map(|s| document.select(s)).flat_map(|a| a);
+    let iters = selectors
+        .iter()
+        .map(|s| document_select(document, s))
+        .flat_map(|a| a);
 
     iters
         .map(|i| {
@@ -56,14 +66,13 @@ fn get_message(document: &kuchiki::NodeRef) -> Result<String, InsertError> {
         })
         .filter(|i| !i.is_empty())
         .nth(0)
-        .ok_or(InsertError::HTML(()))
+        .ok_or("Couldn't find message.".into())
 }
 
-fn get_images(document: &kuchiki::NodeRef) -> Result<Vec<String>, InsertError> {
+fn get_images(document: &kuchiki::NodeRef) -> Result<Vec<String>> {
+    let select = document_select(document, "img")?;
     Ok(
-        document
-            .select("img")
-            .map_err(InsertError::HTML)?
+        select
             .skip(1)
             .map(|a| {
                 a.attributes.borrow().get("src").and_then(
@@ -97,7 +106,7 @@ pub struct Images {
 }
 
 impl Images {
-    fn from_ad(ad: &Ad, images: Vec<Uri>) -> Result<Images, InsertError> {
+    fn from_ad(ad: &Ad, images: Vec<Uri>) -> Result<Images> {
         let thumb = images
             .iter()
             .filter(|i| ad.thumbnail.contains(i.path()))
@@ -115,7 +124,7 @@ impl Images {
             .collect::<Vec<String>>();
 
         let document = kuchiki::parse_html().one(ad.html.clone());
-        for a in document.select("img").map_err(InsertError::HTML)? {
+        for a in document_select(&document, "img")? {
             if let Some(x) = a.attributes.borrow_mut().get_mut("src") {
                 if let Ok(u) = x.parse::<Uri>() {
                     if let Some(i) = images.iter().find(|i| {
@@ -136,11 +145,9 @@ impl Images {
             thumbnail: thumb,
             images: collection,
             title: title,
-            html: document
-                .select("div")
-                .map_err(InsertError::HTML)?
+            html: document_select(&document, "div")?
                 .nth(0)
-                .ok_or(InsertError::HTML(()))?
+                .ok_or("Couldn't find a div in the html")?
                 .as_node()
                 .to_string(),
             message: message,
@@ -206,7 +213,7 @@ impl Ad {
                     .and_then(|res| {
                         res.body().concat2().and_then(|chunk| Ok((chunk, real_url)))
                     })
-                    .map_err(InsertError::Hyper)
+                    .map_err(|e| Error::with_chain(e, "Could not get image"))
             })
             // upload them to s3
             .and_then(move |tuple| {
@@ -215,10 +222,8 @@ impl Ad {
                 // Hyper async yet.
                 pool.spawn_fn(move || {
                     if tuple.1.host().unwrap() != "pp-facebook-ads.s3.amazonaws.com" {
-                        let credentials = DefaultCredentialsProvider::new()
-                            .map_err(InsertError::AWS)?;
-                        let tls = default_tls_client()
-                            .map_err(InsertError::TLS)?;
+                        let credentials = DefaultCredentialsProvider::new()?;
+                        let tls = default_tls_client()?;
                         let client = S3Client::new(tls, credentials, Region::UsEast1);
                         let req = PutObjectRequest {
                             bucket: "pp-facebook-ads".to_string(),
@@ -227,7 +232,7 @@ impl Ad {
                             body: Some(tuple.0.to_vec()),
                             ..PutObjectRequest::default()
                         };
-                        client.put_object(&req).map_err(InsertError::S3)?;
+                        client.put_object(&req)?;
                     }
                     Ok(tuple.1)
                 })
@@ -241,11 +246,10 @@ impl Ad {
                 pool_db.spawn_fn(move || {
                     use schema::ads::dsl::*;
                     let update = Images::from_ad(&ad, imgs)?;
-                    let connection = db.get().map_err(InsertError::Timeout)?;
+                    let connection = db.get()?;
                     diesel::update(ads.filter(id.eq(&ad.id)))
                         .set(&update)
-                        .execute(&*connection)
-                        .map_err(InsertError::DataBase)?;
+                        .execute(&*connection)?;
                     info!("saved {:?}", ad.id);
                     Ok(())
                 })
@@ -257,13 +261,13 @@ impl Ad {
         Box::new(future)
     }
 
-    pub(self) fn image_urls(&self) -> Vec<Result<Uri, InsertError>> {
+    pub(self) fn image_urls(&self) -> Vec<Result<Uri>> {
         let images = [vec![self.thumbnail.clone()], self.images.clone()];
         images
             .concat()
             .iter()
             .map(|a| {
-                let a: Uri = a.parse().map_err(InsertError::Uri)?;
+                let a: Uri = a.parse()?;
                 Ok(a)
             })
             .collect()
@@ -272,31 +276,27 @@ impl Ad {
     pub fn get_ads_by_lang(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<Vec<Ad>, InsertError> {
+    ) -> Result<Vec<Ad>> {
         use schema::ads::dsl::*;
-        let connection = conn.get().map_err(InsertError::Timeout)?;
-        ads.filter(lang.eq(language))
+        let connection = conn.get()?;
+        let res = ads.filter(lang.eq(language))
             .filter(political_probability.gt(0.90))
             .filter(suppressed.eq(false))
             .order(created_at.desc())
             .limit(200)
-            .load::<Ad>(&*connection)
-            .map_err(InsertError::DataBase)
+            .load::<Ad>(&*connection)?;
+        Ok(res)
     }
 
-    pub fn suppress(
-        adid: String,
-        conn: &Pool<ConnectionManager<PgConnection>>,
-    ) -> Result<(), InsertError> {
+    pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
         use schema::ads::dsl::*;
-        let connection = conn.get().map_err(InsertError::Timeout)?;
+        let connection = conn.get()?;
         {
             warn!("Suppressed {:?}", adid);
         }
         diesel::update(ads.filter(id.eq(adid)))
             .set(suppressed.eq(true))
-            .execute(&*connection)
-            .map_err(InsertError::DataBase)?;
+            .execute(&*connection)?;
         Ok(())
     }
 }
@@ -322,7 +322,7 @@ pub struct NewAd<'a> {
 
 
 impl<'a> NewAd<'a> {
-    pub fn new(ad: &'a AdPost, lang: &'a str) -> Result<NewAd<'a>, InsertError> {
+    pub fn new(ad: &'a AdPost, lang: &'a str) -> Result<NewAd<'a>> {
         info!("saving {}", ad.id);
         let document = kuchiki::parse_html().one(ad.html.clone());
 
@@ -348,10 +348,10 @@ impl<'a> NewAd<'a> {
         })
     }
 
-    pub fn save(&self, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<Ad, InsertError> {
+    pub fn save(&self, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<Ad> {
         use schema::ads;
         use schema::ads::dsl::*;
-        let connection = pool.get().map_err(InsertError::Timeout)?;
+        let connection = pool.get()?;
 
         // increment impressions if this is a background save,
         // otherwise increment political counters
@@ -369,14 +369,12 @@ impl<'a> NewAd<'a> {
                 updated_at.eq(Utc::now()),
             )),
         )).into(ads::table)
-            .get_result(&*connection)
-            .map_err(InsertError::DataBase)?;
+            .get_result(&*connection)?;
 
         if self.targeting.is_some() && !ad.targeting.is_some() {
             diesel::update(ads.filter(id.eq(self.id)))
                 .set(targeting.eq(self.targeting.clone()))
-                .execute(&*connection)
-                .map_err(InsertError::DataBase)?;
+                .execute(&*connection)?;
         };
 
         Ok(ad)
