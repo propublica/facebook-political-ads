@@ -38,7 +38,7 @@ fn get_title(document: &kuchiki::NodeRef) -> Result<String> {
     document_select(document, "h5 a, h6 a, strong")?
         .nth(0)
         .and_then(|a| Some(a.text_contents()))
-        .ok_or("Couldn't find title.".into())
+        .ok_or_else(|| "Couldn't find title.".into())
 }
 
 fn get_image(document: &kuchiki::NodeRef) -> Result<String> {
@@ -50,7 +50,7 @@ fn get_image(document: &kuchiki::NodeRef) -> Result<String> {
                 |src| Some(src.to_string()),
             )
         })
-        .ok_or("Couldn't find images.".into())
+        .ok_or_else(|| "Couldn't find images.".into())
 }
 
 fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
@@ -66,7 +66,7 @@ fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
         })
         .filter(|i| !i.is_empty())
         .nth(0)
-        .ok_or("Couldn't find message.".into())
+        .ok_or_else(|| "Couldn't find message.".into())
 }
 
 fn get_images(document: &kuchiki::NodeRef) -> Result<Vec<String>> {
@@ -91,7 +91,7 @@ fn get_real_image_uri(uri: Uri) -> Uri {
     let query_map: HashMap<_, _> = url.unwrap().query_pairs().into_owned().collect();
     query_map.get("url")
         .map(|u| u.parse::<Uri>()) // Option<Result>
-        .unwrap_or(Ok(uri.clone())) // Result
+        .unwrap_or_else(|| Ok(uri.clone())) // Result
         .unwrap_or(uri) // Uri
 }
 

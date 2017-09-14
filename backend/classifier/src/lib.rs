@@ -64,8 +64,7 @@ impl Classifier {
             self.n_features as usize,
             create_feature_vec(doc, self.n_features),
         );
-        let res = (feature_vec * self.feature_log_prob.transpose()) + &(self.class_log_prior);
-        res
+        (feature_vec * self.feature_log_prob.transpose()) + &(self.class_log_prior)
     }
 
     pub fn predict(&self, doc: &str) -> usize {
@@ -84,12 +83,11 @@ impl Classifier {
     pub fn predict_likelihoods(&self, doc: &str) -> Vec<f64> {
         let jll = self.joint_log_likelihood(doc);
         let mut acc = 0.0;
-        for &x in jll.clone().into_vec().iter() {
+        for &x in &jll.clone().into_vec() {
             acc += x.exp();
         }
         acc = acc.ln();
-        let likelihoods = jll.into_vec().iter().map(|x| (x - acc).exp()).collect();
-        likelihoods
+        jll.into_vec().iter().map(|x| (x - acc).exp()).collect()
     }
 
     pub fn from_json(file: &str) -> Result<Classifier> {
@@ -106,38 +104,35 @@ impl Classifier {
 
 /// Returns the index for a given feature.
 ///
-/// Based on sklearn's HashingVectorizer, which uses
-/// abs(murmurhash3(token))%n_features to determine
-/// index of feature.
+/// Based on sklearn's `HashingVectorizer`, which uses `abs(murmurhash3(token))
+/// % n_features` to
+/// determine index of feature.
 pub fn get_feature_idx(token: &str, n_features: i32) -> usize {
     let hash = murmurhash3_x86_32(token.as_bytes(), 0);
-    return ((hash as i32).abs() % n_features) as usize;
+    ((hash as i32).abs() % n_features) as usize
 }
 
 pub fn tokenize_string(string: &str) -> Vec<&str> {
-    let tokens: Vec<&str> = Regex::new(TOKEN_PATTERN)
+    Regex::new(TOKEN_PATTERN)
         .unwrap()
         .find_iter(string)
         .map(|x| x.as_str())
-        .collect();
-    return tokens;
+        .collect()
 }
 
 pub fn create_feature_vec(doc: &str, n_features: i32) -> Vec<f64> {
     let mut feature_vec = vec![0.0; (n_features as usize)];
     let lowercase_doc = &doc.to_lowercase();
-    let tokens = tokenize_string(&lowercase_doc);
+    let tokens = tokenize_string(lowercase_doc);
 
     for tok in tokens {
         feature_vec[get_feature_idx(tok, n_features)] += 1.0;
     }
 
     // L2 norm
-    let mut normalized_vec = feature_vec.to_vec();
+    let normalized_vec = feature_vec.to_vec();
     let euc_norm = Vector::new(feature_vec).norm();
-    normalized_vec = normalized_vec.iter().map(|x| x / euc_norm).collect();
-
-    return normalized_vec;
+    normalized_vec.iter().map(|x| x / euc_norm).collect()
 }
 
 #[cfg(test)]

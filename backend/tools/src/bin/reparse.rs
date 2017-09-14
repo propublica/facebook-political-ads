@@ -1,7 +1,6 @@
 extern crate server;
 extern crate diesel;
 extern crate dotenv;
-extern crate futures;
 extern crate futures_cpupool;
 extern crate hyper;
 extern crate hyper_tls;
