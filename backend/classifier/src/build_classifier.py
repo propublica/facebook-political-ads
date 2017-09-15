@@ -25,28 +25,19 @@ from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score, classification_report, roc_curve
 
+from imblearn.over_sampling import SMOTE
+
 CLASSIFIERS = {
     "MultinomialNB" : MultinomialNB(),
     "BernoulliNB" : BernoulliNB(),
     "LogisticRegression" : LogisticRegression()
 }
 
-def equalize_classes(train):
+def equalize_classes(x, y):
     """Equalize classes in training data for better representation.
 
-    Currently, just repeat samples from underrepresented class until
-    both are equal.
-
-    TODO: In future use SMOTE to equalize?
     """
-    class_diff = len([x for x in train if x[1] == 0]) - \
-                 len([x for x in train if x[1] == 1])
-    if class_diff != 0:
-        to_append = [x for x in train if x[1] == (1 if class_diff > 0 else 0)]
-        for i in range(class_diff):
-            train.append(to_append[i % len(to_append)])
-
-    return train
+    return SMOTE().fit_sample(x, y)
 
 def eval_classifiers(X_train, Y_train, X_test, Y_test):
     """Compare available classifiers, print and plot results.
@@ -81,6 +72,7 @@ if __name__ == '__main__':
         posts = json.load(f)
 
     data = [(item, 1.0) for item in posts['political']]
+    print("seed length %s" % len(data))
     if config["read_from_psql"]:
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
         cur = conn.cursor()
@@ -101,17 +93,17 @@ if __name__ == '__main__':
                 score = 0.0
             data.append((doc.get_text(" "), score))
 
+    print("With data %s" % len(data))
     train, test = train_test_split(data)
-
-    if config['equalize_classes']:
-        train = equalize_classes(train)
-
     X_train, Y_train = zip(*train)
     X_test, Y_test = zip(*test)
 
     vectorizer = HashingVectorizer(alternate_sign=False, n_features=config['n_features'])
     X_train = vectorizer.transform(X_train)
     X_test = vectorizer.transform(X_test)
+    X_train, Y_train = equalize_classes(X_train, Y_train)
+
+    print("Final size: %s" % X_train.shape[0])
 
     if config['run_eval']:
         eval_classifiers(X_train, Y_train, X_test, Y_test)
