@@ -145,6 +145,10 @@ const Ad = ({ad, onClick}) => (
         <td>{ad.id}</td>
       </tr>
       <tr>
+        <td>first seen</td>
+        <td>{new Date(Date.parse(ad.created_at)).toString()}</td>
+      </tr>
+      <tr>
         <td>title</td>
         <td>{ad.title}</td>
       </tr>
@@ -164,6 +168,7 @@ const Ad = ({ad, onClick}) => (
             </button>}
         </td>
       </tr>
+
     </table>
   </div>
 );
