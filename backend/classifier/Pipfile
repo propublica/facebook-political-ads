@@ -3,12 +3,13 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [packages]
+
 certifi = "==2017.7.27.1"
 chardet = "==3.0.4"
-Cycler = "==0.10.0"
+cycler = "==0.10.0"
 facebook-sdk = "==2.0.0"
 idna = "==2.6"
-numpy = "==1.13.1"
+numpy = "*"
 python-dateutil = "==2.6.1"
 pytz = "==2017.2"
 requests = "==2.18.4"
@@ -17,3 +18,6 @@ scipy = "==0.19.1"
 sklearn = "==0.0"
 urllib3 = "==1.22"
 bs4 = "*"
+imbalanced-learn = "*"
+matplotlib = "*"
+psycopg2 = "*"
