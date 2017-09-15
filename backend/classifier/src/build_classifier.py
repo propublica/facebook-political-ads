@@ -12,20 +12,22 @@ import json
 import os
 import sys
 import psycopg2
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 from bs4 import BeautifulSoup
 
-from sklearn.naive_bayes import MultinomialNB, BernoulliNB, GaussianNB
+from sklearn.naive_bayes import MultinomialNB, BernoulliNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import HashingVectorizer
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score, classification_report
+from sklearn.metrics import roc_auc_score, classification_report, roc_curve
 
 CLASSIFIERS = {
     "MultinomialNB" : MultinomialNB(),
     "BernoulliNB" : BernoulliNB(),
-    "GaussianNB" : GaussianNB(),
     "LogisticRegression" : LogisticRegression()
 }
 
@@ -56,8 +58,15 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
         classifier.fit(X_train.todense(), Y_train)
         preds = classifier.predict_proba(X_test.todense())[:, 1]
         print("******** %s: %s" % (name, roc_auc_score(Y_test, preds)))
+        fpr, tpr, _ = roc_curve(Y_test, preds)
         preds = classifier.predict(X_test.todense())
         print(classification_report(Y_test, preds))
+        plt.plot(fpr, tpr, label=name)
+
+    plt.xlabel("FPR")
+    plt.ylabel("TPR")
+    plt.legend()
+    plt.savefig("out.png")
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
@@ -71,9 +80,7 @@ if __name__ == '__main__':
     with open(config['input_filename']) as f:
         posts = json.load(f)
 
-    pol = [(item, 1) for item in posts['political']]
-    npol = [(item, 0) for item in posts['not_political']]
-    data = pol + npol
+    data = [(item, 1.0) for item in posts['political']]
     if config["read_from_psql"]:
         conn = psycopg2.connect(os.environ["DATABASE_URL"])
         cur = conn.cursor()
@@ -112,7 +119,7 @@ if __name__ == '__main__':
     if not config['classifier_type']:
         print('Need to specify model class.')
         print('Currently supported:')
-        print('MultinomialNB, BernoulliNB, GaussianNB, LogisticRegression')
+        print('MultinomialNB, BernoulliNB, Logisticregression')
         exit()
 
     classifier = CLASSIFIERS[config['classifier_type']]
