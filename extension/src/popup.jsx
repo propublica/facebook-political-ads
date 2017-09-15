@@ -94,12 +94,12 @@ const buildUpdate = (type) => ((state = [], action) => {
   case "new_" + type + "s":
     return mergeAds(state, action.value);
   case "update_" + type:
-    return state.map(ad => {
+    return mergeAds(state.map(ad => {
       if(ad.id === action.id) {
         return { ...ad, rating: action.value };
       }
       return ad;
-    });
+    }), {});
   default:
     return state;
   }
