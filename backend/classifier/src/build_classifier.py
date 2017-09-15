@@ -23,7 +23,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.feature_extraction.text import HashingVectorizer
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import roc_auc_score, classification_report, roc_curve
+from sklearn.metrics import roc_auc_score, classification_report, roc_curve, brier_score_loss
 
 from imblearn.over_sampling import SMOTE
 
@@ -52,6 +52,7 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
         fpr, tpr, _ = roc_curve(Y_test, preds)
         preds = classifier.predict(X_test.todense())
         print(classification_report(Y_test, preds))
+        print(brier_score_loss(Y_test, preds))
         plt.plot(fpr, tpr, label=name)
 
     plt.xlabel("FPR")
