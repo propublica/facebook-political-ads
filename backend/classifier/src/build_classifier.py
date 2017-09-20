@@ -54,7 +54,6 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
         print(classification_report(Y_test, preds))
         print(brier_score_loss(Y_test, preds))
         plt.plot(fpr, tpr, label=name)
-
     plt.xlabel("FPR")
     plt.ylabel("TPR")
     plt.legend()

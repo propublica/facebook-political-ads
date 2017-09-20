@@ -62,6 +62,7 @@ impl Service for AdServer {
             (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
                 Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
             })),
+            // Admin
             (&Method::Get, "/facebook-ads/admin") => Either::B(self.get_file(
                 "public/admin.html",
                 ContentType::html(),
@@ -74,13 +75,32 @@ impl Service for AdServer {
                 "public/dist/admin.js.map",
                 ContentType::json(),
             )),
-            (&Method::Get, "/facebook-ads/styles.css") => Either::B(self.get_file(
-                "public/css/styles.css",
-                ContentType(mime::TEXT_PLAIN_UTF_8),
+            (&Method::Get, "/facebook-ads/admin/styles.css") => Either::B(self.get_file(
+                "public/css/admin/styles.css",
+                ContentType(
+                    mime::TEXT_PLAIN_UTF_8,
+                ),
             )),
             (&Method::Post, "/facebook-ads/admin/ads") => Either::B(self.auth(
                 req,
                 |request| self.mark_ad(request),
+            )),
+            // Public
+            (&Method::Get, "/facebook-ads/") => Either::B(self.get_file(
+                "public/index.html",
+                ContentType::html(),
+            )),
+            (&Method::Get, "/facebook-ads/index.js") => Either::B(self.get_file(
+                "public/dist/index.js",
+                ContentType(mime::TEXT_JAVASCRIPT),
+            )),
+            (&Method::Get, "/facebook-ads/index.js.map") => Either::B(self.get_file(
+                "public/dist/index.js.map",
+                ContentType::json(),
+            )),
+            (&Method::Get, "/facebook-ads/styles.css") => Either::B(self.get_file(
+                "public/css/styles.css",
+                ContentType(mime::TEXT_PLAIN_UTF_8),
             )),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
