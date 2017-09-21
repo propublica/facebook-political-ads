@@ -45,7 +45,7 @@ h2 a:hover {
   display: inline-block;
 }
 
-header[role="banner"] {
+header {
   width: 100%;
   height: 40px;
   z-index: 1000;
@@ -58,7 +58,7 @@ h1 {
   font-weight: 700;
 }
 
-header[role="banner"] > h1 {
+header > h1 {
   display: block;
   width: 116px;
   height: 55px;
@@ -70,7 +70,7 @@ header[role="banner"] > h1 {
   opacity: 0.8;
 }
 
-header[role="banner"] > h1 a {
+header > h1 a {
   display: block;
   text-indent: 100%;
   white-space: nowrap;
@@ -83,7 +83,7 @@ nav .facebook a {
   background: url("//static.propublica.org/projects/ferguson-segregation/assets/img/nav-sprites-dark.min.svg") 0 0 no-repeat;
 }
 
-header[role="banner"] nav ul.tools-nav li a {
+header nav ul.tools-nav li a {
   text-decoration: none;
   display: block;
   text-indent: 100%;
@@ -97,7 +97,7 @@ header[role="banner"] nav ul.tools-nav li a {
   opacity: 0.8;
 }
 
-header[role="banner"] nav ul.tools-nav li { display: inline-block; }
+header nav ul.tools-nav li { display: inline-block; }
 
 nav a:hover, nav a:focus, nav .comment a:hover, nav .comment a:focus {
   -webkit-transform: scale(1.25);
@@ -107,7 +107,7 @@ nav a:hover, nav a:focus, nav .comment a:hover, nav .comment a:focus {
   transform: scale(1.25);
 }
 
-header[role="banner"] nav ul.tools-nav .donate a:hover, header[role="banner"] nav ul.tools-nav .donate a:focus {
+header nav ul.tools-nav .donate a:hover, header nav ul.tools-nav .donate a:focus {
   opacity: 1;
   background: #ab3535;
   -webkit-transform: scale(1);
@@ -119,7 +119,7 @@ header[role="banner"] nav ul.tools-nav .donate a:hover, header[role="banner"] na
 
 nav .twitter a { background: url("//static.propublica.org/projects/ferguson-segregation/assets/img/nav-sprites-dark.min.svg") 0 -50px no-repeat; }
 
-header[role="banner"] nav ul.tools-nav .donate a {
+header nav ul.tools-nav .donate a {
   opacity: 0.8;
   background: #be3b3b;
   font-family: 'Tiempos Text', Georgia, serif;
@@ -135,13 +135,12 @@ header[role="banner"] nav ul.tools-nav .donate a {
   -webkit-font-smoothing: antialiased;
 }
 
-header[role="banner"] nav { font-size: 0.875em; }
+header nav { font-size: 0.875em; }
 
-header[role="banner"] nav ul.tools-nav {
+header nav ul.tools-nav {
   display: inline-block;
   position: absolute;
   top: 0.625em;
-  right: 0.5em;
   list-style: none;
   height: 40px;
   right: 1em;
@@ -162,14 +161,14 @@ ol, ul { list-style: none; }
   box-sizing: border-box;
 }
 
-header[role="banner"] nav ul.tools-nav .donate a {
+header nav ul.tools-nav .donate a {
   display: block;
   width: auto;
   text-indent: 0;
 }
 
 nav .comment a { background: url("//static.propublica.org/projects/ferguson-segregation/assets/img/nav-sprites-light.min.svg") 0 -100px no-repeat; }
-header[role="banner"] nav ul.tools-nav li a:hover, header[role="banner"] nav ul.tools-nav li a:focus { opacity: 1; }
+header nav ul.tools-nav li a:hover, header nav ul.tools-nav li a:focus { opacity: 1; }
 html body { padding-top: 0; }
 
 ul li.comment {
@@ -346,4 +345,77 @@ header h4 {
   src: url("https://static.propublica.org/v3/assets/fonts/TiemposTextWeb-BoldItalic.woff2") format("woff2"),url("https://static.propublica.org/v3/assets/fonts/TiemposTextWeb-BoldItalic.woff") format("woff");
   font-weight: bold;
   font-style: italic;
+}
+
+#search {
+  width: 35rem;
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  border-radius: 0.3rem;
+  border: 0.1rem solid #ddd;
+}
+
+.ad:hover {
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.18);
+}
+
+.ad {
+  width: 100%;
+  border-radius: 0.3rem;
+  border: 0.01rem solid #ddd;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  transition: box-shadow 0.2s;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
+}
+
+.adcontainer {
+  display: flow-root;
+}
+
+.ad .display div, #graphic .ad .display p, .ad .targeting div {
+  text-align: left;
+  width: 100%;
+  margin: 0;
+  padding: 0.1rem 0;
+}
+
+.ad .display .title {
+  font-weight: bold;
+  font-size: 1rem;
+  padding-top: 0;
+}
+
+.ad .chiclet {
+  float: left;
+  margin-right: 0.4rem;
+  height: 100%;
+}
+
+.ad .chiclet img {
+  max-width: 15rem;
+  min-width: 6rem;
+}
+
+.ad-content a {
+  pointer-events: none;
+  cursor: default;
+  color: #1f5881;
+}
+
+#content .wrapper {
+  overflow: inherit;
+}
+
+#ads {
+  font-family: -apple-system,BlinkMacSystemFont,avenir next,avenir,helvetica,helvetica neue,ubuntu,roboto,noto,segoe ui,arial,sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  font-weight: 200;
+}
+.targeting h3 {
+  text-align: left;
+  border-top: 1px solid #ddd;
+  margin-bottom: 0;
 }

@@ -1,0 +1,9 @@
+{
+  "title": "Facebook Political Ad Collector",
+  "slug": "See the ads politicians and political groups are running on Facebook",
+  "guff": "Facebook is rife with political advertising. Since early September, we have asked our users to use a <a href=\"https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl\">Chrome extension</a> and collects ads from politicians and political groups on Facebook. You can browse and search through the advertisements we've collected below. The ads shown here are automatically classified by a machine learning algorithm so there may be false positives. If you see anything interesting please let us know at <a href=\"mailto:jeff.larson@propublica.org\">jeff.larson@propublica.org</a>.",
+  "by": "By",
+  "and": "and",
+  "search": "Search the political ads",
+  "targeting": "Targeting information"
+}

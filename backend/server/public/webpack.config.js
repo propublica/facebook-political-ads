@@ -1,9 +1,40 @@
 const path = require('path');
 const webpack = require('webpack');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const ENV = process.env.NODE_ENV || 'development';
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const ENV = 'production';
 
 module.exports = [{
+  entry: "index.jsx",
+  context: path.resolve(__dirname, "src"),
+  resolve: {
+    extensions: ['.jsx', '.js'],
+    modules: ["src", "node_modules"]
+  },
+  output: {
+    filename: 'index.js',
+    path: path.resolve(__dirname, 'dist')
+  },
+  module: {
+    rules: [{
+      test: /\.jsx$/,
+      use: ["source-map-loader"],
+      enforce: "pre"
+    },{
+      test: /\.jsx?$/,
+      exclude: /node_modules/,
+      use: 'babel-loader'
+    }]
+  },
+  plugins: [
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify(ENV)
+    }),
+    new UglifyJSPlugin()
+  ],
+  devtool: 'source-map'
+},{
   entry: "admin.jsx",
   context: path.resolve(__dirname, "src"),
   resolve: {
@@ -30,7 +61,8 @@ module.exports = [{
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(ENV)
-    })
+    }),
+    new UglifyJSPlugin()
   ],
   devtool: 'source-map'
 }];
