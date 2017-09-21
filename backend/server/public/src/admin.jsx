@@ -4,26 +4,12 @@ import thunkMiddleware from 'redux-thunk';
 import persistState from 'redux-localstorage';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
+import { headers, NEW_ADS, refresh, search } from 'utils.js';
+import throttle from "lodash/throttle";
 
-const NEW_ADS = "new_ads";
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
 const LOGOUT = "logout";
-
-const auth = (credentials) => (credentials ?
-  {"Authorization": `Bearer ${credentials.token}`} :
-  {});
-
-const language = () => {
-  const params = new URLSearchParams(location.search);
-  if(params.get("lang")) {
-    return {"Accept-Language": params.get("lang") + ";q=1.0"};
-  } else {
-    return {};
-  }
-};
-
-const headers = (credentials) => Object.assign({}, auth(credentials), language());
 
 const b64 = (thing) => btoa(thing).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 const createJWT = (username, password) => {
@@ -52,12 +38,6 @@ const hideAd = (ad) => ({
   id: ad.id
 });
 
-const refresh = (getState) => fetch("/facebook-ads/ads", {
-  method: "GET",
-  headers: headers(getState().credentials)
-}).then((res) => res.json())
-  .then((ads) => store.dispatch(newAds(ads)));
-
 const suppressAd = (ad) => {
   return (dispatch, getState) => {
     dispatch(hideAd(ad));
@@ -74,11 +54,6 @@ const suppressAd = (ad) => {
     });
   };
 };
-
-const newAds = (ads) => ({
-  type: NEW_ADS,
-  value: ads
-});
 
 const login = (credentials) => ({
   type: LOGIN,
@@ -168,13 +143,13 @@ const Ad = ({ad, onClick}) => (
             </button>}
         </td>
       </tr>
-
     </table>
   </div>
 );
 
-let Ads = ({ads, onClick}) => (
+let Ads = ({ads, onClick, onKeyUp}) => (
   <div id="ads">
+    <input id="search" placeholder="Search for ads" onKeyUp={onKeyUp} />
     {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} />)}
   </div>
 );
@@ -183,16 +158,13 @@ Ads = connect(
     ads: state.ads.filter((ad) => !ad.suppressed)
   }),
   (dispatch) => ({
-    onClick: (ad) => dispatch(suppressAd(ad))
+    onClick: (ad) => dispatch(suppressAd(ad)),
+    onKeyUp: throttle((e) => {
+      e.preventDefault();
+      dispatch(search(store, e.target.value.length ? e.target.value : null));
+    }, 1000)
   })
 )(Ads);
-
-let App = ({credentials}) => (
-  <div id="app">
-    {credentials && credentials.token ? <Ads /> : <Login />}
-  </div>
-);
-App = connect((state) => state)(App);
 
 let Login = ({onLogin}) => (
   <form id="login" onSubmit={onLogin} >
@@ -214,10 +186,18 @@ Login = connect(
   })
 )(Login);
 
+let App = ({credentials}) => (
+  <div id="app">
+    {credentials && credentials.token ? <Ads /> : <Login />}
+  </div>
+);
+App = connect((state) => state)(App);
+
+
 render(
   <Provider store={store}>
     <App />
   </Provider>,
   document.body
 );
-refresh(store.getState);
+refresh(store);

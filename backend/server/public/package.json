@@ -34,10 +34,13 @@
   },
   "dependencies": {
     "i18next": "^9.0.0",
+    "i18next-browser-languagedetector": "^2.0.0",
+    "i18next-localstorage-cache": "^1.1.1",
+    "i18next-xhr-backend": "^1.4.3",
+    "lodash": "^4.17.4",
     "preact": "^8.2.5",
     "preact-redux": "^2.0.2",
     "redux": "^3.7.2",
-    "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0"
   }

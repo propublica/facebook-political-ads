@@ -102,3 +102,15 @@ img {
   margin-right: auto;
   margin-top: 10rem;
 }
+
+#search {
+  display: block;
+  width: 80%;
+  padding: 0.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  border-radius: 0.3rem;
+  border: 0.1rem solid #ddd;
+}

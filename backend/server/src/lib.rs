@@ -5,6 +5,7 @@ extern crate diesel;
 extern crate dotenv;
 #[macro_use]
 extern crate diesel_codegen;
+extern crate diesel_full_text_search;
 #[macro_use]
 extern crate error_chain;
 extern crate hyper;
@@ -27,6 +28,7 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate tokio_core;
 extern crate unicase;
+extern crate url;
 
 pub mod errors;
 pub mod models;

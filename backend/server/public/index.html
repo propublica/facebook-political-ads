@@ -1,44 +1,54 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
-    <meta name="viewport" content="width=device-width, maximum-scale=1.6">
-    <link rel="stylesheet" href="//s3.amazonaws.com/cdn.propublica.net/deploy/css/reset.css?1337900771" type="text/css" media="all" charset="utf-8">
-    <link rel="stylesheet" href="//s3.amazonaws.com/cdn.propublica.net/deploy/css/propublica-text.css?1337900771" type="text/css" media="all" charset="utf-8">
-    <link rel="stylesheet" href="/facebook-ads/styles.css">
-    <title></title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link rel="stylesheet" href="https://s3.amazonaws.com/cdn.propublica.net/deploy/css/reset.css" type="text/css" media="all">
+    <link rel="stylesheet" href="https://s3.amazonaws.com/cdn.propublica.net/deploy/css/propublica-text.css" type="text/css" media="all">
+    <link rel="stylesheet" href="https://www.propublica.org/css/master.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="/facebook-ads/styles.css" type="text/css" media="all">
+    <title>Facebook Political Ad Collector</title>
+    <meta property="og:type" content="article"/>
+    <meta property="og:url" content="https://projects.propublica.org/facebook-ads/" />
+    <meta property="og:title" content="Facebook Political Ad Collector" />
+    <meta property="og:description" content="See the political ads ProPublica has collected." />
+    <meta property="og:image" content="<%= fb_card %>" />
+    <meta property="og:site_name" content="ProPublica">
+    <meta property="fb:admins" content="383965056549"/>
+    <meta property="fb:app_id" content="229862657130557"/>
+    <meta property="og:article:published_time" content="September 22, 2017 8:00:00">
+    <meta name="twitter:creator" content="@ProPublica">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://projects.propublica.org/facebook-ads/">
+    <meta name="twitter:title" content="Facebook Political Ad Collector" />
+    <meta name="twitter:description" content="See the political ads ProPublica has collected." />
+    <meta name="twitter:image:src" content="<%= tw_card %>" />
   </head>
   <body>
     <div class="c-header">
-      <header role="banner">
+      <header>
         <h1><a href="http://www.propublica.org">ProPublica</a></h1>
-        <%= yield_content :banner_series %>
         <nav>
           <ul class="tools-nav">
-            <%= yield_content :socialstuff %>
+            <li class="facebook social-widget ss-fb" data-title="Facebook Political Ad Collector" data-img="<%= fb_card %>" data-txt="Facebook Political Ad Collector"><a href="#">Share on Facebook</a></li>
+            <li class="twitter social-widget ss-tw" data-txt="See the political ads ProPublica has collected." data-url="https://projects.propublica.org/graphics/facebook-ads" data-hashtag=""><a href="#">Share on Twitter</a></li>
             <li class="donate">
-              <a href="https://donate.propublica.org/" target="_blank">Donate</a>
+              <a href="https://donate.propublica.org/" target="_blank" rel="noopener">Donate</a>
             </li>
           </ul>
         </nav>
       </header>
     </div>
-    <div id="content" <%= yield_content :extra_class %> >
+    <div id="content">
       <div class="wrapper">
         <div class="content-full">
-
           <div class="article">
-            <%= yield_content :extra_top %>
-
-            <!-- CONTENT START -->
-            <%= yield %>
-            <!-- CONTENT END -->
-
+            <div id="graphic">
+            </div>
           </div>
         </div>
       </div>
     </div>
-    <script type="text/javascript" src="//www.propublica.org/js/public/assets/beacons.js"></script>
     <div id="footer">
       <div class="wrapper">
         <div id="footer-logo">
@@ -49,5 +59,16 @@
         <div style="clear:both;"></div>
       </div>
     </div>
+    <script type="text/javascript">
+     window.dataLayer = [{
+       'contentType': 'App',
+       'contentSubtype': 'Graphics',
+       'publicationDate': 'September 22, 2017 8:00:00',
+       'articleTitle': "Facebook Political Ad Collector",
+       'authorName': 'Jeff Larson, Julia Angwin',
+       'seriesName': 'Machine Bias'
+     }];
+    </script>
+    <script src="/facebook-ads/index.js"></script>
   </body>
 </html>

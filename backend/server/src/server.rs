@@ -17,8 +17,10 @@ use jsonwebtoken::{decode, Validation};
 use models::{NewAd, Ad};
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
+use url::form_urlencoded;
 use start_logging;
 use serde_json;
+use std::borrow::Cow;
 use std::fs::File;
 use std::io::Read;
 use std::env;
@@ -77,19 +79,16 @@ impl Service for AdServer {
             )),
             (&Method::Get, "/facebook-ads/admin/styles.css") => Either::B(self.get_file(
                 "public/css/admin/styles.css",
-                ContentType(
-                    mime::TEXT_PLAIN_UTF_8,
-                ),
+                ContentType(mime::TEXT_CSS),
             )),
             (&Method::Post, "/facebook-ads/admin/ads") => Either::B(self.auth(
                 req,
                 |request| self.mark_ad(request),
             )),
             // Public
-            (&Method::Get, "/facebook-ads/") => Either::B(self.get_file(
-                "public/index.html",
-                ContentType::html(),
-            )),
+            (&Method::Get, "/facebook-ads/") => Either::B(self.lock_down(req, || {
+                self.get_file("public/index.html", ContentType::html())
+            })),
             (&Method::Get, "/facebook-ads/index.js") => Either::B(self.get_file(
                 "public/dist/index.js",
                 ContentType(mime::TEXT_JAVASCRIPT),
@@ -100,8 +99,20 @@ impl Service for AdServer {
             )),
             (&Method::Get, "/facebook-ads/styles.css") => Either::B(self.get_file(
                 "public/css/styles.css",
-                ContentType(mime::TEXT_PLAIN_UTF_8),
+                ContentType(mime::TEXT_CSS),
             )),
+            (&Method::Get, "/facebook-ads/locales/en/translation.json") => Either::B(
+                self.get_file(
+                    "public/locales/en/translation.json",
+                    ContentType::json(),
+                ),
+            ),
+            (&Method::Get, "/facebook-ads/locales/de/translation.json") => Either::B(
+                self.get_file(
+                    "public/locales/de/translation.json",
+                    ContentType::json(),
+                ),
+            ),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
@@ -122,6 +133,38 @@ impl Service for AdServer {
 // method that works. I should ask on stack overflow or something.
 type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
 impl AdServer {
+    // We're not ready for US audiences
+    fn lock_down<F>(&self, req: Request, callback: F) -> ResponseFuture
+    where
+        F: Fn() -> ResponseFuture,
+    {
+        println!(
+            "{:?}",
+            req.query().and_then(|q| {
+                form_urlencoded::parse(q.as_bytes())
+                    .filter(|pair| pair.0 == Cow::Borrowed("lang"))
+                    .map(|pair| pair.1.to_string())
+                    .nth(0)
+            })
+        );
+
+        if Some(String::from("de-DE")) ==
+            req.query().and_then(|q| {
+                form_urlencoded::parse(q.as_bytes())
+                    .filter(|pair| pair.0 == Cow::Borrowed("lang"))
+                    .map(|pair| pair.1.to_string())
+                    .nth(0)
+            })
+        {
+            callback()
+        } else {
+            Box::new(future::ok(
+                Response::new().with_status(StatusCode::Unauthorized),
+            ))
+        }
+    }
+
+
     fn auth<F>(&self, req: Request, callback: F) -> ResponseFuture
     where
         F: Fn(Request) -> ResponseFuture,
@@ -193,15 +236,20 @@ impl AdServer {
         let pool = self.pool.clone();
         let future = pool.spawn_fn(move || {
             if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-                if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool) {
+                let search = req.query().and_then(|q| {
+                    form_urlencoded::parse(q.as_bytes())
+                        .filter(|pair| pair.0 == Cow::Borrowed("search"))
+                        .map(|pair| pair.1.to_string())
+                        .nth(0)
+                });
+                if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool, search) {
                     if let Ok(serialized) = serde_json::to_string(&ads) {
                         return Ok(
                             Response::new()
                                 .with_header(ContentLength(serialized.len() as u64))
-                                .with_header(Vary::Items(vec![
-                                    Ascii::new("Accept-Encoding".to_owned()),
-                                    Ascii::new("Accept-Language".to_owned()),
-                                ]))
+                                .with_header(
+                                    Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]),
+                                )
                                 .with_header(ContentType::json())
                                 .with_body(serialized),
                         );

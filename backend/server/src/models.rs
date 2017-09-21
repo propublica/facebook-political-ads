@@ -4,6 +4,7 @@ use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
+use diesel_full_text_search::*;
 use errors::*;
 use futures::{Future, stream, Stream};
 use futures_cpupool::CpuPool;
@@ -13,7 +14,7 @@ use hyper_tls::HttpsConnector;
 use kuchiki;
 use kuchiki::iter::{Select, Elements, Descendants};
 use kuchiki::traits::*;
-use reqwest::Url;
+use url::Url;
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::{default_tls_client, Region};
@@ -276,16 +277,22 @@ impl Ad {
     pub fn get_ads_by_lang(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
+        search: Option<String>,
     ) -> Result<Vec<Ad>> {
         use schema::ads::dsl::*;
         let connection = conn.get()?;
-        let res = ads.filter(lang.eq(language))
+        let mut query = ads.filter(lang.eq(language))
             .filter(political_probability.gt(0.90))
             .filter(suppressed.eq(false))
-            .order(created_at.desc())
-            .limit(200)
-            .load::<Ad>(&*connection)?;
-        Ok(res)
+            .into_boxed();
+
+        if search.is_some() {
+            query = query.filter(to_tsvector(html).matches(plainto_tsquery(search.unwrap())));
+        }
+
+        Ok(query.order(created_at.desc()).limit(50).load::<Ad>(
+            &*connection,
+        )?)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
