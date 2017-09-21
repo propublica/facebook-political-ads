@@ -88,7 +88,6 @@ i18next
   .use(LanguageDetector)
   .init({
     fallbackLng: 'en',
-    whitelist: ['en', 'de'],
     backend: {
       loadPath: '/facebook-ads/locales/{{lng}}/{{ns}}.json'
     },
