@@ -309,9 +309,24 @@ const Onboarding = ({onAcceptClick}) => (
   </div>
 );
 
-let Dispatcher = ({terms, onAcceptClick}) => {
+let Language = ({ onAccept }) => (
+  <div id="language">
+    <p>
+      Your browser thinks you speak <select id="lang">{}</select> and live in
+      <select id="country">{}</select>.
+    </p>
+    <p>If that is correct please click ok, otherwise change it via the pulldowns and click ok.</p>
+    <input type="submit" />
+  </div>
+);
+
+let Dispatcher = ({terms, lang, onAcceptClick}) => {
   if(terms) {
-    return <Toggler />;
+    if(lang) {
+      return <Toggler />;
+    } else {
+      return <Language />;
+    }
   } else {
     return <Onboarding onAcceptClick={onAcceptClick}/>;
   }
@@ -324,7 +339,7 @@ const dispatchToProps = (dispatch) => ({
 });
 
 Dispatcher = connect(
-  (state) => ({terms: state.terms}),
+  (state) => ({terms: state.terms, lang: state.lang}),
   dispatchToProps
 )(Dispatcher);
 
