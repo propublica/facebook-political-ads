@@ -361,10 +361,10 @@ header h4 {
 }
 
 .ad {
-  width: 100%;
+  width: 35rem;
   border-radius: 0.3rem;
   border: 0.01rem solid #ddd;
-  margin: 0.5rem 0;
+  margin: 0.5rem auto;
   padding: 0.5rem;
   transition: box-shadow 0.2s;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
@@ -395,7 +395,6 @@ header h4 {
 
 .ad .chiclet img {
   max-width: 15rem;
-  min-width: 6rem;
 }
 
 .ad-content a {
@@ -414,6 +413,24 @@ header h4 {
   line-height: 1.5;
   font-weight: 200;
 }
+
+.targeting, .images {
+  clear: left;
+}
+
+.images {
+  border-top: 1px solid #ddd;
+  overflow-x: scroll;
+  white-space: nowrap;
+  padding: 1rem;
+}
+
+.images img {
+  max-height: 249px;
+  display: inline;
+  margin-right: 1rem;
+}
+
 .targeting h3 {
   text-align: left;
   border-top: 1px solid #ddd;

@@ -40,7 +40,7 @@ const killImages = (html) => {
 };
 
 const Ad = ({ ad }) => (
-  <div className="ad">
+  <div className="ad cf">
     <div className="adcontainer">
       <div className="chiclet">
         {ad.thumbnail ? <img src={ad.thumbnail} /> : ''}
@@ -50,17 +50,22 @@ const Ad = ({ ad }) => (
         <div className="content" dangerouslySetInnerHTML={{__html: killImages(ad.message) }} />
       </div>
     </div>
+    {ad.images.length > 0 ?
+      <div className="images">
+        {ad.images.map((src) => <img src={src} key={src} />)}
+      </div> :
+      ''}
     {ad.targeting ?
       <div className="targeting">
         <h3>{t("targeting")}</h3>
         <div dangerouslySetInnerHTML={{__html: cleanTargeting(ad.targeting) }} />
       </div> :
-    ''}
+      ''}
   </div>
 );
 
 let App = ({ads, onKeyUp}) => (
-  <div id="graphic">
+  <div id="app0">
     <h1>{t("title")}</h1>
     <h2 className="toph2">{t("slug")}</h2>
     <p className="byline">{t("by")} Jeff Larson {t("and")} Julia Angwin, ProPublica, September 22, 2017</p>
