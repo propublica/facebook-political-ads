@@ -31,10 +31,14 @@ const NEW_RATINGS = "new_ratings";
 const UPDATE_AD = "update_ad";
 const UPDATE_RATING = "update_rating";
 const SET_LANGUAGE = "set_language";
+const SET_COUNTRY = "set_country";
+const ACCEPT_LANGUAGE = "accept_locale";
 
 // Actions
 const setLanguage = (language) => ({ type: SET_LANGUAGE, language });
+const setCountry = (country) => ({ type: SET_COUNTRY, country });
 const acceptTerms = () => ({ type: ACCEPT_TERMS });
+const acceptLanguage = () => ({ type: ACCEPT_LANGUAGE });
 const toggle = (value) => ({ type: TOGGLE_TAB, value });
 const newAds = (ads) => ({
   type: NEW_ADS,
@@ -54,7 +58,7 @@ const updateRating = (id, rating) => ({
   id: id,
   value: rating
 });
-const rateAd = (ad, rating, update) => {
+const rateAd = (ad, rating, update, language) => {
   return (dispatch) => {
     let body = {
       ...adForRequest(ad),
@@ -62,7 +66,7 @@ const rateAd = (ad, rating, update) => {
     };
     dispatch(update(ad.id, rating));
     let cb = () => ({});
-    return sendAds([body]).then(cb, cb);
+    return sendAds([body], language).then(cb, cb);
   };
 };
 
@@ -118,10 +122,16 @@ const terms = (state = false, action) => {
   }
 };
 
-const language = (state = null, action) => {
+const browserLanguage = navigator.language.split("-")[0];
+const browserCountry = navigator.language.split("-")[1];
+const language = (state = { language: browserLanguage, country: browserCountry }, action) => {
   switch(action.type) {
   case SET_LANGUAGE:
-    return action.language;
+    return { ...state, language: action.language };
+  case SET_COUNTRY:
+    return { ...state, country: action.country };
+  case ACCEPT_LANGUAGE:
+    return { ...state, accepted: true };
   default:
     return state;
   }
@@ -132,7 +142,8 @@ const reducer = combineReducers({
   active,
   ads: buildUpdate("ad"),
   ratings: buildUpdate("rating"),
-  terms
+  terms,
+  language
 });
 
 let middleware = [thunkMiddleware];
@@ -257,9 +268,9 @@ let Ads = ({ads, onAdClick}) => (
 const adStateToProps = (state) => ({
   ads: insertAdFields(getUnratedRatings(state.ads))
 });
-const adDispatchToProps = (dispatch) => ({
+const adDispatchToProps = (dispatch, getState) => ({
   onAdClick: (id, rating) => {
-    dispatch(rateAd(id, rating, updateAd));
+    dispatch(rateAd(id, rating, updateAd, getState().language));
   }
 });
 Ads = connect(
@@ -299,61 +310,104 @@ let Toggler = ({ads, ratings, active, onToggleClick}) => (
     </div>
   </div>
 );
-
 const togglerDispatchToProps = (dispatch) => ({
   onToggleClick: (type) => {
     dispatch(toggle(type));
   }
 });
-
 Toggler = connect(
   (state) => (state),
   togglerDispatchToProps
 )(Toggler);
 
+let SelectLanguage = ({ language, onChange }) => (
+  <select value={language} onChange={onChange}>
+    {langs.all().map((lang) => (
+      <option id="language" key={lang["1"]} value={lang["1"]}>
+        {lang["name"]} / {lang["local"]}
+      </option>
+    ))}
+  </select>
+);
+const selectLanguageDispatchToProps = (dispatch) => ({
+  onChange: (e) => {
+    dispatch(setLanguage(e.target.value));
+  }
+});
+SelectLanguage = connect(
+  (state) => state.language,
+  selectLanguageDispatchToProps
+)(SelectLanguage);
+
+let SelectCountry = ({ language, country, onChange }) => {
+  let lang = language;
+  let keys = Object.keys(countries.getNames(language));
+  if(keys.length === 0) {
+    keys = Object.keys(countries.getNames('en'));
+    lang = 'en';
+  }
+  return (<select id="country" value={country} onChange={onChange}>
+    {keys.map((country) => (
+      <option key={country} value={country}>
+        {countries.getName(country, lang)}
+      </option>
+    ))}
+  </select>);
+};
+const selectCountryDispatchToProps = (dispatch) => ({
+  onChange: (e) => {
+    dispatch(setCountry(e.target.value));
+  }
+});
+SelectCountry = connect(
+  (state) => state.language,
+  selectCountryDispatchToProps
+)(SelectCountry);
+
+let Language = ({ onAcceptLang }) => (
+  <form id="language" onSubmit={onAcceptLang}>
+    <div>
+      <h2>Your language settings</h2>
+      <p>
+        Your browser thinks you speak <b>{langs.where('1', browserLanguage).local}</b> and live in <b>{countries.getName(browserCountry, browserLanguage) || countries.getName(browserCountry, 'en')}</b>.
+      </p>
+      <p>
+        <label htmlFor="language">Language: </label><SelectLanguage />
+        <label htmlFor="country">Country: </label><SelectCountry />
+      </p>
+      <p>If these settings are correct please click ok, otherwise change it via the pulldowns and
+      click ok.</p>
+    </div>
+    <div>
+      <input className="button" type="submit" value="Ok" />
+    </div>
+  </form>
+);
+const languageDispatchToProps = (dispatch) => ({
+  onAcceptLang: (e) => {
+    e.preventDefault();
+    dispatch(acceptLanguage());
+  }
+});
+Language = connect(
+  (state) => state.language,
+  languageDispatchToProps
+)(Language);
+
 const Onboarding = ({onAcceptClick}) => (
   <div id="tos">
     <div id="terms" dangerouslySetInnerHTML={{__html:getMessage("terms_of_service")}} />
     <div id="accept-box">
-      <button id="accept" onClick={function(){ return onAcceptClick(); }}>
+      <button id="accept" onClick={onAcceptClick}>
         Accept
       </button>
     </div>
   </div>
 );
 
-const Languages = () => (
-  <select id="language">
-    {langs.all().map(lang) => (<></option>)}
-  </select>
-);
-
-
-let Language = ({ onAcceptLang }) => (
-  <form id="language" onSubmit={onAcceptLang}>
-    <h2>Please check that your language settings are correct.</h2>
-    <p>
-      Your browser thinks you speak <select id="lang">{}</select> and live in
-      <select id="country">{}</select>.
-    </p>
-    <p>If that is correct please click ok, otherwise change it via the pulldowns and click ok.</p>
-    <input type="submit" />
-  </form>
-);
-const languageDispatchToProps = (dispatch) => ({
-  onAcceptLang: (type) => {
-    dispatch(setLanguage(type));
-  }
-});
-
-Language = connect(
-  (state) => state,
-  languageDispatchToProps
-)(Language);
-
-let Dispatcher = ({terms, lang, onAcceptClick}) => {
+let Dispatcher = ({terms, language, onAcceptClick}) => {
   if(terms) {
-    if(lang) {
+    if(language.accepted) {
       return <Toggler />;
     } else {
       return <Language />;
@@ -364,13 +418,14 @@ let Dispatcher = ({terms, lang, onAcceptClick}) => {
 };
 
 const dispatchToProps = (dispatch) => ({
-  onAcceptClick: () => {
+  onAcceptClick: (e) => {
+    e.preventDefault();
     dispatch(acceptTerms());
   }
 });
 
 Dispatcher = connect(
-  (state) => ({terms: state.terms, lang: state.lang}),
+  (state) => state,
   dispatchToProps
 )(Dispatcher);
 
@@ -389,7 +444,7 @@ store.subscribe(() => updateBadge(store.getState().ratings || []));
 
 // Refresh our ads by first filtering out ones the user has seen, and then merging like with
 // ratings.
-getAds((resp) => {
+getAds(store.getState().language, (resp) => {
   const set = new Set();
   getUnratedRatings(store.getState().ratings).map((rating) => set.add(rating.id));
   store.dispatch(newAds(resp.filter((ad) => !set.has(ad.id))));
