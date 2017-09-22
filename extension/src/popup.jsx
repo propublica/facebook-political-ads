@@ -5,6 +5,8 @@ import { Provider, connect } from 'preact-redux';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
 import { sendAds, getAds, updateBadge, adForRequest } from 'utils.js';
+import langs from 'langs';
+import countries from 'i18n-iso-countries';
 // styles
 import "../css/styles.css";
 
@@ -28,8 +30,10 @@ const NEW_ADS = "new_ads";
 const NEW_RATINGS = "new_ratings";
 const UPDATE_AD = "update_ad";
 const UPDATE_RATING = "update_rating";
+const SET_LANGUAGE = "set_language";
 
 // Actions
+const setLanguage = (language) => ({ type: SET_LANGUAGE, language });
 const acceptTerms = () => ({ type: ACCEPT_TERMS });
 const toggle = (value) => ({ type: TOGGLE_TAB, value });
 const newAds = (ads) => ({
@@ -109,6 +113,15 @@ const terms = (state = false, action) => {
   switch(action.type) {
   case ACCEPT_TERMS:
     return true;
+  default:
+    return state;
+  }
+};
+
+const language = (state = null, action) => {
+  switch(action.type) {
+  case SET_LANGUAGE:
+    return action.language;
   default:
     return state;
   }
@@ -309,16 +322,34 @@ const Onboarding = ({onAcceptClick}) => (
   </div>
 );
 
-let Language = ({ onAccept }) => (
-  <div id="language">
+const Languages = () => (
+  <select id="language">
+    {langs.all().map(lang) => (<></option>)}
+  </select>
+);
+
+
+let Language = ({ onAcceptLang }) => (
+  <form id="language" onSubmit={onAcceptLang}>
+    <h2>Please check that your language settings are correct.</h2>
     <p>
       Your browser thinks you speak <select id="lang">{}</select> and live in
       <select id="country">{}</select>.
     </p>
     <p>If that is correct please click ok, otherwise change it via the pulldowns and click ok.</p>
     <input type="submit" />
-  </div>
+  </form>
 );
+const languageDispatchToProps = (dispatch) => ({
+  onAcceptLang: (type) => {
+    dispatch(setLanguage(type));
+  }
+});
+
+Language = connect(
+  (state) => state,
+  languageDispatchToProps
+)(Language);
 
 let Dispatcher = ({terms, lang, onAcceptClick}) => {
   if(terms) {
