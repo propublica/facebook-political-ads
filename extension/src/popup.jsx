@@ -4,7 +4,7 @@ import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
-import { sendAds, getAds, updateBadge, adForRequest } from 'utils.js';
+import { sendAds, getAds, updateBadge, adForRequest, getBrowserLocale } from 'utils.js';
 import langs from 'langs';
 import countries from 'i18n-iso-countries';
 // styles
@@ -122,9 +122,9 @@ const terms = (state = false, action) => {
   }
 };
 
-const browserLanguage = navigator.language.split("-")[0];
-const browserCountry = navigator.language.split("-")[1];
-const language = (state = { language: browserLanguage, country: browserCountry }, action) => {
+
+const browserLocale = getBrowserLocale();
+const language = (state = browserLocale, action) => {
   switch(action.type) {
   case SET_LANGUAGE:
     return { ...state, language: action.language };
@@ -369,7 +369,15 @@ let Language = ({ onAcceptLang }) => (
     <div>
       <h2>Your language settings</h2>
       <p>
-        Your browser thinks you speak <b>{langs.where('1', browserLanguage).local}</b> and live in <b>{countries.getName(browserCountry, browserLanguage) || countries.getName(browserCountry, 'en')}</b>.
+        Your browser thinks you speak
+        <b>
+          {langs.where('1', browserLocale.langauge).local || 'Unknown Country' }
+        </b>
+        and live in
+        <b>
+          {countries.getName(browserLocale.country, browserLocale.language) ||
+           countries.getName(browserLocale.country, 'en') || 'Unknown Language' }
+        </b>.
       </p>
       <p>
         <label htmlFor="language">Language: </label><SelectLanguage />
