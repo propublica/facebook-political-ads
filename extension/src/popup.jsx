@@ -370,14 +370,14 @@ let Language = ({ onAcceptLang }) => (
     <div>
       <h2>Your language settings</h2>
       <p>
-        Your browser thinks you speak
+        Your browser thinks you speak&nbsp;
         <b>
-          {langs.where('1', browserLocale.langauge).local || 'Unknown Country' }
+          {langs.where('1', browserLocale.language).local || 'Unknown Language' }
         </b>
-        and live in
+        &nbsp;and live in&nbsp;
         <b>
           {countries.getName(browserLocale.country, browserLocale.language) ||
-           countries.getName(browserLocale.country, 'en') || 'Unknown Language' }
+           countries.getName(browserLocale.country, 'en') || 'Unknown Country' }
         </b>.
       </p>
       <p>
