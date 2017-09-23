@@ -65,10 +65,10 @@ const Ad = ({ ad }) => (
 );
 
 let App = ({ads, onKeyUp}) => (
-  <div id="app0">
+  <div id="app">
     <h1>{t("title")}</h1>
-    <h2 className="toph2">{t("slug")}</h2>
-    <p className="byline">{t("by")} Jeff Larson {t("and")} Julia Angwin, ProPublica, September 22, 2017</p>
+    <h2>{t("slug")}</h2>
+    <p id="byline">{t("by")} Jeff Larson {t("and")} Julia Angwin, ProPublica, September 22, 2017</p>
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
     <input id="search" placeholder={t("search")} onKeyUp={onKeyUp} />
     <div id="ads">
