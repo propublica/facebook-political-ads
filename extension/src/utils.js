@@ -50,7 +50,7 @@ const updateBadge = (ratings) => {
 
 const getBrowserLocale = () => ({
   language: navigator.language.split("-")[0],
-  contry: navigator.language.split("-")[1]
+  country: navigator.language.split("-")[1]
 });
 
 export { sendAds, getAds, mergeAds, updateBadge, adForRequest, getBrowserLocale };
