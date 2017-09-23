@@ -82,7 +82,7 @@ b {
 }
 
 p {
-  max-width: 36rem;
+  max-width: 35rem;
   margin: 0 auto;
   line-height: 1.5;
   padding: 0 1rem;
@@ -215,9 +215,9 @@ header li.donate {
 }
 
 header li.donate a {
-  display: inline-block;
+  display: block;
   font-size: 0.9rem;
-  margin-top: -0.6rem;
+  margin-top: -0.5rem;
   color: #fff;
   background-color: #be4751;
   padding: 0.35rem 0.55rem;
@@ -354,14 +354,4 @@ header ul {
   border-top: 1px solid #ddd;
   margin-bottom: 0;
   font-weight: bold;
-}
-
-@media only screen and (min-device-width: 320px) and (max-device-width: 568px) {
-  h1 {
-    font-size: 2rem;
-  }
-
-  header ul {
-    display: none;
-  }
 }
