@@ -40,7 +40,7 @@ const killImages = (html) => {
 };
 
 const Ad = ({ ad }) => (
-  <div className="ad cf">
+  <div className="message">
     <div className="adcontainer">
       <div className="chiclet">
         {ad.thumbnail ? <img src={ad.thumbnail} /> : ''}
