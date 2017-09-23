@@ -48,4 +48,9 @@ const updateBadge = (ratings) => {
   }
 };
 
-export { sendAds, getAds, mergeAds, updateBadge, adForRequest };
+const getBrowserLocale = () => ({
+  language: navigator.language.split("-")[0],
+  contry: navigator.language.split("-")[1]
+});
+
+export { sendAds, getAds, mergeAds, updateBadge, adForRequest, getBrowserLocale };
