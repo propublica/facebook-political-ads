@@ -17,6 +17,5 @@ chrome.runtime.onMessage.addListener((ads) => {
   } catch(e) {
     console.log(e);
   }
-
 });
 chrome.browserAction.setBadgeBackgroundColor({color: "#0099E6"});
