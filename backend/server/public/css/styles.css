@@ -82,7 +82,7 @@ b {
 }
 
 p {
-  max-width: 35rem;
+  max-width: 36rem;
   margin: 0 auto;
   line-height: 1.5;
   padding: 0 1rem;
@@ -197,6 +197,7 @@ header {
   background-color: #304154;
   margin-bottom: 1.5rem;
   display: flow-root;
+  min-height: 3rem;
 }
 
 header li, header nav {
@@ -275,11 +276,11 @@ header ul {
   width: 100%;
 }
 
-.ad:hover {
+.message:hover {
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.18);
 }
 
-.ad {
+.message {
   max-width: 33rem;
   border: 0.01rem solid #999;
   margin: 0.5rem auto;
@@ -288,33 +289,33 @@ header ul {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
 }
 
-.adcontainer {
+.container {
   display: flow-root;
 }
 
-.ad .display div, #graphic .ad .display p, .ad .targeting div {
+.message .display div, #graphic .message .display p, .message .targeting div {
   text-align: left;
   width: 100%;
   margin: 0;
   padding: 0.1rem 0;
 }
 
-.ad .display .title {
+.message .display .title {
   font-weight: bold;
   font-size: 1rem;
   padding-top: 0;
 }
 
-.ad .chiclet {
+.message .chiclet {
   float: left;
   margin-right: 0.4rem;
 }
 
-.ad .chiclet img {
+.message .chiclet img {
   max-width: 15rem;
 }
 
-.ad-content a {
+.container a {
   pointer-events: none;
   cursor: default;
   color: #1f5881;
@@ -354,4 +355,14 @@ header ul {
   border-top: 1px solid #ddd;
   margin-bottom: 0;
   font-weight: bold;
+}
+
+@media only screen and (min-device-width: 320px) and (max-device-width: 568px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  header ul {
+    display: none;
+  }
 }
