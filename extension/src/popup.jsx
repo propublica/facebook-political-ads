@@ -94,7 +94,8 @@ const mergeAds = (ads, newAds) => {
   });
   return Array.from(ids.values())
     .sort((a, b) => a.id > b.id ? 1 : -1)
-    .sort((a) => a.rating === RatingType.POLITICAL ? 1 : -1);
+    .sort((a) => a.rating === RatingType.POLITICAL ? 1 : -1)
+    .slice(0, 100);
 };
 
 const buildUpdate = (type) => ((state = [], action) => {
