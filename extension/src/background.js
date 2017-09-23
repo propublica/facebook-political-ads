@@ -1,10 +1,10 @@
-import { sendAds, mergeAds, updateBadge, adForRequest } from "utils.js";
+import { sendAds, mergeAds, updateBadge, adForRequest, getBrowserLocale } from "utils.js";
 
 chrome.runtime.onMessage.addListener((ads) => {
   if(!localStorage.getItem("redux")) return;
   try {
     const store = JSON.parse(localStorage.getItem("redux"));
-    if(!store.terms || !store.language || !store.language.accepted) return;
+    if(!store.terms) return;
     let saved = new Set();
     store.ratings.map((ad) => saved.add(ad.id));
     store.ratings = mergeAds(store.ratings || [], ads);
@@ -13,7 +13,7 @@ chrome.runtime.onMessage.addListener((ads) => {
     const saving = ads.filter((ad) => !saved.has(ad.id)).map(adForRequest);
     const success = () => console.log("saved");
     const failure = (e) => console.log(e);
-    if(saving.length > 0) sendAds(saving, store.language).then(success, failure);
+    if(saving.length > 0) sendAds(saving, store.language || getBrowserLocale()).then(success, failure);
   } catch(e) {
     console.log(e);
   }
