@@ -4,9 +4,14 @@ Usage: python build_classifier.py [config_file]
 
 Builds and writes model for classifying political vs. not-political.
 
-When run with "run_eval" option, compares performance of
-several different models.
+Usage: python build_classifier.py [EVAL|BUILD|CLASSIFY] [config_filename]
+Supported modes:
+    EVAL: Compare classifier performance
+    BUILD: Create model and write to model file specified in config
+    CLASSIFY: Write results of prediction to psql at env[DATABASE_URL]
+              using model from model_filename
 """
+import dill
 import itertools
 import json
 import os
@@ -61,14 +66,14 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
 
 def dump_classifier(filename, clf):
     """Write classifier out to disk."""
-    model = {}
-    model['feature_log_prob'] = list(itertools.chain(*classifier.feature_log_prob_.tolist()))
-    model['class_log_prior'] = classifier.class_log_prior_.tolist()
-    model['n_features'] = config['n_features']
-    model['n_classes'] = 2
+    #model = {}
+    #model['feature_log_prob'] = list(itertools.chain(*classifier.feature_log_prob_.tolist()))
+    #model['class_log_prior'] = classifier.class_log_prior_.tolist()
+    #model['n_features'] = config['n_features']
+    #model['n_classes'] = 2
     
-    with open(filename, 'w') as f:
-        json.dump(model, f)
+    with open(filename, 'wb') as f:
+        dill.dump(clf, f)
     print('Dumped model to file ' + filename)
 
 def load_ads_from_psql(database_url, lang):
@@ -93,24 +98,64 @@ def load_ads_from_psql(database_url, lang):
         data.append((doc.get_text(" "), score))
     return data
 
+def write_predictions_to_psql(database_url, lang, model_filename, vectorizer):
+    with open(model_filename, 'rb') as f:
+        clf = dill.load(f)
+
+    conn = psycopg2.connect(database_url)
+    cur = conn.cursor('select-cursor', withhold=True)
+    cur.itersize = 1000000
+
+    updatecur = conn.cursor()
+
+    cur.execute("select id, html from ads where lang = %s", (lang,))
+
+    cnt = 0
+    for pid, html in cur:
+        cnt += 1
+        doc = BeautifulSoup(html, "html.parser")
+        text = doc.get_text(" ")
+        transformed_text = vectorizer.transform([text])
+        pol_score = clf.predict_proba(transformed_text)[0][1]
+        updatecur.execute("UPDATE ads SET political_probability=%s WHERE id=%s", (pol_score, pid))
+        if cnt % 1000 == 0:
+            print(str(cnt) + ' ads processed out of ' + str(cur.rowcount))
+            conn.commit()
+
+    conn.commit()
+    conn.close()
+
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        print('No config file provided!')
-        print('Usage: python build_classifier.py [config_filename]')
+    if len(sys.argv) < 3 or sys.argv[1] not in ['EVAL', 'BUILD', 'CLASSIFY']:
+        print('No config file or mode provided!')
+        print('Usage: python build_classifier.py [EVAL|BUILD|CLASSIFY] [config_filename]')
+        print('Supported modes:')
+        print('EVAL: Compare classifier performance')
+        print('BUILD: Create model and write to model file specified in config')
+        print('CLASSIFY: Write results of prediction to psql at env[DATABASE_URL],')
+        print(' using model from model_filename')
         exit()
 
-    with open(sys.argv[1], 'r') as f:
+    with open(sys.argv[2], 'r') as f:
         config = json.load(f)
 
-    with open(config['input_filename']) as f:
+    model_filename = config['model_filename']
+
+    if sys.argv[1] == 'CLASSIFY':
+        vectorizer = HashingVectorizer(alternate_sign=False, n_features=config['n_features'])
+        write_predictions_to_psql(os.environ["DATABASE_URL"], config["language"],
+                                  model_filename, vectorizer)
+        exit()
+
+    with open(config['seed_filename']) as f:
         posts = json.load(f)
 
     data = [(item, 1.0) for item in posts['political']]
-    print("seed length %s" % len(data))
+    print("seed length: %s" % len(data))
     if config["read_from_psql"]:
         data.extend(load_ads_from_psql(os.environ["DATABASE_URL"], config["language"]))
 
-    print("With data %s" % len(data))
+    print("num unique samples: %s" % len(data))
     train, test = train_test_split(data)
     X_train, Y_train = zip(*train)
     X_test, Y_test = zip(*test)
@@ -120,21 +165,27 @@ if __name__ == '__main__':
     X_test = vectorizer.transform(X_test)
     X_train, Y_train = equalize_classes(X_train, Y_train)
 
-    print("Final size: %s" % X_train.shape[0])
+    print("final size of training data: %s" % X_train.shape[0])
 
-    if config['run_eval']:
+    if sys.argv[1] == 'EVAL':
         eval_classifiers(X_train, Y_train, X_test, Y_test)
-
-    if not config['classifier_type']:
-        print('Need to specify model class.')
-        print('Currently supported:')
-        print('MultinomialNB, BernoulliNB, Logisticregression')
         exit()
 
-    classifier = CLASSIFIERS[config['classifier_type']]
-    classifier.fit(X_train.todense(), Y_train)
-    preds = classifier.predict(X_test.todense())
-    print(classification_report(Y_test, preds))
+    if sys.argv[1] == 'BUILD':
+        if not config['classifier_type']:
+            print('Need to specify model class.')
+            print('Currently supported:')
+            print('MultinomialNB, BernoulliNB, Logisticregression')
+            exit()
 
-    model_filename = config['output_filename']
-    dump_classifier(model_filename, classifier)
+        classifier = CLASSIFIERS[config['classifier_type']]
+        classifier.fit(X_train.todense(), Y_train)
+        preds = classifier.predict(X_test.todense())
+        print(classification_report(Y_test, preds))
+
+        dump_classifier(model_filename, classifier)
+        exit()
+
+    if sys.argv[1] == 'CLASSIFY':
+        write_predictions_to_psql(os.environ["DATABASE_URL"], config["language"],
+                                  model_filename, vectorizer)
