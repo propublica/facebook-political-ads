@@ -40,8 +40,8 @@ const killImages = (html) => {
 };
 
 const Ad = ({ ad }) => (
-  <div className="ad">
-    <div className="adcontainer">
+  <div className="message cf">
+    <div className="container">
       <div className="chiclet">
         {ad.thumbnail ? <img src={ad.thumbnail} /> : ''}
       </div>
@@ -50,20 +50,25 @@ const Ad = ({ ad }) => (
         <div className="content" dangerouslySetInnerHTML={{__html: killImages(ad.message) }} />
       </div>
     </div>
+    {ad.images.length > 0 ?
+      <div className="images">
+        {ad.images.map((src) => <img src={src} key={src} />)}
+      </div> :
+      ''}
     {ad.targeting ?
       <div className="targeting">
         <h3>{t("targeting")}</h3>
         <div dangerouslySetInnerHTML={{__html: cleanTargeting(ad.targeting) }} />
       </div> :
-    ''}
+      ''}
   </div>
 );
 
 let App = ({ads, onKeyUp}) => (
-  <div id="graphic">
+  <div id="app">
     <h1>{t("title")}</h1>
-    <h2 className="toph2">{t("slug")}</h2>
-    <p className="byline">{t("by")} Jeff Larson {t("and")} Julia Angwin, ProPublica, September 22, 2017</p>
+    <h2>{t("slug")}</h2>
+    <p id="byline">{t("by")} Jeff Larson {t("and")} Julia Angwin, ProPublica, September 22, 2017</p>
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
     <input id="search" placeholder={t("search")} onKeyUp={onKeyUp} />
     <div id="ads">
@@ -88,7 +93,6 @@ i18next
   .use(LanguageDetector)
   .init({
     fallbackLng: 'en',
-    whitelist: ['en', 'de'],
     backend: {
       loadPath: '/facebook-ads/locales/{{lng}}/{{ns}}.json'
     },

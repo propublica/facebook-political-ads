@@ -166,25 +166,19 @@ Ads = connect(
   })
 )(Ads);
 
-let Login = ({onLogin}) => (
-  <form id="login" onSubmit={onLogin} >
-    <input id="email" type="text" placeholder="email" />
-    <input id="password" type="password" placeholder="password" />
+let Login = ({ dispatch }) => {
+  let email, password;
+  const onLogin = (e) => {
+    e.preventDefault();
+    dispatch(authorize(email.value, password.value));
+  };
+  return <form id="login" onSubmit={onLogin} >
+    <input id="email" type="text" ref={(node) => email = node } placeholder="email" />
+    <input id="password" type="password" ref={(node) => password = node } placeholder="password" />
     <input id="submit" type="submit" value="login" />
-  </form>
-);
-Login = connect(
-  (state) => state,
-  (dispatch) => ({
-    onLogin: (e) => {
-      e.preventDefault();
-      dispatch(authorize(
-        e.target.querySelector("#email").value,
-        e.target.querySelector("#password").value
-      ));
-    }
-  })
-)(Login);
+  </form>;
+};
+Login = connect()(Login);
 
 let App = ({credentials}) => (
   <div id="app">
