@@ -59,10 +59,44 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
     plt.legend()
     plt.savefig("out.png")
 
+def dump_classifier(filename, clf):
+    """Write classifier out to disk."""
+    model = {}
+    model['feature_log_prob'] = list(itertools.chain(*classifier.feature_log_prob_.tolist()))
+    model['class_log_prior'] = classifier.class_log_prior_.tolist()
+    model['n_features'] = config['n_features']
+    model['n_classes'] = 2
+    
+    with open(filename, 'w') as f:
+        json.dump(model, f)
+    print('Dumped model to file ' + filename)
+
+def load_ads_from_psql(database_url, lang):
+    conn = psycopg2.connect(database_url)
+    cur = conn.cursor()
+    cur.execute("""
+      select
+        html,
+        political::float / (political::float + not_political::float) as political
+      from ads
+        where lang = %s
+        and (political + not_political) > 0;
+     """, (lang, ))
+
+    data = []
+    for html, score in cur:           
+        doc = BeautifulSoup(html, "html.parser")
+        if score > 0.5:
+            score = 1.0
+        else:
+            score = 0.0
+        data.append((doc.get_text(" "), score))
+    return data
+
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('No config file provided!')
-        print('Usage: python run_classifier.py [config_filename]')
+        print('Usage: python build_classifier.py [config_filename]')
         exit()
 
     with open(sys.argv[1], 'r') as f:
@@ -74,24 +108,7 @@ if __name__ == '__main__':
     data = [(item, 1.0) for item in posts['political']]
     print("seed length %s" % len(data))
     if config["read_from_psql"]:
-        conn = psycopg2.connect(os.environ["DATABASE_URL"])
-        cur = conn.cursor()
-        cur.execute("""
-          select
-            html,
-            political::float / (political::float + not_political::float) as political
-          from ads
-            where lang = %s
-            and (political + not_political) > 0;
-         """, (config["language"], ))
-        for row in cur:
-            html, score = row
-            doc = BeautifulSoup(html, "html.parser")
-            if score > 0.5:
-                score = 1.0
-            else:
-                score = 0.0
-            data.append((doc.get_text(" "), score))
+        data.extend(load_ads_from_psql(os.environ["DATABASE_URL"], config["language"]))
 
     print("With data %s" % len(data))
     train, test = train_test_split(data)
@@ -119,13 +136,5 @@ if __name__ == '__main__':
     preds = classifier.predict(X_test.todense())
     print(classification_report(Y_test, preds))
 
-    model = {}
-    model['feature_log_prob'] = list(itertools.chain(*classifier.feature_log_prob_.tolist()))
-    model['class_log_prior'] = classifier.class_log_prior_.tolist()
-    model['n_features'] = config['n_features']
-    model['n_classes'] = 2
-
     model_filename = config['output_filename']
-    with open(model_filename, 'w') as f:
-        json.dump(model, f)
-    print('Dumped model to file ' + model_filename)
+    dump_classifier(model_filename, classifier)
