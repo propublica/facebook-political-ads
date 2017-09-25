@@ -65,13 +65,6 @@ def eval_classifiers(X_train, Y_train, X_test, Y_test):
     plt.savefig("out.png")
 
 def dump_classifier(filename, clf):
-    """Write classifier out to disk."""
-    #model = {}
-    #model['feature_log_prob'] = list(itertools.chain(*classifier.feature_log_prob_.tolist()))
-    #model['class_log_prior'] = classifier.class_log_prior_.tolist()
-    #model['n_features'] = config['n_features']
-    #model['n_classes'] = 2
-    
     with open(filename, 'wb') as f:
         dill.dump(clf, f)
     print('Dumped model to file ' + filename)
@@ -185,7 +178,3 @@ if __name__ == '__main__':
 
         dump_classifier(model_filename, classifier)
         exit()
-
-    if sys.argv[1] == 'CLASSIFY':
-        write_predictions_to_psql(os.environ["DATABASE_URL"], config["language"],
-                                  model_filename, vectorizer)
