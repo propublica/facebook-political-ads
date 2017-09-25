@@ -7,13 +7,22 @@ const adForRequest = (ad) => ({
 const endpoint = process.env.NODE_ENV === 'production' ?
   "https://projects.propublica.org/facebook-ads/ads" :
   "http://0.0.0.0:8080/facebook-ads/ads";
-const sendAds = (body) => fetch(endpoint, {
+
+const headers = (language) => new Headers({
+  "Accept-Language": language.language + "-" + language.country
+});
+
+const sendAds = (body, language) => fetch(endpoint, {
   method: "POST",
   mode: 'no-cors',
+  headers: headers(language),
   body: JSON.stringify(body)
 });
 
-const getAds = (cb) => fetch(endpoint).then((res) => res.json()).then(cb);
+const getAds = (language, cb) => fetch(endpoint, {
+  method: "GET",
+  headers: headers(language),
+}).then((res) => res.json()).then(cb);
 
 const mergeAds = (ads, newAds) => {
   let ids = new Map(ads.map(ad => [ad.id, ad]));
@@ -39,4 +48,9 @@ const updateBadge = (ratings) => {
   }
 };
 
-export { sendAds, getAds, mergeAds, updateBadge, adForRequest };
+const getBrowserLocale = () => ({
+  language: navigator.language.split("-")[0],
+  country: navigator.language.split("-")[1]
+});
+
+export { sendAds, getAds, mergeAds, updateBadge, adForRequest, getBrowserLocale };

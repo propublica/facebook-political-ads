@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <link rel="stylesheet" href="https://s3.amazonaws.com/cdn.propublica.net/deploy/css/reset.css" type="text/css" media="all">
-    <link rel="stylesheet" href="https://s3.amazonaws.com/cdn.propublica.net/deploy/css/propublica-text.css" type="text/css" media="all">
-    <link rel="stylesheet" href="https://www.propublica.org/css/master.css" type="text/css" media="screen">
     <link rel="stylesheet" href="/facebook-ads/styles.css" type="text/css" media="all">
     <title>Facebook Political Ad Collector</title>
     <meta property="og:type" content="article"/>
@@ -25,40 +23,25 @@
     <meta name="twitter:image:src" content="<%= tw_card %>" />
   </head>
   <body>
-    <div class="c-header">
-      <header>
-        <h1><a href="http://www.propublica.org">ProPublica</a></h1>
-        <nav>
-          <ul class="tools-nav">
-            <li class="facebook social-widget ss-fb" data-title="Facebook Political Ad Collector" data-img="<%= fb_card %>" data-txt="Facebook Political Ad Collector"><a href="#">Share on Facebook</a></li>
-            <li class="twitter social-widget ss-tw" data-txt="See the political ads ProPublica has collected." data-url="https://projects.propublica.org/graphics/facebook-ads" data-hashtag=""><a href="#">Share on Twitter</a></li>
-            <li class="donate">
-              <a href="https://donate.propublica.org/" target="_blank" rel="noopener">Donate</a>
-            </li>
-          </ul>
-        </nav>
-      </header>
+    <header className="cf">
+      <nav id="logo"><a href="http://www.propublica.org">ProPublica</a></nav>
+      <ul class="tools">
+        <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=projects.propublica.org/facebook-ads/?lang=de-DE" target="_blank" rel="noopener">Share on Facebook</a></li>
+        <li class="twitter"><a href="https://twitter.com/home?status=https://projects.propublica.org/graphics/facebook-ads" target="_blank" rel="noopener">Share on Twitter</a></li>
+        <li class="donate">
+          <a href="https://donate.propublica.org/" target="_blank" rel="noopener">Donate</a>
+        </li>
+      </ul>
+    </header>
+    <div id="graphic">
     </div>
-    <div id="content">
-      <div class="wrapper">
-        <div class="content-full">
-          <div class="article">
-            <div id="graphic">
-            </div>
-          </div>
-        </div>
+    <footer>
+      <div id="footer-logo">
+        <p id="footer-logo-image">ProPublica</p>
+        <p>© Copyright<br>
+          Pro Publica Inc.</p>
       </div>
-    </div>
-    <div id="footer">
-      <div class="wrapper">
-        <div id="footer-logo">
-          <p id="footer-logo-image">ProPublica</p>
-          <p>© Copyright<br>
-            Pro Publica Inc.</p>
-        </div>
-        <div style="clear:both;"></div>
-      </div>
-    </div>
+    </footer>
     <script type="text/javascript">
      window.dataLayer = [{
        'contentType': 'App',

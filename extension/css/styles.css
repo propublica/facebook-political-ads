@@ -175,7 +175,7 @@ a:focus {
   padding: 0.2rem 0.2rem 0;
 }
 
-.rater button, #tos button {
+.rater button, #tos button, #language .button {
   margin: 0 0.2rem;
   border: 1px solid #efefef;
   background-color: #fff;
@@ -189,13 +189,13 @@ a:focus {
   margin-right: auto;
 }
 
-.rater button:hover, #tos button:hover {
+.rater button:hover, #tos button:hover, #language .button:hover {
   background-color: #0099e6;
   color: white;
   border-color: #0099e6;
 }
 
-#tos button {
+#tos button, #language .button {
   font-size: 1.1rem;
   background-color: #0099e6;
   border-color: #0099e6;
@@ -205,30 +205,33 @@ a:focus {
   display: block;
 }
 
-.rater button:focus {
+.rater button:focus, #language select {
   outline: none;
 }
 
-#tos button:hover {
+#tos button:hover, #language .button:hover {
   background-color: #d0021b;
   border-color: #d0021b;
 }
 
-#tos {
-  display: grid;
+#tos, #language {
+  padding: 1rem;
   width: 100%;
   height: 100%;
+  box-sizing: border-box;
   background-color: #fff;
   color: #304154;
+}
+
+#tos {
+  display: grid;
   grid-template-areas:
-    "header"
     "main"
     "footer";
 }
 
 #tos #terms {
   padding: 1rem;
-  box-sizing: border-box;
   overflow-y: scroll;
   grid-area: main;
 }
@@ -245,7 +248,22 @@ a:focus {
   font-size: 0.8rem;
 }
 
-#tos h1 {
-  text-align: center;
-  font-size: 1.5rem;
+#language h2 {
+  font-size: 1.4rem;
+}
+
+#language b {
+  font-weight: bold;
+}
+
+#language select, #language option {
+  height: 1rem;
+}
+
+#language .button {
+  border-width: 1px;
+}
+
+#language p {
+  margin: 0.4rem 0;
 }
