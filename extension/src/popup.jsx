@@ -4,7 +4,7 @@ import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import { Provider, connect } from 'preact-redux';
 import persistState from 'redux-localstorage';
 import { createLogger } from 'redux-logger';
-import { sendAds, getAds, updateBadge, adForRequest, getBrowserLocale } from 'utils.js';
+import { sendAds, getAds, updateBadge, adForRequest, getBrowserLocale, mergeAds } from 'utils.js';
 import langs from 'langs';
 import countries from 'i18n-iso-countries';
 // styles
@@ -80,24 +80,6 @@ const active = (state = ToggleType.RATER, action) => {
   }
 };
 
-const mergeAds = (ads, newAds) => {
-  let ids = new Map(ads.map(ad => [ad.id, ad]));
-  newAds.forEach(ad => {
-    if(ids.has(ad.id)) {
-      let old = ids.get(ad.id);
-      ids.delete(ad.id);
-      let newAd = Object.assign({}, old, ad);
-      ids.set(newAd.id, newAd);
-    } else {
-      ids.set(ad.id, ad);
-    }
-  });
-  return Array.from(ids.values())
-    .sort((a, b) => a.id > b.id ? 1 : -1)
-    .sort((a) => a.rating === RatingType.POLITICAL ? 1 : -1)
-    .slice(0, 100);
-};
-
 const buildUpdate = (type) => ((state = [], action) => {
   switch(action.type) {
   case "new_" + type + "s":
@@ -108,7 +90,7 @@ const buildUpdate = (type) => ((state = [], action) => {
         return { ...ad, rating: action.value };
       }
       return ad;
-    }), {});
+    }), []);
   default:
     return state;
   }
@@ -269,9 +251,9 @@ let Ads = ({ads, onAdClick}) => (
 const adStateToProps = (state) => ({
   ads: insertAdFields(getUnratedRatings(state.ads))
 });
-const adDispatchToProps = (dispatch, getState) => ({
+const adDispatchToProps = (dispatch) => ({
   onAdClick: (id, rating) => {
-    dispatch(rateAd(id, rating, updateAd, getState().language));
+    dispatch(rateAd(id, rating, updateAd, store.getState().language));
   }
 });
 Ads = connect(
@@ -325,7 +307,7 @@ let SelectLanguage = ({ language, onChange }) => (
   <select value={language} onChange={onChange}>
     {langs.all().map((lang) => (
       <option id="language" key={lang["1"]} value={lang["1"]}>
-        {lang["name"]} / {lang["local"]}
+         {lang["name"]} / {lang["local"]}
       </option>
     ))}
   </select>
@@ -368,27 +350,19 @@ SelectCountry = connect(
 let Language = ({ onAcceptLang }) => (
   <form id="language" onSubmit={onAcceptLang}>
     <div>
-      <h2>Your language settings</h2>
+      <h2>{getMessage("language_settings")}</h2>
+      <p dangerouslySetInnerHTML={{__html:getMessage("you_speak",
+        [langs.where('1', browserLocale.language).local || 'Unknown Language',
+          countries.getName(browserLocale.country, browserLocale.language) ||
+          countries.getName(browserLocale.country, 'en') || 'Unknown Country'])}} />
       <p>
-        Your browser thinks you speak&nbsp;
-        <b>
-          {langs.where('1', browserLocale.language).local || 'Unknown Language' }
-        </b>
-        &nbsp;and live in&nbsp;
-        <b>
-          {countries.getName(browserLocale.country, browserLocale.language) ||
-           countries.getName(browserLocale.country, 'en') || 'Unknown Country' }
-        </b>.
-      </p>
-      <p>
-        <label htmlFor="language">Language: </label><SelectLanguage />
+        <label htmlFor="language">Language: </label><SelectLanguage /><br />
         <label htmlFor="country">Country: </label><SelectCountry />
       </p>
-      <p>If these settings are correct please click ok, otherwise change it via the pulldowns and
-      click ok.</p>
+      <p>{getMessage("language_instructions")}</p>
     </div>
     <div>
-      <input className="button" type="submit" value="Ok" />
+      <input className="button" type="submit" value="OK" />
     </div>
   </form>
 );

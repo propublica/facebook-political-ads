@@ -1,3 +1,5 @@
+import { sortBy } from "lodash";
+
 const adForRequest = (ad) => ({
   id: ad.id,
   html: ad.html,
@@ -9,7 +11,7 @@ const endpoint = process.env.NODE_ENV === 'production' ?
   "http://0.0.0.0:8080/facebook-ads/ads";
 
 const headers = (language) => new Headers({
-  "Accept-Language": language.language + "-" + language.country
+  "Accept-Language": language.language + "-" + language.country + ";q=1.0"
 });
 
 const sendAds = (body, language) => fetch(endpoint, {
@@ -36,7 +38,9 @@ const mergeAds = (ads, newAds) => {
       ids.set(ad.id, ad);
     }
   });
-  return Array.from(ids.values()).sort((a, b) => a.id > b.id ? 1 : -1);
+  const idSort = sortBy(Array.from(ids.values()), (a) => a.id);
+  const poli = sortBy(idSort, (a) => a.rating === "political");
+  return poli.slice(0, 100);
 };
 
 const updateBadge = (ratings) => {

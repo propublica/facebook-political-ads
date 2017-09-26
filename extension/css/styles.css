@@ -77,6 +77,7 @@ body {
   line-height: 1.5;
   font-weight: 200;
   background-color: #eceff1;
+  overflow-y: scroll;
 }
 
 #popup {
@@ -91,6 +92,11 @@ body {
   display: flex;
   top: 0;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.26);
+}
+
+#container {
+  min-height: 1000px;
+  overflow-y: scroll;
 }
 
 .toggle {
