@@ -257,6 +257,7 @@ impl AdServer {
                     }
                 }
             }
+            warn!("Failed getting ads.");
             Ok(Response::new().with_status(StatusCode::BadRequest))
         });
         Box::new(future)
