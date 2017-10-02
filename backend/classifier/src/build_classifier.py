@@ -82,7 +82,7 @@ def load_ads_from_psql(database_url, lang):
      """, (lang, ))
 
     data = []
-    for html, score in cur:           
+    for html, score in cur:
         doc = BeautifulSoup(html, "html.parser")
         if score > 0.5:
             score = 1.0
@@ -111,8 +111,9 @@ def write_predictions_to_psql(database_url, lang, model_filename, vectorizer):
         transformed_text = vectorizer.transform([text])
         pol_score = clf.predict_proba(transformed_text)[0][1]
         updatecur.execute("UPDATE ads SET political_probability=%s WHERE id=%s", (pol_score, pid))
+        print(str(cnt) + ' ads processed out of ' + str(cur.rowcount))
+
         if cnt % 1000 == 0:
-            print(str(cnt) + ' ads processed out of ' + str(cur.rowcount))
             conn.commit()
 
     conn.commit()
