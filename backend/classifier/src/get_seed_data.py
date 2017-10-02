@@ -53,7 +53,7 @@ if __name__ == '__main__':
     res = requests.get(graph_token_url.format(
                         os.environ['FACEBOOK_APP_ID'],
                         os.environ['FACEBOOK_APP_SECRET']))
-
+    print(res)
     access_token = json.loads(res.text)['access_token']
     graph = facebook.GraphAPI(access_token, version=2.7)
 
@@ -63,10 +63,6 @@ if __name__ == '__main__':
                                 for x in fetch_last_n_posts(pagename,
                                                             config['political_messages_per_page'],
                                                             graph)]
-    messages['not_political'] = [x.replace('\n', ' ')
-                                    for pagename in config['not_political_fb_pages']
-                                    for x in fetch_last_n_posts(pagename,
-                                                                config['not_political_messages_per_page'],
-                                                                graph)]
+
     with open(config['output_file'], 'w') as f:
         json.dump(messages, f)

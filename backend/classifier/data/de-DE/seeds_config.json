@@ -1,0 +1,15 @@
+{
+  "political_messages_per_page": 400,
+  "not_political_messages_per_page": 100,
+  "output_file": "../data/de/seeds.json",
+  "political_fb_pages": [
+    "cdu",
+    "spd",
+    "linkspartei",
+    "b90diegruenen",
+    "csu",
+    "fdp",
+    "alternativefuerde",
+    "freie.waehler.bundesvereinigung"
+  ]
+}
