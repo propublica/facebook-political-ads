@@ -35,8 +35,8 @@ fn document_select(
     })
 }
 
-fn get_title(document: &kuchiki::NodeRef) -> Result<String> {
-    document_select(document, "h5 a, h6 a, strong")?
+pub fn get_title(document: &kuchiki::NodeRef) -> Result<String> {
+    document_select(document, "h5 a, h6 a, strong, span.fsl")?
         .nth(0)
         .and_then(|a| Some(a.text_contents()))
         .ok_or_else(|| "Couldn't find title.".into())
@@ -54,8 +54,8 @@ fn get_image(document: &kuchiki::NodeRef) -> Result<String> {
         .ok_or_else(|| "Couldn't find images.".into())
 }
 
-fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
-    let selectors = vec![".userContent p", "span"];
+pub fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
+    let selectors = vec![".userContent p", "div.mbs", "span"];
     let iters = selectors
         .iter()
         .map(|s| document_select(document, s))

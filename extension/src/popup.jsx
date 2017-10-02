@@ -154,13 +154,14 @@ const getImage = (html) => {
 };
 
 const getAdMessage = (html) => {
-  let p = query(html, '.userContent p') || query(html, 'span');
+  let p = query(html, '.userContent p') || query("div.mbs") || query(html, 'span');
   if(p)
     return p.innerHTML;
 };
 
 const getTitle = (html) => {
-  let a = query(html, 'h5 a') || query(html, 'h6 a') || query(html, 'strong');
+  let a = query(html, 'h5 a') || query(html, 'h6 a') || query(html, 'strong') ||
+      query(html, 'span.fsl');
   if(a)
     return a.innerText;
 };
@@ -307,7 +308,7 @@ let SelectLanguage = ({ language, onChange }) => (
   <select value={language} onChange={onChange}>
     {langs.all().map((lang) => (
       <option id="language" key={lang["1"]} value={lang["1"]}>
-         {lang["name"]} / {lang["local"]}
+        {lang["name"]} / {lang["local"]}
       </option>
     ))}
   </select>

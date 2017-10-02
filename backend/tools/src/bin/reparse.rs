@@ -4,6 +4,7 @@ extern crate dotenv;
 extern crate futures_cpupool;
 extern crate hyper;
 extern crate hyper_tls;
+extern crate kuchiki;
 extern crate r2d2;
 extern crate r2d2_diesel;
 extern crate tokio_core;
@@ -14,15 +15,16 @@ use dotenv::dotenv;
 use futures_cpupool::CpuPool;
 use hyper::Client;
 use hyper_tls::HttpsConnector;
+use kuchiki::traits::*;
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
 use server::models::Ad;
-use server::schema::ads::dsl::*;
 use server::start_logging;
 use std::env;
 use tokio_core::reactor::Core;
 
 fn main() {
+    use server::schema::ads::dsl::*;
     dotenv().ok();
     start_logging();
 
@@ -39,10 +41,11 @@ fn main() {
     );
     let dbads: Vec<Ad> = ads.load::<Ad>(&*conn).expect("Couldn't get ads");
 
-    for ad in dbads {
+    for mut ad in dbads {
         let db_pool = db_pool.clone();
         let pool = pool.clone();
         let client = client.clone();
+
         let future = ad.grab_and_store(client, &db_pool, pool);
         core.run(future).unwrap();
     }
