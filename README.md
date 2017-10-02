@@ -57,6 +57,8 @@ So for example, to classify ads in the United States I'd run:
 * [Bringen Sie Licht in den dunklen Facebook-Wahlkampf](http://www.sueddeutsche.de/digital/bundestagswahl-bringen-sie-licht-in-den-dunklen-facebook-wahlkampf-1.3656582)
 * [Wie werben die Parteien auf Facebook?](http://www.spiegel.de/netzwelt/games/facebook-political-ad-collector-plugin-sammelt-wahlwerbung-auf-facebook-ein-a-1166566.html)
 * [So werben die Parteien auf Facebook](http://www.spiegel.de/netzwelt/web/facebook-political-ad-collector-parteienwerbung-auf-facebook-im-ueberblick-a-1169154.html)
+* [Warum Zuckerberg den deutschen Wahlkampf durchleuchten ließ ](http://www.sueddeutsche.de/digital/werbung-auf-facebook-und-google-warum-zuckerberg-den-deutschen-wahlkampf-durchleuchten-liess-1.3679603)
+* [Trust Issues](https://www.wnyc.org/story/on-the-media-2017-09-22/)
 
 ## Where We Need Your Help
 
