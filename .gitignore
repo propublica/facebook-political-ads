@@ -17,3 +17,5 @@ classifier.json
 /backend/.dockerignore
 /backend/Dockerfile
 *.sql
+__pycache__
+*.dill

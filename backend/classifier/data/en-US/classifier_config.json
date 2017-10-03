@@ -1,9 +1,5 @@
 {
   "language": "en-US",
-  "read_from_psql": true,
-  "seed_filename": "../data/en-US/seeds.json",
-  "model_filename": "../data/en-US/classifier.dill",
-  "equalize_classes": true,
   "n_features": 50000,
   "classifier_type": "MultinomialNB"
 }
