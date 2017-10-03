@@ -138,24 +138,14 @@ impl AdServer {
     where
         F: Fn() -> ResponseFuture,
     {
-        println!(
-            "{:?}",
-            req.query().and_then(|q| {
-                form_urlencoded::parse(q.as_bytes())
-                    .filter(|pair| pair.0 == Cow::Borrowed("lang"))
-                    .map(|pair| pair.1.to_string())
-                    .nth(0)
-            })
-        );
-
-        if Some(String::from("de-DE")) ==
-            req.query().and_then(|q| {
-                form_urlencoded::parse(q.as_bytes())
-                    .filter(|pair| pair.0 == Cow::Borrowed("lang"))
-                    .map(|pair| pair.1.to_string())
-                    .nth(0)
-            })
-        {
+        let lang = req.query().and_then(|q| {
+            form_urlencoded::parse(q.as_bytes())
+                .filter(|pair| pair.0 == Cow::Borrowed("lang"))
+                .map(|pair| pair.1.to_string())
+                .nth(0)
+        });
+        
+        if Some(String::from("de-DE")) == lang {
             callback()
         } else {
             Box::new(future::ok(
