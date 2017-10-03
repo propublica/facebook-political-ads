@@ -15,7 +15,6 @@ use dotenv::dotenv;
 use futures_cpupool::CpuPool;
 use hyper::Client;
 use hyper_tls::HttpsConnector;
-use kuchiki::traits::*;
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
 use server::models::Ad;

@@ -1,7 +1,5 @@
 {
-  "political_messages_per_page": 400,
-  "output_file": "../data/de-AT/seeds.json",
-  "political_fb_pages": [
+  "political": [
     "bundeskanzler.christian.kern",
     "Sozialdemokratie",
     "sebastiankurz.at",
@@ -19,5 +17,38 @@
     "esgilt",
     "freielisteoe",
     "DieWahrheitueberSebastianKurz"
+  ],
+  "not_political": [
+    "FrankfurterBrett",
+    "buykud",
+    "SKLUM.de",
+    "GeheimtippHamburg",
+    "masterclassofficial",
+    "zakabelmusic",
+    "symphonikerhamburg",
+    "kayak.deutschland",
+    "ELB.GYM",
+    "litographs",
+    "hessnatur",
+    "newlookde",
+    "LollapaloozaDE",
+    "SPIEGELdaily",
+    "MaggiKochstudio",
+    "elbphilharmonie.hamburg",
+    "beyondskinshoes",
+    "mahabis",
+    "VisitTheUSAde",
+    "Voeslauer",
+    "MAKAROjewelry",
+    "DieGoettlicheOrdnungDE",
+    "kinkybootsgermany",
+    "BombaEstereo",
+    "Hallo.Pizza.Deutschland",
+    "GoProDE",
+    "alohafromdeer",
+    "closed",
+    "officialboho",
+    "TWOTHIRDS",
+    "299612166774381"
   ]
 }
