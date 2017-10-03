@@ -282,7 +282,7 @@ impl Ad {
         use schema::ads::dsl::*;
         let connection = conn.get()?;
         let mut query = ads.filter(lang.eq(language))
-            .filter(political_probability.gt(0.90))
+            .filter(political_probability.gt(0.80))
             .filter(suppressed.eq(false))
             .into_boxed();
 
