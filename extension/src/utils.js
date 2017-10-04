@@ -8,7 +8,7 @@ const adForRequest = (ad) => ({
 
 const endpoint = process.env.NODE_ENV === 'production' ?
   "https://projects.propublica.org/facebook-ads/ads" :
-  "http://0.0.0.0:8080/facebook-ads/ads";
+  "https://projects.propublica.org/facebook-ads/ads";
 
 const headers = (language) => new Headers({
   "Accept-Language": language.language + "-" + language.country + ";q=1.0"
@@ -38,7 +38,7 @@ const mergeAds = (ads, newAds) => {
       ids.set(ad.id, ad);
     }
   });
-  const idSort = sortBy(Array.from(ids.values()), (a) => a.id);
+  const idSort = sortBy(Array.from(ids.values()), (a) => -1 * Date.parse(a.created_at));
   const poli = sortBy(idSort, (a) => a.rating === "political");
   return poli.slice(0, 100);
 };

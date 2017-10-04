@@ -7,6 +7,7 @@ chrome.runtime.onMessage.addListener((ads) => {
     if(!store.terms) return;
     let saved = new Set();
     store.ratings.map((ad) => saved.add(ad.id));
+    ads = ads.map((ad) => Object.assign(ad, {created_at: (new Date()).valueOf()}));
     store.ratings = mergeAds(store.ratings || [], ads);
     localStorage.setItem('redux', JSON.stringify(store));
     updateBadge(store.ratings);
