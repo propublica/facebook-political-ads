@@ -16,7 +16,7 @@ def build(ctx):
     """
     for (directory, conf) in confs(ctx.obj["base"]):
         model = train_classifier(get_classifier(), get_vectorizer(conf),
-                                 directory, conf["language"])[0]
+                                 directory, conf["language"])
         model_path = classifier_path(directory)
         with open(model_path, 'wb') as classy:
             dill.dump(model, classy)

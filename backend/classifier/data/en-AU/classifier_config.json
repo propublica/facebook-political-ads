@@ -1,0 +1,5 @@
+{
+  "language": "en-AU",
+  "n_features": 50000,
+  "classifier_type": "MultinomialNB"
+}
