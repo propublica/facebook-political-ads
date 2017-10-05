@@ -7,6 +7,7 @@ from classifier.utilities import classifier_path, get_vectorizer, confs, DB, get
 
 @click.command("classify")
 @click.option("--newest/--every",
+              default=True,
               help="Classify all of the records")
 @click.pass_context
 def classify(ctx, newest):
@@ -14,9 +15,13 @@ def classify(ctx, newest):
     Classify the ads in the database at $DATABASE_URL.
     """
     if newest:
-        records = DB.query("select * from ads where political_probability = 0;")
+        print("Running newest")
+        query = "select * from ads where political_probability = 0"
+        records = DB.query(query + ";")
     else:
-        records = DB.query("select * from ads;")
+        print("Running every")
+        query = "select * from ads"
+        records = DB.query(query + ";")
 
     classifiers = dict()
     for (directory, conf) in confs(ctx.obj["base"]):
@@ -26,7 +31,7 @@ def classify(ctx, newest):
                 "vectorizer": get_vectorizer(conf)
             }
 
-    length = DB.query("select count(*) as length from ads;")[0]["length"]
+    length = DB.query("select count(*) as length from ({}) as t1;".format(query))[0]["length"]
     updates = []
     query = "update ads set political_probability=:probability where id=:id"
     idx = 0
