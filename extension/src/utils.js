@@ -29,9 +29,9 @@ const getAds = (language, cb) => fetch(endpoint, {
 const mergeAds = (ads, newAds) => {
   let ids = new Map(ads.map(ad => [ad.id, ad]));
   newAds.forEach(ad => {
+    ad = Object.assign({}, {created_at: (new Date()).valueOf()}, ad);
     if(ids.has(ad.id)) {
       let old = ids.get(ad.id);
-      ids.delete(ad.id);
       let newAd = Object.assign({}, old, ad);
       ids.set(newAd.id, newAd);
     } else {
