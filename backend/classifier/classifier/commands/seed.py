@@ -75,8 +75,8 @@ def seed(ctx, language):
     graph = facebook.GraphAPI(access_token, version=2.7)
 
     messages = {
-        'political': fetch(seeds_config["political"], 400, graph),
-        'not_political': fetch(seeds_config["not_political"], 400, graph)
+        'political': fetch(seeds_config["political"], 100, graph),
+        'not_political': fetch(seeds_config["not_political"], 100, graph)
     }
 
     with open(os.path.join(conf_dir, 'seeds.json'), 'w') as out:

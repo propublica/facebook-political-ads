@@ -51,12 +51,14 @@ def train_classifier(classifier, vectorizer, base, language):
     """
     Train a classifier with a given vectorizer, seeds, and language
     """
+    print("============ {} =============".format(base))
     with open(os.path.join(base, "seeds.json"), 'rb') as json_posts:
         posts = json.load(json_posts)
     data = [(item, 1.0) for item in posts['political']]
     data.extend([(item, 0.0) for item in posts['not_political']])
+    print("num seeds: {}".format(len(data)))
     data.extend(load_ads_from_psql(language))
-    print("num unique samples: %s" % len(data))
+    print("num unique samples: {}".format(len(data)))
     train, test = train_test_split(data)
     x_train, y_train = zip(*train)
     x_test, y_test = zip(*test)

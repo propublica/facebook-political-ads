@@ -15,7 +15,7 @@ deploy.sh
 /extension/web-ext-artifacts/*
 classifier.json
 /backend/.dockerignore
-/backend/Dockerfile
+Dockerfile
 *.sql
 __pycache__
 *.dill
