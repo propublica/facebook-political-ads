@@ -17,12 +17,12 @@ def classify(ctx, newest):
     if newest:
         print("Running newest")
         query = "select * from ads where political_probability = 0"
-        records = DB.query(query + ";")
     else:
         print("Running every")
         query = "select * from ads"
-        records = DB.query(query + ";")
 
+    length = DB.query("select count(*) as length from ({}) as t1;".format(query))[0]["length"]
+    records = DB.query(query)
     classifiers = dict()
     for (directory, conf) in confs(ctx.obj["base"]):
         with open(classifier_path(directory), 'rb') as classy:
@@ -31,7 +31,7 @@ def classify(ctx, newest):
                 "vectorizer": get_vectorizer(conf)
             }
 
-    length = DB.query("select count(*) as length from ({}) as t1;".format(query))[0]["length"]
+    print("found {} ads".format(length))
     updates = []
     query = "update ads set political_probability=:probability where id=:id"
     idx = 0
