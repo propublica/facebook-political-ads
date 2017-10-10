@@ -9,17 +9,22 @@ from classifier.utilities import classifier_path, get_vectorizer, confs, DB, get
 @click.option("--newest/--every",
               default=True,
               help="Classify all of the records")
+@click.option("--lang", help="Limit to language")
 @click.pass_context
-def classify(ctx, newest):
+def classify(ctx, newest, lang):
     """
     Classify the ads in the database at $DATABASE_URL.
     """
     if newest:
         print("Running newest")
         query = "select * from ads where political_probability = 0"
+        if lang:
+            query = query + " and lang = '{}'".format(lang)
     else:
         print("Running every")
         query = "select * from ads"
+        if lang:
+            query = query + " where lang = '{}'".format(lang)
 
     length = DB.query("select count(*) as length from ({}) as t1;".format(query))[0]["length"]
     records = DB.query(query)
