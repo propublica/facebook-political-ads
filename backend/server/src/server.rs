@@ -10,7 +10,8 @@ use hyper::{Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
-use hyper::header::{AcceptLanguage, ContentLength, ContentType, Authorization, Bearer, Vary};
+use hyper::header::{AcceptLanguage, ContentLength, ContentType, Authorization, Bearer, Vary,
+                    AccessControlAllowOrigin};
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
@@ -144,7 +145,7 @@ impl AdServer {
                 .map(|pair| pair.1.to_string())
                 .nth(0)
         });
-        
+
         if Some(String::from("de-DE")) == lang {
             callback()
         } else {
@@ -242,6 +243,7 @@ impl AdServer {
                                     Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]),
                                 )
                                 .with_header(ContentType::json())
+                                .with_header(AccessControlAllowOrigin::Any)
                                 .with_body(serialized),
                         );
                     }
