@@ -16,6 +16,5 @@ deploy.sh
 classifier.json
 /backend/.dockerignore
 Dockerfile
-*.sql
 __pycache__
 *.dill
