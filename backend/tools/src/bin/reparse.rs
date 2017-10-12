@@ -40,7 +40,7 @@ fn main() {
     );
     let dbads: Vec<Ad> = ads.load::<Ad>(&*conn).expect("Couldn't get ads");
 
-    for mut ad in dbads {
+    for ad in dbads {
         let db_pool = db_pool.clone();
         let pool = pool.clone();
         let client = client.clone();
