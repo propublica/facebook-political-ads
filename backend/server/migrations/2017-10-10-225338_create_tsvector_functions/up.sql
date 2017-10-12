@@ -3,10 +3,10 @@ create or replace function to_englishtsvector(text text) returns tsvector as $$
 begin
     return to_tsvector('english', text);
 end;
-$$ language plpgsql;
+$$ language plpgsql immutable;
 
 create or replace function to_germantsvector(text text) returns tsvector as $$
 begin
     return to_tsvector('german', text);
 end;
-$$ language plpgsql;
+$$ language plpgsql immutable;

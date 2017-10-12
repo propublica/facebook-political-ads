@@ -50,6 +50,11 @@ pub struct Admin {
     pub username: String,
 }
 
+#[derive(Serialize)]
+pub struct ApiResponse {
+    ads: Vec<Ad>,
+}
+
 impl Service for AdServer {
     type Request = Request;
     type Response = Response;
@@ -162,12 +167,7 @@ impl AdServer {
     {
         let auth = req.headers().get::<Authorization<Bearer>>().and_then(
             |token| {
-                let token =
-                    decode::<Admin>(&token.token, self.password.as_ref(), &Validation::default());
-                if !token.is_ok() {
-                    warn!("Bad Login {:?}", token);
-                }
-                token.ok()
+                decode::<Admin>(&token.token, self.password.as_ref(), &Validation::default()).ok()
             },
         );
 
@@ -175,6 +175,7 @@ impl AdServer {
             info!("Login {:?}", auth);
             callback(req)
         } else {
+            warn!("Bad Login {:?}", auth);
             Box::new(future::ok(
                 Response::new().with_status(StatusCode::Unauthorized),
             ))
@@ -234,8 +235,9 @@ impl AdServer {
                         .map(|pair| pair.1.to_string())
                         .nth(0)
                 });
+
                 if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool, search) {
-                    if let Ok(serialized) = serde_json::to_string(&ads) {
+                    if let Ok(serialized) = serde_json::to_string(&ApiResponse { ads: ads }) {
                         return Ok(
                             Response::new()
                                 .with_header(ContentLength(serialized.len() as u64))
@@ -249,7 +251,6 @@ impl AdServer {
                     }
                 }
             }
-            warn!("Failed getting ads.");
             Ok(Response::new().with_status(StatusCode::BadRequest))
         });
         Box::new(future)
