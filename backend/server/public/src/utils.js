@@ -29,7 +29,7 @@ const refresh = (store, query) => {
     method: "GET",
     headers: headers(store.getState().credentials)
   }).then((res) => res.json())
-    .then((ads) => store.dispatch(newAds(ads)));
+    .then((ads) => { store.dispatch(newAds(ads.ads)); });
 };
 
 const search = (store, query) => () => refresh(store, query);

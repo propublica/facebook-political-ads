@@ -8,7 +8,7 @@ const adForRequest = (ad) => ({
 
 const endpoint = process.env.NODE_ENV === 'production' ?
   "https://projects.propublica.org/facebook-ads/ads" :
-  "https://projects.propublica.org/facebook-ads/ads";
+  "http://0.0.0.0:8080/facebook-ads/ads";
 
 const headers = (language) => new Headers({
   "Accept-Language": language.language + "-" + language.country + ";q=1.0"
@@ -24,7 +24,7 @@ const sendAds = (body, language) => fetch(endpoint, {
 const getAds = (language, cb) => fetch(endpoint, {
   method: "GET",
   headers: headers(language),
-}).then((res) => res.json()).then(cb);
+}).then((res) => res.json()).then((ads) => cb(ads.ads || ads));
 
 const mergeAds = (ads, newAds) => {
   let ids = new Map(ads.map(ad => [ad.id, ad]));

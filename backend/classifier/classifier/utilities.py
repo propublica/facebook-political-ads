@@ -80,8 +80,21 @@ def get_text(html):
     """
     Return the raw text of an ad
     """
-    doc = BeautifulSoup(html, "html.parser")
-    return doc.get_text(" ")
+    if html:
+        doc = BeautifulSoup(html, "html.parser")
+        return doc.get_text(" ")
+
+    return ""
+
+def get_profile_links(html):
+    """
+    Return the links in an ad.
+    """
+    if html:
+        doc = BeautifulSoup(html, "html.parser")
+        return " ".join([a["href"] for a in doc.find_all('a', href=True) if "facebook.com" in a["href"]])
+
+    return ""
 
 def confs(base):
     """
@@ -98,6 +111,7 @@ def load_ads_from_psql(lang):
     ads = DB.query("""
       select
         html,
+        targeting,
         political::float / (political::float + not_political::float) as score
       from ads
         where lang = '{}'
@@ -107,5 +121,7 @@ def load_ads_from_psql(lang):
     data = []
     for advert in ads:
         score = round(advert["score"])
-        data.append((get_text(advert["html"]), score))
+        data.append((" ".join([get_text(advert["html"]),
+                               get_text(advert["targeting"]),
+                               get_profile_links(advert["html"])]), score))
     return data

@@ -31,7 +31,9 @@ module.exports = [{
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(ENV)
     }),
-    new UglifyJSPlugin()
+    new UglifyJSPlugin({
+      sourceMap: true
+    })
   ],
   devtool: 'source-map'
 },{
@@ -62,7 +64,9 @@ module.exports = [{
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(ENV)
     }),
-    new UglifyJSPlugin()
+    new UglifyJSPlugin({
+      sourceMap: true
+    })
   ],
   devtool: 'source-map'
 }];

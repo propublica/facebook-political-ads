@@ -4,6 +4,7 @@ use diesel;
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
+use diesel::types::Text;
 use diesel_full_text_search::*;
 use errors::*;
 use futures::{Future, stream, Stream};
@@ -176,6 +177,13 @@ pub struct Ad {
     pub suppressed: bool,
 }
 
+// We do this because I can't see how to make sql_function! take a string
+// argument.
+sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
+sql_function!(to_germantsvector, to_germantsvector_t, (x: Text) -> TsVector);
+sql_function!(to_englishtsquery, to_englishtsquery_t, (x: Text) -> TsQuery);
+sql_function!(to_germantsquery, to_germantsquery_t, (x: Text) -> TsQuery);
+
 impl Ad {
     // This will asynchronously save the images to s3 we may very well end up
     // dropping images, but I can't see any way around it right now. Also we
@@ -248,7 +256,7 @@ impl Ad {
                     use schema::ads::dsl::*;
                     let update = Images::from_ad(&ad, imgs)?;
                     let connection = db.get()?;
-                    diesel::update(ads.filter(id.eq(&ad.id)))
+                    diesel::update(ads.find(&ad.id))
                         .set(&update)
                         .execute(&*connection)?;
                     info!("saved {:?}", ad.id);
@@ -287,12 +295,28 @@ impl Ad {
             .into_boxed();
 
         if search.is_some() {
-            query = query.filter(to_tsvector(html).matches(plainto_tsquery(search.unwrap())));
-        }
+            let search = search.unwrap();
 
-        Ok(query.order(created_at.desc()).limit(50).load::<Ad>(
-            &*connection,
-        )?)
+            query = match language {
+                "de-DE" => {
+                    query
+                        .filter(to_germantsvector(html).matches(
+                            to_germantsquery(search.clone()),
+                        ))
+                        .order(ts_rank(to_germantsvector(html), to_germantsquery(search)))
+                }
+                _ => {
+                    query
+                        .filter(to_englishtsvector(html).matches(
+                            to_englishtsquery(search.clone()),
+                        ))
+                        .order(ts_rank(to_englishtsvector(html), to_englishtsquery(search)))
+                }
+            };
+        } else {
+            query = query.order(created_at.desc());
+        }
+        Ok(query.limit(20).load::<Ad>(&*connection)?)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
@@ -379,8 +403,8 @@ impl<'a> NewAd<'a> {
             .get_result(&*connection)?;
 
         if self.targeting.is_some() && !ad.targeting.is_some() {
-            diesel::update(ads.filter(id.eq(self.id)))
-                .set(targeting.eq(self.targeting.clone()))
+            diesel::update(ads.find(self.id))
+                .set(targeting.eq(&self.targeting))
                 .execute(&*connection)?;
         };
 
