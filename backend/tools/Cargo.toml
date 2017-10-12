@@ -16,6 +16,10 @@ serde = "^1.0.14"
 serde_derive = "^1.0.14"
 r2d2 = "^0.7.4"
 r2d2-diesel = "^0.16.0"
+rusoto_core = "^0.28.0"
+rusoto_credential = "^0.8.0"
+rusoto_s3 = "^0.28.0"
 tokio-core = "^0.1.9"
+url = "^1.5.1"
 
 server = { path = "../server" }
