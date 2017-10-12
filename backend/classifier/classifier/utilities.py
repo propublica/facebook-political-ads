@@ -86,6 +86,16 @@ def get_text(html):
 
     return ""
 
+def get_targets(html):
+    """
+    Return bolded targeting parameters
+    """
+    if html:
+        doc = BeautifulSoup(html, "html.parser")
+        return " ".join([b.get_text(" ") for b in doc.find_all("b")])
+
+    return ""
+
 def get_profile_links(html):
     """
     Return the links in an ad.

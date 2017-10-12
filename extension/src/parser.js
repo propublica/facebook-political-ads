@@ -12,7 +12,8 @@ const selectors = [
   '.uiPopOver',
   '.uiCloseButton',
   '.uiChevronSelectorButton',
-  'h5._1qbu'
+  'h5._1qbu',
+  '.commentable_item'
 ].join(', ');
 
 const TIMELINE_SELECTOR = '.fbUserContent, .fbUserPost, ._5pcr';
