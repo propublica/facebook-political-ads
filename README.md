@@ -37,18 +37,13 @@ We train the classifier using python and scikit learn and the source is in `back
     pipenv install
     pipenv shell
 
-And to run the classifier you'll want to run:
+And to build the classifier you'll want to run:
 
-    cd src/
-    python build_classifier.py classifier.conf
+    ./classify build
 
 To classify the ads you've collected you can run:
 
-    cargo run --bin classify -p server <lang> <path-to-classifier.json>
-
-So for example, to classify ads in the United States I'd run:
-
-    cargo run --bin classify -p server en-US data/en_us/seeds.json
+    ./classify classify
 
 ## Stories
 
@@ -64,4 +59,4 @@ So for example, to classify ads in the United States I'd run:
 
 In general, the project needs more tests. We've written a couple of tests for parsing the Facebook timeline in the extension directory, and a few for the tricky bits in the server, but any help here would be great!
 
-Also, the rust backend needs a bit of love and care, and there is a bit of a mess in `backend/server/src/server.rs` that could use cleaning up. It would be nice to move the classification to rust as well.
+Also, the rust backend needs a bit of love and care, and there is a bit of a mess in `backend/server/src/server.rs` that could use cleaning up.
