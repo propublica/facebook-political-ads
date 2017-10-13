@@ -58,7 +58,7 @@ const updateRating = (id, rating) => ({
   id: id,
   value: rating
 });
-const rateAd = (ad, rating, update, language) => {
+const rateAd = (ad, rating, update) => {
   return (dispatch) => {
     let body = {
       ...adForRequest(ad),
@@ -66,7 +66,7 @@ const rateAd = (ad, rating, update, language) => {
     };
     dispatch(update(ad.id, rating));
     let cb = () => ({});
-    return sendAds([body], language).then(cb, cb);
+    return sendAds([body], store.getState().language).then(cb, cb);
   };
 };
 
@@ -254,7 +254,7 @@ const adStateToProps = (state) => ({
 });
 const adDispatchToProps = (dispatch) => ({
   onAdClick: (id, rating) => {
-    dispatch(rateAd(id, rating, updateAd, store.getState().language));
+    dispatch(rateAd(id, rating, updateAd));
   }
 });
 Ads = connect(
