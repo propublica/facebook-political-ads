@@ -122,7 +122,8 @@ def load_ads_from_psql(lang):
       select
         html,
         targeting,
-        political::float / (political::float + not_political::float) as score
+        political::float / (political::float + not_political::float) as score,
+        suppressed
       from ads
         where lang = '{}'
         and (political + not_political) > 0;
@@ -130,7 +131,10 @@ def load_ads_from_psql(lang):
 
     data = []
     for advert in ads:
-        score = round(advert["score"])
+        if advert['suppressed']:
+            score = 0
+        else:
+            score = round(advert["score"])
         data.append((" ".join([get_text(advert["html"]),
                                get_text(advert["targeting"]),
                                get_profile_links(advert["html"])]), score))
