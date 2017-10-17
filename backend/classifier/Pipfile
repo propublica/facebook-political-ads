@@ -1,16 +1,20 @@
 [[source]]
+
 url = "https://pypi.python.org/simple"
 verify_ssl = true
+
 
 [packages]
 
 facebook-sdk = "*"
 numpy = "*"
 sklearn = "*"
-bs4 = "*"
+"bs4" = "*"
 imbalanced-learn = "*"
 matplotlib = "*"
-psycopg2 = "*"
+"psycopg2" = "*"
 dill = "*"
 click = "*"
 records = "*"
+spacy-nightly = "*"
+"93d1eba" = {file = "https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-2.0.0a2/xx_ent_wiki_sm-2.0.0a2.tar.gz"}
