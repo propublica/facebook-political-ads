@@ -103,6 +103,14 @@ impl Service for AdServer {
                 "public/dist/index.js.map",
                 ContentType::json(),
             )),
+            (&Method::Get, "/facebook-ads/beacons.js") => Either::B(self.get_file(
+                "public/dist/index.js",
+                ContentType(mime::TEXT_JAVASCRIPT),
+            )),
+            (&Method::Get, "/facebook-ads/beacons.js.map") => Either::B(self.get_file(
+                "public/dist/index.js.map",
+                ContentType::json(),
+            )),
             (&Method::Get, "/facebook-ads/styles.css") => Either::B(self.get_file(
                 "public/css/styles.css",
                 ContentType(mime::TEXT_CSS),

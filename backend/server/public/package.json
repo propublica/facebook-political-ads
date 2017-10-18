@@ -34,8 +34,6 @@
   },
   "dependencies": {
     "i18next": "^10.0.1",
-    "i18next-browser-languagedetector": "^2.0.0",
-    "i18next-localstorage-cache": "^1.1.1",
     "i18next-xhr-backend": "^1.4.3",
     "lodash": "^4.17.4",
     "preact": "^8.2.5",
