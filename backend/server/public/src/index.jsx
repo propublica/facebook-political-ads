@@ -7,7 +7,6 @@ import { NEW_ADS, refresh, search } from 'utils.js';
 import throttle from "lodash/throttle";
 import i18next from "i18next";
 import Backend from 'i18next-xhr-backend';
-import Cache from 'i18next-localstorage-cache';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 const ads = (state = [], action) => {
@@ -89,7 +88,6 @@ App = connect(
 let t = null;
 i18next
   .use(Backend)
-  .use(Cache)
   .use(LanguageDetector)
   .init({
     fallbackLng: 'en',

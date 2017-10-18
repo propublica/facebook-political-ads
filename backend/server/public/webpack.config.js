@@ -69,4 +69,22 @@ module.exports = [{
     })
   ],
   devtool: 'source-map'
+},{
+  entry: "beacons.js",
+  context: path.resolve(__dirname, "src"),
+  output: {
+    filename: 'beacons.js',
+    path: path.resolve(__dirname, 'dist')
+  },
+  resolve: {
+    modules: ["src"]
+  },
+  plugins: [
+    new webpack.optimize.ModuleConcatenationPlugin(),
+    new webpack.NoEmitOnErrorsPlugin(),
+    new UglifyJSPlugin({
+      sourceMap: true
+    })
+  ],
+  devtool: 'source-map'
 }];
