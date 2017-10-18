@@ -7,6 +7,12 @@ import { createLogger } from 'redux-logger';
 import { sendAds, getAds, updateBadge, adForRequest, getBrowserLocale, mergeAds } from 'utils.js';
 import langs from 'langs';
 import countries from 'i18n-iso-countries';
+
+// grab our languages
+['de', 'en', 'fr', 'fi', 'nl', 'da', 'sv'].forEach((lang) => (
+  countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
+));
+
 // styles
 import "../css/styles.css";
 
