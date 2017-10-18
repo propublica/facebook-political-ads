@@ -95,9 +95,6 @@ i18next
     fallbackLng: 'en',
     backend: {
       loadPath: '/facebook-ads/locales/{{lng}}/{{ns}}.json'
-    },
-    detection: {
-      lookupQuerystring: 'lang'
     }
   }, (err, t_) => {
     t = t_;
