@@ -147,6 +147,10 @@ const getUnratedRatings = (ratings) => (
   ratings.filter(rating => rating.rating === RatingType.POLITICAL || !("rating" in rating))
 );
 
+const countUnratedRatings = (ratings) => (
+  ratings.filter(rating => !("rating" in rating))).length
+);
+
 let div = document.createElement('div');
 const query = (html, selector) => {
   div.innerHTML = html;
@@ -269,12 +273,12 @@ Ads = connect(
 )(Ads);
 
 // Controls which section of tabs to show, defaults to the
-const Toggle = ({type, message, active, onToggleClick}) => (
+const Toggle = ({type, message, active, amount, onToggleClick}) => (
   <div
     className={'toggle' + (active === type ? ' active' : '')}
     onClick={function() { onToggleClick(type); }}
   >
-    {getMessage(message)}
+    {getMessage(message)} <b>{(amount ? (100 > amount ? '(' + amount + ')' : '(100+)') : '')}</b>
   </div>
 );
 
@@ -283,11 +287,13 @@ let Toggler = ({ads, ratings, active, onToggleClick}) => (
   <div id="toggler">
     <div id="tabs">
       <Toggle
+        amount={countUnratedRatings(ratings)}
         active={active}
         message="rate_ads" onToggleClick={onToggleClick}
         type={ToggleType.RATER}
       />
       <Toggle
+        amount={countUnratedRatings(ads)}
         active={active}
         message="see_ads" onToggleClick={onToggleClick}
         type={ToggleType.ADS}
