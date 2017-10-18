@@ -120,6 +120,18 @@ body {
   border-bottom: 0.2rem solid #d0021b;
 }
 
+.toggle b {
+  background-color: #0099e6;
+  color: white;
+  border-radius: 0.1rem;
+  margin-left: 0.2rem;
+  display: inline-block;
+  font-size: 0.6rem;
+  padding: 0 0.2rem;
+  vertical-align: top;
+  margin-top: 0.15rem;
+}
+
 .rating {
   font-size: 0.7rem;
   background-color: #fff;

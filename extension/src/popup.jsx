@@ -148,7 +148,7 @@ const getUnratedRatings = (ratings) => (
 );
 
 const countUnratedRatings = (ratings) => (
-  ratings.filter(rating => !("rating" in rating))).length
+  ratings.filter(rating => !("rating" in rating)).length
 );
 
 let div = document.createElement('div');
@@ -278,7 +278,7 @@ const Toggle = ({type, message, active, amount, onToggleClick}) => (
     className={'toggle' + (active === type ? ' active' : '')}
     onClick={function() { onToggleClick(type); }}
   >
-    {getMessage(message)} <b>{(amount ? (100 > amount ? '(' + amount + ')' : '(100+)') : '')}</b>
+    {getMessage(message)}{(amount ? <b>{100 > amount ? amount : '100+'}</b> : '')}
   </div>
 );
 
