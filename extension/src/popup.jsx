@@ -138,7 +138,11 @@ let store = createStore(reducer, enhancer);
 
 // Ad utilities
 const getUnratedRatings = (ratings) => (
-  ratings.filter(rating => (rating.rating === RatingType.POLITICAL || !("rating" in rating)) && !((rating.rating === RatingType.POLITICAL) && ("rating" in rating)))
+  ratings.filter(rating => rating.rating === RatingType.POLITICAL || !("rating" in rating))
+);
+
+const countUnratedRatings = (ratings) => (
+  ratings.filter(rating => !("rating" in rating))).length
 );
 
 let div = document.createElement('div');
@@ -277,13 +281,13 @@ let Toggler = ({ads, ratings, active, onToggleClick}) => (
   <div id="toggler">
     <div id="tabs">
       <Toggle
-        amount={getUnratedRatings(ratings).length}
+        amount={countUnratedRatings(ratings)}
         active={active}
         message="rate_ads" onToggleClick={onToggleClick}
         type={ToggleType.RATER}
       />
       <Toggle
-        amount={getUnratedRatings(ads).length}
+        amount={countUnratedRatings(ads)}
         active={active}
         message="see_ads" onToggleClick={onToggleClick}
         type={ToggleType.ADS}
