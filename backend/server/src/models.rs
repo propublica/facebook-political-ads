@@ -285,7 +285,7 @@ impl Ad {
     pub fn get_ads_by_lang(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
-        options: HashMap<String, String>,
+        options: &HashMap<String, String>,
     ) -> Result<Vec<Ad>> {
         use schema::ads::dsl::*;
         let connection = conn.get()?;
@@ -294,8 +294,7 @@ impl Ad {
             .filter(suppressed.eq(false))
             .into_boxed();
 
-        let search = options.get("search");
-        if let Some(search) = search {
+        if let Some(search) = options.get("search") {
             query = match language {
                 "de-DE" => {
                     query
@@ -314,7 +313,7 @@ impl Ad {
             }
         }
 
-        if let Some(page) = options.clone().get("page") {
+        if let Some(page) = options.get("page") {
             let raw_offset = page.parse::<usize>().unwrap_or_default() * 20;
             let offset = if raw_offset > 1000 { 1000 } else { raw_offset } * 20;
             query = query.offset(offset as i64)
