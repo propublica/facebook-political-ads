@@ -233,6 +233,7 @@ impl AdServer {
         }
     }
 
+
     fn get_ads(&self, req: Request) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
