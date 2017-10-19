@@ -1,10 +1,17 @@
 # Facebook Political Ad Collector
 
-This is the source code behind our project to collect political ads on Facebook.
+This is the source code behind our project to collect political ads on Facebook. Built versions are available for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/) and [Chrome](https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl).
 
 We're asking our readers to use this extension when they are browsing Facebook. While they are on a background script to collect ads they see. The extension shows those ads to users and asks them to decide whether or not a particular ad is political. We use those ratings to train a naive bayes classifier that then automatically rates the other ads we collected. The extension asks the server for the most recent ads that we've classified as political so that users can see political ads they haven't seen. We're careful to protect our user's privacy by not sending identifying information to our backend server.
 
 We're open sourcing this project because we'd love your help. Collecting these ads is challenging, and the more eyes on the problem the better.
+
+## Download and Try It
+
+* Download the [Facebook Political Ad Collector for Firefox](https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/)
+* Download the [Facebook Political Ad Collector for Chrome](https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl?hl=en)
+
+## Build and Develop Locally
 
 The extension popup is a [preact](https://preactjs.com/) application and you can build a development version by running the following:
 
