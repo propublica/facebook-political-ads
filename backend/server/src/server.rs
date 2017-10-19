@@ -21,6 +21,7 @@ use r2d2::{Pool, Config};
 use url::form_urlencoded;
 use start_logging;
 use serde_json;
+use std::collections::HashMap;
 use std::borrow::Cow;
 use std::fs::File;
 use std::io::Read;
@@ -237,14 +238,16 @@ impl AdServer {
         let pool = self.pool.clone();
         let future = pool.spawn_fn(move || {
             if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-                let search = req.query().and_then(|q| {
-                    form_urlencoded::parse(q.as_bytes())
-                        .filter(|pair| pair.0 == Cow::Borrowed("search"))
-                        .map(|pair| pair.1.to_string())
-                        .nth(0)
-                });
+                let options = req.query()
+                    .map(|q| {
+                        form_urlencoded::parse(q.as_bytes())
+                            .into_owned()
+                            .filter(|pair| pair.0 == "search" || pair.0 == "page")
+                            .collect::<HashMap<_, _>>()
+                    })
+                    .unwrap_or_default();
 
-                if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool, search) {
+                if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool, options) {
                     if let Ok(serialized) = serde_json::to_string(&ApiResponse { ads: ads }) {
                         return Ok(
                             Response::new()
