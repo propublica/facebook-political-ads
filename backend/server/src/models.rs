@@ -285,7 +285,7 @@ impl Ad {
     pub fn get_ads_by_lang(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
-        search: Option<String>,
+        options: HashMap<String, String>,
     ) -> Result<Vec<Ad>> {
         use schema::ads::dsl::*;
         let connection = conn.get()?;
@@ -294,9 +294,8 @@ impl Ad {
             .filter(suppressed.eq(false))
             .into_boxed();
 
-        if search.is_some() {
-            let search = search.unwrap();
-
+        let search = options.get("search");
+        if let Some(search) = search {
             query = match language {
                 "de-DE" => {
                     query
@@ -312,11 +311,18 @@ impl Ad {
                         ))
                         .order(ts_rank(to_englishtsvector(html), to_englishtsquery(search)))
                 }
-            };
-        } else {
-            query = query.order(created_at.desc());
+            }
         }
-        Ok(query.limit(20).load::<Ad>(&*connection)?)
+
+        if let Some(page) = options.clone().get("page") {
+            let raw_offset = page.parse::<i64>().unwrap_or_default() * 20;
+            let offset = if raw_offset > 1000 { 1000 } else { raw_offset } * 20;
+            query = query.offset(offset)
+        }
+
+        Ok(query.order(created_at.desc()).limit(20).load::<Ad>(
+            &*connection,
+        )?)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
