@@ -315,9 +315,9 @@ impl Ad {
         }
 
         if let Some(page) = options.clone().get("page") {
-            let raw_offset = page.parse::<i64>().unwrap_or_default() * 20;
+            let raw_offset = page.parse::<usize>().unwrap_or_default() * 20;
             let offset = if raw_offset > 1000 { 1000 } else { raw_offset } * 20;
-            query = query.offset(offset)
+            query = query.offset(offset as i64)
         }
 
         Ok(query.order(created_at.desc()).limit(20).load::<Ad>(
