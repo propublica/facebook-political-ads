@@ -233,7 +233,6 @@ impl AdServer {
         }
     }
 
-
     fn get_ads(&self, req: Request) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
@@ -248,7 +247,7 @@ impl AdServer {
                     })
                     .unwrap_or_default();
 
-                if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool, options) {
+                if let Ok(ads) = Ad::get_ads_by_lang(&lang, &db_pool, &options) {
                     if let Ok(serialized) = serde_json::to_string(&ApiResponse { ads: ads }) {
                         return Ok(
                             Response::new()
