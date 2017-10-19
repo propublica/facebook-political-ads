@@ -202,7 +202,6 @@ impl Ad {
         let pool_db = pool.clone();
         let db = db.clone();
         let future = stream::iter_ok(self.image_urls())
-            .map(|u| u.unwrap())
             // filter ones we already have in the db and ones we can verify as
             // coming from fb, we don't want to become a malware vector :)
             // currently we redownload images we already have, but ok.
@@ -270,15 +269,12 @@ impl Ad {
         Box::new(future)
     }
 
-    pub(self) fn image_urls(&self) -> Vec<Result<Uri>> {
+    pub(self) fn image_urls(&self) -> Vec<Uri> {
         let images = [vec![self.thumbnail.clone()], self.images.clone()];
         images
             .concat()
             .iter()
-            .map(|a| {
-                let a: Uri = a.parse()?;
-                Ok(a)
-            })
+            .flat_map(|a| a.parse::<Uri>())
             .collect()
     }
 
