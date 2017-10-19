@@ -6,6 +6,13 @@ We're asking our readers to use this extension when they are browsing Facebook. 
 
 We're open sourcing this project because we'd love your help. Collecting these ads is challenging, and the more eyes on the problem the better.
 
+## Download and Try It
+
+* Download the [Facebook Political Ad Collector for Firefox](https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/)
+* Download the [Facebook Political Ad Collector for Chrome](https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl?hl=en)
+
+## Build and Develop Locally
+
 The extension popup is a [preact](https://preactjs.com/) application and you can build a development version by running the following:
 
     cd extension
