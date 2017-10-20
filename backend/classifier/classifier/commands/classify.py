@@ -44,7 +44,7 @@ def classify(ctx, newest, lang):
         idx += 1
         if record["lang"] in classifiers:
             classifier = classifiers[record["lang"]]
-            text = classifier["vectorizer"].transform([get_text(record["html"])])
+            text = classifier["vectorizer"].transform([get_text(record)])
             update = {
                 "id": record["id"],
                 "probability": classifier["classifier"].predict_proba(text)[0][1]
