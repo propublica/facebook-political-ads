@@ -2,7 +2,7 @@
 
 This is the source code behind our project to collect political ads on Facebook. Built versions are available for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/) and [Chrome](https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl).
 
-We're asking our readers to use this extension when they are browsing Facebook. While they are on a background script to collect ads they see. The extension shows those ads to users and asks them to decide whether or not a particular ad is political. We use those ratings to train a naive bayes classifier that then automatically rates the other ads we collected. The extension asks the server for the most recent ads that we've classified as political so that users can see political ads they haven't seen. We're careful to protect our user's privacy by not sending identifying information to our backend server.
+We're asking our readers to use this extension when they are browsing Facebook. While they are on Facebook a background script runs to collect ads they see. The extension shows those ads to users and asks them to decide whether or not a particular ad is political. Serverside, we use those ratings to train a naive bayes classifier that then automatically rates the other ads we've collected. The extension also asks the server for the most recent ads that the classifier thinks are political so that users can see political ads they haven't seen. We're careful to protect our user's privacy by not sending identifying information to our backend server.
 
 We're open sourcing this project because we'd love your help. Collecting these ads is challenging, and the more eyes on the problem the better.
 
@@ -61,6 +61,8 @@ To classify the ads you've collected you can run:
 * [So werben die Parteien auf Facebook](http://www.spiegel.de/netzwelt/web/facebook-political-ad-collector-parteienwerbung-auf-facebook-im-ueberblick-a-1169154.html)
 * [Warum Zuckerberg den deutschen Wahlkampf durchleuchten ließ ](http://www.sueddeutsche.de/digital/werbung-auf-facebook-und-google-warum-zuckerberg-den-deutschen-wahlkampf-durchleuchten-liess-1.3679603)
 * [Trust Issues](https://www.wnyc.org/story/on-the-media-2017-09-22/)
+* [Facebook Allowed Questionable Ads in German Election Despite Warnings](https://www.propublica.org/article/facebook-allowed-questionable-ads-in-german-election-despite-warnings)
+* [Same-sex marriage survey: help us track targeted ads on Facebook ](https://www.theguardian.com/australia-news/2017/oct/17/same-sex-marriage-survey-help-track-targeted-ads-facebook)
 
 ## Where We Need Your Help
 
