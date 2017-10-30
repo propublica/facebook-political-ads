@@ -63,6 +63,9 @@ To classify the ads you've collected you can run:
 * [Trust Issues](https://www.wnyc.org/story/on-the-media-2017-09-22/)
 * [Facebook Allowed Questionable Ads in German Election Despite Warnings](https://www.propublica.org/article/facebook-allowed-questionable-ads-in-german-election-despite-warnings)
 * [Same-sex marriage survey: help us track targeted ads on Facebook ](https://www.theguardian.com/australia-news/2017/oct/17/same-sex-marriage-survey-help-track-targeted-ads-facebook)
+* [Revealed: how Australians are targeted with political advertising on Facebook (Searchable Database)](https://www.theguardian.com/technology/ng-interactive/2017/oct/25/revealed-how-australians-are-targeted-with-political-advertising-on-facebook)
+* [Adani posts weird video ad on Facebook to fend off Carmichael criticism](https://www.theguardian.com/business/2017/oct/21/adani-posts-weird-video-ad-on-facebook-to-fend-off-carmichael-criticism)
+* [How Malcolm Turnbull, GetUp and Adani are using Facebook ads to push their agenda](https://www.theguardian.com/technology/2017/oct/25/how-malcolm-turnbull-getup-and-adani-are-using-facebook-ads-to-push-their-agenda)
 
 ## Where We Need Your Help
 
