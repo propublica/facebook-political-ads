@@ -461,11 +461,7 @@ mod tests {
             political_probability: 0.0,
             suppressed: false,
         };
-        let urls = saved_ad
-            .image_urls()
-            .into_iter()
-            .map(|x| x.unwrap())
-            .collect();
+        let urls = saved_ad.image_urls();
         let images = Images::from_ad(&saved_ad, urls).unwrap();
         assert!(images.html != saved_ad.html);
         assert!(!images.html.contains("fbcdn"));
