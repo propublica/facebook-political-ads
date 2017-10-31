@@ -6,7 +6,7 @@ use futures_cpupool::CpuPool;
 use futures::future::{Either, FutureResult};
 use futures::{Future, Stream};
 use hyper;
-use hyper::{Client, Chunk, Method, StatusCode};
+use hyper::{Body, Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
@@ -275,7 +275,7 @@ impl AdServer {
 
     // Beware! This function assumes that we have a caching proxy in front of our
     // web server, otherwise we're making a new connection on every request.
-    fn stream_ads(&self, _req: Request) -> ResponseFuture {
+    fn stream_ads(&self, req: Request) -> ResponseFuture {
         let connector = OpenSsl::new().unwrap();
         let notifications = Connection::connect(
             self.database_url.clone(),
@@ -296,8 +296,8 @@ impl AdServer {
             .with_header(CacheControl(
                 vec![CacheDirective::NoStore, CacheDirective::Private],
             ))
-            .with_body(notifications.into_stream());
-
+            .with_body(Box::new(notifications) as
+                Box<Future<Item = hyper::Chunk, Error = hyper::Error>>);
         Box::new(future::ok(resp))
     }
 
