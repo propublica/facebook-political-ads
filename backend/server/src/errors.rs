@@ -1,9 +1,10 @@
 use r2d2::GetTimeout;
-use diesel::result::Error as diesel_error;
-use serde_json::Error as serde_error;
+use diesel::result::Error as DieselError;
+use serde_json::Error as SerdeError;
 use string::FromUtf8Error;
-use hyper::Error as hyper_error;
+use hyper::Error as HyperError;
 use hyper::error::UriError;
+use tokio_postgres::Error as TokioPostgresError;
 use rusoto_core::TlsError;
 use rusoto_s3::PutObjectError;
 use rusoto_credential::CredentialsError;
@@ -14,14 +15,15 @@ use rusoto_credential::CredentialsError;
 error_chain! {
     foreign_links {
         Timeout(GetTimeout);
-        DataBase(diesel_error);
-        JSON(serde_error);
+        DataBase(DieselError);
+        JSON(SerdeError);
         String(FromUtf8Error);
-        Hyper(hyper_error);
+        Hyper(HyperError);
         Uri(UriError);
         TLS(TlsError);
         S3(PutObjectError);
         AWS(CredentialsError);
+        Notifications(TokioPostgresError);
     }
 
     errors {
