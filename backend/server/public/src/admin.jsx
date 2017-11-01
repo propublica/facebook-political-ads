@@ -136,6 +136,14 @@ const Ad = ({ad, onClick}) => (
         <td dangerouslySetInnerHTML={{__html: ad.targeting}} />
       </tr>
       <tr>
+        <td>
+          political / not political
+        </td>
+        <td>
+          {ad.political} / {ad.not_political}
+        </td>
+      </tr>
+      <tr>
         <td colSpan="2">
           {ad.suppressed ? "Suppressed" :
             <button onClick={function() { return onClick(ad); }}>

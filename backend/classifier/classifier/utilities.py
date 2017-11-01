@@ -76,7 +76,7 @@ def classifier_path(base):
     """
     return os.path.join(base, "classifier.dill")
 
-def get_text(html):
+def get_html_text(html):
     """
     Return the raw text of an ad
     """
@@ -102,9 +102,18 @@ def get_profile_links(html):
     """
     if html:
         doc = BeautifulSoup(html, "html.parser")
-        return " ".join([a["href"] for a in doc.find_all('a', href=True) if "facebook.com" in a["href"]])
+        return " ".join([a["href"] for a in
+                         doc.find_all('a', href=True) if "facebook.com" in a["href"]])
 
     return ""
+
+def get_text(advert):
+    """
+    Return the features we're using to classify the text.
+    """
+    return " ".join([get_html_text(advert["html"]),
+                     get_targets(advert["targeting"]),
+                     get_profile_links(advert["html"])])
 
 def confs(base):
     """
@@ -135,7 +144,5 @@ def load_ads_from_psql(lang):
             score = 0
         else:
             score = round(advert["score"])
-        data.append((" ".join([get_text(advert["html"]),
-                               get_text(advert["targeting"]),
-                               get_profile_links(advert["html"])]), score))
+        data.append((get_text(advert), score))
     return data

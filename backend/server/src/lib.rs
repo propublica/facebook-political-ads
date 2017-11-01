@@ -26,6 +26,7 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 extern crate tokio_core;
+extern crate tokio_postgres;
 extern crate unicase;
 extern crate url;
 
