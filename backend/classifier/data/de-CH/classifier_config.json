@@ -1,5 +1,5 @@
 {
-  "language": "sv-SE",
+  "language": "de-CH",
   "n_features": 100000,
   "classifier_type": "MultinomialNB"
 }
