@@ -17,4 +17,3 @@ classifier.json
 /backend/.dockerignore
 Dockerfile
 __pycache__
-*.dill
