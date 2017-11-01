@@ -1,0 +1,5 @@
+{
+  "language": "nl-NL",
+  "n_features": 100000,
+  "classifier_type": "MultinomialNB"
+}

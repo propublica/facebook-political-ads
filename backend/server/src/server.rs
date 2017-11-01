@@ -6,19 +6,18 @@ use futures_cpupool::CpuPool;
 use futures::future::{Either, FutureResult};
 use futures::{Future, Stream};
 use hyper;
-use hyper::{Client, Chunk, Method, StatusCode};
+use hyper::{Body, Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
 use hyper::header::{AcceptLanguage, ContentLength, ContentType, Authorization, Bearer, Vary,
-                    AccessControlAllowOrigin};
+                    AccessControlAllowOrigin, CacheControl, CacheDirective};
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
 use models::{NewAd, Ad};
 use r2d2_diesel::ConnectionManager;
 use r2d2::{Pool, Config};
-use url::form_urlencoded;
 use start_logging;
 use serde_json;
 use std::collections::HashMap;
@@ -26,9 +25,14 @@ use std::borrow::Cow;
 use std::fs::File;
 use std::io::Read;
 use std::env;
+use std;
 use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
+use tokio_postgres::{Connection, TlsMode};
+use tokio_postgres::tls::openssl::OpenSsl;
 use unicase::Ascii;
+use url::form_urlencoded;
+
 
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
@@ -36,6 +40,7 @@ pub struct AdServer {
     handle: Handle,
     client: Client<HttpsConnector<HttpConnector>>,
     password: String,
+    database_url: String,
 }
 
 #[derive(Deserialize, Debug)]
@@ -129,6 +134,7 @@ impl Service for AdServer {
                 ),
             ),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
+            (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads(req)),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
                 future::ok(Response::new().with_status(
@@ -267,6 +273,34 @@ impl AdServer {
         Box::new(future)
     }
 
+    // Beware! This function assumes that we have a caching proxy in front of our
+    // web server, otherwise we're making a new connection on every request.
+    fn stream_ads(&self, req: Request) -> ResponseFuture {
+        let connector = OpenSsl::new().unwrap();
+        let notifications = Connection::connect(
+            self.database_url.clone(),
+            TlsMode::Require(Box::new(connector)),
+            &self.handle.clone(),
+        ).then(|c| c.unwrap().batch_execute("listen ad_update"))
+            .and_then(|c| {
+                c.notifications().into_future().map_err(
+                    |(e, n)| (e, n.into_inner()),
+                )
+            })
+            .map(|(n, _)| Chunk::from(n.unwrap().payload))
+            .map_err(|(_, _)| {
+                hyper::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, "other"))
+            });
+        let resp = Response::new()
+            .with_header(ContentType("text/event-stream".parse().unwrap()))
+            .with_header(CacheControl(
+                vec![CacheDirective::NoStore, CacheDirective::Private],
+            ))
+            .with_body(Box::new(notifications) as
+                Box<Future<Item = hyper::Chunk, Error = hyper::Error>>);
+        Box::new(future::ok(resp))
+    }
+
     fn process_ads(&self, req: Request) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
@@ -365,7 +399,7 @@ impl AdServer {
         let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
         let config = Config::default();
-        let manager = ConnectionManager::<PgConnection>::new(database_url);
+        let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
         let db_pool = Pool::new(config, manager).expect("Failed to create pool.");
         let pool = CpuPool::new_num_cpus();
 
@@ -385,6 +419,7 @@ impl AdServer {
                 handle: handle.clone(),
                 client: client.clone(),
                 password: admin_password.clone(),
+                database_url: database_url.clone(),
             };
             Http::new().bind_connection(&handle, sock, addr, s);
 

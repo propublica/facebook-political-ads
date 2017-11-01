@@ -1,8 +1,6 @@
 """
 Builds our classifiers
 """
-import os
-import json
 import click
 import dill
 from classifier.utilities import (get_classifier, confs, get_vectorizer,

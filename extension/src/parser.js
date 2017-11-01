@@ -61,7 +61,7 @@ const cleanAd = (html) => {
 
 const checkSponsor = (node) => {
   return Array.from(node.querySelectorAll("a")).some((a) => {
-    return ['Sponsored','Gesponsert'].some((sponsor) => a.textContent === sponsor);
+    return ['Sponsored','Gesponsert','Sponsrad','Sponsorlu','إعلان مُموَّل','Sponsoreret'].some((sponsor) => a.textContent === sponsor);
   });
 };
 
@@ -225,7 +225,8 @@ const timeline = (node) => {
 
   // Finally we have something to save.
   return getTimelineId(parent, {
-    html: cleanAd(node.children[0].outerHTML)
+    html: cleanAd(node.children[0].outerHTML),
+    created_at: (new Date()).valueOf()
   });
 };
 
@@ -252,7 +253,8 @@ const sidebar = (node) => {
   // Then we just need to sent the cleaned ad and the ego-fbid
   return Promise.resolve({
     id: node.getAttribute("data-ego-fbid"),
-    html: cleanAd(node.outerHTML)
+    html: cleanAd(node.outerHTML),
+    created_at: (new Date()).valueOf()
   });
 };
 
