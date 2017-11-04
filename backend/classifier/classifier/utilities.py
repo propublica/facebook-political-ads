@@ -66,8 +66,8 @@ def train_classifier(classifier, vectorizer, base, language):
     x_test = vectorizer.transform(x_test)
     x_train, y_train = equalize_classes(x_train, y_train)
     print("final size of training data: %s" % x_train.shape[0])
-    classifier.fit(x_train.todense(), y_train)
-    print(classification_report(y_test, classifier.predict(x_test.todense())))
+    classifier.fit(x_train, y_train)
+    print(classification_report(y_test, classifier.predict(x_test)))
     return classifier
 
 def classifier_path(base):
