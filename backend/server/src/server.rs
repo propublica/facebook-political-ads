@@ -282,23 +282,19 @@ impl AdServer {
             TlsMode::Require(Box::new(connector)),
             &self.handle.clone(),
         ).then(|c| c.unwrap().batch_execute("listen ad_update"))
-            .and_then(|c| {
-                c.notifications().into_future().map_err(
-                    |(e, n)| (e, n.into_inner()),
-                )
-            })
-            .map(|(n, _)| Chunk::from(n.unwrap().payload))
-            .map_err(|(_, _)| {
-                hyper::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, "other"))
+            .map(|c| {
+                let mut resp = Response::new()
+                    .with_header(ContentType("text/event-stream".parse().unwrap()))
+                    .with_header(CacheControl(
+                        vec![CacheDirective::NoStore, CacheDirective::Private],
+                    ));
+
+                resp.set_body(Box::new(c.notifications()));
+                resp
             });
-        let resp = Response::new()
-            .with_header(ContentType("text/event-stream".parse().unwrap()))
-            .with_header(CacheControl(
-                vec![CacheDirective::NoStore, CacheDirective::Private],
-            ))
-            .with_body(Box::new(notifications) as
-                Box<Future<Item = hyper::Chunk, Error = hyper::Error>>);
-        Box::new(future::ok(resp))
+
+
+        Box::new(notifications)
     }
 
     fn process_ads(&self, req: Request) -> ResponseFuture {
