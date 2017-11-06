@@ -1,0 +1,41 @@
+{
+	"political": [
+		"partitodemocratico.it",
+		"movimentocinquestelle",
+		"ForzaItaliaUfficiale",
+		"LegaNordUfficiale",
+		"FdIANUfficiale",
+		"alternativapopolare.it",
+		"sinistraitalianaSI",
+		"Articolo1Modempro",
+		"casapounditalia",
+		"SceltaCivica",
+		"MontecitorioCinqueStelle",
+		"SenatoCinqueStelle",
+		"matteorenziufficiale",
+		"beppegrillo.it",
+		"SilvioBerlusconi",
+		"salviniofficial",
+		"LuigiDiMaio",
+		"giorgiameloni.paginaufficiale",
+		"angelinoalfano.it",
+		"Fratoianni",
+		"robersperanza"
+	],
+	"not_political": [
+		"Fiat.Italia",
+		"officialceresbeer",
+		"BarillaIT",
+		"sky",
+		"netflixitalia",
+		"volagratis",
+		"GialloZafferanolive",
+		"amazon.it",
+		"lorealparisitalia",
+		"enel.energia.10",
+		"Esselunga",
+		"ASOS.Italia",
+		"vodafoneit",
+		"TimOfficialPage"
+	]
+}
