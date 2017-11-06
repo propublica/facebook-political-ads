@@ -6,7 +6,7 @@ use futures_cpupool::CpuPool;
 use futures::future::{Either, FutureResult};
 use futures::{Future, Stream};
 use hyper;
-use hyper::{Body, Client, Chunk, Method, StatusCode};
+use hyper::{Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
@@ -22,6 +22,8 @@ use start_logging;
 use serde_json;
 use std::collections::HashMap;
 use std::borrow::Cow;
+use std::error::Error as StdError;
+use std::io::Error as StdIoError;
 use std::fs::File;
 use std::io::Read;
 use std::env;
@@ -289,8 +291,14 @@ impl AdServer {
                         vec![CacheDirective::NoStore, CacheDirective::Private],
                     ));
 
-                resp.set_body(Box::new(c.notifications()));
+                let stream = c.notifications().map(|n| n.payload).map_err(|e| {
+                    hyper::Error::Io(StdIoError::new(std::io::ErrorKind::Other, e.description()))
+                });
+                resp.set_body(Box::new(stream));
                 resp
+            })
+            .map_err(|(e, _)| {
+                hyper::Error::Io(StdIoError::new(std::io::ErrorKind::Other, e.description()))
             });
 
 
