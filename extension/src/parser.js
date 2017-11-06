@@ -61,7 +61,15 @@ const cleanAd = (html) => {
 
 const checkSponsor = (node) => {
   return Array.from(node.querySelectorAll("a")).some((a) => {
-    return ['Sponsored','Gesponsert','Sponsrad','Sponsorlu','إعلان مُموَّل','Sponsoreret'].some((sponsor) => a.textContent === sponsor);
+    return [
+      'Sponsored',
+      'Gesponsert',
+      'Sponsrad',
+      'Sponsorlu',
+      'إعلان مُموَّل',
+      'Sponsoreret',
+      'Sponsorizzata'
+    ].some((sponsor) => a.textContent === sponsor);
   });
 };
 
