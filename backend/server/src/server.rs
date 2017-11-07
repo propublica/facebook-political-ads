@@ -292,7 +292,7 @@ impl AdServer {
                 let resp = Response::new()
                     .with_header(ContentType("text/event-stream".parse().unwrap()))
                     .with_header(CacheControl(
-                        vec![CacheDirective::NoStore, CacheDirective::Private],
+                        vec![CacheDirective::Public, CacheDirective::MaxAge(29)],
                     ))
                     .with_body(body);
                 handle.spawn(sender.send_all(notifications).map(|_| ()).map_err(|_| ()));
