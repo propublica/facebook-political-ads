@@ -200,6 +200,61 @@ const getTimelineId = (parent, ad) => {
   return promise;
 };
 
+let sidebarCache = new Map();
+const getSidebarId = (parent, ad) => {
+  const control = parent.querySelector(".uiSelectorMenuWrapper");
+
+  //Replicating getTimelineId. 
+  // Since the sidebar DOM structure is slightly different we need to pull out 
+  // the toggle Id from the data-gt attribute. I was unable to find a dataowner-id attribute
+  const toggle = parent.querySelector('a')
+  const toggleData = JSON.parse(toggle.getAttribute('data-gt')) 
+  const toggleId = toggleData["data_to_log"]["ad_id"]
+  if (!toggle && !toggleData) 
+    return null;
+
+  if (sidebarCache.has(toggleId))
+    return Promise.resolve(sidebarCache.get(toggleId));
+
+  // Leaving this here becuase you'll need to test the above code works.
+  // console.log(toggle, toggleData)
+  let promise = new Promise((resolve, reject) => {
+    let cb = (record, self) => {
+      const menu = Array.from(document.querySelectorAll(".uiMenu"))
+
+      if(!menu) return null;
+      
+      const li = Array.from(layer.querySelectorAll("li"))
+        .filter((it) => it.getAttribute("data-label") === "Why am I seeing this?")[0];
+      const endpoint = li.querySelector("a");
+      if(!endpoint) return null;
+      const url =  endpoint.getAttribute("ajaxify");
+      refocus(() => toggle.click());
+      self.disconnect();
+      try {
+        const resolved = {
+          ...ad,
+          id: new URL("https://facebook.com" + url).searchParams.get("id"),
+          targeting: url
+        };
+
+        if(resolved.id) {
+          sidebarCache.set(toggleId, resolved);
+          resolve(resolved);
+        } else {
+          reject("No ad id");
+        }
+      
+      } catch(e) {
+        reject(e);
+      }
+    };
+    new MutationObserver(cb).observe(document, {childList: true, subtree:true});
+  }).then(getTargeting)
+  
+  refocus(() => toggle.click());
+  return promise;
+}
 const timeline = (node) => {
   // First we check if it is actually a sponsored post
   if(!checkSponsor(node)) return Promise.resolve(false);
@@ -234,6 +289,7 @@ const timeline = (node) => {
 const sidebar = (node) => {
   // Although first we still need to make sure we are in a sponsored box;
   let parent = node;
+  console.log("HEREEE")
   while(parent) {
     if(checkSponsor(parent)) break;
     parent = parent.parentElement;
@@ -249,8 +305,8 @@ const sidebar = (node) => {
 
   // and we have childnodes
   if(!node.children.length === 0) return Promise.resolve(false);
-
   // Then we just need to sent the cleaned ad and the ego-fbid
+  console.log(getSidebarId(node, {}))
   return Promise.resolve({
     id: node.getAttribute("data-ego-fbid"),
     html: cleanAd(node.outerHTML),
