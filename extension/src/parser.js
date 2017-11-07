@@ -200,7 +200,6 @@ const getTimelineId = (parent, ad) => {
   return promise;
 };
 
-let sidebarCache = new Map();
 const getSidebarId = (parent, ad) => {
   const control = parent.querySelector(".uiSelectorMenuWrapper");
 
@@ -239,7 +238,7 @@ const getSidebarId = (parent, ad) => {
         };
 
         if(resolved.id) {
-          sidebarCache.set(toggleId, resolved);
+          timelineCache.set(toggleId, resolved);
           resolve(resolved);
         } else {
           reject("No ad id");
@@ -289,7 +288,6 @@ const timeline = (node) => {
 const sidebar = (node) => {
   // Although first we still need to make sure we are in a sponsored box;
   let parent = node;
-  console.log("HEREEE")
   while(parent) {
     if(checkSponsor(parent)) break;
     parent = parent.parentElement;
@@ -306,7 +304,6 @@ const sidebar = (node) => {
   // and we have childnodes
   if(!node.children.length === 0) return Promise.resolve(false);
   // Then we just need to sent the cleaned ad and the ego-fbid
-  console.log(getSidebarId(node, {}))
   return Promise.resolve({
     id: node.getAttribute("data-ego-fbid"),
     html: cleanAd(node.outerHTML),
