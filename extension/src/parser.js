@@ -304,7 +304,7 @@ const sidebar = (node) => {
   // and we have childnodes
   if(!node.children.length === 0) return Promise.resolve(false);
   // Then we just need to sent the cleaned ad and the ego-fbid
-  return Promise.resolve({
+  return getSidebarId(parent, {
     id: node.getAttribute("data-ego-fbid"),
     html: cleanAd(node.outerHTML),
     created_at: (new Date()).valueOf()
