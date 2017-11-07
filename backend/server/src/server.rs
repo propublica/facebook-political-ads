@@ -4,9 +4,9 @@ use errors::*;
 use futures::future;
 use futures_cpupool::CpuPool;
 use futures::future::{Either, FutureResult};
-use futures::{Future, Stream};
+use futures::{Future, Sink, Stream};
 use hyper;
-use hyper::{Client, Chunk, Method, StatusCode};
+use hyper::{Body, Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
@@ -21,17 +21,16 @@ use r2d2::{Pool, Config};
 use start_logging;
 use serde_json;
 use std::collections::HashMap;
+use std::env;
 use std::borrow::Cow;
 use std::error::Error as StdError;
 use std::io::Error as StdIoError;
 use std::fs::File;
 use std::io::Read;
-use std::env;
 use std;
 use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
 use tokio_postgres::{Connection, TlsMode};
-use tokio_postgres::tls::openssl::OpenSsl;
 use unicase::Ascii;
 use url::form_urlencoded;
 
@@ -62,6 +61,7 @@ pub struct Admin {
 pub struct ApiResponse {
     ads: Vec<Ad>,
 }
+
 
 impl Service for AdServer {
     type Request = Request;
@@ -136,7 +136,7 @@ impl Service for AdServer {
                 ),
             ),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
-            (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads(req)),
+            (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads()),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
                 future::ok(Response::new().with_status(
@@ -277,30 +277,30 @@ impl AdServer {
 
     // Beware! This function assumes that we have a caching proxy in front of our
     // web server, otherwise we're making a new connection on every request.
-    fn stream_ads(&self, req: Request) -> ResponseFuture {
-        let connector = OpenSsl::new().unwrap();
+    fn stream_ads(&self) -> ResponseFuture {
+        let handle = self.handle.clone();
         let notifications = Connection::connect(
             self.database_url.clone(),
-            TlsMode::Require(Box::new(connector)),
+            TlsMode::None,
             &self.handle.clone(),
         ).then(|c| c.unwrap().batch_execute("listen ad_update"))
-            .map(|c| {
-                let mut resp = Response::new()
+            .map(move |c| {
+                let notifications = c.notifications()
+                    .map(|n| Ok(Chunk::from(n.payload)))
+                    .map_err(|_| unimplemented!());
+                let (sender, body) = Body::pair();
+                let resp = Response::new()
                     .with_header(ContentType("text/event-stream".parse().unwrap()))
                     .with_header(CacheControl(
                         vec![CacheDirective::NoStore, CacheDirective::Private],
-                    ));
-
-                let stream = c.notifications().map(|n| n.payload).map_err(|e| {
-                    hyper::Error::Io(StdIoError::new(std::io::ErrorKind::Other, e.description()))
-                });
-                resp.set_body(Box::new(stream));
+                    ))
+                    .with_body(body);
+                handle.spawn(sender.send_all(notifications).map(|_| ()).map_err(|_| ()));
                 resp
             })
             .map_err(|(e, _)| {
                 hyper::Error::Io(StdIoError::new(std::io::ErrorKind::Other, e.description()))
             });
-
 
         Box::new(notifications)
     }
