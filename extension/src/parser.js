@@ -206,9 +206,9 @@ const getSidebarId = (parent, ad) => {
   //Replicating getTimelineId. 
   // Since the sidebar DOM structure is slightly different we need to pull out 
   // the toggle Id from the data-gt attribute. I was unable to find a dataowner-id attribute
-  const toggle = parent.querySelector('a')
-  const toggleData = JSON.parse(toggle.getAttribute('data-gt')) 
-  const toggleId = toggleData["data_to_log"]["ad_id"]
+  const toggle = parent.querySelector('a');
+  const toggleData = JSON.parse(toggle.getAttribute('data-gt'));
+  const toggleId = toggleData["data_to_log"]["ad_id"];
   if (!toggle && !toggleData) 
     return null;
 
