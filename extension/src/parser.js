@@ -234,7 +234,6 @@ const getSidebarId = (parent, ad) => {
     return Promise.resolve(adCache.get(toggleId));
 
   // Leaving this here becuase you'll need to test the above code works.
-  console.log(toggle, toggleData);
   let promise = new Promise(parseMenu(ad, ".uiMenu", toggle, toggleId, (it) => (
     it.getAttribute("data-label") === "Why am I seeing this?")
   )).then(getTargeting);
