@@ -45,7 +45,7 @@ fn main() {
         let pool = pool.clone();
         let client = client.clone();
 
-        let future = ad.grab_and_store(client, &db_pool, pool);
+        let future = ad.grab_and_store(client, &db_pool, &pool);
         core.run(future).unwrap();
     }
 }

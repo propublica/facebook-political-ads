@@ -343,7 +343,7 @@ impl AdServer {
                     handle.spawn(ad.grab_and_store(
                         client.clone(),
                         &image_db,
-                        image_pool.clone(),
+                        &image_pool.clone(),
                     ))
                 }
 
