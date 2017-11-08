@@ -230,7 +230,8 @@ impl Ad {
                 // Hyper async yet.
                 pool.spawn_fn(move || {
                     if tuple.1.host().unwrap() != "pp-facebook-ads.s3.amazonaws.com" {
-                        let credentials = DefaultCredentialsProvider::new()?;
+                        let credentials = DefaultCredentialsProvider::new()
+                            .map_err(|e| { warn!("could not access credentials {:?}", e); e })?;
                         let tls = default_tls_client()?;
                         let client = S3Client::new(tls, credentials, Region::UsEast1);
                         let req = PutObjectRequest {
@@ -240,7 +241,8 @@ impl Ad {
                             body: Some(tuple.0.to_vec()),
                             ..PutObjectRequest::default()
                         };
-                        client.put_object(&req)?;
+                        client.put_object(&req)
+                            .map_err(|e| { warn!("could not store image {:?}", e); e })?;
                         info!("stored {:?}", tuple.1.path());
                     }
                     Ok(tuple.1)
