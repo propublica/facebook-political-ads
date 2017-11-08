@@ -11,7 +11,8 @@ use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
 use hyper::header::{AcceptLanguage, ContentLength, ContentType, Authorization, Bearer, Vary,
-                    AccessControlAllowOrigin, CacheControl, CacheDirective};
+                    AccessControlAllowOrigin, CacheControl, CacheDirective,
+                    Connection as HttpConnection};
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
@@ -301,6 +302,7 @@ impl AdServer {
                     .with_header(CacheControl(
                         vec![CacheDirective::Public, CacheDirective::MaxAge(29)],
                     ))
+                    .with_header(HttpConnection::close())
                     .with_body(body);
                 handle.spawn(sender.send_all(notifications).map(|_| ()).map_err(|_| ()));
                 resp
