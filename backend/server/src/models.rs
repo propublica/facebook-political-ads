@@ -25,7 +25,7 @@ use schema::ads;
 use std::collections::HashMap;
 use server::AdPost;
 
-const ENDPOINT: &'static str = "https://pp-facebook-ads.s3.amazonaws.com/";
+const ENDPOINT: &str = "https://pp-facebook-ads.s3.amazonaws.com/";
 
 fn document_select(
     document: &kuchiki::NodeRef,
@@ -108,14 +108,14 @@ pub struct Images {
 }
 
 impl Images {
-    fn from_ad(ad: &Ad, images: Vec<Uri>) -> Result<Images> {
+    fn from_ad(ad: &Ad, images: &[Uri]) -> Result<Images> {
         let thumb = images
             .iter()
             .filter(|i| ad.thumbnail.contains(i.path()))
             .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches('/'))
             .nth(0);
 
-        let mut rest = images.clone();
+        let mut rest = images.to_owned();
         if let Some(thumb) = thumb.clone() {
             rest.retain(|x| !thumb.contains(x.path()))
         };
@@ -195,7 +195,7 @@ impl Ad {
         &self,
         client: Client<HttpsConnector<HttpConnector>, Body>,
         db: &Pool<ConnectionManager<PgConnection>>,
-        pool: CpuPool,
+        pool: &CpuPool,
     ) -> Box<Future<Item = (), Error = ()>> {
         let ad = self.clone();
         let pool_s3 = pool.clone();
@@ -241,6 +241,7 @@ impl Ad {
                             ..PutObjectRequest::default()
                         };
                         client.put_object(&req)?;
+                        info!("stored {:?}", tuple.1.path());
                     }
                     Ok(tuple.1)
                 })
@@ -253,7 +254,7 @@ impl Ad {
                 let imgs = images.clone();
                 pool_db.spawn_fn(move || {
                     use schema::ads::dsl::*;
-                    let update = Images::from_ad(&ad, imgs)?;
+                    let update = Images::from_ad(&ad, &imgs)?;
                     let connection = db.get()?;
                     diesel::update(ads.find(&ad.id))
                         .set(&update)
@@ -462,7 +463,7 @@ mod tests {
             suppressed: false,
         };
         let urls = saved_ad.image_urls();
-        let images = Images::from_ad(&saved_ad, urls).unwrap();
+        let images = Images::from_ad(&saved_ad, &urls).unwrap();
         assert!(images.html != saved_ad.html);
         assert!(!images.html.contains("fbcdn"));
         assert!(!images.html.contains("html"));

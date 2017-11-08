@@ -41,7 +41,7 @@ fn cleanup(ad: &mut Ad) -> bool {
                 let client = S3Client::new(tls, credentials, Region::UsEast1);
                 let res = client.delete_object(&DeleteObjectRequest {
                     bucket: "pp-facebook-ads".to_string(),
-                    key: url.path().trim_left_matches("/").to_string(),
+                    key: url.path().trim_left_matches('/').to_string(),
                     ..DeleteObjectRequest::default()
                 });
                 *src = "".to_string();
