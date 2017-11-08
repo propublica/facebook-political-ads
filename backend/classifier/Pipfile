@@ -11,10 +11,9 @@ numpy = "*"
 sklearn = "*"
 "bs4" = "*"
 imbalanced-learn = "*"
-matplotlib = "*"
 "psycopg2" = "*"
 dill = "*"
 click = "*"
 records = "*"
-spacy-nightly = "*"
-"93d1eba" = {file = "https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-2.0.0a2/xx_ent_wiki_sm-2.0.0a2.tar.gz"}
+spacy = "*"
+"93d1eba" = {file = "https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-2.0.0/xx_ent_wiki_sm-2.0.0.tar.gz"}
