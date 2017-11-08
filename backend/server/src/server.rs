@@ -24,16 +24,17 @@ use std::collections::HashMap;
 use std::env;
 use std::borrow::Cow;
 use std::error::Error as StdError;
+use std::io::ErrorKind as StdIoErrorKind;
 use std::io::Error as StdIoError;
 use std::fs::File;
 use std::io::Read;
-use std;
+use std::time::Duration;
 use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
 use tokio_postgres::{Connection, TlsMode};
+use tokio_timer::Timer;
 use unicase::Ascii;
 use url::form_urlencoded;
-
 
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
@@ -279,15 +280,21 @@ impl AdServer {
     // web server, otherwise we're making a new connection on every request.
     fn stream_ads(&self) -> ResponseFuture {
         let handle = self.handle.clone();
+
         let notifications = Connection::connect(
             self.database_url.clone(),
             TlsMode::None,
             &self.handle.clone(),
         ).then(|c| c.unwrap().batch_execute("listen ad_update"))
             .map(move |c| {
+                let timer = Timer::default()
+                    .interval(Duration::new(1, 0))
+                    .map(|_| Ok(Chunk::from("event: ping\n\n")))
+                    .map_err(|_| unimplemented!());
                 let notifications = c.notifications()
                     .map(|n| Ok(Chunk::from(n.payload)))
-                    .map_err(|_| unimplemented!());
+                    .map_err(|_| unimplemented!())
+                    .select(timer);
                 let (sender, body) = Body::pair();
                 let resp = Response::new()
                     .with_header(ContentType("text/event-stream".parse().unwrap()))
@@ -299,7 +306,7 @@ impl AdServer {
                 resp
             })
             .map_err(|(e, _)| {
-                hyper::Error::Io(StdIoError::new(std::io::ErrorKind::Other, e.description()))
+                hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
             });
 
         Box::new(notifications)
