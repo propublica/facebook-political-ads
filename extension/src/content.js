@@ -10,6 +10,7 @@ const sendAds = function() {
   let results = [];
   let scraper = posts.reduce((p, i) => p.then(() => {
     let timeout = new Promise((resolve) => setTimeout(() => resolve(false), 5000));
+    console.log(parser(i), i);
     return Promise.race([
       parser(i).then(
         (it) => results.push(it),
