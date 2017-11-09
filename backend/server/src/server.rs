@@ -289,7 +289,7 @@ impl AdServer {
         ).then(|c| c.unwrap().batch_execute("listen ad_update"))
             .map(move |c| {
                 let timer = Timer::default()
-                    .interval(Duration::new(1, 0))
+                    .interval(Duration::from_millis(1000))
                     .map(|_| Ok(Chunk::from("event: ping\n\n")))
                     .map_err(|_| unimplemented!());
                 let notifications = c.notifications()
@@ -302,7 +302,7 @@ impl AdServer {
                     .with_header(CacheControl(
                         vec![CacheDirective::Public, CacheDirective::MaxAge(29)],
                     ))
-                    .with_header(HttpConnection::close())
+                    .with_header(HttpConnection::keep_alive())
                     .with_body(body);
                 handle.spawn(sender.send_all(notifications).map(|_| ()).map_err(|_| ()));
                 resp
