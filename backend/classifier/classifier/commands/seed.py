@@ -22,7 +22,7 @@ def fetch_page(pagename, total_posts, graph):
     while posts:
         for post in posts['data']:
             if 'message' in post:
-                post_bodies.append(post['message'])
+                post_bodies.append(post['message'] + ' https://www.facebook.com/' + pagename + '/')
                 if len(post_bodies) >= total_posts:
                     break
         if 'paging' in posts and len(post_bodies) < total_posts:
