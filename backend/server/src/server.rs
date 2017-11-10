@@ -64,7 +64,6 @@ pub struct ApiResponse {
     ads: Vec<Ad>,
 }
 
-
 impl Service for AdServer {
     type Request = Request;
     type Response = Response;
