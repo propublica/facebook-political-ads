@@ -38,7 +38,9 @@ fn main() {
     let client = Client::configure().connector(connector).build(
         &core.handle(),
     );
-    let dbads: Vec<Ad> = ads.load::<Ad>(&*conn).expect("Couldn't get ads");
+    let dbads: Vec<Ad> = ads.order(created_at.desc()).load::<Ad>(&*conn).expect(
+        "Couldn't get ads",
+    );
 
     for ad in dbads {
         let db_pool = db_pool.clone();
