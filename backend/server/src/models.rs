@@ -44,8 +44,7 @@ pub fn get_title(document: &kuchiki::NodeRef) -> Result<String> {
 }
 
 fn get_image(document: &kuchiki::NodeRef) -> Result<String> {
-    document_select(document, "img")
-        .map_err(|_| ErrorKind::HTML("Selector compile error".to_string()))?
+    document_select(document, "img")?
         .nth(0)
         .and_then(|a| {
             a.attributes.borrow().get("src").and_then(
@@ -86,7 +85,6 @@ fn get_images(document: &kuchiki::NodeRef) -> Result<Vec<String>> {
             .collect::<Vec<String>>(),
     )
 }
-
 
 fn get_real_image_uri(uri: Uri) -> Uri {
     let url = uri.to_string().parse::<Url>();
@@ -469,7 +467,7 @@ mod tests {
         assert!(images.html != saved_ad.html);
         assert!(!images.html.contains("fbcdn"));
         assert!(!images.html.contains("html"));
-        assert!(images.images.len() == saved_ad.images.len());
+        assert_eq!(images.images.len(), saved_ad.images.len());
         assert!(images.thumbnail.unwrap() != saved_ad.thumbnail);
     }
 }
