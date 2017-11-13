@@ -48,6 +48,6 @@ fn main() {
         let client = client.clone();
 
         let future = ad.grab_and_store(client, &db_pool, &pool);
-        core.run(future).unwrap();
+        let _ = core.run(future);
     }
 }
