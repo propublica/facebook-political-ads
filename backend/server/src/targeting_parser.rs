@@ -1,7 +1,4 @@
-use models::Ad;
 use errors::*;
-use kuchiki;
-use kuchiki::traits::*;
 use nom::{IResult, rest_s};
 
 #[derive(Clone, Debug, PartialEq)]
@@ -70,16 +67,24 @@ named!(gender_age_and_location(&str) -> Vec<Targeting>,
     )
 );
 
-named!(parse_targeting(&str) -> Vec<Targeting>,
+named!(targeting(&str) -> Vec<Targeting>,
     alt!(gender_age_and_location | segment | interest)
 );
+
+fn parse_targeting(thing: &str) -> Result<Vec<Targeting>> {
+    match targeting(thing) {
+        IResult::Done(_, result) => Ok(result),
+        IResult::Error(e) => Err(e.into()),
+        IResult::Incomplete(e) => Err(ErrorKind::TargetingIncomplete(e).into()),
+    }
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
     #[test]
-    fn targeting() {
+    fn test_targeting() {
         assert_eq!(
             segment("\"Generation X\""),
 
@@ -115,7 +120,7 @@ mod tests {
             )
         );
         assert_eq!(
-            parse_targeting(
+            targeting(
                 "people ages 18 and older who live or were recently near San Francisco, California",
             ),
             IResult::Done(

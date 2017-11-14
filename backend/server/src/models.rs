@@ -27,7 +27,7 @@ use server::AdPost;
 
 const ENDPOINT: &str = "https://pp-facebook-ads.s3.amazonaws.com/";
 
-fn document_select(
+pub fn document_select(
     document: &kuchiki::NodeRef,
     selector: &str,
 ) -> Result<Select<Elements<Descendants>>> {
