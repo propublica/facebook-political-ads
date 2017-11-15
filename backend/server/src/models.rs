@@ -122,7 +122,6 @@ impl Images {
             .filter(|i| ad.images.iter().any(|a| a.contains(i.path())))
             .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches('/'))
             .collect::<Vec<String>>();
-
         let document = kuchiki::parse_html().one(ad.html.clone());
         for a in document_select(&document, "img")? {
             if let Some(x) = a.attributes.borrow_mut().get_mut("src") {
