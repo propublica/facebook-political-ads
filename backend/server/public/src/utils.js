@@ -20,10 +20,26 @@ const newAds = (ads) => ({
   value: ads
 });
 
-const refresh = (store, query) => {
+const INCREMENT = 'INCREMENT';
+const DECREMENT = "DECREMENT";
+
+const pageCount = {
+  increment() {
+    return { type: INCREMENT };
+  },
+
+  decrement() {
+    return { type: DECREMENT };
+  }
+}
+
+const refresh = (store, query, page) => {
   let url = "/facebook-ads/ads";
   if(query) {
     url = url + `?search=${query}`;
+  }
+  if(page) {
+    url = url + `?page=${page}`;
   }
   return fetch(url, {
     method: "GET",
@@ -32,6 +48,6 @@ const refresh = (store, query) => {
     .then((ads) => { store.dispatch(newAds(ads.ads)); });
 };
 
-const search = (store, query) => () => refresh(store, query);
+const search = (store, query) => () => refresh(store, query, 0);
 
-export { headers, newAds, NEW_ADS, refresh, search };
+export { headers, newAds, NEW_ADS, pageCount, INCREMENT, DECREMENT, refresh, search };
