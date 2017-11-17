@@ -9,9 +9,9 @@
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "17.0.0",
+            "platform_release": "17.2.0",
             "platform_system": "Darwin",
-            "platform_version": "Darwin Kernel Version 17.0.0: Thu Aug 24 21:48:19 PDT 2017; root:xnu-4570.1.46~2/RELEASE_X86_64",
+            "platform_version": "Darwin Kernel Version 17.2.0: Fri Sep 29 18:27:05 PDT 2017; root:xnu-4570.20.62~3/RELEASE_X86_64",
             "python_full_version": "3.6.2",
             "python_version": "3.6",
             "sys_platform": "darwin"
@@ -401,9 +401,9 @@
         },
         "spacy": {
             "hashes": [
-                "sha256:6e872651dfaf9d930daa04110882b231d5fc5ffffbb3012ddd66575ddeb177d3"
+                "sha256:5afe364a5f48cd7a7a9346db18ed3232147f3ae3722d3dabdc3dd2e86ea9944a"
             ],
-            "version": "==2.0.1"
+            "version": "==2.0.3"
         },
         "sqlalchemy": {
             "hashes": [
@@ -425,9 +425,9 @@
         },
         "thinc": {
             "hashes": [
-                "sha256:8615dffa31409d2fac85d4806674d914a554aac297f867a03e6dcd84cb6cc99a"
+                "sha256:28d06bc0e6d921cab2dd6197249c3aed15b2563c0e4166a9970d4f409dab1e81"
             ],
-            "version": "==6.10.0"
+            "version": "==6.10.1"
         },
         "toolz": {
             "hashes": [
