@@ -16,6 +16,8 @@ pub enum Targeting<'a> {
     Agency(&'a str),
     Website(&'a str),
     Language(&'a str),
+    Employer(&'a str),
+    School(&'a str),
     Like,
     List,
 }
@@ -40,9 +42,28 @@ named!(like(&str) -> Targeting,
    )
 );
 
+named!(school(&str) -> Targeting,
+    do_parse!(
+        take_until_and_consume!("som har angivet skolen <b>") >>
+        res: take_until!("</b> på") >>
+        (Targeting::Employer(res))
+    )
+);
+
+named!(employer(&str) -> Targeting,
+    do_parse!(
+        take_until_and_consume!("Personen erreichen möchte, die <b>") >>
+        res: take_until!("</b> als Arbeitgeber") >>
+        (Targeting::Employer(res))
+    )
+);
+
 named!(provider(&str) -> Targeting,
     do_parse!(
-        take_until_and_consume!("based on data provided by") >>
+        alt!(
+            take_until!("based on data provided by") |
+            take_until!("wir basierend auf Daten von")
+        ) >>
         take_until_and_consume!("<b>") >>
         agency: until_b >> (Targeting::Agency(agency))
     )
@@ -80,9 +101,9 @@ named!(language(&str) -> Targeting,
            (Targeting::Language(language))
        )
        | do_parse!(
-           take_until_and_consume!("who speak <b>\"") >>
-           language: take_until_and_consume!("\"") >>
-           until_b >>
+           take_until_and_consume!("who speak <b>") >>
+           opt!(tag!("\"")) >>
+           language: alt!(until_b | take_until_and_consume!("\"")) >>
            (Targeting::Language(language))
        )
    )
@@ -90,9 +111,16 @@ named!(language(&str) -> Targeting,
 
 named!(segment(&str) -> Targeting,
     do_parse!(
-        take_until_and_consume!("<b>") >>
-        tag!("\"") >>
-        segment: take_until_and_consume!("\"") >>
+        alt!(
+            take_until_and_consume!("„<b>") |
+            take_until_and_consume!("<b>\"") |
+            take_until_and_consume!("<b>„")
+        ) >>
+        segment: alt!(
+            take_until!("\"</b>") |
+            take_until!("</b>“") |
+            take_until!("“</b>")
+        ) >>
         (Targeting::Segment(segment))
     )
 );
@@ -101,9 +129,19 @@ named!(gender(&str) -> Option<Targeting>,
     do_parse!(
         take_until_and_consume!("<b>") >>
         result: alt!(
-            alt!(tag!("men") | tag!("Männer")) => {|m| Some(Targeting::Gender(m)) }
-            | alt!(tag!("women") | tag!("Frauen") | tag!("kvinder")) => {|f| Some(Targeting::Gender(f)) }
-            | alt!(tag!("people") | tag!("Personen") | tag!("personer")) => {|_| None }
+            alt!(
+                tag!("men")
+                | tag!("Männer")
+                | tag!("mænd")
+                | tag!("gli uomini")
+                | tag!("män")
+            ) => {|m| Some(Targeting::Gender(m)) }
+            | alt!(
+                tag!("women")
+                | tag!("Frauen")
+                | tag!("kvinder")
+            ) => {|f| Some(Targeting::Gender(f)) }
+            | alt!(tag!("people") | tag!("Personen") | tag!("personer") | tag!("le persone")) => {|_| None }
         ) >>
         (result)
     )
@@ -124,6 +162,9 @@ named!(retargeting(&str) -> Targeting,
             tag!("people who may be similar to their customers")
             | tag!("Personen, die deren Kunden ähneln")
             | tag!("personer, som minder om deres kunder")
+            | tag!("i nærheden af deres virksomhed for nylig")
+            | tag!("kürzlich in der Nähe des Unternehmens")
+            | tag!("nyss varit i närheten av företaget")
         ) >>
         (Targeting::Retargeting(res))
     )
@@ -132,8 +173,19 @@ named!(retargeting(&str) -> Targeting,
 named!(age(&str) -> Option<Targeting>,
     alt!(
         do_parse!(
-          ws!(alt!(tag!("zwischen") | tag!("im Alter von") | tag!("i alderen") | tag!("på"))) >>
-          complete: ws!(take_until_and_consume!(",")) >>
+          ws!(alt!(
+              tag!("zwischen")
+              | tag!("im Alter von")
+              | tag!("i alderen")
+              | tag!("i åldern")
+              | tag!("på")
+              | tag!("di età")
+          )) >>
+          complete: ws!(alt!(
+              take_until_and_consume!(",")
+              | take_until_and_consume!("in")
+              | take_until!("che vivono")
+          )) >>
           (Some(Targeting::Age(complete)))
         ) |
         do_parse!(
@@ -165,18 +217,20 @@ named!(city_state(&str) -> Vec<Option<Targeting>>,
 
 named!(age_and_location(&str) -> Vec<Option<Targeting>>,
     do_parse!(
-        a: ws!(age) >>
-        l: ws!(alt!(city_state | country)) >>
+        a: dbg!(ws!(age)) >>
+        l: ws!(alt!(city_state | dbg!(country))) >>
         (vec![&vec![a][..], &l[..]].concat())
     )
 );
 
 named!(targeting(&str) -> Vec<Targeting>,
-    dbg_dmp!(do_parse!(
+    do_parse!(
         advertiser_first: opt!(advertiser_b) >>
         sources_and_interests: opt!(alt!(
             interest
             | retargeting
+            | employer
+            | school
             | website
             | provider
             | language
@@ -185,14 +239,14 @@ named!(targeting(&str) -> Vec<Targeting>,
             | list
         )) >>
         advertiser_second: opt!(advertiser_wants) >>
-        gender: gender >>
-        location: age_and_location >>
+        gender: dbg!(gender) >>
+        location: dbg!(age_and_location) >>
         (vec![&vec![advertiser_first,
                     sources_and_interests,
                     advertiser_second,
                     gender][..], &location[..]]
               .concat().iter().filter_map(|x| x.clone()).collect())
-    ))
+    )
 );
 
 fn parse_targeting(thing: &str) -> Result<Vec<Targeting>> {
@@ -210,8 +264,8 @@ mod tests {
     #[test]
     fn test_targeting() {
         assert_eq!(
-            segment("<b>\"Generation X\""),
-            IResult::Done("", Targeting::Segment("Generation X"))
+            segment("<b>\"Generation X\"</b>"),
+            IResult::Done("\"</b>", Targeting::Segment("Generation X"))
         );
         let g = "Google";
         assert_eq!(
@@ -277,17 +331,18 @@ mod tests {
         let database_url = env::var("DATABASE_URL").unwrap();
         let connection = PgConnection::establish(&database_url).unwrap();
         let adverts = ads.filter(targeting.is_not_null())
-            .limit(1000)
+            //.filter(political_probability.gt(0.80))
+            .limit(100000)
             .load::<Ad>(&connection)
             .unwrap();
 
         for ad in adverts {
             let t = ad.clone().targeting.unwrap();
             let targets = parse_targeting(&t);
-            println!("{:?}", ad.clone().targeting);
-            println!("{:?}", targets);
             if targets.is_err() {
-                assert!(false)
+                println!("{:?}", ad.clone().targeting);
+
+                // assert!(false);
             }
         }
     }
