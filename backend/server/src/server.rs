@@ -4,14 +4,15 @@ use errors::*;
 use futures::future;
 use futures_cpupool::CpuPool;
 use futures::future::{Either, FutureResult};
-use futures::{Future, Stream};
+use futures::{Future, Sink, Stream};
 use hyper;
 use hyper::{Body, Client, Chunk, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
 use hyper::header::{AcceptLanguage, ContentLength, ContentType, Authorization, Bearer, Vary,
-                    AccessControlAllowOrigin, CacheControl, CacheDirective};
+                    AccessControlAllowOrigin, CacheControl, CacheDirective,
+                    Connection as HttpConnection};
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
@@ -21,18 +22,20 @@ use r2d2::{Pool, Config};
 use start_logging;
 use serde_json;
 use std::collections::HashMap;
+use std::env;
 use std::borrow::Cow;
+use std::error::Error as StdError;
+use std::io::ErrorKind as StdIoErrorKind;
+use std::io::Error as StdIoError;
 use std::fs::File;
 use std::io::Read;
-use std::env;
-use std;
+use std::time::Duration;
 use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
 use tokio_postgres::{Connection, TlsMode};
-use tokio_postgres::tls::openssl::OpenSsl;
+use tokio_timer::Timer;
 use unicase::Ascii;
 use url::form_urlencoded;
-
 
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
@@ -134,7 +137,7 @@ impl Service for AdServer {
                 ),
             ),
             (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
-            (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads(req)),
+            (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads()),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
                 future::ok(Response::new().with_status(
@@ -275,30 +278,39 @@ impl AdServer {
 
     // Beware! This function assumes that we have a caching proxy in front of our
     // web server, otherwise we're making a new connection on every request.
-    fn stream_ads(&self, req: Request) -> ResponseFuture {
-        let connector = OpenSsl::new().unwrap();
+    fn stream_ads(&self) -> ResponseFuture {
+        let handle = self.handle.clone();
+
         let notifications = Connection::connect(
             self.database_url.clone(),
-            TlsMode::Require(Box::new(connector)),
+            TlsMode::None,
             &self.handle.clone(),
         ).then(|c| c.unwrap().batch_execute("listen ad_update"))
-            .and_then(|c| {
-                c.notifications().into_future().map_err(
-                    |(e, n)| (e, n.into_inner()),
-                )
+            .map(move |c| {
+                let timer = Timer::default()
+                    .interval(Duration::from_millis(1000))
+                    .map(|_| Ok(Chunk::from("event: ping\n\n")))
+                    .map_err(|_| unimplemented!());
+                let notifications = c.notifications()
+                    .map(|n| Ok(Chunk::from(n.payload)))
+                    .map_err(|_| unimplemented!())
+                    .select(timer);
+                let (sender, body) = Body::pair();
+                let resp = Response::new()
+                    .with_header(ContentType("text/event-stream".parse().unwrap()))
+                    .with_header(CacheControl(
+                        vec![CacheDirective::Public, CacheDirective::MaxAge(29)],
+                    ))
+                    .with_header(HttpConnection::keep_alive())
+                    .with_body(body);
+                handle.spawn(sender.send_all(notifications).map(|_| ()).map_err(|_| ()));
+                resp
             })
-            .map(|(n, _)| Chunk::from(n.unwrap().payload))
-            .map_err(|(_, _)| {
-                hyper::Error::Io(std::io::Error::new(std::io::ErrorKind::Other, "other"))
+            .map_err(|(e, _)| {
+                hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
             });
-        let resp = Response::new()
-            .with_header(ContentType("text/event-stream".parse().unwrap()))
-            .with_header(CacheControl(
-                vec![CacheDirective::NoStore, CacheDirective::Private],
-            ))
-            .with_body(Box::new(notifications) as
-                Box<Future<Item = hyper::Chunk, Error = hyper::Error>>);
-        Box::new(future::ok(resp))
+
+        Box::new(notifications)
     }
 
     fn process_ads(&self, req: Request) -> ResponseFuture {
@@ -332,7 +344,7 @@ impl AdServer {
                     handle.spawn(ad.grab_and_store(
                         client.clone(),
                         &image_db,
-                        image_pool.clone(),
+                        &image_pool.clone(),
                     ))
                 }
 
@@ -393,9 +405,7 @@ impl AdServer {
         let addr = env::var("HOST").expect("HOST must be set").parse().expect(
             "Error parsing HOST",
         );
-        if let Ok(root) = env::var("ROOT") {
-            env::set_current_dir(&root).expect(&format!("Couldn't change directory to {}", root));
-        }
+
         let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
         let config = Config::default();

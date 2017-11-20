@@ -14,7 +14,7 @@ def targeting():
     """
     ads = DB.query("""
        select * from ads
-       where political_probability > 0.80 and lang = 'en-US' and targeting is not null
+       where political_probability > 0.80 and targeting is not null
     """)
     counter = Counter()
     for advert in ads:

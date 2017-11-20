@@ -38,14 +38,16 @@ fn main() {
     let client = Client::configure().connector(connector).build(
         &core.handle(),
     );
-    let dbads: Vec<Ad> = ads.load::<Ad>(&*conn).expect("Couldn't get ads");
+    let dbads: Vec<Ad> = ads.order(created_at.desc()).load::<Ad>(&*conn).expect(
+        "Couldn't get ads",
+    );
 
     for ad in dbads {
         let db_pool = db_pool.clone();
         let pool = pool.clone();
         let client = client.clone();
 
-        let future = ad.grab_and_store(client, &db_pool, pool);
-        core.run(future).unwrap();
+        let future = ad.grab_and_store(client, &db_pool, &pool);
+        let _ = core.run(future);
     }
 }
