@@ -3,7 +3,7 @@ import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
-import { DECREMENT, INCREMENT, NEW_ADS, pageCount, refresh, search } from 'utils.js';
+import { PAGE_PREV, PAGE_NEXT, NEW_ADS, pageCount, refresh, search } from 'utils.js';
 import throttle from "lodash/throttle";
 import i18next from "i18next";
 import Backend from 'i18next-xhr-backend';
@@ -20,10 +20,10 @@ const ads = (state = [], action) => {
 
 const pageIndex = (state = 0, action) => {
   switch(action.type) {
-    case INCREMENT:
+    case PAGE_NEXT:
       return state + 1;
 
-    case DECREMENT:
+    case PAGE_PREV:
       return state - 1;
 
     default:
@@ -87,9 +87,9 @@ let App = ({ads, onKeyUp}) => (
     <div id="ads">
       {ads.map((ad) => <Ad ad={ad} key={ad.id} />)}
     </div>
-    <div>
-      <div id="previous"><a href="" onClick={pageCount.decrement}>Previous</a></div> 
-      <div id="next"><a href="" onClick={pageCount.increment}>Next</a></div>
+    <div id="pageNav">
+      <div id="previous"><a href="" onClick={pageCount.pagePrev}>Previous</a></div> 
+      <div id="next"><a href="" onClick={pageCount.pageNext}>Next</a></div>
     </div>
   </div>
 );
