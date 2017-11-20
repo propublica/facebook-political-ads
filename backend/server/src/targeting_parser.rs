@@ -331,7 +331,6 @@ mod tests {
         let database_url = env::var("DATABASE_URL").unwrap();
         let connection = PgConnection::establish(&database_url).unwrap();
         let adverts = ads.filter(targeting.is_not_null())
-            //.filter(political_probability.gt(0.80))
             .limit(100000)
             .load::<Ad>(&connection)
             .unwrap();
@@ -342,7 +341,7 @@ mod tests {
             if targets.is_err() {
                 println!("{:?}", ad.clone().targeting);
 
-                // assert!(false);
+                assert!(false);
             }
         }
     }
