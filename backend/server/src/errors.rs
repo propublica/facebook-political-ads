@@ -8,7 +8,8 @@ use tokio_postgres::Error as TokioPostgresError;
 use rusoto_core::TlsError;
 use rusoto_s3::PutObjectError;
 use rusoto_credential::CredentialsError;
-
+use nom::simple_errors::Err;
+use nom::Needed;
 
 // This is basically a catch all for all the Errors we think we'll ever see to
 // combat type restrictions on all of the hyper/futures function calls.
@@ -24,12 +25,18 @@ error_chain! {
         S3(PutObjectError);
         AWS(CredentialsError);
         Notifications(TokioPostgresError);
+        Targeting(Err);
     }
 
     errors {
         HTML(m: String) {
             description("Invalid HTML"),
             display("Invalid HTML: {}", m),
+        }
+
+        TargetingIncomplete(e: Needed) {
+            description("Not enough data for Targeting Parser"),
+            display("Insufficient Data: {:?}", e),
         }
     }
 }

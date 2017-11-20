@@ -61,7 +61,15 @@ const cleanAd = (html) => {
 
 const checkSponsor = (node) => {
   return Array.from(node.querySelectorAll("a")).some((a) => {
-    return ['Sponsored','Gesponsert','Sponsrad','Sponsorlu','إعلان مُموَّل','Sponsoreret'].some((sponsor) => a.textContent === sponsor);
+    return [
+      'Sponsored',
+      'Gesponsert',
+      'Sponsrad',
+      'Sponsorlu',
+      'إعلان مُموَّل',
+      'Sponsoreret',
+      'Sponsorizzata'
+    ].some((sponsor) => a.textContent === sponsor);
   });
 };
 
@@ -145,58 +153,95 @@ const refocus = (cb) => {
   if(focus) focus.focus();
 };
 
-// Getting the extension to show targeting information for timeline ads is hard, so we have this
-// gnarly function.
-let timelineCache = new Map();
+// All of the menus on Facebook are asynchronously opened so we have to use a observer here to make
+// sure we can grab the targeting urls. There's a ton of state here, so we should probably try and
+// collapse it at some point.
+let adCache = new Map();
+const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => ((resolve, reject) => {
+  let cb = (record, self) => {
+    const menu = menuFilter();
+    if(!menu) return null;
+    const li = Array.from(menu.querySelectorAll("li")).filter(filter)[0];
+    if(!li) return null;
+    const endpoint = li.querySelector("a");
+    if(!endpoint) return null;
+    const url = endpoint.getAttribute("ajaxify");
+    refocus(() => toggle.click());
+    self.disconnect();
+    try {
+      const resolved = {
+        ...ad,
+        id: new URL("https://facebook.com" + url).searchParams.get("id"),
+        targeting: url
+      };
+
+      if(resolved.id) {
+        adCache.set(toggleId, resolved);
+        resolve(resolved);
+      } else {
+        reject("No ad id");
+      }
+    } catch(e) {
+      reject(e);
+    }
+  };
+  new MutationObserver(cb).observe(document, {childList: true, subtree:true});
+  refocus(() => toggle.click());
+});
+
+
+// Grab an id from a timeline ad which is hidden in a async popup.
 const getTimelineId = (parent, ad) => {
   const control = parent.querySelector(".uiPopover");
   if(!control && control.id === "")
-    return null;
+    return Promise.resolve(ad);
 
   const toggle = control.querySelector("a");
   if(!toggle)
-    return null;
+    return Promise.resolve(ad);
 
-  if(timelineCache.has(toggle.id))
-    return Promise.resolve(timelineCache.get(toggle.id));
+  if(adCache.has(toggle.id))
+    return Promise.resolve(adCache.get(toggle.id));
 
   // this is async, we have to wait until our popup shows up.
-  let promise = new Promise((resolve, reject) => {
-    let cb = (record, self) => {
-      const layer = Array.from(document.querySelectorAll(".uiLayer"))
-        .filter((a) => {
-          return a.getAttribute("data-ownerid") === toggle.id;
-        })[0];
-      if(!layer) return null;
-      const li = Array.from(layer.querySelectorAll("li"))
-        .filter((it) => it.getAttribute("data-feed-option-name") === "FeedAdSeenReasonOption")[0];
-      if(!li) return null;
-      const endpoint = li.querySelector("a");
-      if(!endpoint) return null;
-      const url =  endpoint.getAttribute("ajaxify");
-      refocus(() => toggle.click());
-      self.disconnect();
-      try {
-        const resolved = {
-          ...ad,
-          id: new URL("https://facebook.com" + url).searchParams.get("id"),
-          targeting: url
-        };
+  let promise = new Promise(parseMenu(ad, ".uiLayer", toggle, toggle.id,
+    () => Array.from(document.querySelectorAll(".uiLayer")).filter((a) => (
+      a.getAttribute("data-ownerid") === toggle.id)
+    )[0],
+    (it) => it.getAttribute("data-feed-option-name") === "FeedAdSeenReasonOption"),
+  ).then(getTargeting);
+  return promise;
+};
 
-        if(resolved.id) {
-          timelineCache.set(toggle.id, resolved);
-          resolve(resolved);
-        } else {
-          reject("No ad id");
-        }
-      } catch(e) {
-        reject(e);
-      }
-    };
+// Similar to the above -- while we could just use the data-ego-fbid from before, it makes sense to
+// use the one in the encoded url in case that the dom one goes away.
+const getSidebarId = (parent, ad) => {
+  const control = parent.querySelector(".uiSelector");
+  if(!control)
+    return Promise.resolve(ad);
+  //Replicating getTimelineId.
+  // Since the sidebar DOM structure is slightly different we need to pull out
+  // the toggle Id from the data-gt attribute.
+  const toggle = control.querySelector('a');
+  if(!toggle)
+    return Promise.resolve(ad);
 
-    new MutationObserver(cb).observe(document, {childList: true, subtree:true});
-  }).then(getTargeting);
-  refocus(() => toggle.click());
+  const toggleData = JSON.parse(toggle.getAttribute('data-gt'));
+  if(!toggleData["data_to_log"])
+    return Promise.resolve(ad);
+
+  const toggleId = toggleData["data_to_log"]["ad_id"];
+  if (!toggleId)
+    return Promise.resolve(ad);
+
+  if (adCache.has(toggleId))
+    return Promise.resolve(adCache.get(toggleId));
+
+  let promise = new Promise(parseMenu(ad, ".uiMenu", toggle, toggleId,
+    () => control,
+    (it) => it.getAttribute("data-label") === "Why am I seeing this?")
+  ).then(getTargeting);
+
   return promise;
 };
 
@@ -249,10 +294,8 @@ const sidebar = (node) => {
 
   // and we have childnodes
   if(!node.children.length === 0) return Promise.resolve(false);
-
-  // Then we just need to sent the cleaned ad and the ego-fbid
-  return Promise.resolve({
-    id: node.getAttribute("data-ego-fbid"),
+  // Then we just need to send the cleaned ad
+  return getSidebarId(parent, {
     html: cleanAd(node.outerHTML),
     created_at: (new Date()).valueOf()
   });

@@ -22,7 +22,7 @@ def fetch_page(pagename, total_posts, graph):
     while posts:
         for post in posts['data']:
             if 'message' in post:
-                post_bodies.append(post['message'])
+                post_bodies.append(post['message'] + ' https://www.facebook.com/' + pagename + '/')
                 if len(post_bodies) >= total_posts:
                     break
         if 'paging' in posts and len(post_bodies) < total_posts:
@@ -51,6 +51,7 @@ def seed(ctx, language):
     """
     Create a list of seed posts for our classifier by language
     """
+    options = None
     for directory, conf in confs(ctx.obj["base"]):
         if conf["language"] == language:
             options = conf
@@ -61,7 +62,7 @@ def seed(ctx, language):
         print("Couldn't find a config for {}".format(language))
         exit()
 
-    with open(os.path.join(conf_dir, 'seeds_config.json'), 'rb') as seeds_file:
+    with open(os.path.join(conf_dir, 'seeds_config.json'), 'r') as seeds_file:
         seeds_config = json.load(seeds_file)
 
     graph_token_url = 'https://graph.facebook.com/oauth/access_token?' \

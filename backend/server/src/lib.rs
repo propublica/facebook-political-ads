@@ -17,6 +17,8 @@ extern crate kuchiki;
 #[macro_use]
 extern crate log;
 extern crate log4rs;
+#[macro_use]
+extern crate nom;
 extern crate r2d2;
 extern crate r2d2_diesel;
 extern crate rusoto_core;
@@ -27,6 +29,7 @@ extern crate serde_json;
 extern crate serde_derive;
 extern crate tokio_core;
 extern crate tokio_postgres;
+extern crate tokio_timer;
 extern crate unicase;
 extern crate url;
 
@@ -34,6 +37,7 @@ pub mod errors;
 pub mod models;
 pub mod schema;
 pub mod server;
+pub mod targeting_parser;
 
 use log::LogLevelFilter;
 use log4rs::append::console::ConsoleAppender;
