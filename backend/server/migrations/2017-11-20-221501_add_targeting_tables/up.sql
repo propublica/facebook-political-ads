@@ -6,7 +6,6 @@ create type targeting_type as enum (
   'Age',
   'Interest',
   'Segment',
-  'Advertiser',
   'Retargeting',
   'Agency',
   'Website',
