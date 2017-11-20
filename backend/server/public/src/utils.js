@@ -20,16 +20,16 @@ const newAds = (ads) => ({
   value: ads
 });
 
-const INCREMENT = 'INCREMENT';
-const DECREMENT = "DECREMENT";
+const PAGE_NEXT = 'PAGE_NEXT';
+const PAGE_PREV = 'PAGE_PREV';
 
 const pageCount = {
-  increment() {
-    return { type: INCREMENT };
+  pageNext() {
+    return { type: PAGE_NEXT };
   },
 
-  decrement() {
-    return { type: DECREMENT };
+  pagePrev() {
+    return { type: PAGE_PREV };
   }
 }
 
@@ -50,4 +50,4 @@ const refresh = (store, query, page) => {
 
 const search = (store, query) => () => refresh(store, query, 0);
 
-export { headers, newAds, NEW_ADS, pageCount, INCREMENT, DECREMENT, refresh, search };
+export { headers, newAds, NEW_ADS, pageCount, PAGE_NEXT, PAGE_PREV, refresh, search };
