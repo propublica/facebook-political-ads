@@ -34,9 +34,9 @@ The backend server is a rust application that runs on top of [diesel](https://di
 
 You can kick the tires by running:
 
-    cd backend
+    cd backend/server
     cargo build
-    cargo run --bin server -p server
+    cargo run
 
 We train the classifier using python and scikit learn and the source is in `backend/classifier/`. We're using [pipenv](http://docs.pipenv.org/en/latest/) to track dependencies. To get started you can run:
 
