@@ -16,6 +16,7 @@ use kuchiki;
 use kuchiki::iter::{Select, Elements, Descendants};
 use kuchiki::traits::*;
 use url::Url;
+use targeting_parser::{collect_targeting, collect_advertiser, Targeting};
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::{default_tls_client, Region};
@@ -378,6 +379,20 @@ impl<'a> NewAd<'a> {
             impressions: if !ad.political.is_some() { 1 } else { 0 },
             targeting: ad.targeting.clone(),
         })
+    }
+
+    fn targets(&self) -> Option<Vec<Targeting>> {
+        match self.targeting {
+            Some(ref targeting) => collect_targeting(&targeting).ok(),
+            None => None,
+        }
+    }
+
+    fn advertiser(&self) -> Option<Targeting> {
+        match self.targeting {
+            Some(ref targeting) => collect_advertiser(&targeting),
+            None => None,
+        }
     }
 
     pub fn save(&self, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<Ad> {
