@@ -1,7 +1,6 @@
 use errors::*;
 use nom::IResult;
 
-
 #[derive(Clone, Debug, PartialEq)]
 pub enum Targeting<'a> {
     Gender(&'a str),
@@ -11,7 +10,6 @@ pub enum Targeting<'a> {
     Age(&'a str),
     Interest(&'a str),
     Segment(&'a str),
-    Advertiser(&'a str),
     Retargeting(&'a str),
     Agency(&'a str),
     Website(&'a str),
@@ -20,6 +18,8 @@ pub enum Targeting<'a> {
     School(&'a str),
     Like,
     List,
+    // This is a special field that allows us to tie a page to a name
+    Advertiser(&'a str),
 }
 
 named!(until_b(&str) -> &str, take_until!("</b>"));
@@ -248,6 +248,36 @@ named!(targeting(&str) -> Vec<Targeting>,
               .concat().iter().filter_map(|x| x.clone()).collect())
     )
 );
+
+pub fn collect_targeting(thing: &str) -> Result<Vec<Targeting>> {
+    match parse_targeting(thing) {
+        Ok(result) => Ok(
+            result
+                .into_iter()
+                .filter(|t| match t {
+                    &Targeting::Advertiser(_) => false,
+                    _ => true,
+                })
+                .collect(),
+        ),
+        e => e,
+    }
+}
+
+pub fn collect_advertiser(thing: &str) -> Option<Targeting> {
+    match parse_targeting(thing) {
+        Ok(result) => {
+            result
+                .into_iter()
+                .filter(|t| match t {
+                    &Targeting::Advertiser(_) => true,
+                    _ => false,
+                })
+                .nth(0)
+        }
+        _ => None,
+    }
+}
 
 fn parse_targeting(thing: &str) -> Result<Vec<Targeting>> {
     match targeting(thing) {
