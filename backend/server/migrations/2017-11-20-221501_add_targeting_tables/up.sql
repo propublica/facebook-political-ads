@@ -1,30 +1,12 @@
-create type targeting_type as enum (
-  'Gender',
-  'City',
-  'State',
-  'Region'
-  'Age',
-  'Interest',
-  'Segment',
-  'Retargeting',
-  'Agency',
-  'Website',
-  'Language',
-  'Employer',
-  'School',
-  'Like',
-  'List',
-);
-
-create table targeting (
+create table targeting_info (
   id integer primary key not null,
-  targeting targeting_type,
-  segment string
+  targeting text not null,
+  segment text
 );
-create unique index index_targeting_on_targeting_and_segment(targeting, segment);
+create unique index index_targeting_info_on_targeting_and_segment on targeting_info(targeting, segment);
 
 create table ads_targeting (
-  ad_id text references ads(id),
-  targeting_id integer references targeting(id),
+  ad_id text references ads(id) on delete restrict,
+  targeting_id integer references targeting_info(id) on delete cascade,
   primary key (ad_id, targeting_id)
 );
