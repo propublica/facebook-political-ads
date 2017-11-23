@@ -1,6 +1,22 @@
 use errors::*;
 use nom::IResult;
 
+#[derive(Insertable)]
+#[table_name = "targeting_info"]
+pub struct TargetingInfo<'a> {
+    targeting: &'a str,
+    segment: Option<&'a str>,
+}
+
+impl<'a> TargetingInfo<'a> {
+    fn new(targeting: &'a str, segment: Option<&'a str>) -> Self {
+        TargetingInfo {
+            targeting: targeting,
+            segment: segment,
+        }
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum Targeting<'a> {
     Gender(&'a str),
@@ -20,6 +36,54 @@ pub enum Targeting<'a> {
     List,
     // This is a special field that allows us to tie a page to a name
     Advertiser(&'a str),
+}
+
+impl<'a> From<TargetingInfo<'a>> for Targeting<'a> {
+    fn from(row: TargetingInfo<'a>) -> Self {
+        match row.targeting {
+            "Gender" => Targeting::Gender(row.segment.unwrap()),
+            "City" => Targeting::City(row.segment.unwrap()),
+            "State" => Targeting::State(row.segment.unwrap()),
+            "Region" => Targeting::Region(row.segment.unwrap()),
+            "Age" => Targeting::Age(row.segment.unwrap()),
+            "Interest" => Targeting::Interest(row.segment.unwrap()),
+            "Segment" => Targeting::Segment(row.segment.unwrap()),
+            "Retargeting" => Targeting::Retargeting(row.segment.unwrap()),
+            "Agency" => Targeting::Agency(row.segment.unwrap()),
+            "Website" => Targeting::Website(row.segment.unwrap()),
+            "Language" => Targeting::Language(row.segment.unwrap()),
+            "Employer" => Targeting::Employer(row.segment.unwrap()),
+            "School" => Targeting::School(row.segment.unwrap()),
+            "Like" => Targeting::Like,
+            "List" => Targeting::List,
+            _ => panic!("Trying to convert an unknown enum"),
+        }
+    }
+}
+
+impl<'a> From<Targeting<'a>> for TargetingInfo<'a> {
+    fn from(targeting: Targeting<'a>) -> Self {
+        match targeting {
+            Targeting::Gender(s) => TargetingInfo::new("Gender", Some(s)),
+            Targeting::City(s) => TargetingInfo::new("City", Some(s)),
+            Targeting::State(s) => TargetingInfo::new("State", Some(s)),
+            Targeting::Region(s) => TargetingInfo::new("Region", Some(s)),
+            Targeting::Age(s) => TargetingInfo::new("Age", Some(s)),
+            Targeting::Interest(s) => TargetingInfo::new("Interest", Some(s)),
+            Targeting::Segment(s) => TargetingInfo::new("Segment", Some(s)),
+            Targeting::Retargeting(s) => TargetingInfo::new("Retargeting", Some(s)),
+            Targeting::Agency(s) => TargetingInfo::new("Agency", Some(s)),
+            Targeting::Website(s) => TargetingInfo::new("Website", Some(s)),
+            Targeting::Language(s) => TargetingInfo::new("Language", Some(s)),
+            Targeting::Employer(s) => TargetingInfo::new("Employer", Some(s)),
+            Targeting::School(s) => TargetingInfo::new("School", Some(s)),
+            Targeting::Like => TargetingInfo::new("Like", None),
+            Targeting::List => TargetingInfo::new("List", None),
+            // This is a special field that allows us to tie a page to a name, it is a bit
+            // unfortunate that we include it here, but that's ok because it helps out with below.
+            Targeting::Advertiser(_) => panic!("Advertiser is not allowed as a targeting field"),
+        }
+    }
 }
 
 named!(until_b(&str) -> &str, take_until!("</b>"));
@@ -141,7 +205,12 @@ named!(gender(&str) -> Option<Targeting>,
                 | tag!("Frauen")
                 | tag!("kvinder")
             ) => {|f| Some(Targeting::Gender(f)) }
-            | alt!(tag!("people") | tag!("Personen") | tag!("personer") | tag!("le persone")) => {|_| None }
+            | alt!(
+                tag!("people")
+                | tag!("Personen")
+                | tag!("personer")
+                | tag!("le persone")
+            ) => {|_| None }
         ) >>
         (result)
     )
@@ -165,6 +234,7 @@ named!(retargeting(&str) -> Targeting,
             | tag!("i nærheden af deres virksomhed for nylig")
             | tag!("kürzlich in der Nähe des Unternehmens")
             | tag!("nyss varit i närheten av företaget")
+            | tag!("recently near their business")
         ) >>
         (Targeting::Retargeting(res))
     )
@@ -223,7 +293,7 @@ named!(age_and_location(&str) -> Vec<Option<Targeting>>,
     )
 );
 
-named!(targeting(&str) -> Vec<Targeting>,
+named!(get_targeting(&str) -> Vec<Targeting>,
     do_parse!(
         advertiser_first: opt!(advertiser_b) >>
         sources_and_interests: opt!(alt!(
@@ -280,7 +350,7 @@ pub fn collect_advertiser(thing: &str) -> Option<Targeting> {
 }
 
 fn parse_targeting(thing: &str) -> Result<Vec<Targeting>> {
-    match targeting(thing) {
+    match get_targeting(thing) {
         IResult::Done(_, result) => Ok(result),
         IResult::Error(e) => Err(e.into()),
         IResult::Incomplete(e) => Err(ErrorKind::TargetingIncomplete(e).into()),

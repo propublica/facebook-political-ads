@@ -292,8 +292,8 @@ impl Ad {
             .into_boxed();
 
         if let Some(search) = options.get("search") {
-            query = match language {
-                "de-DE" => {
+            query = match &language[..2] {
+                "de" => {
                     query
                         .filter(to_germantsvector(html).matches(
                             to_germantsquery(search.clone()),
@@ -333,6 +333,7 @@ impl Ad {
         Ok(())
     }
 }
+
 
 #[derive(Insertable)]
 #[table_name = "ads"]
@@ -399,6 +400,7 @@ impl<'a> NewAd<'a> {
         use schema::ads;
         use schema::ads::dsl::*;
         let connection = pool.get()?;
+        // TODO wrap this in a transaction
 
         // increment impressions if this is a background save,
         // otherwise increment political counters
