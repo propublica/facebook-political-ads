@@ -17,7 +17,7 @@ The extension popup is a [preact](https://preactjs.com/) application and you can
 
     cd extension
     npm install
-    npm watch
+    npm run watch
 
 If you are a Firefox user you can open a clean browser instance with:
 
