@@ -7,6 +7,7 @@ import { createLogger } from 'redux-logger';
 import { sendAds, getAds, updateBadge, adForRequest, getBrowserLocale, mergeAds } from 'utils.js';
 import langs from 'langs';
 import countries from 'i18n-iso-countries';
+import { withI18n } from './i18n';
 
 // grab our languages
 ['de', 'en', 'fr', 'fi', 'nl', 'da', 'sv'].forEach((lang) => (
@@ -15,8 +16,6 @@ import countries from 'i18n-iso-countries';
 
 // styles
 import "../css/styles.css";
-
-const getMessage = chrome.i18n.getMessage;
 
 // Constants
 const ToggleType = {
@@ -198,7 +197,7 @@ const Ad = ({title, message, id, image}) => (
   </div>
 );
 
-const RatingForm = ({rating, action, question})=> (
+const RatingForm = withI18n(({getMessage, rating, action, question})=> (
   <div className="rater">
     {getMessage(question)}
     <button
@@ -214,10 +213,10 @@ const RatingForm = ({rating, action, question})=> (
       {getMessage('normal')}
     </button>
   </div>
-);
+));
 
 // Ads to be rated and sent to the server
-const Rating = ({rating, action, question}) => (
+const Rating = withI18n(({getMessage, rating, action, question}) => (
   <div className="rating">
     <Ad
       title={rating.title}
@@ -229,7 +228,7 @@ const Rating = ({rating, action, question}) => (
       <b className="political">{getMessage('political')}</b> :
       <RatingForm action={action} rating={rating} question={question} /> }
   </div>
-);
+));
 
 const Ratings = ({onRatingClick, ratings}) => (
   <div id="ratings">
@@ -273,14 +272,14 @@ Ads = connect(
 )(Ads);
 
 // Controls which section of tabs to show, defaults to the
-const Toggle = ({type, message, active, amount, onToggleClick}) => (
+const Toggle = withI18n(({getMessage, type, message, active, amount, onToggleClick}) => (
   <div
     className={'toggle' + (active === type ? ' active' : '')}
     onClick={function() { onToggleClick(type); }}
   >
     {getMessage(message)}{(amount ? <b>{100 > amount ? amount : '100+'}</b> : '')}
   </div>
-);
+));
 
 // Our Main container.
 let Toggler = ({ads, ratings, active, onToggleClick}) => (
@@ -360,14 +359,20 @@ SelectCountry = connect(
   selectCountryDispatchToProps
 )(SelectCountry);
 
-let Language = ({ onAcceptLang }) => (
+let Language = withI18n(({ getMessage, onAcceptLang }) => (
   <form id="language" onSubmit={onAcceptLang}>
     <div>
       <h2>{getMessage("language_settings")}</h2>
-      <p dangerouslySetInnerHTML={{__html:getMessage("you_speak",
-        [langs.where('1', browserLocale.language).local || 'Unknown Language',
-          countries.getName(browserLocale.country, browserLocale.language) ||
-          countries.getName(browserLocale.country, 'en') || 'Unknown Country'])}} />
+      <p dangerouslySetInnerHTML={{
+        __html:getMessage(
+          "you_speak",
+          {
+            language: langs.where('1', browserLocale.language).local || 'Unknown Language',
+            country: countries.getName(browserLocale.country, browserLocale.language) ||
+            countries.getName(browserLocale.country, 'en') || 'Unknown Country'
+          }
+        )
+      }} />
       <p>
         <label htmlFor="language">Language: </label><SelectLanguage /><br />
         <label htmlFor="country">Country: </label><SelectCountry />
@@ -378,7 +383,7 @@ let Language = ({ onAcceptLang }) => (
       <input className="button" type="submit" value="OK" />
     </div>
   </form>
-);
+));
 const languageDispatchToProps = (dispatch) => ({
   onAcceptLang: (e) => {
     e.preventDefault();
@@ -390,7 +395,7 @@ Language = connect(
   languageDispatchToProps
 )(Language);
 
-const Onboarding = ({onAcceptClick}) => (
+const Onboarding = withI18n(({getMessage, onAcceptClick}) => (
   <div id="tos">
     <div id="terms" dangerouslySetInnerHTML={{__html:getMessage("terms_of_service")}} />
     <div id="accept-box">
@@ -399,7 +404,7 @@ const Onboarding = ({onAcceptClick}) => (
       </button>
     </div>
   </div>
-);
+));
 
 let Dispatcher = ({terms, language, onAcceptClick}) => {
   if(terms) {
