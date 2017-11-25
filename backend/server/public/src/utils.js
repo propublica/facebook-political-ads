@@ -62,7 +62,7 @@ const refresh = (store, query, page) => {
     headers: headers(store.getState().credentials)
   }).then((res) => res.json())
     .then((ads) => {
-      if (store.getState().pageIndex > 4) {
+      if (ads.ads.length < 20) {
         store.dispatch(isLastPage());
       } else {
         store.dispatch(notLastPage());
