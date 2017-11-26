@@ -7,12 +7,7 @@ import { createLogger } from 'redux-logger';
 import { sendAds, getAds, updateBadge, adForRequest, getBrowserLocale, mergeAds } from 'utils.js';
 import langs from 'langs';
 import countries from 'i18n-iso-countries';
-import { withI18n } from './i18n';
-
-// grab our languages
-['de', 'en', 'fr', 'fi', 'nl', 'da', 'sv'].forEach((lang) => (
-  countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
-));
+import { withI18n, activeCountries, activeLanguages } from './i18n';
 
 // styles
 import "../css/styles.css";
@@ -311,7 +306,6 @@ Toggler = connect(
   togglerDispatchToProps
 )(Toggler);
 
-const activeLanguages = ['da', 'de', 'en', 'it'];
 let SelectLanguage = ({ language, onChange }) => {
   const allLangs = langs.all();
 
@@ -343,7 +337,6 @@ SelectLanguage = connect(
   selectLanguageDispatchToProps
 )(SelectLanguage);
 
-const activeCountries = ['DK', 'DE', 'CH', 'US', 'IT'];
 let SelectCountry = ({ language, country, onChange }) => {
   const lang = countries.langs().includes(language) ? language : 'en';
   const names = countries.getNames(lang);
