@@ -1,8 +1,23 @@
 import { memoize } from "lodash";
 import { connect } from 'preact-redux';
+import countries from 'i18n-iso-countries';
 
-const messages = ['da', 'de', 'de_CH', 'en', 'it'].reduce((index, lang) => {
-  index[lang] = require(`../_locales/${lang}/messages.json`);
+// active ones get prioritised in the ui (pull downs)
+// ISO 3166-1 Alpha-2 (upper case)
+export const activeCountries = ['DK', 'DE', 'CH', 'US', 'IT', 'AU'];
+// ISO 639-1 (2 characters, lower case)
+export const activeLanguages = ['da', 'de', 'en', 'it'];
+
+// load country names in our languages
+activeLanguages.concat(['fr', 'fi', 'nl', 'sv']).forEach((lang) => (
+  countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
+));
+
+// load all messages from ../_locales
+const requireLocales = require.context('../_locales', true, /messages\.json$/);
+const messages = requireLocales.keys().reduce((index, key) => {
+  const locale = key.split('/')[1]; // example key: './de_CH/messages.json'
+  index[locale] = requireLocales(key);
   return index;
 }, {});
 
@@ -27,7 +42,7 @@ const createFormatter = (...locales) => {
 
 const getFormatter = memoize(({language, country}) => createFormatter(
   messages[`${language}_${country}`],
-  messages[`${language}`],
+  messages[language],
   messages.en // always fallback to English
 ));
 

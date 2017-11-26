@@ -52,6 +52,31 @@ To classify the ads you've collected you can run:
 
     ./classify classify
 
+### Internationalization and Localization
+
+Translations for the extension are stored in `extension/_locales/${locale}/messages.json`.
+
+A `locale` is a ISO 639-1 language code (e.g. `en`, `de`) with an optional ISO 3166-1 Alpha-2 country suffix (e.g. `de_CH`).
+
+Users can select from all known languages and countries while onboarding. The UI then uses the first available translation in following order: `${langauge}_${country}`, `${langauge}`, `en`.
+
+#### Active Languages and Countries
+
+In `extension/src/i18n.js` a list of active language and country codes can be defined. Active ones get prioritised in the UI.
+
+#### Locale Specific Styles in Popup
+
+You can customize, for example font sizes, with `[lang]` and `[data-locale]` CSS selectors:
+
+```css
+[lang=de] .toggle {
+  font-size: 0.78rem;
+}
+[data-locale=de_CH] .toggle {
+  font-size: 0.78rem;
+}
+```
+
 ## Stories
 
 * [Help Us Monitor Political Ads Online](https://www.propublica.org/article/help-us-monitor-political-ads-online)
