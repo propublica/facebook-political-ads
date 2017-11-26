@@ -112,6 +112,10 @@ body {
   font-weight: normal;
 }
 
+[lang=de] .toggle {
+  font-size: 0.78rem;
+}
+
 .toggle:hover {
   border-bottom: 0.2rem solid #0099e6;
 }

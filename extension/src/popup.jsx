@@ -418,11 +418,17 @@ const Onboarding = withI18n(({getMessage, onAcceptClick}) => (
   </div>
 ));
 
-let Dispatcher = ({terms, onAcceptClick}) => {
-  if(terms) {
-    return <Toggler />;
-  }
-  return <Onboarding onAcceptClick={onAcceptClick}/>;
+let Dispatcher = ({terms, language, onAcceptClick}) => {
+  return (
+    <div
+      id="popup"
+      lang={language.language}
+      data-locale={`${language.language}_${language.country}`}>
+      {terms
+        ? <Toggler />
+        : <Onboarding onAcceptClick={onAcceptClick} />}
+    </div>
+  );
 };
 
 const dispatchToProps = (dispatch) => ({
