@@ -42,6 +42,7 @@
     "redux": "^3.7.2",
     "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "url-search-params-polyfill": "^2.0.1"
   }
 }

@@ -1,3 +1,5 @@
+import 'url-search-params-polyfill';
+
 const auth = (credentials) => (credentials ?
   {"Authorization": `Bearer ${credentials.token}`} :
   {});
@@ -22,7 +24,6 @@ const newAds = (ads) => ({
 
 const PAGE_NEXT = 'PAGE_NEXT';
 const PAGE_PREV = 'PAGE_PREV';
-// SM: Guessing we need this for clearing pages when you search. Haven't implemneted yet.
 const PAGE_CLEAR = 'PAGE_CLEAR';
 
 const pageCount = {
@@ -49,15 +50,18 @@ const notLastPage = () => ({
 })
 
 const refresh = (store, query, page) => {
-  let url = "/facebook-ads/ads";
+  let url = "/facebook-ads/ads?";
+  var params = new URLSearchParams ()
   if(query) {
-    url = url + `?search=${query}`;
+    // url = url + `?search=${query}`;
+    params.append("search", query);
   }
   if (store.getState().pageIndex) {
-    url = url + `?page=${store.getState().pageIndex}`;
+    // url = url + `?page=${store.getState().pageIndex}`;
+    params.append("page", store.getState().pageIndex);
   }
 
-  return fetch(url, {
+  return fetch(`${url}${params.toString()}`, {
     method: "GET",
     headers: headers(store.getState().credentials)
   }).then((res) => res.json())
