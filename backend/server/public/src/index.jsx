@@ -3,7 +3,7 @@ import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
-import { IS_LAST_PAGE, NOT_LAST_PAGE, PAGE_PREV, PAGE_NEXT, NEW_ADS, pageCount, refresh, search } from 'utils.js';
+import { IS_LAST_PAGE, NOT_LAST_PAGE, PAGE_PREV, PAGE_NEXT, PAGE_CLEAR, NEW_ADS, pageCount, refresh, search } from 'utils.js';
 import throttle from "lodash/throttle";
 import i18next from "i18next";
 import Backend from 'i18next-xhr-backend';
@@ -37,6 +37,8 @@ const pageIndex = (state = 0, action) => {
     case PAGE_PREV:
       return state - 1;
 
+    case PAGE_CLEAR:
+      return 0;
     default:
       return state;
   }
@@ -110,6 +112,7 @@ App = connect(
   (dispatch) => ({
     onKeyUp: throttle((e) => {
       e.preventDefault();
+      store.dispatch(pageCount.pageClear())
       dispatch(search(store, e.target.value.length ? e.target.value : null));
     }, 1000),
     prev: (e) => {
