@@ -51,10 +51,6 @@
       }
     }
   },
-  "language_instructions": {
-    "message": "Se queste impostazioni sono corrette clicca su ok, altrimenti cambiale e poi clicca ok.",
-    "description": "Instructions for clicking ok."
-  },
   "language": {
     "message": "Lingua: ",
     "description": "Language"

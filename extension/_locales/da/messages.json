@@ -51,10 +51,6 @@
       }
     }
   },
-  "language_instructions": {
-    "message": "Er indstillingerne korrekte tryk ok, ellers kan du ændre dem via drop-down menuerne og klikke ok.",
-    "description": "Instructions for clicking ok."
-  },
   "language": {
     "message": "Sprog: ",
     "description": "Language"
