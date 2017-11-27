@@ -7,16 +7,10 @@ import { createLogger } from 'redux-logger';
 import { sendAds, getAds, updateBadge, adForRequest, getBrowserLocale, mergeAds } from 'utils.js';
 import langs from 'langs';
 import countries from 'i18n-iso-countries';
-
-// grab our languages
-['de', 'en', 'fr', 'fi', 'nl', 'da', 'sv'].forEach((lang) => (
-  countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
-));
+import { withI18n, activeCountries, activeLanguages } from './i18n';
 
 // styles
 import "../css/styles.css";
-
-const getMessage = chrome.i18n.getMessage;
 
 // Constants
 const ToggleType = {
@@ -38,13 +32,11 @@ const UPDATE_AD = "update_ad";
 const UPDATE_RATING = "update_rating";
 const SET_LANGUAGE = "set_language";
 const SET_COUNTRY = "set_country";
-const ACCEPT_LANGUAGE = "accept_locale";
 
 // Actions
 const setLanguage = (language) => ({ type: SET_LANGUAGE, language });
 const setCountry = (country) => ({ type: SET_COUNTRY, country });
 const acceptTerms = () => ({ type: ACCEPT_TERMS });
-const acceptLanguage = () => ({ type: ACCEPT_LANGUAGE });
 const toggle = (value) => ({ type: TOGGLE_TAB, value });
 const newAds = (ads) => ({
   type: NEW_ADS,
@@ -119,8 +111,6 @@ const language = (state = browserLocale, action) => {
     return { ...state, language: action.language };
   case SET_COUNTRY:
     return { ...state, country: action.country };
-  case ACCEPT_LANGUAGE:
-    return { ...state, accepted: true };
   default:
     return state;
   }
@@ -198,7 +188,7 @@ const Ad = ({title, message, id, image}) => (
   </div>
 );
 
-const RatingForm = ({rating, action, question})=> (
+const RatingForm = withI18n(({getMessage, rating, action, question})=> (
   <div className="rater">
     {getMessage(question)}
     <button
@@ -214,10 +204,10 @@ const RatingForm = ({rating, action, question})=> (
       {getMessage('normal')}
     </button>
   </div>
-);
+));
 
 // Ads to be rated and sent to the server
-const Rating = ({rating, action, question}) => (
+const Rating = withI18n(({getMessage, rating, action, question}) => (
   <div className="rating">
     <Ad
       title={rating.title}
@@ -229,7 +219,7 @@ const Rating = ({rating, action, question}) => (
       <b className="political">{getMessage('political')}</b> :
       <RatingForm action={action} rating={rating} question={question} /> }
   </div>
-);
+));
 
 const Ratings = ({onRatingClick, ratings}) => (
   <div id="ratings">
@@ -273,14 +263,14 @@ Ads = connect(
 )(Ads);
 
 // Controls which section of tabs to show, defaults to the
-const Toggle = ({type, message, active, amount, onToggleClick}) => (
+const Toggle = withI18n(({getMessage, type, message, active, amount, onToggleClick}) => (
   <div
     className={'toggle' + (active === type ? ' active' : '')}
     onClick={function() { onToggleClick(type); }}
   >
     {getMessage(message)}{(amount ? <b>{100 > amount ? amount : '100+'}</b> : '')}
   </div>
-);
+));
 
 // Our Main container.
 let Toggler = ({ads, ratings, active, onToggleClick}) => (
@@ -316,15 +306,27 @@ Toggler = connect(
   togglerDispatchToProps
 )(Toggler);
 
-let SelectLanguage = ({ language, onChange }) => (
-  <select value={language} onChange={onChange}>
-    {langs.all().map((lang) => (
-      <option id="language" key={lang["1"]} value={lang["1"]}>
-        {lang["name"]} / {lang["local"]}
-      </option>
-    ))}
-  </select>
-);
+let SelectLanguage = ({ language, onChange }) => {
+  const allLangs = langs.all();
+
+  const createOption = lang => (
+    <option key={lang["1"]} value={lang["1"]}>
+      {lang["name"]} / {lang["local"]}
+    </option>
+  );
+
+  return (
+    <select value={language} onChange={onChange}>
+      {allLangs
+        .filter(l => activeLanguages.includes(l["1"]))
+        .map(createOption)}
+      <option disabled>──────────</option>
+      {allLangs
+        .filter(l => !activeLanguages.includes(l["1"]))
+        .map(createOption)}
+    </select>
+  );
+};
 const selectLanguageDispatchToProps = (dispatch) => ({
   onChange: (e) => {
     dispatch(setLanguage(e.target.value));
@@ -336,18 +338,24 @@ SelectLanguage = connect(
 )(SelectLanguage);
 
 let SelectCountry = ({ language, country, onChange }) => {
-  let lang = language;
-  let keys = Object.keys(countries.getNames(language));
-  if(keys.length === 0) {
-    keys = Object.keys(countries.getNames('en'));
-    lang = 'en';
-  }
-  return (<select id="country" value={country} onChange={onChange}>
-    {keys.map((country) => (
-      <option key={country} value={country}>
-        {countries.getName(country, lang)}
-      </option>
-    ))}
+  const lang = countries.langs().includes(language) ? language : 'en';
+  const names = countries.getNames(lang);
+  const keys = Object.keys(names);
+
+  const createOption = alpha2 => (
+    <option key={alpha2} value={alpha2}>
+      {names[alpha2]}
+    </option>
+  );
+
+  return (<select value={country} onChange={onChange}>
+    {keys
+      .filter(k => activeCountries.includes(k))
+      .map(createOption)}
+    <option disabled>──────────</option>
+    {keys
+      .filter(k => !activeCountries.includes(k))
+      .map(createOption)}
   </select>);
 };
 const selectCountryDispatchToProps = (dispatch) => ({
@@ -360,57 +368,60 @@ SelectCountry = connect(
   selectCountryDispatchToProps
 )(SelectCountry);
 
-let Language = ({ onAcceptLang }) => (
-  <form id="language" onSubmit={onAcceptLang}>
-    <div>
-      <h2>{getMessage("language_settings")}</h2>
-      <p dangerouslySetInnerHTML={{__html:getMessage("you_speak",
-        [langs.where('1', browserLocale.language).local || 'Unknown Language',
-          countries.getName(browserLocale.country, browserLocale.language) ||
-          countries.getName(browserLocale.country, 'en') || 'Unknown Country'])}} />
-      <p>
-        <label htmlFor="language">Language: </label><SelectLanguage /><br />
-        <label htmlFor="country">Country: </label><SelectCountry />
-      </p>
-      <p>{getMessage("language_instructions")}</p>
-    </div>
-    <div>
-      <input className="button" type="submit" value="OK" />
-    </div>
-  </form>
-);
-const languageDispatchToProps = (dispatch) => ({
-  onAcceptLang: (e) => {
-    e.preventDefault();
-    dispatch(acceptLanguage());
-  }
-});
-Language = connect(
-  (state) => state.language,
-  languageDispatchToProps
-)(Language);
 
-const Onboarding = ({onAcceptClick}) => (
+const Language = withI18n(({ getMessage, language }) => (
+  <div id="language">
+    <h2>{getMessage("language_settings")}</h2>
+    <p dangerouslySetInnerHTML={{
+      __html:getMessage(
+        "you_speak",
+        {
+          language: langs.where('1', browserLocale.language).local || 'Unknown Language',
+          country: countries.getName(browserLocale.country, language.language) ||
+          countries.getName(browserLocale.country, 'en') || 'Unknown Country'
+        }
+      )
+    }} />
+    <p>{getMessage("language_instructions")}</p>
+    <p>
+      <label>
+        {getMessage("language")}<br />
+        <SelectLanguage />
+      </label>
+      <br />
+      <label>
+        {getMessage("country")}<br />
+        <SelectCountry />
+      </label>
+    </p>
+  </div>
+));
+
+const Onboarding = withI18n(({getMessage, onAcceptClick}) => (
   <div id="tos">
-    <div id="terms" dangerouslySetInnerHTML={{__html:getMessage("terms_of_service")}} />
+    <div id="main">
+      <Language />
+      <div id="terms" dangerouslySetInnerHTML={{__html:getMessage("terms_of_service")}} />
+    </div>
     <div id="accept-box">
       <button id="accept" onClick={onAcceptClick}>
-        Accept
+        {getMessage("terms_of_service_accept")}
       </button>
     </div>
   </div>
-);
+));
 
 let Dispatcher = ({terms, language, onAcceptClick}) => {
-  if(terms) {
-    if(language.accepted) {
-      return <Toggler />;
-    } else {
-      return <Language />;
-    }
-  } else {
-    return <Onboarding onAcceptClick={onAcceptClick}/>;
-  }
+  return (
+    <div
+      id="popup"
+      lang={language.language}
+      data-locale={`${language.language}_${language.country}`}>
+      {terms
+        ? <Toggler />
+        : <Onboarding onAcceptClick={onAcceptClick} />}
+    </div>
+  );
 };
 
 const dispatchToProps = (dispatch) => ({
