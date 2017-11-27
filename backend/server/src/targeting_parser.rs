@@ -1,5 +1,6 @@
 use errors::*;
 use nom::IResult;
+use schema::targeting_info;
 
 #[derive(Insertable)]
 #[table_name = "targeting_info"]
