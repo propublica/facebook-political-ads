@@ -123,6 +123,17 @@ def confs(base):
         with open(os.path.join(directory, "classifier_config.json"), 'r') as conf:
             yield (directory, json.load(conf))
 
+def entities_confs(base):
+    """
+    Read all the entity configuration files for our various supported languages.
+    """
+    for directory in glob(os.path.join(base, "*/")):
+        if os.path.isfile(os.path.join(directory, "entities_config.json")):
+            with open(os.path.join(directory, "entities_config.json"), 'r') as conf:
+                yield (directory, json.load(conf))
+        else:
+            yield (directory, False)
+
 def load_ads_from_psql(lang):
     """
     Grab ads that users have rated for our classifier
