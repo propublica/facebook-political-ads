@@ -1,5 +1,5 @@
 import 'url-search-params-polyfill';
-
+import {isLastPage, notLastPage} from 'pagination.js'
 const auth = (credentials) => (credentials ?
   {"Authorization": `Bearer ${credentials.token}`} :
   {});
@@ -22,42 +22,13 @@ const newAds = (ads) => ({
   value: ads
 });
 
-const PAGE_NEXT = 'PAGE_NEXT';
-const PAGE_PREV = 'PAGE_PREV';
-const PAGE_CLEAR = 'PAGE_CLEAR';
-
-const pageCount = {
-  pageNext() {
-    return { type: PAGE_NEXT };
-  },
-  pagePrev() {
-    return { type: PAGE_PREV };
-  },
-  pageClear() {
-    return { type: PAGE_CLEAR}
-  }
-}
-
-const IS_LAST_PAGE = 'IS_LAST_PAGE';
-const NOT_LAST_PAGE = 'NOT_LAST_PAGE';
-
-const isLastPage = () => ({
-  type: IS_LAST_PAGE
-});
-
-const notLastPage = () => ({
-  type: NOT_LAST_PAGE
-})
-
 const refresh = (store, query, page) => {
   let url = "/facebook-ads/ads?";
   var params = new URLSearchParams ()
   if(query) {
-    // url = url + `?search=${query}`;
     params.append("search", query);
   }
   if (store.getState().pageIndex) {
-    // url = url + `?page=${store.getState().pageIndex}`;
     params.append("page", store.getState().pageIndex);
   }
 
@@ -77,4 +48,4 @@ const refresh = (store, query, page) => {
 
 const search = (store, query) => () => refresh(store, query, 0);
 
-export { headers, newAds, NEW_ADS, pageCount, PAGE_NEXT, PAGE_PREV, PAGE_CLEAR, IS_LAST_PAGE, NOT_LAST_PAGE, refresh, search };
+export { headers, newAds, NEW_ADS,  refresh, search };
