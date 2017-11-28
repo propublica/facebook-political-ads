@@ -38,7 +38,7 @@ const mergeAds = (ads, newAds) => {
     }
   });
   const idSort = sortBy(Array.from(ids.values()), (a) => -1 * Date.parse(a.created_at));
-  return sortBy(idSort, (a) => a.rating === "political");
+  return sortBy(idSort, (a) => a.rating === "political").slice(0, 200);
 };
 
 const updateBadge = (ratings) => {

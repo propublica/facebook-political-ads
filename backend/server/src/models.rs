@@ -1,9 +1,9 @@
 use chrono::DateTime;
 use chrono::offset::Utc;
 use diesel;
-use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::pg::upsert::*;
+use diesel::prelude::*;
 use diesel::types::Text;
 use diesel_full_text_search::*;
 use errors::*;
