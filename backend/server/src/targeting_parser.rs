@@ -1,3 +1,6 @@
+use diesel;
+use diesel::pg::PgConnection;
+use diesel::prelude::*;
 use errors::*;
 use nom::IResult;
 use models::Ad;
@@ -25,12 +28,12 @@ impl<'a> NewTargeting<'a> {
         }
     }
 
-    pub fn connect(ad: Ad) -> Option<Vec<TargetingInfo>> {
-        let t = ad.targeting?;
+    pub fn connect(ad: &Ad, conn: &PgConnection) -> Option<()> {
+        let t = ad.targeting.clone()?;
         collect_targeting(&t)
-            .map(NewTargeting::insert_targets)
+            .map(|targets| NewTargeting::insert_targets(targets, conn))
             .and_then(|r| r) // unwrap nesting -- we have Result<Result>
-            .map(NewTargeting::connect_targets)
+            .map(|targets| NewTargeting::connect_targets(&ad, targets, conn))
             .and_then(|r| r) // unwrap nesting again
             .map(|res| Some(res))
             .map_err(|e| {
@@ -40,12 +43,31 @@ impl<'a> NewTargeting<'a> {
             .unwrap_or(None)
     }
 
-    fn insert_targets(targets: Vec<Targeting>) -> Result<Vec<TargetingInfo>> {
-        unimplemented!();
+    fn insert_targets(targets: Vec<Targeting>, conn: &PgConnection) -> Result<Vec<TargetingInfo>> {
+        use schema::targeting_infos;
+        use schema::targeting_infos::dsl::*;
+        let mut ret: Vec<TargetingInfo> = Vec::with_capacity(targets.len());
+        for target in targets {
+            let new_target = NewTargeting::from(target);
+            let target: TargetingInfo = diesel::insert(&new_target)
+                .into(targeting_infos::table)
+                .get_result(conn)
+                .or_else(|_| {
+                    targeting_infos
+                        .filter(targeting_type.eq(new_target.targeting_type))
+                        .filter(segment.eq(new_target.segment))
+                        .get_result(conn)
+                })?;
+            ret.push(target);
+        }
+        Ok(ret)
     }
 
-    fn connect_targets(targets: Vec<TargetingInfo>) -> Result<Vec<TargetingInfo>> {
-        unimplemented!();
+    fn connect_targets(ad: &Ad, targets: Vec<TargetingInfo>, conn: &PgConnection) -> Result<()> {
+        for target in targets {
+            AdsTargetingInfo::connect(ad, target, conn)?;
+        }
+        Ok(())
     }
 }
 
@@ -55,6 +77,24 @@ impl<'a> NewTargeting<'a> {
 pub struct AdsTargetingInfo {
     ad_id: String,
     targeting_info_id: i32,
+}
+
+impl AdsTargetingInfo {
+    pub fn connect(
+        ad: &Ad,
+        target: TargetingInfo,
+        conn: &PgConnection,
+    ) -> Result<AdsTargetingInfo> {
+        use schema::ads_targeting_infos;
+        let row = AdsTargetingInfo {
+            ad_id: ad.id.clone(),
+            targeting_info_id: target.id,
+        };
+        let res = diesel::insert(&row)
+            .into(ads_targeting_infos::table)
+            .get_result(conn)?;
+        Ok(res)
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
