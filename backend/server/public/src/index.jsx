@@ -8,6 +8,7 @@ import throttle from "lodash/throttle";
 import i18next from "i18next";
 import Backend from 'i18next-xhr-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import { lastPage, pageIndex, pageCount } from 'pagination.js'
 
 const ads = (state = [], action) => {
   switch(action.type) {
@@ -19,7 +20,9 @@ const ads = (state = [], action) => {
 };
 
 const reducer = combineReducers({
-  ads
+  ads, 
+  pageIndex,
+  lastPage
 });
 
 const middleware = [thunkMiddleware, createLogger()];
@@ -63,7 +66,7 @@ const Ad = ({ ad }) => (
   </div>
 );
 
-let App = ({ads, onKeyUp}) => (
+let App = ({ads, onKeyUp, prev, next}) => (
   <div id="app">
     <h1>{t("title")}</h1>
     <h2>{t("slug")}</h2>
@@ -73,6 +76,10 @@ let App = ({ads, onKeyUp}) => (
     <div id="ads">
       {ads.map((ad) => <Ad ad={ad} key={ad.id} />)}
     </div>
+    <div id="pageNav">
+      <div id="previous"><a href="#" onClick={prev}>Previous</a></div> 
+      <div id="next"><a href="#" onClick={next}>Next</a></div>
+    </div>
   </div>
 );
 App = connect(
@@ -80,8 +87,23 @@ App = connect(
   (dispatch) => ({
     onKeyUp: throttle((e) => {
       e.preventDefault();
+      store.dispatch(pageCount.pageClear())
       dispatch(search(store, e.target.value.length ? e.target.value : null));
-    }, 1000)
+    }, 1000),
+    prev: (e) => {
+      e.preventDefault();
+      if (store.getState().pageIndex > 0) {
+        store.dispatch(pageCount.pagePrev())
+        refresh(store)
+      }
+    },
+    next: (e) => {
+      e.preventDefault();
+      if (!store.getState().lastPage) {
+        store.dispatch(pageCount.pageNext())
+        refresh(store)
+      }
+    }
   })
 )(App);
 
