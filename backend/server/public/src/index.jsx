@@ -8,17 +8,7 @@ import throttle from "lodash/throttle";
 import i18next from "i18next";
 import Backend from 'i18next-xhr-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { IS_LAST_PAGE, NOT_LAST_PAGE, PAGE_PREV, PAGE_NEXT, PAGE_CLEAR, pageCount } from 'pagination.js'
-const lastPage = (state = false, action) => {
-  switch(action.type) {
-    case IS_LAST_PAGE:
-      return true;
-    case NOT_LAST_PAGE:
-      return false;
-    default:
-      return state;
-  }
-}
+import { lastPage, pageIndex, pageCount } from 'pagination.js'
 
 const ads = (state = [], action) => {
   switch(action.type) {
@@ -28,21 +18,6 @@ const ads = (state = [], action) => {
     return state;
   }
 };
-
-const pageIndex = (state = 0, action) => {
-  switch(action.type) {
-    case PAGE_NEXT:
-      return state + 1;
-
-    case PAGE_PREV:
-      return state - 1;
-
-    case PAGE_CLEAR:
-      return 0;
-    default:
-      return state;
-  }
-}
 
 const reducer = combineReducers({
   ads, 
