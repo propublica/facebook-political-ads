@@ -24,4 +24,30 @@ const notLastPage = () => ({
   type: NOT_LAST_PAGE
 })
 
-export { pageCount, PAGE_NEXT, PAGE_PREV, PAGE_CLEAR, IS_LAST_PAGE, NOT_LAST_PAGE, isLastPage, notLastPage} ;
+const lastPage = (state = false, action) => {
+  switch(action.type) {
+    case IS_LAST_PAGE:
+      return true;
+    case NOT_LAST_PAGE:
+      return false;
+    default:
+      return state;
+  }
+}
+const pageIndex = (state = 0, action) => {
+  switch(action.type) {
+    case PAGE_NEXT:
+      return state + 1;
+
+    case PAGE_PREV:
+      return state - 1;
+
+    case PAGE_CLEAR:
+      return 0;
+
+    default:
+      return state;
+  }
+}
+
+export { pageCount, lastPage, pageIndex, isLastPage, notLastPage} ;
