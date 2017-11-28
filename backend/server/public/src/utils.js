@@ -1,3 +1,5 @@
+import 'url-search-params-polyfill';
+import {isLastPage, notLastPage} from 'pagination.js'
 const auth = (credentials) => (credentials ?
   {"Authorization": `Bearer ${credentials.token}`} :
   {});
@@ -21,17 +23,29 @@ const newAds = (ads) => ({
 });
 
 const refresh = (store, query) => {
-  let url = "/facebook-ads/ads";
+  let url = "/facebook-ads/ads?";
+  var params = new URLSearchParams ()
   if(query) {
-    url = url + `?search=${query}`;
+    params.append("search", query);
   }
-  return fetch(url, {
+  if (store.getState().pageIndex) {
+    params.append("page", store.getState().pageIndex);
+  }
+
+  return fetch(`${url}${params.toString()}`, {
     method: "GET",
     headers: headers(store.getState().credentials)
   }).then((res) => res.json())
-    .then((ads) => { store.dispatch(newAds(ads.ads)); });
+    .then((ads) => {
+      if (ads.ads.length < 20) {
+        store.dispatch(isLastPage());
+      } else {
+        store.dispatch(notLastPage());
+      }
+      store.dispatch(newAds(ads.ads));
+    });
 };
 
-const search = (store, query) => () => refresh(store, query);
+const search = (store, query) => () => refresh(store, query, 0);
 
-export { headers, newAds, NEW_ADS, refresh, search };
+export { headers, newAds, NEW_ADS,  refresh, search };
