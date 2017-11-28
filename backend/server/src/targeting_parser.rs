@@ -1,21 +1,60 @@
 use errors::*;
 use nom::IResult;
-use schema::targeting_info;
+use models::Ad;
+use schema::{targeting_infos, ads_targeting_infos};
 
-#[derive(Insertable)]
-#[table_name = "targeting_info"]
-pub struct TargetingInfo<'a> {
-    targeting: &'a str,
+#[derive(Debug, Identifiable, Queryable)]
+pub struct TargetingInfo {
+    id: i32,
+    targeting_type: String,
+    segment: Option<String>,
+}
+
+#[derive(Insertable, Debug)]
+#[table_name = "targeting_infos"]
+pub struct NewTargeting<'a> {
+    targeting_type: &'a str,
     segment: Option<&'a str>,
 }
 
-impl<'a> TargetingInfo<'a> {
+impl<'a> NewTargeting<'a> {
     fn new(targeting: &'a str, segment: Option<&'a str>) -> Self {
-        TargetingInfo {
-            targeting: targeting,
+        NewTargeting {
+            targeting_type: targeting,
             segment: segment,
         }
     }
+
+    pub fn connect(ad: Ad) -> Option<Vec<TargetingInfo>> {
+        let t = ad.targeting?;
+        collect_targeting(&t)
+            .map(NewTargeting::insert_targets)
+            .and_then(|r| r) // unwrap nesting -- we have Result<Result>
+            .map(NewTargeting::connect_targets)
+            .and_then(|r| r) // unwrap nesting again
+            .map(|res| Some(res))
+            .map_err(|e| {
+                warn!("Couldn't parse {:?}: {:?}", t, e);
+                e
+            })
+            .unwrap_or(None)
+    }
+
+    fn insert_targets(targets: Vec<Targeting>) -> Result<Vec<TargetingInfo>> {
+        unimplemented!();
+    }
+
+    fn connect_targets(targets: Vec<TargetingInfo>) -> Result<Vec<TargetingInfo>> {
+        unimplemented!();
+    }
+}
+
+#[derive(Insertable, Queryable, Associations)]
+#[belongs_to(TargetingInfo)]
+#[table_name = "ads_targeting_infos"]
+pub struct AdsTargetingInfo {
+    ad_id: String,
+    targeting_info_id: i32,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -39,9 +78,9 @@ pub enum Targeting<'a> {
     Advertiser(&'a str),
 }
 
-impl<'a> From<TargetingInfo<'a>> for Targeting<'a> {
-    fn from(row: TargetingInfo<'a>) -> Self {
-        match row.targeting {
+impl<'a> From<NewTargeting<'a>> for Targeting<'a> {
+    fn from(row: NewTargeting<'a>) -> Self {
+        match row.targeting_type {
             "Gender" => Targeting::Gender(row.segment.unwrap()),
             "City" => Targeting::City(row.segment.unwrap()),
             "State" => Targeting::State(row.segment.unwrap()),
@@ -62,24 +101,24 @@ impl<'a> From<TargetingInfo<'a>> for Targeting<'a> {
     }
 }
 
-impl<'a> From<Targeting<'a>> for TargetingInfo<'a> {
+impl<'a> From<Targeting<'a>> for NewTargeting<'a> {
     fn from(targeting: Targeting<'a>) -> Self {
         match targeting {
-            Targeting::Gender(s) => TargetingInfo::new("Gender", Some(s)),
-            Targeting::City(s) => TargetingInfo::new("City", Some(s)),
-            Targeting::State(s) => TargetingInfo::new("State", Some(s)),
-            Targeting::Region(s) => TargetingInfo::new("Region", Some(s)),
-            Targeting::Age(s) => TargetingInfo::new("Age", Some(s)),
-            Targeting::Interest(s) => TargetingInfo::new("Interest", Some(s)),
-            Targeting::Segment(s) => TargetingInfo::new("Segment", Some(s)),
-            Targeting::Retargeting(s) => TargetingInfo::new("Retargeting", Some(s)),
-            Targeting::Agency(s) => TargetingInfo::new("Agency", Some(s)),
-            Targeting::Website(s) => TargetingInfo::new("Website", Some(s)),
-            Targeting::Language(s) => TargetingInfo::new("Language", Some(s)),
-            Targeting::Employer(s) => TargetingInfo::new("Employer", Some(s)),
-            Targeting::School(s) => TargetingInfo::new("School", Some(s)),
-            Targeting::Like => TargetingInfo::new("Like", None),
-            Targeting::List => TargetingInfo::new("List", None),
+            Targeting::Gender(s) => NewTargeting::new("Gender", Some(s)),
+            Targeting::City(s) => NewTargeting::new("City", Some(s)),
+            Targeting::State(s) => NewTargeting::new("State", Some(s)),
+            Targeting::Region(s) => NewTargeting::new("Region", Some(s)),
+            Targeting::Age(s) => NewTargeting::new("Age", Some(s)),
+            Targeting::Interest(s) => NewTargeting::new("Interest", Some(s)),
+            Targeting::Segment(s) => NewTargeting::new("Segment", Some(s)),
+            Targeting::Retargeting(s) => NewTargeting::new("Retargeting", Some(s)),
+            Targeting::Agency(s) => NewTargeting::new("Agency", Some(s)),
+            Targeting::Website(s) => NewTargeting::new("Website", Some(s)),
+            Targeting::Language(s) => NewTargeting::new("Language", Some(s)),
+            Targeting::Employer(s) => NewTargeting::new("Employer", Some(s)),
+            Targeting::School(s) => NewTargeting::new("School", Some(s)),
+            Targeting::Like => NewTargeting::new("Like", None),
+            Targeting::List => NewTargeting::new("List", None),
             // This is a special field that allows us to tie a page to a name, it is a bit
             // unfortunate that we include it here, but that's ok because it helps out with below.
             Targeting::Advertiser(_) => panic!("Advertiser is not allowed as a targeting field"),
