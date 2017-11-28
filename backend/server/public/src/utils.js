@@ -22,7 +22,7 @@ const newAds = (ads) => ({
   value: ads
 });
 
-const refresh = (store, query, page) => {
+const refresh = (store, query) => {
   let url = "/facebook-ads/ads?";
   var params = new URLSearchParams ()
   if(query) {
