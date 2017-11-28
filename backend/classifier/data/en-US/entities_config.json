@@ -1,0 +1,17 @@
+{
+	"exclude": [
+		"👊",
+		" "
+	],
+	"parents": {
+		"Trump" :[
+			"Donald Trump's",
+			"Trump administration",
+			"TrumpCare",
+			"Trump administration’s",
+			"Trumpcare",
+			"the Trump Organization",
+			"Trump’s Muslim Ban"
+		]
+	}
+}
