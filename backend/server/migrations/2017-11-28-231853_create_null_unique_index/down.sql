@@ -1,0 +1,2 @@
+drop index index_targeting_infos_on_targeting_and_segment;
+create unique index index_targeting_info_on_targeting_and_segment on targeting_infos(targeting_type, segment);
