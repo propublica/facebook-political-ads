@@ -1,109 +1,53 @@
-use diesel;
-use diesel::pg::PgConnection;
-use diesel::prelude::*;
 use errors::*;
 use nom::IResult;
-use models::Ad;
-use schema::{targeting_infos, ads_targeting_infos};
 
-#[derive(Debug, Identifiable, Queryable)]
-pub struct TargetingInfo {
-    id: i32,
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Targeting {
     targeting_type: String,
     segment: Option<String>,
 }
 
-#[derive(Insertable, Debug)]
-#[table_name = "targeting_infos"]
-pub struct NewTargeting<'a> {
-    targeting_type: &'a str,
-    segment: Option<&'a str>,
-}
-
-impl<'a> NewTargeting<'a> {
-    fn new(targeting: &'a str, segment: Option<&'a str>) -> Self {
-        NewTargeting {
-            targeting_type: targeting,
-            segment: segment,
+impl Targeting {
+    fn new(targeting: &str, segment: Option<&str>) -> Self {
+        Targeting {
+            targeting_type: targeting.to_string(),
+            segment: match segment {
+                Some(s) => Some(s.to_string()),
+                None => None,
+            },
         }
-    }
-
-    pub fn connect(ad: &Ad, conn: &PgConnection) -> Option<()> {
-        let t = ad.targeting.clone()?;
-        collect_targeting(&t)
-            .map(|targets| NewTargeting::insert_targets(targets, conn))
-            .and_then(|r| r) // unwrap nesting -- we have Result<Result>
-            .map(|targets| NewTargeting::connect_targets(&ad, targets, conn))
-            .and_then(|r| r) // unwrap nesting again
-            .map(|res| Some(res))
-            .map_err(|e| {
-                warn!("Couldn't insert: {:?}", e);
-                e
-            })
-            .unwrap_or(None)
-    }
-
-    fn insert_targets(targets: Vec<Targeting>, conn: &PgConnection) -> Result<Vec<TargetingInfo>> {
-        use schema::targeting_infos;
-        use schema::targeting_infos::dsl::*;
-        let mut ret: Vec<TargetingInfo> = Vec::with_capacity(targets.len());
-        for target in targets {
-            let new_target = NewTargeting::from(target);
-            let target: TargetingInfo = diesel::insert(&new_target)
-                .into(targeting_infos::table)
-                .get_result(conn)
-                .or_else(|_| {
-                    let query =
-                        targeting_infos.filter(targeting_type.eq(new_target.targeting_type));
-
-                    let segment_filter = match new_target.segment {
-                        Some(seg) => query.filter(segment.eq(seg)).into_boxed(),
-                        None => query.into_boxed(),
-                    };
-
-                    segment_filter.get_result(conn)
-                })?;
-            ret.push(target);
-        }
-        Ok(ret)
-    }
-
-    fn connect_targets(ad: &Ad, targets: Vec<TargetingInfo>, conn: &PgConnection) -> Result<()> {
-        for target in targets {
-            AdsTargetingInfo::connect(ad, target, conn)?;
-        }
-        Ok(())
     }
 }
 
-#[derive(Insertable, Queryable, Associations)]
-#[belongs_to(TargetingInfo)]
-#[table_name = "ads_targeting_infos"]
-pub struct AdsTargetingInfo {
-    ad_id: String,
-    targeting_info_id: i32,
-}
-
-impl AdsTargetingInfo {
-    pub fn connect(
-        ad: &Ad,
-        target: TargetingInfo,
-        conn: &PgConnection,
-    ) -> Result<AdsTargetingInfo> {
-        use schema::ads_targeting_infos;
-        let row = AdsTargetingInfo {
-            ad_id: ad.id.clone(),
-            targeting_info_id: target.id,
-        };
-        let res = diesel::insert(&row)
-            .into(ads_targeting_infos::table)
-            .get_result(conn)?;
-        Ok(res)
+impl<'a> From<TargetingParsed<'a>> for Targeting {
+    fn from(targeting: TargetingParsed<'a>) -> Self {
+        match targeting {
+            TargetingParsed::Gender(s) => Targeting::new("Gender", Some(s)),
+            TargetingParsed::City(s) => Targeting::new("City", Some(s)),
+            TargetingParsed::State(s) => Targeting::new("State", Some(s)),
+            TargetingParsed::Region(s) => Targeting::new("Region", Some(s)),
+            TargetingParsed::Age(s) => Targeting::new("Age", Some(s)),
+            TargetingParsed::Interest(s) => Targeting::new("Interest", Some(s)),
+            TargetingParsed::Segment(s) => Targeting::new("Segment", Some(s)),
+            TargetingParsed::Retargeting(s) => Targeting::new("Retargeting", Some(s)),
+            TargetingParsed::Agency(s) => Targeting::new("Agency", Some(s)),
+            TargetingParsed::Website(s) => Targeting::new("Website", Some(s)),
+            TargetingParsed::Language(s) => Targeting::new("Language", Some(s)),
+            TargetingParsed::Employer(s) => Targeting::new("Employer", Some(s)),
+            TargetingParsed::School(s) => Targeting::new("School", Some(s)),
+            TargetingParsed::Like => Targeting::new("Like", None),
+            TargetingParsed::List => Targeting::new("List", None),
+            // This is a special field that allows us to tie a page to a name, it is a bit
+            // unfortunate that we include it here, but that's ok because it helps out with below.
+            TargetingParsed::Advertiser(_) => {
+                panic!("Advertiser is not allowed as a targeting field")
+            }
+        }
     }
 }
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum Targeting<'a> {
+pub enum TargetingParsed<'a> {
     Gender(&'a str),
     City(&'a str),
     State(&'a str),
@@ -123,145 +67,97 @@ pub enum Targeting<'a> {
     Advertiser(&'a str),
 }
 
-impl<'a> From<NewTargeting<'a>> for Targeting<'a> {
-    fn from(row: NewTargeting<'a>) -> Self {
-        match row.targeting_type {
-            "Gender" => Targeting::Gender(row.segment.unwrap()),
-            "City" => Targeting::City(row.segment.unwrap()),
-            "State" => Targeting::State(row.segment.unwrap()),
-            "Region" => Targeting::Region(row.segment.unwrap()),
-            "Age" => Targeting::Age(row.segment.unwrap()),
-            "Interest" => Targeting::Interest(row.segment.unwrap()),
-            "Segment" => Targeting::Segment(row.segment.unwrap()),
-            "Retargeting" => Targeting::Retargeting(row.segment.unwrap()),
-            "Agency" => Targeting::Agency(row.segment.unwrap()),
-            "Website" => Targeting::Website(row.segment.unwrap()),
-            "Language" => Targeting::Language(row.segment.unwrap()),
-            "Employer" => Targeting::Employer(row.segment.unwrap()),
-            "School" => Targeting::School(row.segment.unwrap()),
-            "Like" => Targeting::Like,
-            "List" => Targeting::List,
-            _ => panic!("Trying to convert an unknown enum"),
-        }
-    }
-}
-
-impl<'a> From<Targeting<'a>> for NewTargeting<'a> {
-    fn from(targeting: Targeting<'a>) -> Self {
-        match targeting {
-            Targeting::Gender(s) => NewTargeting::new("Gender", Some(s)),
-            Targeting::City(s) => NewTargeting::new("City", Some(s)),
-            Targeting::State(s) => NewTargeting::new("State", Some(s)),
-            Targeting::Region(s) => NewTargeting::new("Region", Some(s)),
-            Targeting::Age(s) => NewTargeting::new("Age", Some(s)),
-            Targeting::Interest(s) => NewTargeting::new("Interest", Some(s)),
-            Targeting::Segment(s) => NewTargeting::new("Segment", Some(s)),
-            Targeting::Retargeting(s) => NewTargeting::new("Retargeting", Some(s)),
-            Targeting::Agency(s) => NewTargeting::new("Agency", Some(s)),
-            Targeting::Website(s) => NewTargeting::new("Website", Some(s)),
-            Targeting::Language(s) => NewTargeting::new("Language", Some(s)),
-            Targeting::Employer(s) => NewTargeting::new("Employer", Some(s)),
-            Targeting::School(s) => NewTargeting::new("School", Some(s)),
-            Targeting::Like => NewTargeting::new("Like", None),
-            Targeting::List => NewTargeting::new("List", None),
-            // This is a special field that allows us to tie a page to a name, it is a bit
-            // unfortunate that we include it here, but that's ok because it helps out with below.
-            Targeting::Advertiser(_) => panic!("Advertiser is not allowed as a targeting field"),
-        }
-    }
-}
-
 named!(until_b(&str) -> &str, take_until!("</b>"));
 
-named!(list(&str) -> Targeting,
+named!(list(&str) -> TargetingParsed,
    do_parse!(
        take_until!("added you to a list of people they want to reach on Facebook.") >>
-       (Targeting::List)
+       (TargetingParsed::List)
    )
 );
 
-named!(like(&str) -> Targeting,
+named!(like(&str) -> TargetingParsed,
    do_parse!(
        alt!(
            take_until!("who like their")
            | take_until!("whose friends like their")
            | take_until!("Personen erreichen möchte, denen deren Seite gefällt.")
        ) >>
-       (Targeting::Like)
+       (TargetingParsed::Like)
    )
 );
 
-named!(school(&str) -> Targeting,
+named!(school(&str) -> TargetingParsed,
     do_parse!(
         take_until_and_consume!("som har angivet skolen <b>") >>
         res: take_until!("</b> på") >>
-        (Targeting::Employer(res))
+        (TargetingParsed::Employer(res))
     )
 );
 
-named!(employer(&str) -> Targeting,
+named!(employer(&str) -> TargetingParsed,
     do_parse!(
         take_until_and_consume!("Personen erreichen möchte, die <b>") >>
         res: take_until!("</b> als Arbeitgeber") >>
-        (Targeting::Employer(res))
+        (TargetingParsed::Employer(res))
     )
 );
 
-named!(provider(&str) -> Targeting,
+named!(provider(&str) -> TargetingParsed,
     do_parse!(
         alt!(
             take_until!("based on data provided by") |
             take_until!("wir basierend auf Daten von")
         ) >>
         take_until_and_consume!("<b>") >>
-        agency: until_b >> (Targeting::Agency(agency))
+        agency: until_b >> (TargetingParsed::Agency(agency))
     )
 );
 
-named!(advertiser_wants(&str) -> Targeting,
+named!(advertiser_wants(&str) -> TargetingParsed,
     do_parse!(
         take_until_and_consume!("including that ") >>
         advertiser: take_until!(" wants to reach") >>
-        (Targeting::Advertiser(advertiser))
+        (TargetingParsed::Advertiser(advertiser))
     )
 );
 
-named!(advertiser_b(&str) -> Targeting,
+named!(advertiser_b(&str) -> TargetingParsed,
     do_parse!(
         alt!(
             take_until_and_consume!("is that <b>") |
             take_until_and_consume!("<b id=\"ad_prefs_advertiser\">")
         ) >>
         advertiser: until_b >>
-        (Targeting::Advertiser(advertiser))
+        (TargetingParsed::Advertiser(advertiser))
     )
 );
 
-named!(interest(&str) -> Targeting,
+named!(interest(&str) -> TargetingParsed,
    do_parse!(
         take_until_and_consume!("<b id=\"ad_prefs_interest\">") >>
         interest: until_b >>
-        (Targeting::Interest(interest))
+        (TargetingParsed::Interest(interest))
     )
 );
 
-named!(language(&str) -> Targeting,
+named!(language(&str) -> TargetingParsed,
    alt!(
        do_parse!(
            take_until_and_consume!("die <b>") >>
            language: take_until!("</b> sprechen") >>
-           (Targeting::Language(language))
+           (TargetingParsed::Language(language))
        )
        | do_parse!(
            take_until_and_consume!("who speak <b>") >>
            opt!(tag!("\"")) >>
            language: alt!(take_until_and_consume!("\"</b>") | until_b) >>
-           (Targeting::Language(language))
+           (TargetingParsed::Language(language))
        )
    )
 );
 
-named!(segment(&str) -> Targeting,
+named!(segment(&str) -> TargetingParsed,
     do_parse!(
         alt!(
             take_until_and_consume!("„<b>") |
@@ -273,11 +169,11 @@ named!(segment(&str) -> Targeting,
             take_until!("</b>“") |
             take_until!("“</b>")
         ) >>
-        (Targeting::Segment(segment))
+        (TargetingParsed::Segment(segment))
     )
 );
 
-named!(gender(&str) -> Option<Targeting>,
+named!(gender(&str) -> Option<TargetingParsed>,
     do_parse!(
         take_until_and_consume!("<b>") >>
         result: alt!(
@@ -287,12 +183,12 @@ named!(gender(&str) -> Option<Targeting>,
                 | tag!("mænd")
                 | tag!("gli uomini")
                 | tag!("män")
-            ) => {|m| Some(Targeting::Gender(m)) }
+            ) => {|m| Some(TargetingParsed::Gender(m)) }
             | alt!(
                 tag!("women")
                 | tag!("Frauen")
                 | tag!("kvinder")
-            ) => {|f| Some(Targeting::Gender(f)) }
+            ) => {|f| Some(TargetingParsed::Gender(f)) }
             | alt!(
                 tag!("people")
                 | tag!("Personen")
@@ -304,15 +200,15 @@ named!(gender(&str) -> Option<Targeting>,
     )
 );
 
-named!(website(&str) -> Targeting,
+named!(website(&str) -> TargetingParsed,
    do_parse!(
        take_until_and_consume!("wants to reach ") >>
        res: tag!("people who have visited their website or used one of their apps") >>
-       (Targeting::Website(res))
+       (TargetingParsed::Website(res))
    )
 );
 
-named!(retargeting(&str) -> Targeting,
+named!(retargeting(&str) -> TargetingParsed,
     do_parse!(
         take_until_and_consume!("<b>") >>
         res: alt!(
@@ -324,11 +220,11 @@ named!(retargeting(&str) -> Targeting,
             | tag!("nyss varit i närheten av företaget")
             | tag!("recently near their business")
         ) >>
-        (Targeting::Retargeting(res))
+        (TargetingParsed::Retargeting(res))
     )
 );
 
-named!(age(&str) -> Option<Targeting>,
+named!(age(&str) -> Option<TargetingParsed>,
     alt!(
         do_parse!(
           ws!(alt!(
@@ -346,28 +242,28 @@ named!(age(&str) -> Option<Targeting>,
               | take_until_and_consume!("che vivono")
               | take_until_and_consume!(",")
           )) >>
-          (Some(Targeting::Age(complete)))
+          (Some(TargetingParsed::Age(complete)))
         ) |
         do_parse!(
             ws!(tag!("age")) >>
             ws!(opt!(tag!("s"))) >>
             ws!(opt!(tag!("d"))) >>
             complete: ws!(take_until_and_consume!(" who")) >>
-            (Some(Targeting::Age(complete)))
+            (Some(TargetingParsed::Age(complete)))
         )
     )
 );
 
-named!(country(&str) -> Vec<Option<Targeting>>,
+named!(country(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
          tag!("live") >>
-         take_until_and_consume!("in") >> 
+         take_until_and_consume!("in") >>
          country: until_b >>
-         (vec![Some(Targeting::Region(country))])
+         (vec![Some(TargetingParsed::Region(country))])
      )
 );
 
-named!(city_state(&str) -> Vec<Option<Targeting>>,
+named!(city_state(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
         ws!(alt!(
             take_until_and_consume!("near") |
@@ -376,11 +272,11 @@ named!(city_state(&str) -> Vec<Option<Targeting>>,
         )) >>
         city: ws!(take_until_and_consume!(",")) >>
         state: alt!(take_until!("wohnen oder") | until_b) >>
-        (vec![Some(Targeting::City(city)), Some(Targeting::State(state))])
+        (vec![Some(TargetingParsed::City(city)), Some(TargetingParsed::State(state))])
     )
 );
 
-named!(age_and_location(&str) -> Vec<Option<Targeting>>,
+named!(age_and_location(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
         a: ws!(age) >>
         l: ws!(alt!(city_state | country)) >>
@@ -388,7 +284,7 @@ named!(age_and_location(&str) -> Vec<Option<Targeting>>,
     )
 );
 
-named!(get_targeting(&str) -> Vec<Targeting>,
+named!(get_targeting(&str) -> Vec<TargetingParsed>,
     do_parse!(
         advertiser_first: opt!(advertiser_b) >>
         sources_and_interests: opt!(alt!(
@@ -415,18 +311,16 @@ named!(get_targeting(&str) -> Vec<Targeting>,
 );
 
 pub fn collect_targeting(thing: &str) -> Result<Vec<Targeting>> {
-    match parse_targeting(thing) {
-        Ok(result) => Ok(
-            result
-                .into_iter()
-                .filter(|t| match t {
-                    &Targeting::Advertiser(_) => false,
-                    _ => true,
-                })
-                .collect(),
-        ),
-        e => e,
-    }
+    parse_targeting(thing).map(|result| {
+        result
+            .into_iter()
+            .filter(|t| match t {
+                &TargetingParsed::Advertiser(_) => false,
+                _ => true,
+            })
+            .map(|t| Targeting::from(t))
+            .collect()
+    })
 }
 
 pub fn collect_advertiser(thing: &str) -> Option<Targeting> {
@@ -435,16 +329,17 @@ pub fn collect_advertiser(thing: &str) -> Option<Targeting> {
             result
                 .into_iter()
                 .filter(|t| match t {
-                    &Targeting::Advertiser(_) => true,
+                    &TargetingParsed::Advertiser(_) => true,
                     _ => false,
                 })
+                .map(|t| t.into())
                 .nth(0)
         }
         _ => None,
     }
 }
 
-fn parse_targeting(thing: &str) -> Result<Vec<Targeting>> {
+fn parse_targeting(thing: &str) -> Result<Vec<TargetingParsed>> {
     match get_targeting(thing) {
         IResult::Done(_, result) => Ok(result),
         IResult::Error(e) => Err(e.into()),
@@ -460,42 +355,42 @@ mod tests {
     fn test_targeting() {
         assert_eq!(
             segment("<b>\"Generation X\"</b>"),
-            IResult::Done("\"</b>", Targeting::Segment("Generation X"))
+            IResult::Done("\"</b>", TargetingParsed::Segment("Generation X"))
         );
         let g = "Google";
         assert_eq!(
             advertiser_b(&format!("<b id=\"ad_prefs_advertiser\">{}</b>", g)),
-            IResult::Done("</b>", Targeting::Advertiser(g))
+            IResult::Done("</b>", TargetingParsed::Advertiser(g))
         );
         let i = "American Federation of State, County and Municipal Employees";
         assert_eq!(
             interest(&format!("<b id=\"ad_prefs_interest\">{}</b>", i)),
-            IResult::Done("</b>", Targeting::Interest(i))
+            IResult::Done("</b>", TargetingParsed::Interest(i))
         );
         assert_eq!(
             gender("<b>men"),
-            IResult::Done("", Some(Targeting::Gender("men")))
+            IResult::Done("", Some(TargetingParsed::Gender("men")))
         );
         assert_eq!(
             gender("<b>women"),
-            IResult::Done("", Some(Targeting::Gender("women")))
+            IResult::Done("", Some(TargetingParsed::Gender("women")))
         );
         assert_eq!(gender("<b>people"), IResult::Done("", None));
         assert_eq!(
             age(" ages 26 to 62 who "),
-            IResult::Done("", Some(Targeting::Age("26 to 62")))
+            IResult::Done("", Some(TargetingParsed::Age("26 to 62")))
         );
         assert_eq!(
             country("United States</b>"),
-            IResult::Done("</b>", vec![Some(Targeting::Region("United States"))])
+            IResult::Done("</b>", vec![Some(TargetingParsed::Region("United States"))])
         );
         assert_eq!(
             city_state("Burlington, North Carolina</b>"),
             IResult::Done(
                 "</b>",
                 vec![
-                    Some(Targeting::City("Burlington")),
-                    Some(Targeting::State("North Carolina")),
+                    Some(TargetingParsed::City("Burlington")),
+                    Some(TargetingParsed::State("North Carolina")),
                 ],
             )
         );
@@ -506,9 +401,9 @@ mod tests {
             IResult::Done(
                 "</b>",
                 vec![
-                    Some(Targeting::Age("18 and older")),
-                    Some(Targeting::City("San Francisco")),
-                    Some(Targeting::State("California")),
+                    Some(TargetingParsed::Age("18 and older")),
+                    Some(TargetingParsed::City("San Francisco")),
+                    Some(TargetingParsed::State("California")),
                 ],
             )
         );
@@ -533,8 +428,8 @@ mod tests {
 
         for ad in adverts {
             let t = ad.clone().targeting.unwrap();
-            let targets = parse_targeting(&t);
-            if targets.is_err() {
+            let targts = parse_targeting(&t);
+            if targts.is_err() {
                 println!("{:?}", ad.clone().targeting);
 
                 // assert!(false);
