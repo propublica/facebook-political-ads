@@ -37,7 +37,7 @@ impl<'a> NewTargeting<'a> {
             .and_then(|r| r) // unwrap nesting again
             .map(|res| Some(res))
             .map_err(|e| {
-                warn!("Couldn't parse {:?}: {:?}", t, e);
+                warn!("Couldn't insert: {:?}", e);
                 e
             })
             .unwrap_or(None)
@@ -53,10 +53,15 @@ impl<'a> NewTargeting<'a> {
                 .into(targeting_infos::table)
                 .get_result(conn)
                 .or_else(|_| {
-                    targeting_infos
-                        .filter(targeting_type.eq(new_target.targeting_type))
-                        .filter(segment.eq(new_target.segment))
-                        .get_result(conn)
+                    let query =
+                        targeting_infos.filter(targeting_type.eq(new_target.targeting_type));
+
+                    let segment_filter = match new_target.segment {
+                        Some(seg) => query.filter(segment.eq(seg)).into_boxed(),
+                        None => query.into_boxed(),
+                    };
+
+                    segment_filter.get_result(conn)
                 })?;
             ret.push(target);
         }
@@ -223,7 +228,10 @@ named!(advertiser_wants(&str) -> Targeting,
 
 named!(advertiser_b(&str) -> Targeting,
     do_parse!(
-        take_until_and_consume!("<b id=\"ad_prefs_advertiser\">") >>
+        alt!(
+            take_until_and_consume!("is that <b>") |
+            take_until_and_consume!("<b id=\"ad_prefs_advertiser\">")
+        ) >>
         advertiser: until_b >>
         (Targeting::Advertiser(advertiser))
     )
@@ -247,7 +255,7 @@ named!(language(&str) -> Targeting,
        | do_parse!(
            take_until_and_consume!("who speak <b>") >>
            opt!(tag!("\"")) >>
-           language: alt!(until_b | take_until_and_consume!("\"")) >>
+           language: alt!(take_until_and_consume!("\"</b>") | until_b) >>
            (Targeting::Language(language))
        )
    )
@@ -332,9 +340,11 @@ named!(age(&str) -> Option<Targeting>,
               | tag!("di età")
           )) >>
           complete: ws!(alt!(
-              take_until_and_consume!(",")
-              | take_until_and_consume!("in")
-              | take_until!("che vivono")
+              take_until_and_consume!("derover")
+              | take_until_and_consume!("älter")
+              | take_until_and_consume!("die in")
+              | take_until_and_consume!("che vivono")
+              | take_until_and_consume!(",")
           )) >>
           (Some(Targeting::Age(complete)))
         ) |
@@ -349,7 +359,12 @@ named!(age(&str) -> Option<Targeting>,
 );
 
 named!(country(&str) -> Vec<Option<Targeting>>,
-    do_parse!(country: until_b >> (vec![Some(Targeting::Region(country))]))
+    do_parse!(
+         tag!("live") >>
+         take_until_and_consume!("in") >> 
+         country: until_b >>
+         (vec![Some(Targeting::Region(country))])
+     )
 );
 
 named!(city_state(&str) -> Vec<Option<Targeting>>,
@@ -367,8 +382,8 @@ named!(city_state(&str) -> Vec<Option<Targeting>>,
 
 named!(age_and_location(&str) -> Vec<Option<Targeting>>,
     do_parse!(
-        a: dbg!(ws!(age)) >>
-        l: ws!(alt!(city_state | dbg!(country))) >>
+        a: ws!(age) >>
+        l: ws!(alt!(city_state | country)) >>
         (vec![&vec![a][..], &l[..]].concat())
     )
 );
@@ -475,7 +490,7 @@ mod tests {
             IResult::Done("</b>", vec![Some(Targeting::Region("United States"))])
         );
         assert_eq!(
-            city_state("near Burlington, North Carolina</b>"),
+            city_state("Burlington, North Carolina</b>"),
             IResult::Done(
                 "</b>",
                 vec![
@@ -511,7 +526,8 @@ mod tests {
         let database_url = env::var("DATABASE_URL").unwrap();
         let connection = PgConnection::establish(&database_url).unwrap();
         let adverts = ads.filter(targeting.is_not_null())
-            .limit(100000)
+            .filter(lang.eq("en-US"))
+            .limit(1000)
             .load::<Ad>(&connection)
             .unwrap();
 
@@ -521,7 +537,7 @@ mod tests {
             if targets.is_err() {
                 println!("{:?}", ad.clone().targeting);
 
-                assert!(false);
+                // assert!(false);
             }
         }
     }
