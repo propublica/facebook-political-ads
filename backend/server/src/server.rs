@@ -18,7 +18,7 @@ use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
 use models::{NewAd, Ad};
 use r2d2_diesel::ConnectionManager;
-use r2d2::{Pool, Config};
+use r2d2::Pool;
 use start_logging;
 use serde_json;
 use std::collections::HashMap;
@@ -408,9 +408,10 @@ impl AdServer {
 
         let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
-        let config = Config::default();
         let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
-        let db_pool = Pool::new(config, manager).expect("Failed to create pool.");
+        let db_pool = Pool::builder().build(manager).expect(
+            "Failed to create pool.",
+        );
         let pool = CpuPool::new_num_cpus();
 
         let mut core = Core::new().unwrap();

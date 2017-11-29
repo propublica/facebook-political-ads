@@ -2,7 +2,6 @@ use chrono::DateTime;
 use chrono::offset::Utc;
 use diesel;
 use diesel::pg::PgConnection;
-use diesel::pg::upsert::*;
 use diesel::prelude::*;
 use diesel::types::Text;
 use diesel_full_text_search::*;
@@ -16,13 +15,15 @@ use kuchiki;
 use kuchiki::iter::{Select, Elements, Descendants};
 use kuchiki::traits::*;
 use url::Url;
-use targeting_parser::{collect_targeting, collect_advertiser, Targeting};
+use targeting_parser::collect_targeting;
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::{default_tls_client, Region};
 use rusoto_credential::DefaultCredentialsProvider;
 use rusoto_s3::{PutObjectRequest, S3Client, S3};
 use schema::ads;
+use serde_json;
+use serde_json::Value;
 use std::collections::HashMap;
 use server::AdPost;
 
@@ -173,6 +174,7 @@ pub struct Ad {
     pub targeting: Option<String>,
     #[serde(skip_serializing)]
     pub suppressed: bool,
+    pub targets: Option<Value>,
 }
 
 // We do this because I can't see how to make sql_function! take a string
@@ -335,6 +337,25 @@ impl Ad {
 }
 
 
+fn get_targets(targeting: Option<String>) -> Option<Value> {
+    match targeting {
+        Some(ref targeting) => {
+            collect_targeting(&targeting)
+                .map(|t| serde_json::to_value(t).unwrap())
+                .ok()
+        }
+        None => None,
+    }
+}
+
+// fn get_advertiser(targeting: Option<String>) -> Option<Targeting> {
+//     match targeting {
+//         Some(ref targeting) => collect_advertiser(&targeting).into(),
+//         None => None,
+//     }
+// }
+
+
 #[derive(Insertable)]
 #[table_name = "ads"]
 pub struct NewAd<'a> {
@@ -352,6 +373,7 @@ pub struct NewAd<'a> {
     impressions: i32,
 
     targeting: Option<String>,
+    targets: Option<Value>,
 }
 
 
@@ -379,45 +401,26 @@ impl<'a> NewAd<'a> {
             images: images,
             impressions: if !ad.political.is_some() { 1 } else { 0 },
             targeting: ad.targeting.clone(),
+            targets: get_targets(ad.targeting.clone()),
         })
-    }
-
-    fn targets(&self) -> Option<Vec<Targeting>> {
-        match self.targeting {
-            Some(ref targeting) => collect_targeting(&targeting).ok(),
-            None => None,
-        }
-    }
-
-    fn advertiser(&self) -> Option<Targeting> {
-        match self.targeting {
-            Some(ref targeting) => collect_advertiser(&targeting),
-            None => None,
-        }
     }
 
     pub fn save(&self, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<Ad> {
         use schema::ads;
         use schema::ads::dsl::*;
         let connection = pool.get()?;
-        // TODO wrap this in a transaction
-
         // increment impressions if this is a background save,
         // otherwise increment political counters
-        let ad: Ad = diesel::insert(&self.on_conflict(
-            id,
-            do_update().set((
+        let ad: Ad = diesel::insert_into(ads::table)
+            .values(self)
+            .on_conflict(id)
+            .do_update()
+            .set((
                 political.eq(political + self.political),
-                not_political.eq(
-                    not_political +
-                        self.not_political,
-                ),
-                impressions.eq(
-                    impressions + self.impressions,
-                ),
+                not_political.eq(not_political + self.not_political),
+                impressions.eq(impressions + self.impressions),
                 updated_at.eq(Utc::now()),
-            )),
-        )).into(ads::table)
+            ))
             .get_result(&*connection)?;
 
         if self.targeting.is_some() && !ad.targeting.is_some() {
@@ -477,6 +480,7 @@ mod tests {
             targeting: None,
             political_probability: 0.0,
             suppressed: false,
+            targets: None,
         };
         let urls = saved_ad.image_urls();
         let images = Images::from_ad(&saved_ad, &urls).unwrap();

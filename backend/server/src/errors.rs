@@ -1,4 +1,4 @@
-use r2d2::GetTimeout;
+use r2d2::Error as R2Error;
 use diesel::result::Error as DieselError;
 use serde_json::Error as SerdeError;
 use string::FromUtf8Error;
@@ -15,7 +15,7 @@ use nom::Needed;
 // combat type restrictions on all of the hyper/futures function calls.
 error_chain! {
     foreign_links {
-        Timeout(GetTimeout);
+        PoolError(R2Error);
         DataBase(DieselError);
         JSON(SerdeError);
         String(FromUtf8Error);

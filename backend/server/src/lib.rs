@@ -2,10 +2,10 @@
 extern crate chrono;
 #[macro_use]
 extern crate diesel;
-extern crate dotenv;
 #[macro_use]
-extern crate diesel_codegen;
+extern crate diesel_infer_schema;
 extern crate diesel_full_text_search;
+extern crate dotenv;
 #[macro_use]
 extern crate error_chain;
 extern crate hyper;
