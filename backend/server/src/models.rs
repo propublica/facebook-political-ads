@@ -1,8 +1,10 @@
 use chrono::DateTime;
 use chrono::offset::Utc;
 use diesel;
+use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use diesel::sql_query;
 use diesel::types::Text;
 use diesel_full_text_search::*;
 use errors::*;
@@ -22,6 +24,8 @@ use rusoto_core::{default_tls_client, Region};
 use rusoto_credential::DefaultCredentialsProvider;
 use rusoto_s3::{PutObjectRequest, S3Client, S3};
 use schema::ads;
+use schema::ads::BoxedQuery;
+use schema::AggregateTargeting;
 use serde_json;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -156,6 +160,25 @@ impl Images {
     }
 }
 
+impl AggregateTargeting {
+    pub fn get_targets(
+        language: &str,
+        conn: &Pool<ConnectionManager<PgConnection>>,
+        options: &HashMap<String, String>,
+    ) -> Result<Vec<Self>> {
+        let connection = conn.get()?;
+        // WARNING! String interpolation here.
+        print_sql!(Ad::get_ads_query(language, options));
+        Ad::get_ads_query(language, options).select(ads::html);
+        Ok(sql_query(
+            "with fields_rowset as (
+             select jsonb_array_elements(targets) as fields from ads
+          ) select count(*) as count, fields->'targeting_type' as targeting_type
+          from fields_rowset group by fields->'targeting_type';",
+        ).load::<Self>(&*connection)?)
+    }
+}
+
 #[derive(Serialize, Queryable, Debug, Clone)]
 pub struct Ad {
     pub id: String,
@@ -176,9 +199,7 @@ pub struct Ad {
     pub suppressed: bool,
     pub targets: Option<Value>,
 }
-
-// We do this because I can't see how to make sql_function! take a string
-// argument.
+// Define our special functions for searching
 sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
 sql_function!(to_germantsvector, to_germantsvector_t, (x: Text) -> TsVector);
 sql_function!(to_englishtsquery, to_englishtsquery_t, (x: Text) -> TsQuery);
@@ -281,46 +302,51 @@ impl Ad {
             .collect()
     }
 
-    pub fn get_ads_by_lang(
-        language: &str,
-        conn: &Pool<ConnectionManager<PgConnection>>,
+    pub(self) fn get_ads_query<'a>(
+        language: &'a str,
         options: &HashMap<String, String>,
-    ) -> Result<Vec<Ad>> {
+    ) -> BoxedQuery<'a, Pg> {
         use schema::ads::dsl::*;
-        let connection = conn.get()?;
         let mut query = ads.filter(lang.eq(language))
             .filter(political_probability.gt(0.70))
             .filter(suppressed.eq(false))
+            .order(created_at.desc())
             .into_boxed();
 
         if let Some(search) = options.get("search") {
             query = match &language[..2] {
                 "de" => {
-                    query
-                        .filter(to_germantsvector(html).matches(
-                            to_germantsquery(search.clone()),
-                        ))
-                        .order(ts_rank(to_germantsvector(html), to_germantsquery(search)))
+                    query.filter(to_germantsvector(html).matches(
+                        to_germantsquery(search.clone()),
+                    ))
                 }
                 _ => {
-                    query
-                        .filter(to_englishtsvector(html).matches(
-                            to_englishtsquery(search.clone()),
-                        ))
-                        .order(ts_rank(to_englishtsvector(html), to_englishtsquery(search)))
+                    query.filter(to_englishtsvector(html).matches(
+                        to_englishtsquery(search.clone()),
+                    ))
                 }
             }
         }
 
+        query
+    }
+
+    pub fn get_ads(
+        language: &str,
+        conn: &Pool<ConnectionManager<PgConnection>>,
+        options: &HashMap<String, String>,
+    ) -> Result<Vec<Ad>> {
+        let connection = conn.get()?;
+
+        let mut query = Ad::get_ads_query(language, options);
+
         if let Some(page) = options.get("page") {
             let raw_offset = page.parse::<usize>().unwrap_or_default() * 20;
             let offset = if raw_offset > 1000 { 1000 } else { raw_offset };
-            query = query.offset(offset as i64)
+            query = query.offset(offset as i64);
         }
 
-        Ok(query.order(created_at.desc()).limit(20).load::<Ad>(
-            &*connection,
-        )?)
+        Ok(query.limit(20).load::<Ad>(&*connection)?)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
@@ -337,7 +363,7 @@ impl Ad {
 }
 
 
-fn get_targets(targeting: Option<String>) -> Option<Value> {
+pub fn get_targets(targeting: Option<String>) -> Option<Value> {
     match targeting {
         Some(ref targeting) => {
             collect_targeting(&targeting)
@@ -359,7 +385,7 @@ fn get_targets(targeting: Option<String>) -> Option<Value> {
 #[derive(Insertable)]
 #[table_name = "ads"]
 pub struct NewAd<'a> {
-    id: &'a str,
+    pub id: &'a str,
     html: &'a str,
     political: i32,
     not_political: i32,
@@ -373,7 +399,7 @@ pub struct NewAd<'a> {
     impressions: i32,
 
     targeting: Option<String>,
-    targets: Option<Value>,
+    pub targets: Option<Value>,
 }
 
 
@@ -425,7 +451,10 @@ impl<'a> NewAd<'a> {
 
         if self.targeting.is_some() && !ad.targeting.is_some() {
             diesel::update(ads.find(self.id))
-                .set(targeting.eq(&self.targeting))
+                .set((
+                    targeting.eq(&self.targeting),
+                    targets.eq(get_targets(ad.targeting.clone())),
+                ))
                 .execute(&*connection)?;
         };
 
