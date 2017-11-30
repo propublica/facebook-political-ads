@@ -46,6 +46,18 @@ impl<'a> From<TargetingParsed<'a>> for Targeting {
     }
 }
 
+// https://github.com/Geal/nom/issues/613
+trait DbgFakeHex {
+    fn to_hex(&self, chunk_size: usize) -> String;
+}
+
+impl DbgFakeHex for str {
+    fn to_hex(&self, chunk_size: usize) -> String {
+        use nom::HexDisplay;
+        self.as_bytes().to_hex(chunk_size)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum TargetingParsed<'a> {
     Gender(&'a str),
@@ -254,10 +266,10 @@ named!(age(&str) -> Option<TargetingParsed>,
     )
 );
 
-named!(country(&str) -> Vec<Option<TargetingParsed>>,
+named!(region(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
          tag!("live") >>
-         take_until_and_consume!("in") >>
+         ws!(take_until_and_consume!("in")) >>
          country: until_b >>
          (vec![Some(TargetingParsed::Region(country))])
      )
@@ -279,7 +291,7 @@ named!(city_state(&str) -> Vec<Option<TargetingParsed>>,
 named!(age_and_location(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
         a: ws!(age) >>
-        l: ws!(alt!(city_state | country)) >>
+        l: ws!(alt!(city_state | region)) >>
         (vec![&vec![a][..], &l[..]].concat())
     )
 );
@@ -300,8 +312,8 @@ named!(get_targeting(&str) -> Vec<TargetingParsed>,
             | list
         )) >>
         advertiser_second: opt!(advertiser_wants) >>
-        gender: dbg!(gender) >>
-        location: dbg!(age_and_location) >>
+        gender: dbg_dmp!(gender) >>
+        location: dbg_dmp!(age_and_location) >>
         (vec![&vec![advertiser_first,
                     sources_and_interests,
                     advertiser_second,
@@ -432,7 +444,7 @@ mod tests {
             if targts.is_err() {
                 println!("{:?}", ad.clone().targeting);
 
-                // assert!(false);
+                assert!(false);
             }
         }
     }

@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Jeff Larson <thejefflarson@gmail.com>"]
 
 [dependencies]
-diesel = { version = "^0.16", features = ["postgres"] }
+diesel = { version = "^0.99", features = ["postgres"] }
 docopt = "^0.8.1"
 dotenv = "^0.10.1"
 futures = "^0.1.15"
@@ -14,8 +14,8 @@ hyper-tls = "^0.1.2"
 kuchiki = "^0.6.0"
 serde = "^1.0.16"
 serde_derive = "^1.0.16"
-r2d2 = "^0.7.4"
-r2d2-diesel = "^0.16.0"
+r2d2 = "^0.8.1"
+r2d2-diesel = "^0.99.0"
 rusoto_core = "0.29.0"
 rusoto_credential = "^0.9.0"
 rusoto_s3 = "0.29.0"
