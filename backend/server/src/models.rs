@@ -172,9 +172,10 @@ impl AggregateTargeting {
         Ad::get_ads_query(language, options).select(ads::html);
         Ok(sql_query(
             "with fields_rowset as (
-             select jsonb_array_elements(targets) as fields from ads
-          ) select count(*) as count, fields->'targeting_type' as targeting_type
-          from fields_rowset group by fields->'targeting_type';",
+             select jsonb_array_elements(targets) as fields from ads where
+             political_probability > 0.70 and suppressed = false and lang = 'en-US'
+          ) select count(*) as count, fields->>'targeting_type'::text as targeting_type
+          from fields_rowset group by fields->>'targeting_type' order by count desc;",
         ).load::<Self>(&*connection)?)
     }
 }
@@ -518,5 +519,29 @@ mod tests {
         assert!(!images.html.contains("html"));
         assert_eq!(images.images.len(), saved_ad.images.len());
         assert!(images.thumbnail.unwrap() != saved_ad.thumbnail);
+    }
+
+    #[test]
+    fn getting_targets() {
+        use dotenv::dotenv;
+        use std::env;
+
+        dotenv().ok();
+        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+        let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
+        let db_pool = Pool::builder().build(manager).expect(
+            "Failed to create pool.",
+        );
+
+        let options: HashMap<String, String> = HashMap::new();
+        println!(
+            "{}",
+            AggregateTargeting::get_targets("en-US", &db_pool, &options)
+                .unwrap()
+                .iter()
+                .nth(0)
+                .unwrap()
+                .targeting_type
+        );
     }
 }

@@ -393,7 +393,7 @@ mod tests {
             IResult::Done("", Some(TargetingParsed::Age("26 to 62")))
         );
         assert_eq!(
-            country("United States</b>"),
+            region("United States</b>"),
             IResult::Done("</b>", vec![Some(TargetingParsed::Region("United States"))])
         );
         assert_eq!(
