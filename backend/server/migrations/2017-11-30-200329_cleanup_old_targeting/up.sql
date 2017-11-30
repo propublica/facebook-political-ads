@@ -1,0 +1,3 @@
+drop index index_targeting_infos_on_targeting_and_segment;
+drop table ads_targeting_infos;
+drop table targeting_infos;
