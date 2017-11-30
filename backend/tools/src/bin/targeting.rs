@@ -4,9 +4,8 @@ extern crate server;
 use dotenv::dotenv;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use server::models::Ad;
+use server::models::{Ad, get_targets};
 use server::start_logging;
-use server::targeting_parser::NewTargeting;
 use server::schema::ads::dsl::*;
 use std::env;
 
@@ -21,6 +20,12 @@ fn main() {
         .load::<Ad>(&conn)
         .unwrap();
     for ad in dbads {
-        NewTargeting::connect(&ad, &conn);
+        diesel::update(ads.find(ad.id))
+            .set((
+                targeting.eq(&ad.targeting),
+                targets.eq(get_targets(ad.targeting.clone())),
+            ))
+            .execute(&conn)
+            .unwrap();
     }
 }
