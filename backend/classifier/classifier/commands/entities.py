@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import click
 import spacy
 import json
+
 from classifier.utilities import DB, entities_confs
 
 LABELS = ['PER', 'NORP', 'ORG', 'GPE', 'LOC', 'PERSON', 'PRODUCT', 'EVENT', 'LAW', 'FAC']
@@ -20,6 +21,7 @@ def entities(ctx):
     for (directory, conf) in entities_confs(ctx.obj["base"]):
         if conf:
             lang = directory.split('/')[1]
+
             print("running entity extraction for %s" % lang)
             nlp = spacy.load("en")
             ads = DB.query("select * from ads where political_probability > 0.80 and lang = '%s'" % lang)
