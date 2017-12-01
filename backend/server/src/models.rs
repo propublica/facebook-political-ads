@@ -5,9 +5,7 @@ use diesel::dsl::sql;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use diesel::query_source::QueryableByName;
 use diesel::row::NamedRow;
-use diesel::sql_query;
 use diesel::types::{BigInt, Text};
 use diesel_full_text_search::*;
 use errors::*;
@@ -30,7 +28,6 @@ use schema::ads;
 use schema::ads::BoxedQuery;
 use serde_json;
 use serde_json::Value;
-use std;
 use std::collections::HashMap;
 use server::AdPost;
 
@@ -163,21 +160,10 @@ impl Images {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct AggregateTargeting {
     pub count: i64,
     pub targeting_type: String,
-}
-
-impl QueryableByName<Pg> for AggregateTargeting {
-    fn build<R: NamedRow<Pg>>(
-        row: &R,
-    ) -> std::result::Result<Self, Box<std::error::Error + Send + Sync>> {
-        Ok(AggregateTargeting {
-            count: row.get::<BigInt, _>("count")?,
-            targeting_type: row.get::<Text, _>("targeting_type")?,
-        })
-    }
 }
 
 impl AggregateTargeting {
@@ -187,16 +173,16 @@ impl AggregateTargeting {
         options: &HashMap<String, String>,
     ) -> Result<Vec<Self>> {
         let connection = conn.get()?;
-        // WARNING! String interpolation here.
-        // print_sql!(Ad::get_ads_query(language, options));
-        // Ad::get_ads_query(language, options).select(ads::html);
-        Ok(sql_query(
-            "with fields_rowset as (
-             select jsonb_array_elements(targets) as fields from ads where
-             political_probability > 0.70 and suppressed = false and lang = 'en-US'
-          ) select count(*) as count, fields->>'targeting_type'::text as targeting_type
-          from fields_rowset group by fields->>'targeting_type' order by count desc;",
-        ).load::<Self>(&*connection)?)
+        Ok(Ad::get_ads_query(language, options)
+            .select((
+                sql::<BigInt>("count(*) as count"),
+                sql::<Text>(
+                    "jsonb_array_elements(targets)->>'targeting_type' as targeting_type",
+                ),
+            ))
+            .group_by(sql::<Text>("targeting_type"))
+            .order(sql::<BigInt>("count desc"))
+            .load::<Self>(&*connection)?)
     }
 }
 
@@ -333,7 +319,6 @@ impl Ad {
         let mut query = ads.filter(lang.eq(language))
             .filter(political_probability.gt(0.70))
             .filter(suppressed.eq(false))
-            .order(created_at.desc())
             .into_boxed();
 
         if let Some(search) = options.get("search") {
@@ -368,6 +353,8 @@ impl Ad {
         conn: &Pool<ConnectionManager<PgConnection>>,
         options: &HashMap<String, String>,
     ) -> Result<Vec<Ad>> {
+        use schema::ads::dsl::*;
+
         let connection = conn.get()?;
 
         let mut query = Ad::get_ads_query(language, options);
@@ -378,7 +365,9 @@ impl Ad {
             query = query.offset(offset as i64);
         }
 
-        Ok(query.limit(20).load::<Ad>(&*connection)?)
+        Ok(query.limit(20).order(created_at.desc()).load::<Ad>(
+            &*connection,
+        )?)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
