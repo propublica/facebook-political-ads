@@ -5,7 +5,6 @@ use diesel::dsl::sql;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use diesel::row::NamedRow;
 use diesel::types::{BigInt, Text};
 use diesel_full_text_search::*;
 use errors::*;
@@ -207,6 +206,7 @@ pub struct Ad {
     pub targets: Option<Value>,
     pub pages: Option<Value>,
     pub advertiser: Option<String>,
+    pub entities: Option<Value>,
 }
 // Define our special functions for searching
 sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
