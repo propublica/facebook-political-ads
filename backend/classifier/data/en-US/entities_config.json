@@ -4,14 +4,24 @@
 		" "
 	],
 	"parents": {
-		"Trump" :[
-			"Donald Trump's",
-			"Trump administration",
-			"TrumpCare",
-			"Trump administration’s",
-			"Trumpcare",
-			"the Trump Organization",
-			"Trump’s Muslim Ban"
-		]
+		"Donald Trump" : {
+			"label": "PERSON",
+			"entities": [
+				"Donald Trump",
+				"Trump",
+				"Donald Trump's",
+				"Donald J. Trump",
+				"Trump administration",
+				"TrumpCare",
+				"Trump administration’s",
+				"Trumpcare",
+				"the Trump Organization",
+				"Trump’s Muslim Ban",
+				"Trump", 
+				"Trump’s",
+				"Donald Trump’s",
+				"DONALD TRUMP"
+			]
+		}
 	}
 }

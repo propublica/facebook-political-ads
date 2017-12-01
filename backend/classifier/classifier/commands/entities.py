@@ -6,6 +6,7 @@ from collections import Counter
 from bs4 import BeautifulSoup
 import click
 import spacy
+import json
 from classifier.utilities import DB, entities_confs
 
 LABELS = ['PER', 'NORP', 'ORG', 'GPE', 'LOC', 'PERSON', 'PRODUCT', 'EVENT', 'LAW', 'FAC']
@@ -19,27 +20,38 @@ def entities(ctx):
     for (directory, conf) in entities_confs(ctx.obj["base"]):
         if conf:
             lang = directory.split('/')[1]
+            print("running entity extraction for %s" % lang)
             nlp = spacy.load("en")
             ads = DB.query("select * from ads where political_probability > 0.80 and lang = '%s'" % lang)
             counter = Counter()
+            query = "update ads set entities=:entities where id=:id"
+            updates = []
+
             for advert in ads:
                 doc = BeautifulSoup(advert["html"], "html.parser")
                 text = ' '.join([graf.get_text() for graf in doc.select("p")])
 
+                update = {"id": advert["id"], "entities": set()}
                 for ent in nlp(text).ents:
+                    
+                    if ent.text in conf["exclude"]:
+                        continue
 
-                        counter[(ent.text, ent.label_)] += 1
+                    has_parent = False
+                    for parent, children in conf["parents"].items():
+                        if ent.text in children["entities"]:
+                            has_parent = True   
+                            update["entities"].add((parent, children["label"]))
+                    
+                    if not has_parent:
+                        update["entities"].add((ent.text, ent.label_))
 
-            summarized = {}
-            for parent, children in conf["parents"].items():
-                children_entities = [thing for thing in counter.most_common(MOST_COMMON_COUNT) if thing[0][0] in children]
-                summarized[parent] = children_entities
-                
-            print("parent_tag,child_tag,type,count")
-            for parent, children_entities in summarized.items():
-                for child in children_entities:
-                    print("{},{},{},{}".format(parent, child[0][0], child[0][1], child[1]))
+                update["entities"] = json.dumps([{"name":e[0], "label": e[1]} for e in update["entities"]])
+                updates.append(update)
 
-            # SM: Leaving here for now in case you want to revert
-            # for thing in counter.most_common(500):
-            #     print("{},{},{}".format(thing[0][0], thing[0][1], thing[1]))
+                if len(updates) >= 100:
+                    DB.bulk_query(query, updates)
+                    updates = []
+            
+            if updates:
+                DB.bulk_query(query, updates)
