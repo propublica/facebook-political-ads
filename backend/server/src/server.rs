@@ -16,7 +16,7 @@ use hyper::header::{AcceptLanguage, ContentLength, ContentType, Authorization, B
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
-use models::{NewAd, Ad};
+use models::{NewAd, Ad, AggregateTargeting};
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use start_logging;
@@ -62,6 +62,7 @@ pub struct Admin {
 #[derive(Serialize)]
 pub struct ApiResponse {
     ads: Vec<Ad>,
+    targets: Vec<AggregateTargeting>,
 }
 
 impl Service for AdServer {
@@ -243,37 +244,55 @@ impl AdServer {
     }
 
     fn get_ads(&self, req: Request) -> ResponseFuture {
-        let db_pool = self.db_pool.clone();
-        let pool = self.pool.clone();
-        let future = pool.spawn_fn(move || {
-            if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-                let options = req.query()
-                    .map(|q| {
-                        form_urlencoded::parse(q.as_bytes())
-                            .into_owned()
-                            .filter(|pair| pair.0 == "search" || pair.0 == "page")
-                            .collect::<HashMap<_, _>>()
-                    })
-                    .unwrap_or_default();
+        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
+            let options = req.query()
+                .map(|q| {
+                    form_urlencoded::parse(q.as_bytes())
+                        .into_owned()
+                        .filter(|pair| {
+                            pair.0 == "search" || pair.0 == "page" || pair.0 == "targets"
+                        })
+                        .collect::<HashMap<_, _>>()
+                })
+                .unwrap_or_default();
+            let agg_options = options.clone();
+            let db_pool = self.db_pool.clone();
+            let agg_db_pool = self.db_pool.clone();
+            let agg_lang = lang.clone();
 
-                if let Ok(ads) = Ad::get_ads(&lang, &db_pool, &options) {
-                    if let Ok(serialized) = serde_json::to_string(&ApiResponse { ads: ads }) {
-                        return Ok(
-                            Response::new()
-                                .with_header(ContentLength(serialized.len() as u64))
-                                .with_header(
-                                    Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]),
-                                )
-                                .with_header(ContentType::json())
-                                .with_header(AccessControlAllowOrigin::Any)
-                                .with_body(serialized),
-                        );
-                    }
-                }
-            }
-            Ok(Response::new().with_status(StatusCode::BadRequest))
-        });
-        Box::new(future)
+            let ads_future = self.pool.spawn_fn(
+                move || Ad::get_ads(&lang, &db_pool, &options),
+            );
+            let agg_future = self.pool.spawn_fn(move || {
+                AggregateTargeting::get_targets(&agg_lang, &agg_db_pool, &agg_options)
+            });
+            let future = ads_future
+                .join(agg_future)
+                .map(|(ads, targeting)| {
+                    serde_json::to_string(&ApiResponse {
+                        ads: ads,
+                        targets: targeting,
+                    }).map(|serialized| {
+                        Response::new()
+                            .with_header(ContentLength(serialized.len() as u64))
+                            .with_header(
+                                Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]),
+                            )
+                            .with_header(ContentType::json())
+                            .with_header(AccessControlAllowOrigin::Any)
+                            .with_body(serialized)
+                    })
+                        .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
+                })
+                .map_err(|e| {
+                    hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+                });
+            Box::new(future)
+        } else {
+            Box::new(future::ok(
+                Response::new().with_status(StatusCode::BadRequest),
+            ))
+        }
     }
 
     // Beware! This function assumes that we have a caching proxy in front of our

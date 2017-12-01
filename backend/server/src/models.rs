@@ -1,11 +1,14 @@
 use chrono::DateTime;
 use chrono::offset::Utc;
 use diesel;
+use diesel::dsl::sql;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use diesel::query_source::QueryableByName;
+use diesel::row::NamedRow;
 use diesel::sql_query;
-use diesel::types::Text;
+use diesel::types::{BigInt, Text};
 use diesel_full_text_search::*;
 use errors::*;
 use futures::{Future, stream, Stream};
@@ -17,7 +20,7 @@ use kuchiki;
 use kuchiki::iter::{Select, Elements, Descendants};
 use kuchiki::traits::*;
 use url::Url;
-use targeting_parser::collect_targeting;
+use targeting_parser::{collect_targeting, Targeting};
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::{default_tls_client, Region};
@@ -25,9 +28,9 @@ use rusoto_credential::DefaultCredentialsProvider;
 use rusoto_s3::{PutObjectRequest, S3Client, S3};
 use schema::ads;
 use schema::ads::BoxedQuery;
-use schema::AggregateTargeting;
 use serde_json;
 use serde_json::Value;
+use std;
 use std::collections::HashMap;
 use server::AdPost;
 
@@ -160,6 +163,23 @@ impl Images {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct AggregateTargeting {
+    pub count: i64,
+    pub targeting_type: String,
+}
+
+impl QueryableByName<Pg> for AggregateTargeting {
+    fn build<R: NamedRow<Pg>>(
+        row: &R,
+    ) -> std::result::Result<Self, Box<std::error::Error + Send + Sync>> {
+        Ok(AggregateTargeting {
+            count: row.get::<BigInt, _>("count")?,
+            targeting_type: row.get::<Text, _>("targeting_type")?,
+        })
+    }
+}
+
 impl AggregateTargeting {
     pub fn get_targets(
         language: &str,
@@ -168,8 +188,8 @@ impl AggregateTargeting {
     ) -> Result<Vec<Self>> {
         let connection = conn.get()?;
         // WARNING! String interpolation here.
-        print_sql!(Ad::get_ads_query(language, options));
-        Ad::get_ads_query(language, options).select(ads::html);
+        // print_sql!(Ad::get_ads_query(language, options));
+        // Ad::get_ads_query(language, options).select(ads::html);
         Ok(sql_query(
             "with fields_rowset as (
              select jsonb_array_elements(targets) as fields from ads where
@@ -199,6 +219,8 @@ pub struct Ad {
     #[serde(skip_serializing)]
     pub suppressed: bool,
     pub targets: Option<Value>,
+    pub pages: Option<Value>,
+    pub advertiser: Option<String>,
 }
 // Define our special functions for searching
 sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
@@ -326,6 +348,15 @@ impl Ad {
                         to_englishtsquery(search.clone()),
                     ))
                 }
+            }
+        }
+
+        if let Some(target) = options.get("targets") {
+            let targts: Result<Vec<Targeting>> = serde_json::from_str(target).map_err(|e| e.into());
+            if targts.is_ok() {
+                let json = serde_json::to_string(&targts.unwrap()).unwrap();
+                // WARNING! Possible injection, always rely on serde serialization above.
+                query = query.filter(sql(&format!("targets @> '{}'", json)));
             }
         }
 

@@ -4,6 +4,7 @@ use nom::IResult;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Targeting {
     targeting_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     segment: Option<String>,
 }
 
