@@ -6,16 +6,15 @@ $mar: 68; // Margin width
 $col: 68; // Column width
 $gut: 26; // Gutter width
 $pad: 13; // Padding width
-$grid-color: red; // Any color you want!
+$grid-color: #f00; // Any color you want!
 
 $breakpoints: (
-    xs:  (cols:  4, min: 0,      margin: $pad), // Includes optional custom margin
-    sm:  (cols:  6, min: 37.5em, margin: $gut), // Includes optional custom margin
-    md:  (cols:  8, min: 48em),
-    lg:  (cols: 12, min: 60em),
-    xl:  (cols: 12, min: 75em),
-    xxl: (cols: 12, min: 90em)
+  xs:  (cols:  4, min: 0,      margin: $pad), // Includes optional custom margin
+  sm:  (cols:  6, min: 37.5em, margin: $gut), // Includes optional custom margin
+  md:  (cols:  8, min: 48em),
+  lg:  (cols: 12, min: 60em),
+  xl:  (cols: 12, min: 75em),
+  xxl: (cols: 12, min: 90em)
 );
 
-// $max-width: 1680px; // For no max-width, use $max-width: null;
 $max-width: 1440px;

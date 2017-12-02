@@ -26,27 +26,6 @@ $max-width: 75em; // 1200/16;
 $navbar-height-offset: 40px; // temp override
 
 // -----------------------------------------------------------------------------
-// COLORS
-// -----------------------------------------------------------------------------
-
-// $blue: #4aace2;
-// $light-blue: #50b1e3;
-// $green: #7ed221;
-// $red: #d24121;
-$light-red: #be3b3b;
-// $dark-red: #9f3131;
-
-// $light-gray: #4b4f53;
-// // $medium-gray: #32363b;
-// // $dark-gray: #26292c;
-
-// $hed-color:  black;
-// $text-color: #111;
-// $link-color: $light-blue;
-// $bgd-color: white;
-// $bgd-color-alt: #262626;
-
-// -----------------------------------------------------------------------------
 // GLOBAL STYLES
 // -----------------------------------------------------------------------------
 
@@ -720,7 +699,7 @@ header[role='banner'] {
   width: 100%;
   height: $navbar-height-offset;
   z-index: 1000;
-  background-color: #fff;
+  background-color: $page-bg-color;
   border-bottom: 1px solid lighten($text-color, 85%);
   @include breakpoint-min(xl) {
     background-color: transparent;
@@ -755,7 +734,6 @@ header[role='banner'] > h2 {
   margin-left: 10px;
   padding-top: 2px;
   padding-left: 10px;
-  // border-left: 1px solid rgba(255, 255, 255, 0.8);
   border-left: 1px solid rgba(0, 0, 0, 0.15);
   font-family: $fonts-sans;
   font-size: 0.875rem;
@@ -771,12 +749,8 @@ header[role='banner'] > h2 {
 }
 
 header[role='banner'] > h2 a {
-  // color: white;
   text-decoration: none;
-  // @include transition (all 0.25s ease);
-  // .waypoint-header-exited & {
   color: black;
-  // }
 }
 
 header[role='banner'] nav {
