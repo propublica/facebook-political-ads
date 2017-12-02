@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <link rel="stylesheet" href="/facebook-ads/styles.css" type="text/css" media="all">
     <title>Facebook Political Ad Collector</title>
+    <meta name="description" content="Browse through political ads that ProPublica has collected." />
     <meta property="og:type" content="article"/>
     <meta property="og:url" content="https://projects.propublica.org/facebook-ads/" />
     <meta property="og:title" content="Facebook Political Ad Collector" />
@@ -23,25 +24,47 @@
     <meta name="twitter:image:src" content="<%= tw_card %>" />
   </head>
   <body>
-    <header className="cf">
-      <nav id="logo"><a href="http://www.propublica.org">ProPublica</a></nav>
-      <ul class="tools">
-        <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=projects.propublica.org/facebook-ads/?lang=de-DE" target="_blank" rel="noopener">Share on Facebook</a></li>
-        <li class="twitter"><a href="https://twitter.com/home?status=https://projects.propublica.org/graphics/facebook-ads" target="_blank" rel="noopener">Share on Twitter</a></li>
-        <li class="donate">
-          <a href="https://donate.propublica.org/" target="_blank" rel="noopener">Donate</a>
-        </li>
-      </ul>
-    </header>
-    <div id="graphic">
+    <div id="page-body" class="default">
+      <header role="banner">
+        <h1><a href="https://www.propublica.org/">ProPublica</a></h1>
+	<nav>
+	  <ul class="social-links">
+
+            <li class="facebook"><a href="https://www.facebook.com/sharer/sharer.php?u=projects.propublica.org/facebook-ads/?lang=de-DE" target="_blank" rel="noopener">Share on Facebook</a></li>
+            <li class="twitter"><a href="https://twitter.com/home?status=https://projects.propublica.org/graphics/facebook-ads" target="_blank" rel="noopener">Share on Twitter</a></li>
+          </ul>
+          <ul class="donate-links">
+            <li class="tab">
+              <a href="https://donate.propublica.org/" target="_blank" rel="noopener">Donate</a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <main role="main" class="content">
+        <div id="article-top"></div>
+        <article>
+          <header>
+            <div class="title-set">
+              <div class="titles">
+                <h1 class="hed">Facebook Political Ads</h1>
+                <span class="byline">by <a href="https://www.propublica.org/people/jeff-larson">Jeff Larson</a>, <a href="https://www.propublica.org/people/rob-weychert">Rob Weychert</a>, <a href="https://www.propublica.org/people/julia-angwin">Julia Angwin</a> and <a href="https://www.propublica.org/people/jennifer-valentino-devries">Jennifer Valentino-DeVries</a></span>
+		<time class="dateline">December  4, 2017</time>
+              </div>
+            </div>
+          </header>
+          <div id="graphic" class="article-body">
+          </div>
+        </article>
+      </main>
     </div>
-    <footer>
+    <footer role="contentinfo">
       <div id="footer-logo">
         <p id="footer-logo-image">ProPublica</p>
         <p>© Copyright<br>
           Pro Publica Inc.</p>
       </div>
     </footer>
+    </div>
     <script type="text/javascript">
      window.dataLayer = [{
        'contentType': 'App',

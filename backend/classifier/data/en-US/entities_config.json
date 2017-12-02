@@ -48,21 +48,27 @@
     },
     "Obamacare": {
       "label": "LAW",
-      "entities": []
+      "entities": [
+        "Obamacare"
+      ]
     },
     "Russia": {
       "label": "GPE",
       "entities": [
-        "Russia"
+        "Russia",
+        "RUSSIA"
       ]
     },
     "DACA": {
       "label": "LAW",
-      "entities": []
+      "entities": [
+        "DACA"
+      ]
     },
     "Danica Roem": {
-      "label": "Person",
+      "label": "PERSON",
       "entities": [
+        "Danica Roem",
         "Roem"
       ]
     },
@@ -79,6 +85,13 @@
       "entities": [
         "Republican",
         "RNC"
+      ]
+    },
+    "U.S.": {
+      "label":"GPE",
+      "Entities": [
+        "U.S.",
+        "US"
       ]
     }
   }
