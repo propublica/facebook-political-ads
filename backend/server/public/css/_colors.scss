@@ -2,27 +2,21 @@
 // COLOR VARIABLES
 // ------------------------------------------------------------
 
-// $pp-blue: #134f7c;
 $pp-blue: #304154;
 $red: #d0011b;
 $green: #36bc36;
 
-$hed-color: #000000;
-$text-color: #333333;
-$text-color-retina: #000000;
+$hed-color: #000;
+$text-color: #333;
+$text-color-retina: #000;
 $text-color-low-contrast: lighten($text-color, 45%);
 
-$page-bg-color: #ffffff;
-// $bg-low-contrast: rgba($text-color,.12);
-// $bg-low-contrast: lighten($text-color, 73%);
+$page-bg-color: #fff;
 $bg-low-contrast: #f0efee;
 
-// $border-color: lighten($text-color, 60%);
-// $border: 1px solid #{$border-color};
 $border-color: darken($bg-low-contrast, 10%);
 $border: 1px solid $border-color;
 
-// $link-color: #2262cc;
 $link-color: saturate(lighten($pp-blue, 25%), 50%);
 $donate-color: #bf2d2d;
 
@@ -31,3 +25,4 @@ $nav-blue: #304154; // All instance of $nav-blue should be replaced with $pp-blu
 
 $fb-color: #3f5d9a;
 $twitter-color: #1da1f3;
+$light-red: #be3b3b;
