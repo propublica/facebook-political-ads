@@ -122,8 +122,12 @@ impl Service for AdServer {
                 ContentType::json(),
             )),
             (&Method::Get, "/facebook-ads/styles.css") => Either::B(self.get_file(
-                "public/css/styles.css",
+                "public/dist/styles.css",
                 ContentType(mime::TEXT_CSS),
+            )),
+            (&Method::Get, "/facebook-ads/styles.css.map") => Either::B(self.get_file(
+                "public/dist/styles.css.map",
+                ContentType::json(),
             )),
             (&Method::Get, "/facebook-ads/locales/en/translation.json") => Either::B(
                 self.get_file(
@@ -158,7 +162,6 @@ impl Service for AdServer {
 // method that works. I should ask on stack overflow or something.
 type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
 impl AdServer {
-    // We're not ready for US audiences
     fn lock_down<F>(&self, req: Request, callback: F) -> ResponseFuture
     where
         F: Fn() -> ResponseFuture,
@@ -170,13 +173,16 @@ impl AdServer {
                 .nth(0)
         });
 
-        if Some(String::from("de-DE")) == lang {
-            callback()
-        } else {
-            Box::new(future::ok(
-                Response::new().with_status(StatusCode::Unauthorized),
-            ))
+
+        if let Some(lang) = lang.or(AdServer::get_lang_from_headers(req.headers())) {
+            if lang == "de-DE" || lang == "en-US" {
+                return callback();
+            }
         }
+
+        Box::new(future::ok(
+            Response::new().with_status(StatusCode::Unauthorized),
+        ))
     }
 
 

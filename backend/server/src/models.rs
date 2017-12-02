@@ -537,6 +537,9 @@ mod tests {
             political_probability: 0.0,
             suppressed: false,
             targets: None,
+            advertiser: None,
+            entities: None,
+            pages: None,
         };
         let urls = saved_ad.image_urls();
         let images = Images::from_ad(&saved_ad, &urls).unwrap();

@@ -3,12 +3,12 @@ import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
-import { NEW_ADS, refresh, search } from 'utils.js';
+import { NEW_ADS, search, refresh } from 'utils.js';
 import throttle from "lodash/throttle";
 import i18next from "i18next";
 import Backend from 'i18next-xhr-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import { lastPage, pageIndex, pageCount } from 'pagination.js'
+import { lastPage, pageIndex, pageCount } from 'pagination.js';
 
 const ads = (state = [], action) => {
   switch(action.type) {
@@ -20,9 +20,10 @@ const ads = (state = [], action) => {
 };
 
 const reducer = combineReducers({
-  ads, 
+  ads,
   pageIndex,
-  lastPage
+  lastPage,
+  search
 });
 
 const middleware = [thunkMiddleware, createLogger()];
@@ -32,53 +33,75 @@ const div = document.createElement('div');
 const cleanTargeting = (html) => {
   div.innerHTML = html;
   Array.from(div.querySelectorAll('a')).map((a) => a.remove());
-  return Array.from(div.querySelectorAll('span:not(.hidden_elem)')).reduce((memo, it) => memo + it.outerHTML, '');
-};
-
-const killImages = (html) => {
-  div.innerHTML = html;
-  Array.from(div.querySelectorAll('img')).map((a) => a.remove());
-  return div.outerHTML;
+  return Array.from(div.querySelectorAll('span:not(.hidden_elem)'))
+    .reduce((memo, it) => memo + it.outerHTML, '');
 };
 
 const Ad = ({ ad }) => (
-  <div className="message cf">
-    <div className="container">
-      <div className="chiclet">
-        {ad.thumbnail ? <img src={ad.thumbnail} /> : ''}
-      </div>
-      <div className="display">
-        <div className="title">{ad.title}</div>
-        <div className="content" dangerouslySetInnerHTML={{__html: killImages(ad.message) }} />
-      </div>
-    </div>
-    {ad.images.length > 0 ?
-      <div className="images">
-        {ad.images.map((src) => <img src={src} key={src} />)}
-      </div> :
-      ''}
-    {ad.targeting ?
-      <div className="targeting">
-        <h3>{t("targeting")}</h3>
-        <div dangerouslySetInnerHTML={{__html: cleanTargeting(ad.targeting) }} />
-      </div> :
-      ''}
+  <div className="message">
+    <div dangerouslySetInnerHTML={{__html: ad.html}} />
   </div>
 );
 
-let App = ({ads, onKeyUp, prev, next}) => (
+let Term = ({ search, term, onClick }) => (
+  <li>
+    <button
+      type="button"
+      className={term === search ? "prefab current" : "prefab"}
+      onClick={function() { return onClick(store, term); }}
+      value={term}>{term}</button>
+  </li>
+);
+Term = connect(
+  (state) => state,
+  (dispatch) => ({ onClick: (store, term) => dispatch(refresh(store, term)) })
+)(Term);
+
+const Filters = () => (<div className="filters" />);
+let Pagination = ({ pageIndex, prev, next }) => (
+  <nav className="pagination">
+    <ul>
+      <li className="current">{pageIndex}</li>
+    </ul>
+  </nav>
+);
+Pagination = connect(
+  (state) => state,
+  (dispatch) => ({
+    prev: () => {
+      dispatch(pageCount.pagePrev());
+      refresh(store);
+    },
+    next: (e) => {
+      e.preventDefault();
+      if (!store.getState().lastPage) {
+        dispatch(pageCount.pageNext());
+        refresh(store);
+      }
+    }
+  })
+);
+
+let App = ({ads, onKeyUp, pageIndex, search}) => (
   <div id="app">
-    <h1>{t("title")}</h1>
-    <h2>{t("slug")}</h2>
-    <p id="byline">{t("by")} Jeff Larson {t("and")} Julia Angwin, ProPublica, September 22, 2017</p>
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
-    <input id="search" placeholder={t("search")} onKeyUp={onKeyUp} />
-    <div id="ads">
-      {ads.map((ad) => <Ad ad={ad} key={ad.id} />)}
-    </div>
-    <div id="pageNav">
-      <div id="previous"><a href="#" onClick={prev}>Previous</a></div> 
-      <div id="next"><a href="#" onClick={next}>Next</a></div>
+    <form id="facebook-pac-browser">
+      <fieldset className="prefabs">
+        <legend>{t("search_terms")}</legend>
+        <ul>
+          {["Trump", "Obama", "Hillary", "Mueller", "Health", "Taxes"]
+            .map((term) => <Term key={term} search={search} term={term} />)}
+        </ul>
+      </fieldset>
+      <input type="search" id="search" placeholder={t("search")} onKeyUp={onKeyUp} value={search} />
+      <Filters />
+    </form>
+    <div className="facebook-pac-ads">
+      <Pagination page={pageIndex} />
+      <div id="ads">
+        {ads.map((ad) => <Ad ad={ad} key={ad.id} />)}
+      </div>
+      <Pagination page={pageIndex} />
     </div>
   </div>
 );
@@ -87,23 +110,9 @@ App = connect(
   (dispatch) => ({
     onKeyUp: throttle((e) => {
       e.preventDefault();
-      store.dispatch(pageCount.pageClear())
-      dispatch(search(store, e.target.value.length ? e.target.value : null));
-    }, 1000),
-    prev: (e) => {
-      e.preventDefault();
-      if (store.getState().pageIndex > 0) {
-        store.dispatch(pageCount.pagePrev())
-        refresh(store)
-      }
-    },
-    next: (e) => {
-      e.preventDefault();
-      if (!store.getState().lastPage) {
-        store.dispatch(pageCount.pageNext())
-        refresh(store)
-      }
-    }
+      dispatch(pageCount.pageClear());
+      dispatch(refresh(store, e.target.value.length ? e.target.value : null));
+    }, 1000)
   })
 )(App);
 
@@ -124,5 +133,5 @@ i18next
       </Provider>,
       document.querySelector("#graphic")
     );
-    refresh(store);
+    store.dispatch(refresh(store));
   });

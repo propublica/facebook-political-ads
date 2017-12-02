@@ -1,9 +1,4 @@
 {
-  "title": "Facebook Political Ad Collector",
-  "slug": "See the ads politicians and political groups are running on Facebook",
-  "guff": "Facebook is rife with political advertising. Since early September, we have asked our users to use a <a href=\"https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl\">Chrome extension</a> and collects ads from politicians and political groups on Facebook. You can browse and search through the advertisements we've collected below. The ads shown here are automatically classified by a machine learning algorithm so there may be false positives. If you see anything interesting please let us know at <a href=\"mailto:jeff.larson@propublica.org\">jeff.larson@propublica.org</a>.",
-  "by": "By",
-  "and": "and",
-  "search": "Search the political ads",
-  "targeting": "Targeting information"
+  "guff": "<p>Online political ads are often only seen by their target audience — making them difficult to fact-check. In order to shine a light on political advertising on Facebook, <a href=\"https://www.propublica.org/article/help-us-monitor-political-ads-online\">ProPublica built a tool</a> that allows Facebook users to automatically send us the political ads that were displayed on their News Feeds. (If you’d like to contribute ads, please download our software for <a href=\"https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/\">Firefox</a> or <a href=\"https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl\">Chrome</a> web browsers.) Use this tool to view the Facebook political ads we’ve collected so far.</p>",
+  "search_terms": "Some search terms of interest:"
 }
