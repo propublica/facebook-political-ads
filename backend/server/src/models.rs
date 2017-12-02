@@ -203,10 +203,10 @@ pub struct Ad {
     pub targeting: Option<String>,
     #[serde(skip_serializing)]
     pub suppressed: bool,
-    pub targets: Option<Value>,
-    pub pages: Option<Value>,
+    pub targets: Value,
+    pub pages: Vec<String>,
     pub advertiser: Option<String>,
-    pub entities: Option<Value>,
+    pub entities: Value,
 }
 // Define our special functions for searching
 sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
