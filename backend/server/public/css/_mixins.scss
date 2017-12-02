@@ -1,0 +1,57 @@
+
+/*- Sass mixins --------------------------------------------------------------*/
+
+//  xs    /  37.5em  /   600px
+//  sm    /  48em    /   768px
+//  med   /  50em    /   800px
+//  lg    /  56.25em /   900px
+//  xl    /  64em    /   1024px
+//  xxl   /  75em    /   1200px
+//  xxxl  /  87.5em  /   1400px
+//  short /  20em    /   320px
+//  tall  /  40em    /   640px
+
+$breakpoints: (
+  'xs': 37.5em,
+  'sm': 48em,
+  'med': 50em,
+  'lg': 56.25em,
+  'xl': 64em,
+  'xxl': 75em,
+  'xxxl': 87.5em,
+  'short': 20em,
+  'tall': 40em
+);
+
+@mixin breakpoint($breakpoint) {
+   @media screen and (min-width: map-get($breakpoints, $breakpoint)) { @content; }
+}
+
+@mixin breakpoint-range($min, $max:null) {
+  @if not $max {
+    @media screen and (max-width: map-get($breakpoints, $min)) { @content; }
+  } @else {
+    @media screen and (min-width: map-get($breakpoints, $min)) and (max-width: map-get($breakpoints, $max)) { @content; }
+  }
+}
+
+@mixin vertical-breakpoint($breakpoint) {
+   @media screen and (min-height: map-get($breakpoints, $breakpoint)) { @content; }
+}
+
+// see https://gist.github.com/marcedwards/3446599
+@mixin high-dpi() {
+  @media only screen and (-webkit-min-device-pixel-ratio: 1.3),
+  only screen and (-o-min-device-pixel-ratio: 13/10),
+  only screen and (min-resolution: 120dpi) {
+      @content;
+  }
+}
+
+@mixin clearfix {
+  &:after {
+    clear: both;
+    content: "";
+    display: table;
+  }
+}

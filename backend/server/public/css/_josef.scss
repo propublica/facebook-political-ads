@@ -1,0 +1,481 @@
+// ------------------------------------------------------------
+// FUNCTIONS
+// ------------------------------------------------------------
+// invalid
+// wrong-type
+// missing
+// optional
+// ----------------------------------------
+// Josef uses the "invalid", "wrong-type", "missing", and
+// "optional" functions to build error messages.
+
+@function invalid($call, $arg2:null, $arg3:null, $arg4:null) {
+	@if $arg2
+	and $arg3
+	and $arg4 {
+		@return "'#{$call}(#{$arg2},#{$arg3},#{$arg4})' is invalid because ";
+	}
+	@if $arg2
+	and $arg3
+	and not $arg4 {
+		@return "'#{$call}(#{$arg2},#{$arg3})' is invalid because ";
+	}
+	@if $arg2
+	and not $arg3
+	and not $arg4 {
+		@return "'#{$call}(#{$arg2})' is invalid because ";
+	}
+	@if not $arg2 {
+		@return "'#{$call}()' is invalid because ";
+	}
+}
+@function wrong-type($type, $arg2:null, $arg3:null) {
+	@if $arg2
+	and $arg3 {
+		@return "'#{$arg2}' and '#{$arg3}' are not #{$type}s"
+	}
+	@if not $arg3 {
+		@return "'#{$arg2}' is not a #{$type}"
+	}
+}
+@function missing($number) {
+	@if $number < 2 {
+		@return "an argument is missing. "
+	}
+	@if $number >= 2 {
+		@return "arguments are missing. "
+	}
+}
+@function optional($number,$current,$correct) {
+	@return "the optional #{$number} argument (currently '#{$current}') will only accept a value of '#{$correct}'. "
+}
+
+// ----------------------------------------
+// bp-attribute
+// ----------------------------------------
+// Josef uses the "bp-attribute" function to retrieve the
+// values of breakpoint attributes (such as "cols" and "min",
+// found in the $breakpoints map in "main.scss").
+//
+// EXAMPLE: To access the minimum measurement of the "sm"
+// breakpoint...
+//
+// bp-attribute(sm, min)
+//
+// ...returns something like this:
+//
+// 40em
+
+@function bp-attribute($bp-name, $bp-attribute) {
+	@return map-get(map-get($breakpoints, $bp-name), $bp-attribute)
+}
+
+// ----------------------------------------
+// width
+// ----------------------------------------
+// Josef uses the "width" function to calculate the width of a
+// span of columns, derived from the proportional width
+// variables whose customizable values are defined at the top
+// of "main.scss".
+//
+// EXAMPLE: For a width spanning 6 columns...
+//
+// width(6)
+//
+// ...returns something like this:
+//
+// 538
+
+@function width($width) {
+	@return (($col * $width) + ($gut * ($width - 1)))
+}
+
+// ----------------------------------------
+// colspan
+// ----------------------------------------
+// The "colspan" function allows the user to generate
+// grid-based, percentage width values, derived from the
+// proportional width variables whose customizable values are
+// defined at the top of "main.scss".
+//
+// EXAMPLE: For a width spanning 6 of 12 columns...
+//
+// width: colspan(6,12);
+//
+// ...compiles to something like this:
+//
+// width: 48.82033%;
+
+$colspan-lesson: "A 'colspan' function call must include the numeric column widths of both the target and its container, e.g. 'colspan(4,8)'. The target width can also be specified as 'p' (for padding width) or 'g' (for gutter width).";
+
+@function colspan($target:null,$container:null) {
+	@if $target
+	and $container {
+		@if $target == "m"
+		and type-of($container) == "number" {
+			@return percentage($mar / (width($container) + ($mar * 2)))
+		}
+		@if $target == "p"
+		and type-of($container) == "number" {
+			@return percentage($pad / width($container))
+		}
+		@if $target == "g"
+		and type-of($container) == "number" {
+			@return percentage($gut / width($container))
+		}
+		@if type-of($target) != "number"
+		and type-of($container) != "number"
+		and $target != "m"
+		and $target != "p"
+		and $target != "g" {
+			@warn invalid("colspan",$target,$container) + wrong-type("number",$target,$container) + ". " + $colspan-lesson;
+			@return false;
+		}
+		@if type-of($target) != "number"
+		and type-of($container) == "number" {
+			@warn invalid("colspan",$target,$container) + wrong-type("number",$target) + ". " + $colspan-lesson;
+			@return false;
+		}
+		@if type-of($target) == "number"
+		and type-of($container) != "number"
+		or ($target == "m" and type-of($container) != "number")
+		or ($target == "p" and type-of($container) != "number")
+		or ($target == "g" and type-of($container) != "number") {
+			@warn invalid("colspan",$target,$container) + wrong-type("number",$container) + ". " + $colspan-lesson;
+			@return false;
+		}
+	}
+	@if $target
+	and not $container {
+		@if type-of($target) == "number" {
+			@warn invalid(colspan,$target) + missing(1) + $colspan-lesson;
+			@return false;
+		} @else {
+			@warn invalid(colspan,$target) + wrong-type("number",$target) + ", and " + missing(1) + $colspan-lesson;
+			@return false;
+		}
+	}
+	@if not $target {
+		@warn invalid(colspan) + missing(2) + $colspan-lesson;
+		@return false;
+	} @else {
+		@return percentage(width($target) / width($container))
+	}
+}
+
+// ------------------------------------------------------------
+// MIXINS
+// ------------------------------------------------------------
+// full-width
+// ----------------------------------------
+// The "full-width" mixin allows the user to break an element
+// out of the grid and into the margins, taking up the full
+// width of the viewport.
+
+@mixin full-width {
+	width: auto;
+	margin-left: calc(-50vw + 50%);
+	margin-right: calc(-50vw + 50%);
+}
+
+// ----------------------------------------
+// breakpoint
+// breakpoint-max
+// breakpoint-range
+// ----------------------------------------
+// The three flavors of the "breakpoint" mixin allow the user
+// to generate width- and height-based media queries using the
+// breakpoint names and values defined in the $breakpoints map
+// in main.scss. They generate min-width and max-width by
+// default, but can generate min-height and max-height instead
+// by including the optional "height" argument.
+
+$valid-bp-names: "Current valid breakpoint names: " + map-keys($breakpoints) + ".";
+$bp-min-lesson: "A 'breakpoint-min' mixin call must contain a valid breakpoint name, e.g. 'breakpoint-min(small)'. " + $valid-bp-names;
+$bp-max-lesson: "A 'breakpoint-max' mixin call must contain a valid breakpoint name, e.g. 'breakpoint-max(large)'. " + $valid-bp-names;
+$bp-range-lesson: "A 'breakpoint-range' mixin call must contain valid minimum and maximum breakpoint names, e.g. 'breakpoint-range(small,large)'. " + $valid-bp-names;
+
+// @include breakpoint-min(lg) { ... }
+//
+// ...compiles to something like this:
+//
+// @media screen and (min-width: 50em) { ... }
+
+@mixin breakpoint-min($bp:null, $height:null) {
+	$all-is-well: true;
+	@if $bp {
+		@if $height {
+			@if $height != "height"
+			and $height != null {
+				$all-is-well: false;
+				@if not map-has-key($breakpoints, $bp) {
+					@warn invalid("breakpoint-min",$bp,$height) + wrong-type("valid breakpoint name",$bp) + ", and " +  optional("second",$height,"height") + $bp-min-lesson;
+				} @else {
+					@warn invalid("breakpoint-min",$bp,$height) + optional("second",$height,"height");
+				}
+			}
+			@if ($height == "height" or $height == null)
+			and not map-has-key($breakpoints, $bp) {
+				$all-is-well: false;
+				@warn invalid("breakpoint-min",$bp,$height) + wrong-type("valid breakpoint name",$bp) + ". " + $bp-min-lesson;
+			}
+		} @else {
+			@if not map-has-key($breakpoints, $bp) {
+				$all-is-well: false;
+				@warn invalid("breakpoint-min",$bp) + wrong-type("valid breakpoint name",$bp) + ". " + $bp-min-lesson;
+			}
+		}
+	} @else {
+		$all-is-well: false;
+		@warn invalid("breakpoint-min") + missing(1) + $bp-min-lesson;
+	}
+	@if $all-is-well == true {
+		@if $height {
+			@media screen and (min-height: bp-attribute($bp, min)) { @content; }
+		} @else {
+			@media screen and (min-width: bp-attribute($bp, min)) { @content; }
+		}
+	}
+}
+
+// @include breakpoint-max(lg, height) { ... }
+//
+// ...compiles to something like this:
+//
+// @media screen and (max-height: 50em) { ... }
+
+@mixin breakpoint-max($bp:null, $height:null) {
+	$all-is-well: true;
+	@if $bp {
+		@if $height {
+			@if $height != "height"
+			and $height != null {
+				$all-is-well: false;
+				@if not map-has-key($breakpoints, $bp) {
+					@warn invalid("breakpoint-max",$bp,$height) + wrong-type("valid breakpoint name",$bp) + ", and " +  optional("second",$height,"height") + $bp-min-lesson;
+				} @else {
+					@warn invalid("breakpoint-max",$bp,$height) + optional("second",$height,"height");
+				}
+			}
+			@if ($height == "height" or $height == null)
+			and not map-has-key($breakpoints, $bp) {
+				$all-is-well: false;
+				@warn invalid("breakpoint-max",$bp,$height) + wrong-type("valid breakpoint name",$bp) + ". " + $bp-min-lesson;
+			}
+		} @else {
+			@if not map-has-key($breakpoints, $bp) {
+				$all-is-well: false;
+				@warn invalid("breakpoint-max",$bp) + wrong-type("valid breakpoint name",$bp) + ". " + $bp-min-lesson;
+			}
+		}
+	} @else {
+		$all-is-well: false;
+		@warn invalid("breakpoint-max") + missing(1) + $bp-min-lesson;
+	}
+	@if $all-is-well == true {
+		@if $height {
+			@media screen and (max-height: bp-attribute($bp, min)) { @content; }
+		} @else {
+			@media screen and (max-width: bp-attribute($bp, min)) { @content; }
+		}
+	}
+}
+
+// @include breakpoint-range(md, lg) { ... }
+//
+// ...compiles to something like this:
+//
+// @media screen and (min-width: 40em) and (max-width: 50em) { ... }
+
+@mixin breakpoint-range($bp-min:null, $bp-max:null, $height:null) {
+	$all-is-well: true;
+	@if $bp-min
+	and $bp-max {
+		@if $height {
+			@if $height != "height"
+			and $height != null {
+				@if not map-has-key($breakpoints, $bp-min)
+				and not map-has-key($breakpoints, $bp-max) {
+					$all-is-well: false;
+					@warn invalid("breakpoint-range",$bp-min,$bp-max,$height) + wrong-type("valid breakpoint name",$bp-min,$bp-max) + ", and " + optional("third",$height,"height") + $bp-range-lesson;
+				}
+				@if not map-has-key($breakpoints, $bp-min)
+				and map-has-key($breakpoints, $bp-max) {
+					$all-is-well: false;
+					@warn invalid("breakpoint-range",$bp-min,$bp-max,$height) + wrong-type("valid breakpoint name",$bp-min) + ", and " + optional("third",$height,"height") + $bp-range-lesson;
+				}
+				@if map-has-key($breakpoints, $bp-min)
+				and not map-has-key($breakpoints, $bp-max) {
+					$all-is-well: false;
+					@warn invalid("breakpoint-range",$bp-min,$bp-max,$height) + wrong-type("valid breakpoint name",$bp-max) + ", and " + optional("third",$height,"height") + $bp-range-lesson;
+				}
+				@if map-has-key($breakpoints, $bp-min)
+				and map-has-key($breakpoints, $bp-max) {
+					$all-is-well: false;
+					@warn invalid("breakpoint-range",$bp-min,$bp-max,$height) + optional("third",$height,"height");
+				}			
+			} @else {
+				@if not map-has-key($breakpoints, $bp-min)
+				and not map-has-key($breakpoints, $bp-max) {
+					$all-is-well: false;
+					@warn invalid("breakpoint-range",$bp-min,$bp-max,$height) + wrong-type("valid breakpoint name",$bp-min,$bp-max) + ". " + $bp-range-lesson;
+				}
+				@if not map-has-key($breakpoints, $bp-min)
+				and map-has-key($breakpoints, $bp-max) {
+					$all-is-well: false;
+					@warn invalid("breakpoint-range",$bp-min,$bp-max,$height) + wrong-type("valid breakpoint name",$bp-min) + ". " + $bp-range-lesson;
+				}
+				@if map-has-key($breakpoints, $bp-min)
+				and not map-has-key($breakpoints, $bp-max) {
+					$all-is-well: false;
+					@warn invalid("breakpoint-range",$bp-min,$bp-max,$height) + wrong-type("valid breakpoint name",$bp-max) + ". " + $bp-range-lesson;
+				}
+			}
+		} @else {
+			@if not map-has-key($breakpoints, $bp-min)
+			and not map-has-key($breakpoints, $bp-max) {
+				$all-is-well: false;
+				@warn invalid("breakpoint-range",$bp-min,$bp-max) + wrong-type("valid breakpoint name",$bp-min,$bp-max) + ". " + $bp-range-lesson;
+			}
+			@if not map-has-key($breakpoints, $bp-min)
+			and map-has-key($breakpoints, $bp-max) {
+				$all-is-well: false;
+				@warn invalid("breakpoint-range",$bp-min,$bp-max) + wrong-type("valid breakpoint name",$bp-min) + ". " + $bp-range-lesson;
+			}
+			@if map-has-key($breakpoints, $bp-min)
+			and not map-has-key($breakpoints, $bp-max) {
+				$all-is-well: false;
+				@warn invalid("breakpoint-range",$bp-min,$bp-max) + wrong-type("valid breakpoint name",$bp-max) + ". " + $bp-range-lesson;
+			}
+		}
+	}
+	@if $bp-min
+	and not $bp-max {
+		$all-is-well: false;
+		@if map-has-key($breakpoints, $bp-min) {
+			@warn invalid("breakpoint-range",$bp-min) + missing(1) + $bp-range-lesson;
+		} @else {
+			@warn invalid("breakpoint-range",$bp-min) + wrong-type("valid breakpoint name",$bp-min) + ", and " + missing(1) + $bp-range-lesson;
+		}
+	}
+	@if not $bp-min {
+		$all-is-well: false;
+		@warn invalid("breakpoint-range") + missing(2) + $bp-range-lesson;
+	}
+	@if $all-is-well == true {
+		@if $height {
+			@media screen and (min-height: bp-attribute($bp-min, min)) and (max-height: bp-attribute($bp-max, min)) { @content }
+		} @else {
+			@media screen and (min-width: bp-attribute($bp-min, min)) and (max-width: bp-attribute($bp-max, min)) { @content }
+		}
+	}
+}
+
+// ----------------------------------------
+// grid
+// ----------------------------------------
+// The "grid" mixin allows the user to identify the class of
+// the primary containing element in which their grid-aligned
+// content lives. The mixin uses all of the info from the
+// proportional width and breakpoint variables defined at the
+// top of "main.scss" to specify appropriate margin widths for
+// the grid container at each breakpoint. Optionally including
+// "overlay" as a second argument will add a translucent grid
+// overlay on top of the grid container which can be used in
+// production to ensure that your design is aligning to the
+// grid as intended.
+//
+// EXAMPLE: If "main.scss" defines two breakpoints and the
+// primary grid container has a class of "content"...
+//
+// @include grid(content);
+//
+// ...compiles to something like this:
+//
+// @media screen and (min-width: 0) {
+//   .content {
+//     margin: 0 3.38638%;
+//   }
+// }
+// @media screen and (min-width: 30em) {
+//   .content {
+//     margin: 0 4.36194%;
+//   }
+// }
+
+$grid-lesson: "A 'grid' mixin call must include a valid class name, e.g. 'grid(content);'. It may optionally include a second argument of 'overlay' (e.g. 'grid(content,overlay);') to create a translucent grid overlay on top of the grid container.";
+
+@mixin grid($class:null, $overlay:null) {
+	$all-is-well: true;
+	@if not $class {
+		$all-is-well: false;
+		@warn invalid("grid") + missing(1) + $grid-lesson;
+	}
+	@if $overlay != "overlay" 
+	and $overlay != null {
+		$all-is-well: false;
+		@warn invalid("grid",$class,$overlay) + optional("second",$overlay,"overlay") + $grid-lesson;
+	}
+	@if $all-is-well == true {
+		.#{$class} {
+			@each $bp, $value in $breakpoints {
+				@include breakpoint-min($bp) {
+					@if map-has-key(map-get($breakpoints, $bp), margin) {
+						margin: 0 colspan(bp-attribute($bp, margin), width(bp-attribute($bp, cols)) + (bp-attribute($bp, margin) * 2));
+					} @else {
+						margin: 0 colspan(m, bp-attribute($bp, cols));
+					}
+				}
+			}
+
+			// If there is a max-width,
+			// create a breakpoint with a min-width equal to:
+			// (((mar / width) * max-width) * 2) + max-width
+
+			@if $max-width {
+				max-width: $max-width;
+				$bp-final: nth(map-keys($breakpoints), -1); // Name of the widest breakpoint
+				@if map-has-key(map-get($breakpoints, $bp-final), margin) {
+					@media screen and (min-width: ((((bp-attribute($bp-final, margin) / width(bp-attribute($bp-final, cols))) * $max-width) * 2) + $max-width)) {
+						margin: 0 auto;
+					}
+				} @else {
+					@media screen and (min-width: (((($mar / width(bp-attribute($bp-final, cols))) * $max-width) * 2) + $max-width)) {
+						margin: 0 auto;
+					}
+				}
+			}
+			@if $overlay == overlay {
+				position: relative;
+				$gc: rgba($grid-color, .1);
+				$gp: rgba($grid-color, .2);
+				$gg: rgba($grid-color, 0);
+				&:before {
+					content: "";
+					display: block;
+					position: absolute;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					z-index: 100;
+					@each $bp, $value in $breakpoints {
+						@include breakpoint-min($bp) {
+							background-image: repeating-linear-gradient(
+								to right,
+								$gp,
+								$gp colspan(p, bp-attribute($bp, cols)),
+								$gc colspan(p, bp-attribute($bp, cols)),
+								$gc colspan(1, bp-attribute($bp, cols)) - colspan(p, bp-attribute($bp, cols)),
+								$gp colspan(1, bp-attribute($bp, cols)) - colspan(p, bp-attribute($bp, cols)),
+								$gp colspan(1, bp-attribute($bp, cols)),
+								$gg colspan(1, bp-attribute($bp, cols)),
+								$gg colspan(1, bp-attribute($bp, cols)) + colspan(g, bp-attribute($bp, cols))
+							);
+						}
+					}
+				}
+			}
+		}
+	}
+}

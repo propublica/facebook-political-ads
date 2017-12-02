@@ -1,0 +1,118 @@
+// ------------------------------------------------------------
+// FONTS
+// ------------------------------------------------------------
+
+@font-face {
+  font-family: 'Tiempos Text';
+  src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Regular.woff2) format('woff2'),
+  url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Regular.woff) format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Tiempos Text';
+  src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-RegularItalic.woff2) format('woff2'),
+  url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-RegularItalic.woff) format('woff');
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Tiempos Text';
+  src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Bold.woff2) format('woff2'),
+  url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-Bold.woff) format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Tiempos Text';
+  src: url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-BoldItalic.woff2) format('woff2'),
+  url(https://assets.propublica.org/prod/v3/fonts/TiemposTextWeb-BoldItalic.woff) format('woff');
+  font-weight: bold;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Graphik';
+  src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-Regular-Web.woff2) format('woff2'),
+  url(https://assets.propublica.org/prod/v3/fonts/Graphik-Regular-Web.woff) format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Graphik';
+  src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-RegularItalic-Web.woff2) format('woff2'),
+  url(https://assets.propublica.org/prod/v3/fonts/Graphik-RegularItalic-Web.woff2) format('woff');
+  font-weight: normal;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Graphik';
+  src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-Bold-Web.woff2) format('woff2'),
+  url(https://assets.propublica.org/prod/v3/fonts/Graphik-Bold-Web.woff) format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Graphik';
+  src: url(https://assets.propublica.org/prod/v3/fonts/Graphik-BoldItalic-Web.woff2) format('woff2'),
+  url(https://assets.propublica.org/prod/v3/fonts/Graphik-BoldItalic-Web.woff) format('woff');
+  font-weight: bold;
+  font-style: italic;
+}
+
+// ------------------------------------------------------------
+// FONT STACKS
+// ------------------------------------------------------------
+
+$fonts-serif-initial: Georgia, Times, 'Times New Roman', serif;
+$fonts-serif: 'Tiempos Text', serif;
+$fonts-sans-initial: Arial, Verdana, sans-serif;
+$fonts-sans: Graphik, sans-serif;
+$fonts-monospace: monospace;
+
+// ------------------------------------------------------------
+// TYPOGRAPHIC SCALE
+// ------------------------------------------------------------
+// Dual-stranded Fibonacci series: 5+8=13, 8+13=21, 13+21=34, etc.
+// 005   008   013   021   034   055   089   144   233   377   610   987
+//    006   010   016   026   042   068   110   178   288   466   754
+
+ $scale-1: 00.3125rem;  //    5
+ $scale-2: 00.3750rem;  //    6
+ $scale-3: 00.5000rem;  //    8
+ $scale-4: 00.6250rem;  //   10
+ $scale-5: 00.8125rem;  //   13
+ $scale-6: 01.0000rem;  //   16
+ $scale-7: 01.3125rem;  //   21
+ $scale-8: 01.6250rem;  //   26
+ $scale-9: 02.1250rem;  //   34
+$scale-10: 02.6250rem;  //   42
+$scale-11: 03.4375rem;  //   55
+$scale-12: 04.2500rem;  //   68
+$scale-13: 05.5625rem;  //   89
+$scale-14: 06.8750rem;  //  110
+$scale-15: 09.0000rem;  //  144
+$scale-16: 11.1250rem;  //  178
+$scale-17: 14.5625rem;  //  233
+$scale-18: 18.0000rem;  //  288
+$scale-19: 23.5625rem;  //  377
+$scale-20: 29.1250rem;  //  466
+$scale-21: 38.1250rem;  //  610
+$scale-22: 47.1250rem;  //  754
+$scale-23: 61.6875rem;  //  987
+$scale-24: 76.2500rem;  // 1220
+
+// ------------------------------------------------------------
+// LINE-HEIGHT & LETTER-SPACING
+// ------------------------------------------------------------
+
+$line-height-taller:   1.7;
+$line-height-base:     1.5;
+$line-height-shorter:  1.3;
+$line-height-shortest: 1.1;
+
+// $letter-spacing-more: 0.05em;
+// $letter-spacing-base: 0.035em;
+// $letter-spacing-less: 0.025em;
+$letter-spacing-more: 0.035em;
+$letter-spacing-base: 0.025em;
+$letter-spacing-less: 0.015em;
