@@ -1,0 +1,905 @@
+// -----------------------------------------------------------------------------
+// IMPORTS, GLOBAL VARIABLES
+// -----------------------------------------------------------------------------
+
+// @import 'bourbon/bourbon';
+@import 'reset';
+@import 'mixins';
+@import 'colors';
+@import 'typography';
+@import 'grid-settings';
+@import 'josef';
+
+
+$image-assets: '../images';
+$cachebuster: random(1000000);
+
+// -----------------------------------------------------------------------------
+// LAYOUT GRID
+// -----------------------------------------------------------------------------
+
+// temp Bourbon grid settings
+$fg-column: 36px; // base column width, converted to % by Bourbon
+$fg-gutter: 6px; // base gutter width, converted to % by Bourbon
+$fg-max-columns: 23; // number of columns, used by Bourbon
+$max-width: 75em; // 1200/16;
+$navbar-height-offset: 40px; // temp override
+
+// -----------------------------------------------------------------------------
+// COLORS
+// -----------------------------------------------------------------------------
+
+// $blue: #4aace2;
+// $light-blue: #50b1e3;
+// $green: #7ed221;
+// $red: #d24121;
+$light-red: #be3b3b;
+// $dark-red: #9f3131;
+
+// $light-gray: #4b4f53;
+// // $medium-gray: #32363b;
+// // $dark-gray: #26292c;
+
+// $hed-color:  black;
+// $text-color: #111;
+// $link-color: $light-blue;
+// $bgd-color: white;
+// $bgd-color-alt: #262626;
+
+// -----------------------------------------------------------------------------
+// GLOBAL STYLES
+// -----------------------------------------------------------------------------
+
+@include grid(content); // Apply the grid to items with a class of 'content'.
+// @include grid(content,overlay); // Apply the grid and overlay to items with a class of 'content'.
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%; // 16
+  @include breakpoint-min(md) {
+    font-size: 112.5%; // 18/16
+  }
+  // @include breakpoint-min(xxl) {
+  //      font-size: 131.25%; // 21/16
+  // }
+}
+
+body {
+  background-color: $page-bg-color;
+  color: $text-color;
+  font-family: $fonts-serif;
+  line-height: $line-height-base;
+  @media (-webkit-min-device-pixel-ratio: 2),
+  (min-resolution: 192dpi) {
+    color: $text-color-retina;
+  }
+}
+
+article {
+  a {
+    transition: .2s;
+    color: $link-color;
+    text-decoration: none;
+    border-bottom: 1px solid rgba($link-color, 0);
+
+    &:focus,
+    &:hover {
+      border-bottom: 1px solid rgba($link-color, .6);
+    }
+  }
+
+  cite,
+  em {
+    font-style: italic;
+  }
+
+  strong {
+    font-weight: bold;
+  }
+
+  abbr {
+    text-decoration: none;
+  }
+
+  hr {
+    border: $border;
+    border-width: 1px 0 0;
+    margin: $scale-5 0;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+  }
+
+  .article-body,
+  .article-footer {
+    margin-left: auto;
+    margin-right: auto;
+
+    @include breakpoint-min(md) {
+      width: colspan(6, 8);
+    }
+
+    @include breakpoint-min(lg) {
+      width: colspan(8, 12);
+    }
+  }
+
+}
+
+
+// -----------------------------------------------------------------------------
+// TITLE STYLES
+// -----------------------------------------------------------------------------
+
+
+.title-set {
+  text-align: center;
+  margin-top: $scale-12;
+
+  @include breakpoint-min(sm) {
+    margin-top: $scale-13;
+  }
+
+  @include breakpoint-min(md) {
+
+  }
+
+  @include breakpoint-min(lg) {
+    padding: 0 (colspan(1,12) + colspan(g,12));
+  }
+}
+.hed {
+  font-size: $scale-9;
+  font-weight: bold;
+  line-height: 1.2;
+
+  @include breakpoint-min(md) {
+    font-size: $scale-10;
+    line-height: 1;
+  }
+
+  @include breakpoint-min(lg) {
+    font-size: $scale-11;
+  }
+}
+.dek {
+  font-family: $fonts-sans;
+  margin: 1em 0;
+
+  @include breakpoint-min(md) {
+    font-size: $scale-7;
+  }
+}
+.byline {
+  display: block;
+  font-family: $fonts-sans;
+  color: $text-color-low-contrast;
+  margin-top: 1em;
+  a {
+    font-weight: bold;
+    color: inherit;
+    &:hover,
+    &:focus {
+      color: $link-color;
+    }
+  }
+}
+.dateline {
+  display: block;
+  font-family: $fonts-sans;
+  color: $text-color-low-contrast;
+  // font-style: italic;
+  margin-bottom: 1em;
+}
+
+
+// -----------------------------------------------------------------------------
+// FACEBOOK AD BROWSER FORM STYLES
+// -----------------------------------------------------------------------------
+
+
+#facebook-pac-browser {
+  font-family: $fonts-sans;
+  font-size: $scale-5;
+  margin: colspan(g,4) 0;
+  @include clearfix;
+  @include breakpoint-min(sm) {
+    width: colspan(4,6);
+    margin: colspan(g,6) auto;
+  }
+  @include breakpoint-min(md) {
+    width: 100%;
+    margin: colspan(g,8) 0;
+  }
+  @include breakpoint-min(lg) {
+    text-align: center;
+    width: colspan(12,8);
+    margin-left: -(colspan(2,8) + colspan(g,8));
+  }
+  .prefabs {
+    @include breakpoint-min(lg) {
+      width: colspan(8,12);
+      margin-left: colspan(2,12) + colspan(g,12);
+    }
+    legend {
+      margin-bottom: 0.5em;
+      text-align: center;
+      width: 100%;
+    }
+    li {
+      display: inline-block;
+      line-height: 2.75;
+      margin-right: 0.3em;
+    }
+  }
+  .prefab {
+    font-size: $scale-5;
+    color: $pp-blue;
+    padding: 0.5em;
+    background-color: $bg-low-contrast;
+    border: none;
+    border-radius: 0.25em;
+    &:hover,
+    &:focus {
+      cursor: pointer;
+      color: white;
+      background-color: $link-color;
+    }
+    &.current,
+    &.current:hover,
+    &.current:focus {
+      cursor: default;
+      color: white;
+      background-color: $pp-blue;
+    }
+  }
+  input[type='search'] {
+    -webkit-appearance: textfield;
+    width: 100%;
+    font-size: $scale-7;
+    background-color: $bg-low-contrast;
+    padding: 0.5em;
+    margin: colspan(g,4) 0;
+    border: $border;
+    // border: 2px solid $pp-blue;
+    @include breakpoint-min(md) {
+      margin: colspan(g,6) 0;
+    }
+    @include breakpoint-min(lg) {
+      display: block;
+      text-align: center;
+      width: colspan(6,12);
+      margin: colspan(g,12) 0;
+      margin-left: colspan(3,12) + colspan(g,12);
+      // margin-left: auto;
+      // margin-right: auto;
+    }
+  }
+  ::-webkit-input-placeholder {
+    color: $border-color;
+  }
+  ::-moz-placeholder {
+    color: $border-color;
+  }
+  :-ms-input-placeholder {
+    color: $border-color;
+  }
+  :-moz-placeholder {
+    color: $border-color;
+  }
+  .filters legend {
+    display: block;
+    width: 100%;
+    font-size: $scale-6;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding-bottom: 0.5em;
+    margin: 1em 0;
+    // background-color: #e9ebee;
+    // border-radius: 4px;
+    border-bottom: 1px solid $border-color;
+  }
+  .filter {
+    position: relative;
+    text-align: left;
+    color: $pp-blue;
+    margin-bottom: 1em;
+    @include breakpoint-min(lg) {
+      float: left;
+      width: colspan(4,12);
+      margin-bottom: 0;
+      margin-right: colspan(g,12);
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+    &:hover,
+    &:focus {
+      display: block;
+      cursor: default;
+      .filter-title {
+        z-index: 1001;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        box-shadow: 0 0 2em rgba( $pp-blue, 0.4 );
+        &:after {
+          content: ' ▲';
+        }
+      }
+      .filter-options {
+        display: block;
+      }
+    }
+  }
+  .filter-title {
+    position: relative;
+    // font-size: $scale-6;
+    background-color: $bg-low-contrast;
+    padding: 0.5em;
+    border-radius: 0.25em;
+    &:after {
+      position: absolute;
+      content: ' ▼';
+      font-size: 0.75em;
+      bottom: 0.85em;
+      right: 1em;
+      margin: auto;
+    }
+  }
+  .filter-options {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    width: 100%;
+    max-height: 16.5em;
+    overflow: scroll;
+    background-color: $bg-low-contrast;
+    border-top: 1px solid $border-color;
+    border-bottom-left-radius: 0.25em;
+    border-bottom-right-radius: 0.25em;
+    box-shadow: 0 0 2em rgba( $pp-blue, 0.4 );
+    @include breakpoint-min(sm) {
+      max-height: 26.25em;
+    }
+    li {
+      position: relative;
+      text-align: left;
+      border-bottom: 1px solid $border-color;
+      &:last-child {
+        border: none;
+      }
+    }
+    input[type='checkbox'] {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 1em;
+      margin: auto;
+      &:checked + label {
+        color: white;
+        background-color: $pp-blue;
+      }
+    }
+    label {
+      display: block;
+      text-align: left;
+      padding: 0.5em 0.5em 0.5em 2.5em;
+      &:hover,
+      &:focus {
+        color: white;
+        background-color: $link-color;
+      }
+    }
+  }
+  select {
+    font-size: $scale-6;
+    width: 100%;
+    margin: 1em 0;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+// PAGINATION NAV
+// -----------------------------------------------------------------------------
+
+.pagination {
+  display: block;
+  text-align: center;
+  &:first-child {
+    margin-bottom: 2em;
+  }
+  &:last-child {
+    margin-top: 2em;
+  }
+  li {
+    display: inline-block;
+    margin-bottom: 0.5em;
+    &.current {
+      color: white;
+      background-color: $pp-blue;
+      padding: 0.5em 1em;
+      border-radius: 0.25em;
+    }
+  }
+  li a {
+    display: block;
+    // color: $link-color;
+    // background-color: white;
+    padding: 0.5em 1em;
+    border: $border;
+    border-radius: 0.25em;
+    &:hover,
+    &:focus {
+      color: white;
+      background-color: $link-color;
+      border-color: $link-color;
+    }
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+// FACEBOOK AD STYLES
+// -----------------------------------------------------------------------------
+
+.facebook-pac-ads {
+  font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: left;
+  padding: colspan(g,4) 12px;
+  // background-color: #e9ebee;
+  background-color: $bg-low-contrast;
+  @include full-width;
+  @include breakpoint-min(sm) {
+    padding-top: colspan(g,6);
+    padding-bottom: colspan(g,6);
+  }
+  @include breakpoint-min(md) {
+    padding-top: colspan(1,8);
+    padding-bottom: colspan(1,8);
+  }
+  @include breakpoint-min(lg) {
+    padding-top: colspan(g,8);
+    padding-bottom: colspan(g,8);
+  }
+  a {
+    color: rgb(54, 88, 153);
+    border: none;
+    &:hover,
+    &:focus {
+      border: none;
+    }
+  }
+  p + p {
+    margin-top: 6px;
+  }
+}
+
+._4uoz { // Targeting info
+  color: $text-color-low-contrast;
+  max-width: 500px;
+  padding: 0 12px;
+  margin: 12px auto 24px auto;
+  a {
+    display: none;
+  }
+  b {
+    color: $text-color;
+    font-weight: bold;
+  }
+  ._4hcd {
+    margin-top: 6px;
+  }
+}
+
+._4-i0._26c5,
+._4uor._52jw,
+._4uou,
+._5lnf.uiOverlayFooter._5a8u._4866 { // Excess targeting info
+  display: none;
+}
+
+
+
+._1dwg._1w_m, // Timeline ad wrapper div
+.ego_unit {   // Sidebar ad wrapper div
+  background-color: white;
+  padding: 12px;
+  margin: 0 auto 12px auto;
+  border-radius: 4px;
+  overflow: hidden;
+  ._1dwg._1w_m {
+    display: block;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+  }
+}
+
+._1dwg._1w_m { // Timeline ad wrapper div
+  max-width: 500px;
+  border: 1px solid #dddfe2;
+}
+
+.ego_unit { // Sidebar ad wrapper div
+  max-width: 308px;
+  border: 1px solid #d9d9d9;
+}
+
+
+/* NEWS FEED ADS */
+
+
+._5pb8._1yz2._8o._8s.lfloat._ohe,
+._38vo { // Profile pic wrapper
+  display: block;
+  float: left;
+  width: 32px;
+  margin-right: 8px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+._5x46,
+._3dp._29k { // Profile name wrapper
+  @include clearfix;
+  margin-bottom: 6px;
+  a:hover,
+  a:focus {
+    text-decoration: underline;
+  }
+}
+
+._5pbw { // Profile name
+  font-weight: bold;
+}
+
+._5pcp._5lel._232_,
+._5paw { // 'Sponsored'
+  font-size: 12px;
+  color: rgb(144, 148, 156);
+  div {
+    display: inline;
+  }
+  a {
+    color: inherit;
+  }
+}
+
+.lock.img { // 'Public' globe
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-image: url(../images/fb-globe.png);
+  background-repeat: no-repeat;
+  background-size: 100%;
+  vertical-align: -2px;
+}
+
+.userContent { // Post text
+  clear: both;
+}
+
+.text_exposed_show { // Truncated post text
+  display: none;
+}
+
+.mtm,
+._dcs { // Article wrap
+  margin-top: 10px;
+  border: 1px solid rgba(0,0,0,0.1);
+  .mtm,
+  ._dcs {
+    margin-top: 0;
+    border: none;
+  }
+}
+
+._150c { // Video (and slideshow?) wrap
+  > * {
+    display: none;
+  }
+  > img:first-of-type {
+    display: block;
+  }
+}
+
+._2a2q ._5dec._xcx { // Slideshow images
+  display: none;
+  &:first-child {
+    display: block;
+  }
+}
+
+._6ks > a { // Article image wrap
+  display: block;
+}
+
+.fbStoryAttachmentImage { // Article image
+}
+
+// ._6m3._--6,
+._3ekx._29_4 { // Article description wrap
+  padding: 12px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+._5qf- { // Profile metadata
+  display: none;
+}
+
+._5s6c { // Article hed
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 18px;
+  line-height: 22px;
+  margin-bottom: 5px;
+  a {
+    color: inherit;
+  }
+}
+
+._6m7._3bt9,
+._5q4r { // Article dek
+  font-size: 12px;
+  line-height: 16px;
+}
+
+._59tj._2iau,
+._1s4d { // Article URL/CTA wrap
+  vertical-align: bottom;
+  padding-top: 5px;
+  @include clearfix;
+}
+
+._522u.rfloat._ohf,
+._275-._4s-8.rfloat._ohf { // CTA button
+  display: inline-block;
+  float: right;
+  margin-left: 10px;
+  a {
+    display: block;
+    color: rgb(75, 79, 86);
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 22px;
+    padding: 0 8px;
+    background-color: rgb(246, 247, 249);
+    border: 1px solid rgb(206, 208, 212);
+    border-radius: 2px;
+  }
+  a:hover,
+  a:focus {
+    background-color: #e9ebee;
+  }
+}
+
+._6lz._6mb,
+._275y { // Article URL
+  color: rgb(144, 148, 156);
+  font-size: 12px;
+  line-height: 11px;
+  text-transform: uppercase;
+  padding-top: 13px;
+}
+
+._5g-l, // 'Suggested Post'
+._5tc6,
+._1-m5 { // 'Not affiliated with Facebook'
+  display: none;
+}
+
+
+/* SIDEBAR ADS */
+
+.ego_unit { // Sidebar ad
+  font-size: 13px;
+  line-height: 16px;
+
+  // These all use different class names, hence the delightful muck below. Fun!
+
+  div > div > a > div > div:nth-child(2) { // Sidebar ad hed/URL wrapper
+    padding-top: 10px;
+  }
+  div > div > a > div > div:nth-child(4) { // Sidebar ad article dek
+    color: rgb(144, 148, 156);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// MAIN HEADER + NAV
+// -----------------------------------------------------------------------------
+
+header[role='banner'] {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: $navbar-height-offset;
+  z-index: 1000;
+  .waypoint-header-exited & {
+    // background-color: white;
+    // border-bottom: 1px solid lighten($text-color, 85%);
+    background-color: rgba(248,248,248,0.97);
+    @include breakpoint-min(xl) {
+      background-color: transparent;
+      border-bottom: none;
+    }
+  }
+}
+
+header[role='banner'] > h1 {
+  display: block;
+  width: 150px;
+  height: inherit;
+  float: left;
+  margin-left: 0.25em;
+  @include breakpoint-min(sm) {
+    margin-left: 0.33em;
+  }
+  a {
+    display: block;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    height: inherit;
+    background: url('#{$image-assets}/pp-logo-dark.svg') 0 50% no-repeat;
+    background-size: contain;
+  }
+}
+
+header[role='banner'] > h2 {
+  display: none;
+  float: left;
+  margin-top: 12px;
+  margin-left: 10px;
+  padding-top: 2px;
+  padding-left: 10px;
+  // border-left: 1px solid rgba(255, 255, 255, 0.8);
+  border-left: 1px solid rgba(0, 0, 0, 0.15);
+  font-family: $fonts-sans;
+  font-size: 0.875rem;
+  font-weight: normal;
+  text-transform: uppercase;
+  -webkit-font-smoothing: antialiased;
+  @include breakpoint-min(sm) {
+    display: inline-block;
+  }
+  .waypoint-header-exited & {
+    border-left: 1px solid rgba(0, 0, 0, 0.8);
+  }
+}
+
+header[role='banner'] > h2 a {
+  // color: white;
+  text-decoration: none;
+  // @include transition (all 0.25s ease);
+  // .waypoint-header-exited & {
+  color: black;
+  // }
+}
+
+header[role='banner'] nav {
+  position: fixed;
+  top: 0;
+  right: 0.5em;
+  font-family: $fonts-sans;
+  font-size: 0.875em; // 14/16
+  -webkit-font-smoothing: antialiased;
+}
+
+header[role='banner'] nav ul {
+  list-style: none;
+}
+
+header[role='banner'] nav ul li {
+  padding-bottom: inherit; // override global
+}
+
+header[role='banner'] nav ul li a {
+  color: $text-color;
+  // .waypoint-header-exited & {
+  //  color: $text-color;
+  // }
+}
+
+header[role='banner'] nav .other-links {
+  display: none;
+  position: relative;
+  top: 0.5rem;
+  margin-right: 0.5rem;
+  @include breakpoint-min(sm) {
+    display: inline-block;
+  }
+  li {
+    display: inline-block;
+  }
+  li a {
+    display: block;
+    overflow: hidden;
+    text-decoration: none;
+    // color: white;
+    color: $text-color;
+  }
+  li a:hover,
+  li a:focus {
+    text-decoration: underline;
+  }
+  // .waypoint-header-exited & li a {
+  //     color: $text-color;
+  // }
+}
+
+header[role='banner'] nav .social-links {
+  display: inline-block;
+  position: relative;
+  top: 0.5rem;
+  li {
+    display: inline-block;
+  }
+  li a {
+    display: block;
+    text-indent: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 26px;
+    text-decoration: none;
+  }
+}
+
+nav .facebook a {
+  background: url('#{$image-assets}/nav-sprites-dark.svg') -1px 0 no-repeat;
+}
+
+nav .twitter a {
+  background: url('#{$image-assets}/nav-sprites-dark.svg') 0 -50px no-repeat;
+}
+
+nav .comment a {
+  background: url('#{$image-assets}/nav-sprites-dark.svg') -2px -100px no-repeat;
+}
+
+header[role='banner'] nav .social-links li.comment a  {
+  display: none;
+  @include breakpoint-min(sm) {
+    display: block;
+  }
+}
+
+header[role='banner'] nav .donate-links {
+  float: right;
+  margin-left: 0.25rem;
+  li {
+    display: inline-block;
+  }
+  li a {
+    display: inline-block;
+    cursor: pointer;
+    padding: 0.375rem 0.5rem 0.3rem 0.5rem;
+    font-family: $fonts-serif;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+    border-radius: 0 0 0.2rem 0.2rem;
+    // @include transition (all 0.25s ease);
+  }
+  li a:link,
+  li a:visited {
+    background-color: $light-red;
+    // background-color: $agent-orange;
+  }
+  li a:hover,
+  li a:focus,
+  li a:active {
+    background-color: darken($light-red, 5%);
+    // background-color: darken($agent-orange, 5%);
+  }
+}
