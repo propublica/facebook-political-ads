@@ -1,27 +1,85 @@
 {
-	"exclude": [
-		"👊",
-		" "
-	],
-	"parents": {
-		"Donald Trump" : {
-			"label": "PERSON",
-			"entities": [
-				"Donald Trump",
-				"Trump",
-				"Donald Trump's",
-				"Donald J. Trump",
-				"Trump administration",
-				"TrumpCare",
-				"Trump administration’s",
-				"Trumpcare",
-				"the Trump Organization",
-				"Trump’s Muslim Ban",
-				"Trump", 
-				"Trump’s",
-				"Donald Trump’s",
-				"DONALD TRUMP"
-			]
-		}
-	}
+  "exclude": [
+    "👊",
+    " ",
+    "THE USA Tag & Share",
+    "NOW",
+    "SIGN",
+    "Doug",
+    "Ryan",
+    "11:59pm",
+    "👉",
+    "🚨  ",
+    "SIGN &",
+    "Amy",
+    "Joe",
+    "Trump-Russia",
+    "Download",
+    "YOU’VE",
+    "😭",
+    "🚨🚨  ",
+    "Dan",
+    "🚨🚨 URGENT",
+    "  1",
+    "➡",
+    "🚨",
+    "🚨   "
+  ],
+  "parents": {
+    "Donald Trump": {
+      "label": "PERSON",
+      "entities": [
+        "Donald Trump",
+        "Trump",
+        "Donald Trump's",
+        "Donald J. Trump",
+        "Trump administration",
+        "TrumpCare",
+        "Trump administration’s",
+        "Trumpcare",
+        "the Trump Organization",
+        "Trump’s Muslim Ban",
+        "Trump",
+        "Trump’s",
+        "Donald Trump’s",
+        "DONALD TRUMP",
+        "‼️ Trump"
+      ]
+    },
+    "Obamacare": {
+      "label": "LAW",
+      "entities": []
+    },
+    "Russia": {
+      "label": "GPE",
+      "entities": [
+        "Russia"
+      ]
+    },
+    "DACA": {
+      "label": "LAW",
+      "entities": []
+    },
+    "Danica Roem": {
+      "label": "Person",
+      "entities": [
+        "Roem"
+      ]
+    },
+    "Democrats": {
+      "label": "NORP",
+      "entities": [
+        "Democratic",
+        "Democrat",
+        "DNC"
+      ]
+    },
+    "Republicans": {
+      "label": "NORP",
+      "entities": [
+        "Republican",
+        "RNC"
+      ]
+    }
+  }
 }

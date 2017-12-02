@@ -17,7 +17,7 @@ use kuchiki;
 use kuchiki::iter::{Select, Elements, Descendants};
 use kuchiki::traits::*;
 use url::Url;
-use targeting_parser::{collect_targeting, Targeting};
+use targeting_parser::{collect_targeting, collect_advertiser, Targeting};
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::{default_tls_client, Region};
@@ -203,10 +203,10 @@ pub struct Ad {
     pub targeting: Option<String>,
     #[serde(skip_serializing)]
     pub suppressed: bool,
-    pub targets: Value,
-    pub pages: Vec<String>,
+    pub targets: Option<Value>,
+    pub pages: Option<Vec<String>>,
     pub advertiser: Option<String>,
-    pub entities: Value,
+    pub entities: Option<Value>,
 }
 // Define our special functions for searching
 sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
@@ -395,12 +395,16 @@ pub fn get_targets(targeting: Option<String>) -> Option<Value> {
     }
 }
 
-// fn get_advertiser(targeting: Option<String>) -> Option<Targeting> {
-//     match targeting {
-//         Some(ref targeting) => collect_advertiser(&targeting).into(),
-//         None => None,
-//     }
-// }
+fn get_advertiser(targeting: Option<String>) -> Option<String> {
+    match targeting {
+        Some(ref targeting) => {
+            collect_advertiser(&targeting).map(|t| t.segment).and_then(
+                |t| t,
+            )
+        }
+        None => None,
+    }
+}
 
 
 #[derive(Insertable)]
@@ -421,6 +425,7 @@ pub struct NewAd<'a> {
 
     targeting: Option<String>,
     pub targets: Option<Value>,
+    advertiser: Option<String>,
 }
 
 
@@ -449,6 +454,7 @@ impl<'a> NewAd<'a> {
             impressions: if !ad.political.is_some() { 1 } else { 0 },
             targeting: ad.targeting.clone(),
             targets: get_targets(ad.targeting.clone()),
+            advertiser: get_advertiser(ad.targeting.clone()),
         })
     }
 
