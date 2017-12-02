@@ -51,7 +51,6 @@ $light-red: #be3b3b;
 // -----------------------------------------------------------------------------
 
 @include grid(content); // Apply the grid to items with a class of 'content'.
-// @include grid(content,overlay); // Apply the grid and overlay to items with a class of 'content'.
 
 * {
   box-sizing: border-box;
@@ -62,9 +61,6 @@ html {
   @include breakpoint-min(md) {
     font-size: 112.5%; // 18/16
   }
-  // @include breakpoint-min(xxl) {
-  //      font-size: 131.25%; // 21/16
-  // }
 }
 
 body {
@@ -724,14 +720,11 @@ header[role='banner'] {
   width: 100%;
   height: $navbar-height-offset;
   z-index: 1000;
-  .waypoint-header-exited & {
-    // background-color: white;
-    // border-bottom: 1px solid lighten($text-color, 85%);
-    background-color: rgba(248,248,248,0.97);
-    @include breakpoint-min(xl) {
-      background-color: transparent;
-      border-bottom: none;
-    }
+  background-color: #fff;
+  border-bottom: 1px solid lighten($text-color, 85%);
+  @include breakpoint-min(xl) {
+    background-color: transparent;
+    border-bottom: none;
   }
 }
 
@@ -805,9 +798,6 @@ header[role='banner'] nav ul li {
 
 header[role='banner'] nav ul li a {
   color: $text-color;
-  // .waypoint-header-exited & {
-  //  color: $text-color;
-  // }
 }
 
 header[role='banner'] nav .other-links {
@@ -825,16 +815,12 @@ header[role='banner'] nav .other-links {
     display: block;
     overflow: hidden;
     text-decoration: none;
-    // color: white;
     color: $text-color;
   }
   li a:hover,
   li a:focus {
     text-decoration: underline;
   }
-  // .waypoint-header-exited & li a {
-  //     color: $text-color;
-  // }
 }
 
 header[role='banner'] nav .social-links {
@@ -889,17 +875,14 @@ header[role='banner'] nav .donate-links {
     text-decoration: none;
     color: white;
     border-radius: 0 0 0.2rem 0.2rem;
-    // @include transition (all 0.25s ease);
   }
   li a:link,
   li a:visited {
     background-color: $light-red;
-    // background-color: $agent-orange;
   }
   li a:hover,
   li a:focus,
   li a:active {
     background-color: darken($light-red, 5%);
-    // background-color: darken($agent-orange, 5%);
   }
 }
