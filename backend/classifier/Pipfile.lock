@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "1b49c2f0a6d1d12d85ba773c70f8b2a5dc2af9b298c79ea32bcdd57fc2d2bc11"
+            "sha256": "93d6ea4d7c2908c3193d1431787971655b24541cd4e59efe598702a41856e38c"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -26,9 +26,6 @@
         ]
     },
     "default": {
-        "93d1eba": {
-            "file": "https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-2.0.0/xx_ent_wiki_sm-2.0.0.tar.gz"
-        },
         "beautifulsoup4": {
             "hashes": [
                 "sha256:7015e76bf32f1f574636c4288399a6de66ce08fb7b2457f628a8d70c0fbabb11",
@@ -97,6 +94,9 @@
                 "sha256:49b3a825280bd66b3aa83585ef59c4a8c82f2c8a522dbe754a8bc8d08c85c491"
             ],
             "version": "==0.6.2"
+        },
+        "en-core-web-lg": {
+            "file": "https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-2.0.0/en_core_web_lg-2.0.0.tar.gz"
         },
         "et-xmlfile": {
             "hashes": [

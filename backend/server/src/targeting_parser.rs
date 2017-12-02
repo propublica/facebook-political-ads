@@ -5,7 +5,7 @@ use nom::IResult;
 pub struct Targeting {
     targeting_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    segment: Option<String>,
+    pub segment: Option<String>,
 }
 
 impl Targeting {

@@ -16,4 +16,4 @@ dill = "*"
 click = "*"
 records = "*"
 spacy = "*"
-"93d1eba" = {file = "https://github.com/explosion/spacy-models/releases/download/xx_ent_wiki_sm-2.0.0/xx_ent_wiki_sm-2.0.0.tar.gz"}
+"en_core_web_lg" = {file = "https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-2.0.0/en_core_web_lg-2.0.0.tar.gz"}
