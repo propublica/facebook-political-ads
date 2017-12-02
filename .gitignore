@@ -16,4 +16,5 @@ deploy.sh
 classifier.json
 /backend/.dockerignore
 Dockerfile
+.sass-cache
 __pycache__
