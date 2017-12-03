@@ -176,6 +176,7 @@ impl AdServer {
 
         if let Some(lang) = lang.or(AdServer::get_lang_from_headers(req.headers())) {
             if lang == "de-DE" || lang == "en-US" {
+                println!("yo");
                 return callback();
             }
         }
@@ -291,6 +292,7 @@ impl AdServer {
                         .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
                 })
                 .map_err(|e| {
+                    warn!("{:?}", e);
                     hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
                 });
             Box::new(future)
