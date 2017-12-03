@@ -24,7 +24,7 @@ $breakpoints: (
 );
 
 @mixin breakpoint($breakpoint) {
-   @media screen and (min-width: map-get($breakpoints, $breakpoint)) { @content; }
+  @media screen and (min-width: map-get($breakpoints, $breakpoint)) { @content; }
 }
 
 @mixin breakpoint-range($min, $max:null) {
@@ -36,7 +36,7 @@ $breakpoints: (
 }
 
 @mixin vertical-breakpoint($breakpoint) {
-   @media screen and (min-height: map-get($breakpoints, $breakpoint)) { @content; }
+  @media screen and (min-height: map-get($breakpoints, $breakpoint)) { @content; }
 }
 
 // see https://gist.github.com/marcedwards/3446599
@@ -44,14 +44,14 @@ $breakpoints: (
   @media only screen and (-webkit-min-device-pixel-ratio: 1.3),
   only screen and (-o-min-device-pixel-ratio: 13/10),
   only screen and (min-resolution: 120dpi) {
-      @content;
+    @content;
   }
 }
 
 @mixin clearfix {
   &:after {
     clear: both;
-    content: "";
+    content: '';
     display: table;
   }
 }

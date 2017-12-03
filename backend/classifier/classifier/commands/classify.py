@@ -2,7 +2,6 @@
 Classify loops through all the ads and save the scores to the database.
 """
 import click
-import xx_ent_wiki_sm
 import dill
 from classifier.utilities import classifier_path, get_vectorizer, confs, DB, get_text
 
