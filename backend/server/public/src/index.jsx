@@ -5,9 +5,8 @@ import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
 import { NEW_ADS, search, refresh } from 'utils.js';
 import throttle from "lodash/throttle";
-import i18next from "i18next";
-import Backend from 'i18next-xhr-backend';
-import LanguageDetector from 'i18next-browser-languagedetector';
+import { Filters } from 'filters.jsx';
+import { go, t } from 'i18n.js';
 import { lastPage, pageIndex, pageCount } from 'pagination.js';
 
 const ads = (state = [], action) => {
@@ -53,11 +52,10 @@ let Term = ({ search, term, onClick }) => (
   </li>
 );
 Term = connect(
-  (state) => state,
+  () => ({}),
   (dispatch) => ({ onClick: (store, term) => dispatch(refresh(store, term)) })
 )(Term);
 
-const Filters = () => (<div className="filters" />);
 let Pagination = ({ pageIndex, prev, next }) => (
   <nav className="pagination">
     <ul>
@@ -80,7 +78,7 @@ Pagination = connect(
       }
     }
   })
-);
+)(Pagination);
 
 let App = ({ads, onKeyUp, pageIndex, search}) => (
   <div id="app">
@@ -116,22 +114,12 @@ App = connect(
   })
 )(App);
 
-let t = null;
-i18next
-  .use(Backend)
-  .use(LanguageDetector)
-  .init({
-    fallbackLng: 'en',
-    backend: {
-      loadPath: '/facebook-ads/locales/{{lng}}/{{ns}}.json'
-    }
-  }, (err, t_) => {
-    t = t_;
-    render(
-      <Provider store={store}>
-        <App />
-      </Provider>,
-      document.querySelector("#graphic")
-    );
-    store.dispatch(refresh(store));
-  });
+go(() => {
+  render(
+    <Provider store={store}>
+      <App />
+    </Provider>,
+    document.querySelector("#graphic")
+  );
+  store.dispatch(refresh(store));
+});
