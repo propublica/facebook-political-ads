@@ -8,6 +8,7 @@ const Filter = ({ data, title }) => (
 
   </div>
 );
+
 let Filters = ({ entities, advertisers, targets }) => (
   <div className="filters">
     <Filter data={entities} title={t("related_terms")} />
@@ -16,12 +17,7 @@ let Filters = ({ entities, advertisers, targets }) => (
   </div>
 );
 Filters = connect(
-  (state) => ({
-    entities: state.entities,
-    advertisers: state.advertisers,
-    targets: state.targets
-  }),
-  () => ({})
+  ({ entities, advertiser, targets }) => ({ entities, advertiser, targets }),
 )(Filters);
 
 export { Filters };

@@ -42,18 +42,17 @@ const Ad = ({ ad }) => (
   </div>
 );
 
-let Term = ({ search, term, onClick }) => (
+let Term = ({ search, term, dispatch }) => (
   <li>
     <button
       type="button"
       className={term === search ? "prefab current" : "prefab"}
-      onClick={function() { return onClick(store, term); }}
+      onClick={() => dispatch(refresh(store, term)) }
       value={term}>{term}</button>
   </li>
 );
 Term = connect(
-  () => ({}),
-  (dispatch) => ({ onClick: (store, term) => dispatch(refresh(store, term)) })
+  () => ({})
 )(Term);
 
 let Pagination = ({ pageIndex, prev, next }) => (
