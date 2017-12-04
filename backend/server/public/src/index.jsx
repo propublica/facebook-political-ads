@@ -4,7 +4,7 @@ import thunkMiddleware from 'redux-thunk';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
 import { NEW_ADS, search, refresh, newSearch, deserialize } from 'utils.js';
-import throttle from "lodash/throttle";
+import debounce from "lodash";
 import { Filters, entities, targets, advertisers, filters } from 'filters.jsx';
 import { go, t } from 'i18n.js';
 import { lastPage, pageIndex, pageCount } from 'pagination.js';
@@ -101,7 +101,7 @@ Pagination = connect(
 let App = ({ads, onKeyUp, pageIndex, search}) => (
   <div id="app">
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
-    <form id="facebook-pac-browser">
+    <form id="facebook-pac-browser" onSubmit={(e) => e.preventDefault()}>
       <fieldset className="prefabs">
         <legend>{t("search_terms")}</legend>
         <ul>
@@ -124,11 +124,11 @@ let App = ({ads, onKeyUp, pageIndex, search}) => (
 App = connect(
   (state) => state,
   (dispatch) => ({
-    onKeyUp: throttle((e) => {
+    onKeyUp: debounce((e) => {
       e.preventDefault();
       dispatch(pageCount.setPage(0));
       dispatch(newSearch(e.target.value.length ? e.target.value : null));
-    }, 1000)
+    }, 250)
   })
 )(App);
 
