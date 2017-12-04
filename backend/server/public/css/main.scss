@@ -285,6 +285,8 @@ article {
     text-align: left;
     color: $pp-blue;
     margin-bottom: 1em;
+    cursor: pointer;
+
     @include breakpoint-min(lg) {
       float: left;
       width: colspan(4,12);
@@ -294,12 +296,10 @@ article {
         margin-right: 0;
       }
     }
-    &:hover,
-    &:focus,
-    .active {
+    &.active {
       display: block;
-      cursor: default;
       .filter-title {
+        cursor: pointer;
         z-index: 1001;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
@@ -309,6 +309,7 @@ article {
         }
       }
       .filter-options {
+        cursor: pointer;
         display: block;
       }
     }
