@@ -69,7 +69,7 @@ let Pagination = ({ pageIndex, prev, next, set }) => (
   <nav className="pagination">
     <ul>
       <li><a href="" onClick={prev}>←</a></li>
-      {range(Math.max(0, pageIndex - 3), pageIndex + 4).map((i) => {
+      {range(Math.max(0, pageIndex - 2), pageIndex + 3).map((i) => {
         return (i === pageIndex ?
           <li key={i} className="current">{pageIndex + 1}</li> :
           <li key={i} ><a href="" onClick={(e) => set(e, i + 1)}>{i + 1}</a></li>);
