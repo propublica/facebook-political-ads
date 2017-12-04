@@ -104,7 +104,7 @@ const Filter = ({ data, title, activate, toggle, active }) => (
             onChange={() => activate(filter)} />
           <label
             htmlFor={filter.key}
-            onClick={ () => activate(filter)}>{filter.key} ({filter.count})</label>
+            onClick={() => activate(filter)}>{filter.key} ({filter.count})</label>
         </li>)}
       </ul>
     </fieldset>

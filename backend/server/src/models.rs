@@ -396,6 +396,18 @@ impl Ad {
             .collect()
     }
 
+    pub fn get_total(
+        language: &str,
+        conn: &Pool<ConnectionManager<PgConnection>>,
+        options: &HashMap<String, String>,
+    ) -> Result<i64> {
+        let connection = conn.get()?;
+        let count = Ad::get_ads_query(language, options)
+            .count()
+            .get_result::<i64>(&*connection)?;
+        Ok(count)
+    }
+
     pub(self) fn get_ads_query<'a>(
         language: &'a str,
         options: &HashMap<String, String>,

@@ -3,12 +3,11 @@ import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
-import { NEW_ADS, search, refresh, newSearch, deserialize } from 'utils.js';
+import { NEW_ADS, search, refresh, newSearch, deserialize, enableBatching } from 'utils.js';
 import { debounce } from "lodash";
 import { Filters, entities, targets, advertisers, filters } from 'filters.jsx';
 import { go, t } from 'i18n.js';
-import { lastPage, pageIndex, pageCount } from 'pagination.js';
-import { range } from 'lodash';
+import { Pagination, pagination } from 'pagination.js';
 
 const ads = (state = [], action) => {
   switch(action.type) {
@@ -19,16 +18,15 @@ const ads = (state = [], action) => {
   }
 };
 
-const reducer = combineReducers({
+const reducer = enableBatching(combineReducers({
   ads,
-  pageIndex,
-  lastPage,
   search,
   entities,
   advertisers,
   targets,
-  filters
-});
+  filters,
+  pagination
+}));
 
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(applyMiddleware(...middleware)));
@@ -61,42 +59,7 @@ let Term = ({ search, term, dispatch }) => (
       value={term}>{term}</button>
   </li>
 );
-Term = connect(
-  () => ({})
-)(Term);
-
-let Pagination = ({ pageIndex, prev, next, set }) => (
-  <nav className="pagination">
-    <ul>
-      <li><a href="" onClick={prev}>←</a></li>
-      {range(Math.max(0, pageIndex - 2), pageIndex + 3).map((i) => {
-        return (i === pageIndex ?
-          <li key={i} className="current">{pageIndex + 1}</li> :
-          <li key={i} ><a href="" onClick={(e) => set(e, i + 1)}>{i + 1}</a></li>);
-      })}
-      <li><a href="" onClick={next}>→</a></li>
-    </ul>
-  </nav>
-);
-Pagination = connect(
-  (state) => state,
-  (dispatch) => ({
-    prev: (e) => {
-      e.preventDefault();
-      dispatch(pageCount.pagePrev());
-    },
-    next: (e) => {
-      e.preventDefault();
-      if(!store.getState().lastPage) {
-        dispatch(pageCount.pageNext());
-      }
-    },
-    set: (e, i) => {
-      e.preventDefault();
-      dispatch(pageCount.setPage(i));
-    }
-  })
-)(Pagination);
+Term = connect()(Term);
 
 let App = ({ads, onKeyUp, pageIndex, search}) => (
   <div id="app">
@@ -126,7 +89,6 @@ App = connect(
   (dispatch) => ({
     onKeyUp: debounce((e) => {
       e.preventDefault();
-      dispatch(pageCount.setPage(0));
       dispatch(newSearch(e.target.value.length ? e.target.value : null));
     }, 750)
   })
