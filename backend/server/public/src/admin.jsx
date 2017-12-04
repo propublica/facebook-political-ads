@@ -4,8 +4,8 @@ import thunkMiddleware from 'redux-thunk';
 import persistState from 'redux-localstorage';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
-import { headers, NEW_ADS, refresh, search } from 'utils.js';
-import throttle from "lodash/throttle";
+import { headers, NEW_ADS, refresh, search, deserialize } from 'utils.js';
+import { debounce } from "lodash";
 
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
@@ -145,10 +145,9 @@ const Ad = ({ad, onClick}) => (
       </tr>
       <tr>
         <td colSpan="2">
-          {ad.suppressed ? "Suppressed" :
-            <button onClick={function() { return onClick(ad); }}>
+          {ad.suppressed ? "Suppressed" : <button onClick={function() { return onClick(ad); }}>
               Suppress
-            </button>}
+          </button>}
         </td>
       </tr>
     </table>
@@ -167,7 +166,7 @@ Ads = connect(
   }),
   (dispatch) => ({
     onClick: (ad) => dispatch(suppressAd(ad)),
-    onKeyUp: throttle((e) => {
+    onKeyUp: debounce((e) => {
       e.preventDefault();
       dispatch(search(store, e.target.value.length ? e.target.value : null));
     }, 1000)

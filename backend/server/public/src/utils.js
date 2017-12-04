@@ -1,5 +1,5 @@
 import 'url-search-params-polyfill';
-import { isLastPage, notLastPage, pageCount } from 'pagination.js';
+import { setTotal, setPage } from 'pagination.js';
 import {
   newAdvertisers, newEntities, newTargets,
   serializeAdvertisers, serializeTargets, serializeEntities,
@@ -54,8 +54,8 @@ const serialize = (store) => {
   params = [serializeAdvertisers, serializeTargets, serializeEntities]
     .reduce((params, cb) => cb(params, state), params);
 
-  if(state.pageIndex) {
-    params.set("page", state.pageIndex);
+  if(state.pagination.page) {
+    params.set("page", state.pagination.page);
   }
 
   return params;
@@ -63,70 +63,92 @@ const serialize = (store) => {
 
 const deserialize = (dispatch) => {
   const params = new URLSearchParams(window.location.search);
+  const actions = [];
   if(params.has("search")) {
-    dispatch(newSearch(params.get("search")));
+    actions.push(newSearch(params.get("search")));
   }
 
   if(params.has("entities")) {
     const entities = JSON.parse(params.get("entities"));
-    dispatch(newEntities(entities));
+    actions.push(newEntities(entities));
     entities.map((it) => {
-      dispatch(filterEntity(it));
+      actions.push(filterEntity(it));
     });
   }
 
-  if(params.has("targeting")) {
-    const targeting = JSON.parse(params.get("targeting"));
-    dispatch(newTargets(targeting));
+  if(params.has("targets")) {
+    const targeting = JSON.parse(params.get("targets"));
+    actions.push(newTargets(targeting));
     targeting.map((it) => {
-      dispatch(filterTarget(it));
+      actions.push(filterTarget(it));
     });
   }
 
-  if(params.has("advertiser")) {
-    const advertisers = JSON.parse(params.get("advertiser")).map((advertiser) => ({ advertiser }));
-    dispatch(newAdvertisers(advertisers));
+  if(params.has("advertisers")) {
+    const advertisers = JSON.parse(params.get("advertisers")).map((advertiser) => ({ advertiser }));
+    actions.push(newAdvertisers(advertisers));
     advertisers.map((advertiser) => {
-      dispatch(filterAdvertiser(advertiser));
+      actions.push(filterAdvertiser(advertiser));
     });
   }
 
   if(params.has("page")) {
-    dispatch(pageCount.setPage(parseInt(params.get("page"), 10)));
+    actions.push(setPage(parseInt(params.get("page"), 10)));
   }
+
+  dispatch(batch(...actions));
+};
+
+const BATCH = 'batch';
+const batch = (...actions) => {
+  return {
+    type: BATCH,
+    actions: actions
+  };
+};
+
+// https://github.com/reactjs/redux/issues/911#issuecomment-149192251
+const enableBatching = (reducer) => {
+  return function batchingReducer(state, action) {
+    switch (action.type) {
+    case BATCH:
+      return action.actions.reduce(batchingReducer, state);
+    default:
+      return reducer(state, action);
+    }
+  };
 };
 
 
 let loaded = false;
-const refresh = (store) => {
-  const url = "/facebook-ads/ads";
+const refresh = (store, url = "/facebook-ads/ads") => {
   const dispatch = store.dispatch;
   const params = serialize(store, dispatch);
   let path = `${url}?${params.toString()}`;
-  const cleanSearch = (new URLSearchParams(window.location.search)).toString();
-  if(!loaded || (cleanSearch !== params.toString())) {
+  const cleanSearch = (new URLSearchParams(window.location.search));
+
+  if(!loaded || (cleanSearch.toString() !== params.toString())) {
     if(!loaded) {
       path = url + window.location.search;
     } else {
-      history.pushState({}, "", window.location.pathname + '?' + params.toString());
+      let query = params.toString().length > 0 ? `?${params.toString()}` : '';
+      history.pushState({}, "", `${window.location.pathname}${query}`);
     }
     return fetch(path, {
       method: "GET",
       headers: headers(store.getState().credentials)
     }).then((res) => res.json())
       .then((ads) => {
-        if (ads.ads.length < 20) {
-          dispatch(isLastPage());
-        } else {
-          dispatch(notLastPage());
-        }
-        dispatch(newAds(ads.ads));
-        dispatch(newEntities(ads.entities));
-        dispatch(newAdvertisers(ads.advertisers));
-        dispatch(newTargets(ads.targets));
+        dispatch(batch(
+          newAds(ads.ads),
+          newEntities(ads.entities),
+          newAdvertisers(ads.advertisers),
+          newTargets(ads.targets),
+          setTotal(ads.total),
+        ));
         loaded = true;
       });
   }
 };
 
-export { headers, newAds, NEW_ADS, search, refresh, newSearch, deserialize };
+export { headers, newAds, NEW_ADS, search, refresh, newSearch, deserialize, enableBatching };
