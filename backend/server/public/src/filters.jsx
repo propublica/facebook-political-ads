@@ -17,10 +17,26 @@ const filterEntity = a(FILTER_ENTITY);
 const filterAdvertiser = a(FILTER_ADVERTISER);
 const filterTarget = a(FILTER_TARGET);
 
-// const toggleTarget = (arg) => ({ type: TOGGLE_TARGET });
-// const toggleAdvertiser = (arg) => ({ type: TOGGLE_ADVERTISER });
-// const toggleEntity = (arg) => ({ })
+const TOGGLE_TARGET = 'toggle_target';
+const TOGGLE_ADVERTISER = 'toggle_advertiser';
+const TOGGLE_ENTITY = 'toggle_entity';
 
+const toggleTarget = () => ({ type: TOGGLE_TARGET });
+const toggleAdvertiser = () => ({ type: TOGGLE_ADVERTISER });
+const toggleEntity = () => ({ type: TOGGLE_ENTITY });
+
+const filters = (state = {}, action) => {
+  switch(action.type) {
+  case TOGGLE_TARGET:
+    return { ...state, target: !state.target };
+  case TOGGLE_ADVERTISER:
+    return { ...state, advertiser: !state.advertiser };
+  case TOGGLE_ENTITY:
+    return { ...state, entity: !state.entity };
+  default:
+    return state;
+  }
+};
 
 const makeReducer = (plural, singular) => {
   return (state = [], action) => {
@@ -70,10 +86,10 @@ const serializeEntities = s("entities", "entity", (entity) => ({ entity }));
 const serializeAdvertisers = s("advertisers", "advertiser");
 const serializeTargets = s("targets", "target", (target) => ({ target }));
 
-const Filter = ({ data, title, activate }) => (
-  <div className="filter">
-    <h3 className="filter-title">{title}</h3>
-    <fieldset className="filter filter-options">
+const Filter = ({ data, title, activate, toggle, active }) => (
+  <div className={ active ? "active filter" : "filter" }>
+    <h3 className="filter-title" onClick={toggle}>{title}</h3>
+    <fieldset className="filter-options">
       {data.map((filter) => <li key={filter.key + "-li"}>
         <input
           type="checkbox"
@@ -89,29 +105,41 @@ const Filter = ({ data, title, activate }) => (
   </div>
 );
 
-let Filters = ({ entities, advertisers, targets, dispatch }) => (
+
+let Filters = ({ entities, advertisers, targets, filters, dispatch }) => (
   <div className="filters">
     <Filter
       data={entities}
       title={t("related_terms")}
-      activate={(it) => dispatch(filterEntity(it)) } />
+      activate={(it) => dispatch(filterEntity(it))}
+      toggle={() => dispatch(toggleEntity())}
+      active={filters.entity} />
     <Filter
       data={advertisers}
       title={t("advertiser")}
-      activate={(it) => dispatch(filterAdvertiser(it)) } />
+      activate={(it) => dispatch(filterAdvertiser(it)) }
+      toggle={() => dispatch(toggleAdvertiser())}
+      active={filters.advertiser} />
     <Filter
       data={targets}
       title={t("target_audience")}
-      activate={(it) => dispatch(filterTarget(it)) } />
+      activate={(it) => dispatch(filterTarget(it))}
+      toggle={() => dispatch(toggleTarget())}
+      active={filters.target} />
   </div>
 );
 Filters = connect(
-  ({ entities, advertisers, targets }) => ({ entities, advertisers, targets }),
+  ({ entities, advertisers, targets, filters }) => ({
+    entities,
+    advertisers,
+    targets,
+    filters
+  }),
 )(Filters);
 
 export {
   Filters, entities, advertisers, targets,
   newEntities, newAdvertisers, newTargets,
   serializeAdvertisers, serializeTargets, serializeEntities,
-  filterAdvertiser, filterEntity, filterTarget
+  filterAdvertiser, filterEntity, filterTarget, filters
 };
