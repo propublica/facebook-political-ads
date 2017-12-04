@@ -126,7 +126,7 @@ App = connect(
   (dispatch) => ({
     onKeyUp: throttle((e) => {
       e.preventDefault();
-      dispatch(pageCount.pageClear());
+      dispatch(pageCount.setPage(0));
       dispatch(newSearch(e.target.value.length ? e.target.value : null));
     }, 1000)
   })
