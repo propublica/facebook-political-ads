@@ -128,7 +128,7 @@ App = connect(
       e.preventDefault();
       dispatch(pageCount.setPage(0));
       dispatch(newSearch(e.target.value.length ? e.target.value : null));
-    }, 250)
+    }, 750)
   })
 )(App);
 
