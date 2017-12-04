@@ -90,17 +90,19 @@ const Filter = ({ data, title, activate, toggle, active }) => (
   <div className={ active ? "active filter" : "filter" }>
     <h3 className="filter-title" onClick={toggle}>{title}</h3>
     <fieldset className="filter-options">
-      {data.map((filter) => <li key={filter.key + "-li"}>
-        <input
-          type="checkbox"
-          name={filter.key}
-          checked={filter.active}
-          key={filter.key}
-          onChange={() => activate(filter)} />
-        <label
-          htmlFor={filter.key}
-          onClick={ () => activate(filter)}>{filter.key} ({filter.count})</label>
-      </li>)}
+      <ul>
+        {data.map((filter) => <li key={filter.key + "-li"}>
+          <input
+            type="checkbox"
+            name={filter.key}
+            checked={filter.active}
+            key={filter.key}
+            onChange={() => activate(filter)} />
+          <label
+            htmlFor={filter.key}
+            onClick={ () => activate(filter)}>{filter.key} ({filter.count})</label>
+        </li>)}
+      </ul>
     </fieldset>
   </div>
 );
