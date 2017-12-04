@@ -1,5 +1,7 @@
 import 'url-search-params-polyfill';
-import {isLastPage, notLastPage} from 'pagination.js';
+import { isLastPage, notLastPage } from 'pagination.js';
+import { newAdvertisers, newEntities, newTargets } from 'filters.jsx';
+
 const auth = (credentials) => (credentials ?
   {"Authorization": `Bearer ${credentials.token}`} :
   {});
@@ -52,7 +54,6 @@ const refresh = (store, query) => {
       params.append("page", store.getState().pageIndex);
     }
 
-
     return fetch(`${url}${params.toString()}`, {
       method: "GET",
       headers: headers(store.getState().credentials)
@@ -64,6 +65,9 @@ const refresh = (store, query) => {
           dispatch(notLastPage());
         }
         dispatch(newAds(ads.ads));
+        dispatch(newEntities(ads.entities));
+        dispatch(newAdvertisers(ads.advertisers));
+        dispatch(newTargets(ads.targets));
       });
   };
 };
