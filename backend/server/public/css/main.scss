@@ -416,7 +416,7 @@ article {
     &:focus {
       color: white;
       background-color: $link-color;
-      border-color: $link-color;
+      border: 1px solid $link-color;
     }
   }
 }
@@ -503,19 +503,19 @@ article {
 }
 
 .message {
-  margin: 12px auto;
+  margin: 12px auto 0;
   border-radius: 4px;
   min-width: 308px;
   max-width: 500px;
 }
 
 .targeting_info {
-  background-color: white;
-  padding: 12px;
-
+  max-width: 500px;
+  margin: 0 auto 12px;
   h3 {
     font-weight: bold;
-    margin: 0 0 5px;
+    padding-left: 12px;
+    margin-top: 6px;
   }
 
   .targeting {

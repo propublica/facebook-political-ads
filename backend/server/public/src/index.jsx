@@ -34,25 +34,20 @@ const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(applyMiddleware(...middleware)));
 const div = document.createElement('div');
 
-const cleanTargeting = (html) => {
-  div.innerHTML = html;
-  Array.from(div.querySelectorAll('a')).map((a) => a.remove());
-  return Array.from(div.querySelectorAll('span:not(.hidden_elem)'))
-    .reduce((memo, it) => memo + it.outerHTML, '');
-};
-
 const Targeting = ({ targeting }) => (
   <div className="targeting_info">
     <h3>Targeting Information</h3>
     <div
       className="targeting"
-      dangerouslySetInnerHTML={{__html:cleanTargeting(targeting)}} />
+      dangerouslySetInnerHTML={{__html:targeting}} />
   </div>
 );
 
 const Ad = ({ ad }) => (
-  <div className="message">
-    <div dangerouslySetInnerHTML={{__html: ad.html}} />
+  <div>
+    <div className="message">
+      <div dangerouslySetInnerHTML={{__html: ad.html}} />
+    </div>
     {ad.targeting !== null ? <Targeting targeting={ad.targeting} /> : ''}
   </div>
 );
