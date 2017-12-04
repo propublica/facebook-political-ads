@@ -18,10 +18,11 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let conn = PgConnection::establish(&database_url).unwrap();
     let dbads: Vec<Ad> = ads.order(created_at.desc())
-        .filter(political_probability.gt(0.70))
+        .filter(targeting.is_not_null())
         .load::<Ad>(&conn)
         .unwrap();
     for ad in dbads {
+        println!("{:?}", get_targets(ad.targeting.clone()));
         let document = kuchiki::parse_html().one(ad.html.clone());
         diesel::update(ads.find(ad.id))
             .set((

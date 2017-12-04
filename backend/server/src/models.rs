@@ -218,6 +218,13 @@ where
     }
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct EntityFilter {
+    entity: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    entity_type: Option<String>,
+}
+
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Entities {
     pub count: i64,
@@ -414,7 +421,8 @@ impl Ad {
         }
 
         if let Some(entity) = options.get("entities") {
-            let ents: Result<Vec<Entities>> = serde_json::from_str(entity).map_err(|e| e.into());
+            let ents: Result<Vec<EntityFilter>> =
+                serde_json::from_str(entity).map_err(|e| e.into());
             if ents.is_ok() {
                 let json = serde_json::to_string(&ents.unwrap()).unwrap();
                 query = query.filter(sql(&format!("entities @> '{}'", json)));

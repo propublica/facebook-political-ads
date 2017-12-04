@@ -1,6 +1,9 @@
 import 'url-search-params-polyfill';
 import { isLastPage, notLastPage } from 'pagination.js';
-import { newAdvertisers, newEntities, newTargets } from 'filters.jsx';
+import {
+  newAdvertisers, newEntities, newTargets,
+  serializeAdvertisers, serializeTargets, serializeEntities
+} from 'filters.jsx';
 
 const auth = (credentials) => (credentials ?
   {"Authorization": `Bearer ${credentials.token}`} :
@@ -39,22 +42,34 @@ const search = (state = null, action) => {
   }
 };
 
-const refresh = (store, query) => {
-  return (dispatch) => {
-    let url = "/facebook-ads/ads?";
-    var params = new URLSearchParams();
+const serialize = (store) => {
+  let params = new URLSearchParams();
+  const state = store.getState();
 
-    if(query) {
-      params.append("search", query);
-      dispatch(newSearch(query));
+  if(state.search) {
+    params.set("search", state.search);
+  }
 
-    }
+  params = [serializeAdvertisers, serializeTargets, serializeEntities]
+    .reduce((params, cb) => cb(params, state), params);
 
-    if (store.getState().pageIndex) {
-      params.append("page", store.getState().pageIndex);
-    }
+  if(state.pageIndex) {
+    params.set("page", state.pageIndex);
+  }
 
-    return fetch(`${url}${params.toString()}`, {
+  return params;
+};
+let loaded = false;
+const refresh = (store) => {
+  const url = "/facebook-ads/ads?";
+  const dispatch = store.dispatch;
+  const params = serialize(store, dispatch);
+  const path = `${url}${params.toString()}`;
+  const cleanSearch = (new URLSearchParams(window.location.search)).toString();
+  if(!loaded || (cleanSearch !== params.toString())) {
+    loaded = true;
+    history.pushState({}, "", window.location.pathname + '?' + params.toString());
+    return fetch(path, {
       method: "GET",
       headers: headers(store.getState().credentials)
     }).then((res) => res.json())
@@ -69,8 +84,8 @@ const refresh = (store, query) => {
         dispatch(newAdvertisers(ads.advertisers));
         dispatch(newTargets(ads.targets));
       });
-  };
+  }
 };
 
 
-export { headers, newAds, NEW_ADS, search, refresh };
+export { headers, newAds, NEW_ADS, search, refresh, newSearch };
