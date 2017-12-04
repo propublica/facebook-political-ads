@@ -75,6 +75,17 @@ pub fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
         .ok_or_else(|| "Couldn't find message.".into())
 }
 
+// Only available in timeline ads
+pub fn get_advertiser_link(
+    document: &kuchiki::NodeRef,
+) -> Result<kuchiki::NodeDataRef<kuchiki::ElementData>> {
+    document_select(document, ".fwb > a")?.nth(0).ok_or_else(
+        || {
+            "Couldn't find advertiser link".into()
+        },
+    )
+}
+
 fn get_images(document: &kuchiki::NodeRef) -> Result<Vec<String>> {
     let select = document_select(document, "img")?;
     Ok(
@@ -159,31 +170,88 @@ impl Images {
     }
 }
 
+
+pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
+    fn field() -> &'static str {
+        Self::column()
+    }
+
+    fn column() -> &'static str;
+
+    fn get(
+        language: &str,
+        conn: &Pool<ConnectionManager<PgConnection>>,
+        options: &HashMap<String, String>,
+    ) -> Result<Vec<T>> {
+        let connection = conn.get()?;
+        let mut query = Ad::get_ads_query(language, options)
+            .select((
+                sql::<BigInt>("count(*) as count"),
+                sql::<Text>(Self::column()),
+            ))
+            .group_by(sql::<Text>(Self::field()))
+            .order(sql::<BigInt>("count desc"))
+            .limit(20);
+        if Self::column() == Self::field() {
+            query = query.filter(sql::<Text>(Self::field()).is_not_null());
+        }
+        Ok(query.load::<T>(&*connection)?)
+    }
+}
+
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
-pub struct AggregateTargeting {
+pub struct Targets {
     pub count: i64,
     pub targeting_type: String,
 }
 
-impl AggregateTargeting {
-    pub fn get_targets(
-        language: &str,
-        conn: &Pool<ConnectionManager<PgConnection>>,
-        options: &HashMap<String, String>,
-    ) -> Result<Vec<Self>> {
-        let connection = conn.get()?;
-        Ok(Ad::get_ads_query(language, options)
-            .select((
-                sql::<BigInt>("count(*) as count"),
-                sql::<Text>(
-                    "jsonb_array_elements(targets)->>'targeting_type' as targeting_type",
-                ),
-            ))
-            .group_by(sql::<Text>("targeting_type"))
-            .order(sql::<BigInt>("count desc"))
-            .load::<Self>(&*connection)?)
+impl<T> Aggregate<T> for Targets
+where
+    T: Queryable<(BigInt, Text), Pg>,
+{
+    fn field() -> &'static str {
+        "targeting_type"
+    }
+
+    fn column() -> &'static str {
+        "jsonb_array_elements(targets)->>'targeting_type' as targeting_type"
     }
 }
+
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+pub struct Entities {
+    pub count: i64,
+    pub entity: String,
+}
+
+impl<T> Aggregate<T> for Entities
+where
+    T: Queryable<(BigInt, Text), Pg>,
+{
+    fn field() -> &'static str {
+        "entity"
+    }
+
+    fn column() -> &'static str {
+        "jsonb_array_elements(entities)->>'entity' as entity"
+    }
+}
+
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+pub struct Advertisers {
+    pub count: i64,
+    pub advertiser: String,
+}
+
+impl<T> Aggregate<T> for Advertisers
+where
+    T: Queryable<(BigInt, Text), Pg>,
+{
+    fn column() -> &'static str {
+        "advertiser"
+    }
+}
+
 
 #[derive(Serialize, Queryable, Debug, Clone)]
 pub struct Ad {
@@ -204,9 +272,9 @@ pub struct Ad {
     #[serde(skip_serializing)]
     pub suppressed: bool,
     pub targets: Option<Value>,
-    pub pages: Option<Vec<String>>,
     pub advertiser: Option<String>,
     pub entities: Option<Value>,
+    pub page: Option<String>,
 }
 // Define our special functions for searching
 sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
@@ -335,13 +403,29 @@ impl Ad {
                 }
             }
         }
-
+        // TODO: Make these into a function
         if let Some(target) = options.get("targets") {
             let targts: Result<Vec<Targeting>> = serde_json::from_str(target).map_err(|e| e.into());
             if targts.is_ok() {
                 let json = serde_json::to_string(&targts.unwrap()).unwrap();
                 // WARNING! Possible injection, always rely on serde serialization above.
                 query = query.filter(sql(&format!("targets @> '{}'", json)));
+            }
+        }
+
+        if let Some(entity) = options.get("entities") {
+            let ents: Result<Vec<Entities>> = serde_json::from_str(entity).map_err(|e| e.into());
+            if ents.is_ok() {
+                let json = serde_json::to_string(&ents.unwrap()).unwrap();
+                query = query.filter(sql(&format!("entities @> '{}'", json)));
+            }
+        }
+
+        if let Some(advertisers) = options.get("advertisers") {
+            let adverts: Result<Vec<String>> =
+                serde_json::from_str(advertisers).map_err(|e| e.into());
+            if adverts.is_ok() {
+                query = query.filter(advertiser.eq_any(adverts.unwrap()));
             }
         }
 
@@ -359,8 +443,8 @@ impl Ad {
 
         let mut query = Ad::get_ads_query(language, options);
 
-        if let Some(page) = options.get("page") {
-            let raw_offset = page.parse::<usize>().unwrap_or_default() * 20;
+        if let Some(p) = options.get("page") {
+            let raw_offset = p.parse::<usize>().unwrap_or_default() * 20;
             let offset = if raw_offset > 1000 { 1000 } else { raw_offset };
             query = query.offset(offset as i64);
         }
@@ -383,7 +467,6 @@ impl Ad {
     }
 }
 
-
 pub fn get_targets(targeting: Option<String>) -> Option<Value> {
     match targeting {
         Some(ref targeting) => {
@@ -395,11 +478,13 @@ pub fn get_targets(targeting: Option<String>) -> Option<Value> {
     }
 }
 
-fn get_advertiser(targeting: Option<String>) -> Option<String> {
+pub fn get_advertiser(targeting: Option<String>, document: &kuchiki::NodeRef) -> Option<String> {
     match targeting {
         Some(ref targeting) => {
-            collect_advertiser(&targeting).map(|t| t.segment).and_then(
-                |t| t,
+            collect_advertiser(&targeting).or(
+                get_advertiser_link(document)
+                    .map(|a| a.text_contents())
+                    .ok(),
             )
         }
         None => None,
@@ -428,7 +513,6 @@ pub struct NewAd<'a> {
     advertiser: Option<String>,
 }
 
-
 impl<'a> NewAd<'a> {
     pub fn new(ad: &'a AdPost, lang: &'a str) -> Result<NewAd<'a>> {
         info!("saving {}", ad.id);
@@ -454,7 +538,7 @@ impl<'a> NewAd<'a> {
             impressions: if !ad.political.is_some() { 1 } else { 0 },
             targeting: ad.targeting.clone(),
             targets: get_targets(ad.targeting.clone()),
-            advertiser: get_advertiser(ad.targeting.clone()),
+            advertiser: get_advertiser(ad.targeting.clone(), &document),
         })
     }
 
@@ -539,7 +623,7 @@ mod tests {
             targets: None,
             advertiser: None,
             entities: None,
-            pages: None,
+            page: None,
         };
         let urls = saved_ad.image_urls();
         let images = Images::from_ad(&saved_ad, &urls).unwrap();
@@ -563,14 +647,7 @@ mod tests {
         );
 
         let options: HashMap<String, String> = HashMap::new();
-        println!(
-            "{}",
-            AggregateTargeting::get_targets("en-US", &db_pool, &options)
-                .unwrap()
-                .iter()
-                .nth(0)
-                .unwrap()
-                .targeting_type
-        );
+        let t: Result<Vec<Targets>> = Targets::get("en-US", &db_pool, &options);
+        assert!(t.unwrap().iter().nth(0).is_some());
     }
 }

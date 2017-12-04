@@ -16,7 +16,7 @@ use hyper::header::{AcceptLanguage, ContentLength, ContentType, Authorization, B
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
-use models::{NewAd, Ad, AggregateTargeting};
+use models::{Aggregate, Advertisers, NewAd, Ad, Targets, Entities};
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use start_logging;
@@ -62,7 +62,9 @@ pub struct Admin {
 #[derive(Serialize)]
 pub struct ApiResponse {
     ads: Vec<Ad>,
-    targets: Vec<AggregateTargeting>,
+    targets: Vec<Targets>,
+    entities: Vec<Entities>,
+    advertisers: Vec<Advertisers>,
 }
 
 impl Service for AdServer {
@@ -156,6 +158,16 @@ impl Service for AdServer {
             }
         }
     }
+}
+
+// this lets us use variables many times by cloning them
+macro_rules! spawn_with_clone {
+    ($pool:ident; $($n:ident),+; $body:expr) => ({
+        {
+            $(let $n = $n.clone();)+
+            $pool.spawn_fn(move || $body)
+        }
+    });
 }
 
 // I'm not happy with the OK OK OKs here, but I can't quite find a Result
@@ -256,28 +268,36 @@ impl AdServer {
                     form_urlencoded::parse(q.as_bytes())
                         .into_owned()
                         .filter(|pair| {
-                            pair.0 == "search" || pair.0 == "page" || pair.0 == "targets"
+                            pair.0 == "search" || pair.0 == "page" || pair.0 == "targets" ||
+                                pair.0 == "advertisers" ||
+                                pair.0 == "entities"
                         })
                         .collect::<HashMap<_, _>>()
                 })
                 .unwrap_or_default();
-            let agg_options = options.clone();
-            let db_pool = self.db_pool.clone();
-            let agg_db_pool = self.db_pool.clone();
-            let agg_lang = lang.clone();
 
-            let ads_future = self.pool.spawn_fn(
-                move || Ad::get_ads(&lang, &db_pool, &options),
-            );
-            let agg_future = self.pool.spawn_fn(move || {
-                AggregateTargeting::get_targets(&agg_lang, &agg_db_pool, &agg_options)
-            });
-            let future = ads_future
-                .join(agg_future)
-                .map(|(ads, targeting)| {
+            let db_pool = self.db_pool.clone();
+            let pool = self.pool.clone();
+            let ads =
+                spawn_with_clone!(pool; lang, db_pool, options;
+                                        Ad::get_ads(&lang, &db_pool, &options));
+            let targets =
+                spawn_with_clone!(pool; lang, db_pool, options;
+                                            Targets::get(&lang, &db_pool, &options));
+            let entities =
+                spawn_with_clone!(pool; lang, db_pool, options;
+                                  Entities::get(&lang, &db_pool, &options));
+            let advertisers =
+                spawn_with_clone!(pool; lang, db_pool, options;
+                                  Advertisers::get(&lang, &db_pool, &options));
+
+            let future = ads.join4(targets, entities, advertisers)
+                .map(|(ads, targeting, entities, advertisers)| {
                     serde_json::to_string(&ApiResponse {
                         ads: ads,
                         targets: targeting,
+                        entities: entities,
+                        advertisers: advertisers,
                     }).map(|serialized| {
                         Response::new()
                             .with_header(ContentLength(serialized.len() as u64))

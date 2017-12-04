@@ -55,7 +55,7 @@ def entities(ctx):
                     if not has_parent:
                         update["entities"].add((ent.text, ent.label_))
 
-                update["entities"] = json.dumps([{"name":e[0], "label": LABELS[e[1]]}
+                update["entities"] = json.dumps([{"entity":e[0], "entity_type": LABELS[e[1]]}
                                                  for e in update["entities"]
                                                  if e[1] in LABELS.keys()])
                 updates.append(update)
