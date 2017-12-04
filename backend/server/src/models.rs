@@ -402,7 +402,7 @@ impl Ad {
     ) -> BoxedQuery<'a, Pg> {
         use schema::ads::dsl::*;
         let mut query = ads.filter(lang.eq(language))
-            .filter(political_probability.gt(0.70))
+            .filter(political_probability.gt(0.80))
             .filter(suppressed.eq(false))
             .into_boxed();
 
