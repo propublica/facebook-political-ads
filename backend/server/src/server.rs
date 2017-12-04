@@ -176,7 +176,6 @@ impl AdServer {
 
         if let Some(lang) = lang.or(AdServer::get_lang_from_headers(req.headers())) {
             if lang == "de-DE" || lang == "en-US" {
-                println!("yo");
                 return callback();
             }
         }

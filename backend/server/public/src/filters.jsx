@@ -5,7 +5,6 @@ import { t } from 'i18n.js';
 const Filter = ({ data, title }) => (
   <div className="filter">
     <h3 className="filter-title">{title} (0/4)</h3>
-
   </div>
 );
 
