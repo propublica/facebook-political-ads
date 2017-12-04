@@ -99,7 +99,7 @@ Pagination = connect(
 )(Pagination);
 
 let App = ({ads, onKeyUp, pageIndex, search, onClick}) => (
-  <div id="app" onClick={onClick}>
+  <div id="app">
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
     <form id="facebook-pac-browser">
       <fieldset className="prefabs">
@@ -129,7 +129,7 @@ App = connect(
       dispatch(pageCount.setPage(0));
       dispatch(newSearch(e.target.value.length ? e.target.value : null));
     }, 1000),
-    onClick: () => dispatch(resetDropdowns())
+    //onClick: () => dispatch(resetDropdowns())
   })
 )(App);
 
