@@ -22,7 +22,6 @@ const makeReducer = (plural, singular) => {
   return (state = [], action) => {
     switch(action.type) {
     case `new_${plural}`: {
-      console.log(action.value);
       const lookup = new Set(state.filter((filter) => filter.active).map((it) => it[singular]));
       return action.value.map((filter) => ({
         ...filter,

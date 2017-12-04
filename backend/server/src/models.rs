@@ -178,23 +178,25 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
 
     fn column() -> &'static str;
 
+    fn null_check() -> &'static str {
+        Self::field()
+    }
+
     fn get(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
         options: &HashMap<String, String>,
     ) -> Result<Vec<T>> {
         let connection = conn.get()?;
-        let mut query = Ad::get_ads_query(language, options)
+        let query = Ad::get_ads_query(language, options)
             .select((
                 sql::<BigInt>("count(*) as count"),
                 sql::<Text>(Self::column()),
             ))
             .group_by(sql::<Text>(Self::field()))
             .order(sql::<BigInt>("count desc"))
+            .filter(sql::<Text>(Self::null_check()).is_not_null())
             .limit(20);
-        if Self::column() == Self::field() {
-            query = query.filter(sql::<Text>(Self::field()).is_not_null());
-        }
         Ok(query.load::<T>(&*connection)?)
     }
 }
@@ -202,7 +204,7 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct Targets {
     pub count: i64,
-    pub targeting_type: String,
+    pub target: String,
 }
 
 impl<T> Aggregate<T> for Targets
@@ -210,11 +212,15 @@ where
     T: Queryable<(BigInt, Text), Pg>,
 {
     fn field() -> &'static str {
-        "targeting_type"
+        "target"
     }
 
     fn column() -> &'static str {
-        "jsonb_array_elements(targets)->>'targeting_type' as targeting_type"
+        "jsonb_array_elements(targets)->>'target' as target"
+    }
+
+    fn null_check() -> &'static str {
+        "targets"
     }
 }
 
@@ -241,6 +247,10 @@ where
 
     fn column() -> &'static str {
         "jsonb_array_elements(entities)->>'entity' as entity"
+    }
+
+    fn null_check() -> &'static str {
+        "entities"
     }
 }
 
