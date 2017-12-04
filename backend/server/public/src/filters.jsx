@@ -118,7 +118,7 @@ let Filters = ({ entities, advertisers, targets, filters, dispatch }) => (
       data={entities}
       title={t("related_terms")}
       activate={(it) => dispatch(filterEntity(it))}
-      toggle={() => e.stopPropagation() || dispatch(toggleEntity())}
+      toggle={() => dispatch(toggleEntity())}
       active={filters.entity} />
     <Filter
       data={advertisers}

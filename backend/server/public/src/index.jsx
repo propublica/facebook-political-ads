@@ -98,7 +98,7 @@ Pagination = connect(
   })
 )(Pagination);
 
-let App = ({ads, onKeyUp, pageIndex, search, onClick}) => (
+let App = ({ads, onKeyUp, pageIndex, search}) => (
   <div id="app">
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
     <form id="facebook-pac-browser">
@@ -128,8 +128,7 @@ App = connect(
       e.preventDefault();
       dispatch(pageCount.setPage(0));
       dispatch(newSearch(e.target.value.length ? e.target.value : null));
-    }, 1000),
-    //onClick: () => dispatch(resetDropdowns())
+    }, 1000)
   })
 )(App);
 
