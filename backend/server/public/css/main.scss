@@ -103,14 +103,11 @@ article {
       width: colspan(8, 12);
     }
   }
-
 }
-
 
 // -----------------------------------------------------------------------------
 // TITLE STYLES
 // -----------------------------------------------------------------------------
-
 
 .title-set {
   text-align: center;
@@ -142,6 +139,7 @@ article {
     font-size: $scale-11;
   }
 }
+
 .dek {
   font-family: $fonts-sans;
   margin: 1em 0;
@@ -150,11 +148,13 @@ article {
     font-size: $scale-7;
   }
 }
+
 .byline {
   display: block;
   font-family: $fonts-sans;
   color: $text-color-low-contrast;
   margin-top: 1em;
+
   a {
     font-weight: bold;
     color: inherit;
@@ -164,6 +164,7 @@ article {
     }
   }
 }
+
 .dateline {
   display: block;
   font-family: $fonts-sans;
@@ -481,15 +482,13 @@ article {
   display: none;
 }
 
-
-
 ._1dwg._1w_m, // Timeline ad wrapper div
 .ego_unit {   // Sidebar ad wrapper div
   background-color: white;
   padding: 12px;
-  margin: 0 auto 12px auto;
-  border-radius: 4px;
+  margin: 0 auto;
   overflow: hidden;
+
   ._1dwg._1w_m {
     display: block;
     max-width: 100%;
@@ -500,14 +499,39 @@ article {
   }
 }
 
-._1dwg._1w_m { // Timeline ad wrapper div
+.message {
+  background-color: white;
+  margin: 12px auto;
+  border-radius: 4px;
+  min-width: 308px;
   max-width: 500px;
   border: 1px solid #dddfe2;
+  border-radius: 4px;
+}
+
+.targeting_info {
+  h3 {
+    font-weight: bold;
+    margin: 0 0 5px;
+    padding-left: 12px;
+    border-top: 1px solid #dddfe2;
+  }
+}
+
+.targeting {
+  display: inline-block;
+  padding: 0 12px 12px;
+  b {
+    font-weight: bold;
+  }
+}
+
+._1dwg._1w_m { // Timeline ad wrapper div
+  max-width: 500px;
 }
 
 .ego_unit { // Sidebar ad wrapper div
   max-width: 308px;
-  border: 1px solid #d9d9d9;
 }
 
 

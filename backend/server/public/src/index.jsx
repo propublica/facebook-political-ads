@@ -42,6 +42,13 @@ const cleanTargeting = (html) => {
 const Ad = ({ ad }) => (
   <div className="message">
     <div dangerouslySetInnerHTML={{__html: ad.html}} />
+    <div className="targeting_info">
+      <h3>Targeting Information</h3>
+      {ad.targeting ?
+        <div
+          className="targeting"
+          dangerouslySetInnerHTML={{__html:cleanTargeting(ad.targeting)}} /> : ''}
+    </div>
   </div>
 );
 
