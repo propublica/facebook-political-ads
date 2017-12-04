@@ -38,8 +38,6 @@ impl<'a> From<TargetingParsed<'a>> for Targeting {
             TargetingParsed::School(s) => Targeting::new("School", Some(s)),
             TargetingParsed::Like => Targeting::new("Like", None),
             TargetingParsed::List => Targeting::new("List", None),
-            // This is a special field that allows us to tie a page to a name, it is a bit
-            // unfortunate that we include it here, but that's ok because it helps out with below.
             TargetingParsed::Advertiser(_) => {
                 panic!("Advertiser is not allowed as a targeting field")
             }
@@ -313,8 +311,8 @@ named!(get_targeting(&str) -> Vec<TargetingParsed>,
             | list
         )) >>
         advertiser_second: opt!(advertiser_wants) >>
-        gender: dbg_dmp!(gender) >>
-        location: dbg_dmp!(age_and_location) >>
+        gender: gender >>
+        location: age_and_location >>
         (vec![&vec![advertiser_first,
                     sources_and_interests,
                     advertiser_second,
@@ -336,7 +334,7 @@ pub fn collect_targeting(thing: &str) -> Result<Vec<Targeting>> {
     })
 }
 
-pub fn collect_advertiser(thing: &str) -> Option<Targeting> {
+pub fn collect_advertiser(thing: &str) -> Option<String> {
     match parse_targeting(thing) {
         Ok(result) => {
             result
@@ -345,8 +343,11 @@ pub fn collect_advertiser(thing: &str) -> Option<Targeting> {
                     &TargetingParsed::Advertiser(_) => true,
                     _ => false,
                 })
-                .map(|t| t.into())
                 .nth(0)
+                .map(|t| match t {
+                    TargetingParsed::Advertiser(a) => a.to_string(),
+                    _ => panic!("Somehow got something other than an Advertiser"),
+                })
         }
         _ => None,
     }

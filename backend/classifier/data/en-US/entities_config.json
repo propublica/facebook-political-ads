@@ -89,7 +89,7 @@
     },
     "U.S.": {
       "label":"GPE",
-      "Entities": [
+      "entities": [
         "U.S.",
         "US"
       ]
