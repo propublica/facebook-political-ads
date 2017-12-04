@@ -22,6 +22,7 @@ const makeReducer = (plural, singular) => {
   return (state = [], action) => {
     switch(action.type) {
     case `new_${plural}`: {
+      console.log(action.value);
       const lookup = new Set(state.filter((filter) => filter.active).map((it) => it[singular]));
       return action.value.map((filter) => ({
         ...filter,
@@ -109,5 +110,6 @@ Filters = connect(
 export {
   Filters, entities, advertisers, targets,
   newEntities, newAdvertisers, newTargets,
-  serializeAdvertisers, serializeTargets, serializeEntities
+  serializeAdvertisers, serializeTargets, serializeEntities,
+  filterAdvertiser, filterEntity, filterTarget
 };

@@ -2,7 +2,8 @@ import 'url-search-params-polyfill';
 import { isLastPage, notLastPage } from 'pagination.js';
 import {
   newAdvertisers, newEntities, newTargets,
-  serializeAdvertisers, serializeTargets, serializeEntities
+  serializeAdvertisers, serializeTargets, serializeEntities,
+  filterAdvertiser, filterEntity, filterTarget
 } from 'filters.jsx';
 
 const auth = (credentials) => (credentials ?
@@ -59,16 +60,49 @@ const serialize = (store) => {
 
   return params;
 };
+
+const deserialize = (dispatch) => {
+  const params = new URLSearchParams(window.location.search);
+  if(params.has("search")) {
+    dispatch(newSearch(params.get("search")));
+  }
+  if(params.has("entities")) {
+    const entities = JSON.parse(params.get("entities"));
+    dispatch(newEntities(entities));
+    entities.map((it) => {
+      dispatch(filterEntity(it));
+    });
+  }
+  if(params.has("targeting")) {
+    const targeting = JSON.parse(params.get("targeting"));
+    dispatch(newTargets(targeting));
+    targeting.map((it) => {
+      dispatch(filterTarget(it));
+    });
+  }
+  if(params.has("advertiser")) {
+    const advertisers = JSON.parse(params.get("advertiser")).map((advertiser) => ({ advertiser }));
+    dispatch(newAdvertisers(advertisers));
+    advertisers.map((advertiser) => {
+      dispatch(filterAdvertiser(advertiser));
+    });
+  }
+};
+
+
 let loaded = false;
 const refresh = (store) => {
-  const url = "/facebook-ads/ads?";
+  const url = "/facebook-ads/ads";
   const dispatch = store.dispatch;
   const params = serialize(store, dispatch);
-  const path = `${url}${params.toString()}`;
+  let path = `${url}?${params.toString()}`;
   const cleanSearch = (new URLSearchParams(window.location.search)).toString();
   if(!loaded || (cleanSearch !== params.toString())) {
-    loaded = true;
-    history.pushState({}, "", window.location.pathname + '?' + params.toString());
+    if(!loaded) {
+      path = url + window.location.search;
+    } else {
+      history.pushState({}, "", window.location.pathname + '?' + params.toString());
+    }
     return fetch(path, {
       method: "GET",
       headers: headers(store.getState().credentials)
@@ -83,9 +117,9 @@ const refresh = (store) => {
         dispatch(newEntities(ads.entities));
         dispatch(newAdvertisers(ads.advertisers));
         dispatch(newTargets(ads.targets));
+        loaded = true;
       });
   }
 };
 
-
-export { headers, newAds, NEW_ADS, search, refresh, newSearch };
+export { headers, newAds, NEW_ADS, search, refresh, newSearch, deserialize };
