@@ -295,7 +295,8 @@ article {
       }
     }
     &:hover,
-    &:focus {
+    &:focus,
+    .active {
       display: block;
       cursor: default;
       .filter-title {
@@ -488,6 +489,7 @@ article {
   padding: 12px;
   margin: 0 auto;
   overflow: hidden;
+  border-radius: 4px;
 
   ._1dwg._1w_m {
     display: block;
@@ -500,38 +502,36 @@ article {
 }
 
 .message {
-  background-color: white;
   margin: 12px auto;
   border-radius: 4px;
   min-width: 308px;
   max-width: 500px;
-  border: 1px solid #dddfe2;
-  border-radius: 4px;
 }
 
 .targeting_info {
+  background-color: white;
+  padding: 0px 12px 12px;
+
   h3 {
     font-weight: bold;
     margin: 0 0 5px;
-    padding-left: 12px;
-    border-top: 1px solid #dddfe2;
   }
-}
 
-.targeting {
-  display: inline-block;
-  padding: 0 12px 12px;
-  b {
-    font-weight: bold;
+  .targeting {
+    b {
+      font-weight: bold;
+    }
   }
 }
 
 ._1dwg._1w_m { // Timeline ad wrapper div
   max-width: 500px;
+  border: 1px solid #dddfe2;
 }
 
 .ego_unit { // Sidebar ad wrapper div
   max-width: 308px;
+  border: 1px solid #dddfe2;
 }
 
 

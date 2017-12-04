@@ -17,6 +17,10 @@ const filterEntity = a(FILTER_ENTITY);
 const filterAdvertiser = a(FILTER_ADVERTISER);
 const filterTarget = a(FILTER_TARGET);
 
+// const toggleTarget = (arg) => ({ type: TOGGLE_TARGET });
+// const toggleAdvertiser = (arg) => ({ type: TOGGLE_ADVERTISER });
+// const toggleEntity = (arg) => ({ })
+
 
 const makeReducer = (plural, singular) => {
   return (state = [], action) => {
@@ -76,11 +80,10 @@ const Filter = ({ data, title, activate }) => (
           name={filter.key}
           checked={filter.active}
           key={filter.key}
-          onChange={(e) => {
-            e.preventDefault();
-            activate(filter);
-          }} />
-        <label htmlFor={filter.key}>{filter.key} ({filter.count})</label>
+          onChange={() => activate(filter)} />
+        <label
+          htmlFor={filter.key}
+          onClick={ () => activate(filter)}>{filter.key} ({filter.count})</label>
       </li>)}
     </fieldset>
   </div>

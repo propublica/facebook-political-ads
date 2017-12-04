@@ -8,6 +8,7 @@ import throttle from "lodash/throttle";
 import { Filters, entities, targets, advertisers } from 'filters.jsx';
 import { go, t } from 'i18n.js';
 import { lastPage, pageIndex, pageCount } from 'pagination.js';
+import { range } from 'lodash';
 
 const ads = (state = [], action) => {
   switch(action.type) {
@@ -39,16 +40,19 @@ const cleanTargeting = (html) => {
     .reduce((memo, it) => memo + it.outerHTML, '');
 };
 
+const Targeting = ({ targeting }) => (
+  <div className="targeting_info">
+    <h3>Targeting Information</h3>
+    <div
+      className="targeting"
+      dangerouslySetInnerHTML={{__html:cleanTargeting(targeting)}} />
+  </div>
+);
+
 const Ad = ({ ad }) => (
   <div className="message">
     <div dangerouslySetInnerHTML={{__html: ad.html}} />
-    <div className="targeting_info">
-      <h3>Targeting Information</h3>
-      {ad.targeting ?
-        <div
-          className="targeting"
-          dangerouslySetInnerHTML={{__html:cleanTargeting(ad.targeting)}} /> : ''}
-    </div>
+    {ad.targeting !== null ? <Targeting targeting={ad.targeting} /> : ''}
   </div>
 );
 
@@ -65,24 +69,35 @@ Term = connect(
   () => ({})
 )(Term);
 
-let Pagination = ({ pageIndex, prev, next }) => (
+let Pagination = ({ pageIndex, prev, next, set }) => (
   <nav className="pagination">
     <ul>
-      <li className="current">{pageIndex}</li>
+      <li><a href="" onClick={prev}>←</a></li>
+      {range(Math.max(0, pageIndex - 3), pageIndex + 3).map((i) => {
+        return (i === pageIndex ?
+          <li key={i} className="current">{pageIndex + 1}</li> :
+          <li key={i} ><a href="" onClick={(e) => set(e, i + 1)}>{i + 1}</a></li>);
+      })}
+      <li><a href="" onClick={next}>→</a></li>
     </ul>
   </nav>
 );
 Pagination = connect(
   (state) => state,
   (dispatch) => ({
-    prev: () => {
+    prev: (e) => {
+      e.preventDefault();
       dispatch(pageCount.pagePrev());
     },
     next: (e) => {
       e.preventDefault();
-      if (!store.getState().lastPage) {
+      if(!store.getState().lastPage) {
         dispatch(pageCount.pageNext());
       }
+    },
+    set: (e, i) => {
+      e.preventDefault();
+      dispatch(pageCount.setPage(i));
     }
   })
 )(Pagination);
