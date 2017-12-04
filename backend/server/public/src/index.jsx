@@ -3,7 +3,7 @@ import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
-import { NEW_ADS, search, refresh } from 'utils.js';
+import { NEW_ADS, search, refresh, newSearch } from 'utils.js';
 import throttle from "lodash/throttle";
 import { Filters, entities, targets, advertisers } from 'filters.jsx';
 import { go, t } from 'i18n.js';
@@ -50,7 +50,7 @@ let Term = ({ search, term, dispatch }) => (
     <button
       type="button"
       className={term === search ? "prefab current" : "prefab"}
-      onClick={() => dispatch(refresh(store, term)) }
+      onClick={() => dispatch(newSearch(term)) }
       value={term}>{term}</button>
   </li>
 );
@@ -70,13 +70,11 @@ Pagination = connect(
   (dispatch) => ({
     prev: () => {
       dispatch(pageCount.pagePrev());
-      refresh(store);
     },
     next: (e) => {
       e.preventDefault();
       if (!store.getState().lastPage) {
         dispatch(pageCount.pageNext());
-        refresh(store);
       }
     }
   })
@@ -111,7 +109,7 @@ App = connect(
     onKeyUp: throttle((e) => {
       e.preventDefault();
       dispatch(pageCount.pageClear());
-      dispatch(refresh(store, e.target.value.length ? e.target.value : null));
+      dispatch(newSearch(e.target.value.length ? e.target.value : null));
     }, 1000)
   })
 )(App);
@@ -123,5 +121,6 @@ go(() => {
     </Provider>,
     document.querySelector("#graphic")
   );
-  store.dispatch(refresh(store));
+  refresh(store);
+  store.subscribe(() => refresh(store));
 });
