@@ -210,6 +210,7 @@ impl AdServer {
                     );
                 }
             }
+            warn!("couldn't get {}", path);
             Ok(Response::new().with_status(StatusCode::NotFound))
         });
         Box::new(future)
