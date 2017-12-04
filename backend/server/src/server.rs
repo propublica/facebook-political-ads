@@ -23,7 +23,6 @@ use start_logging;
 use serde_json;
 use std::collections::HashMap;
 use std::env;
-use std::borrow::Cow;
 use std::error::Error as StdError;
 use std::io::ErrorKind as StdIoErrorKind;
 use std::io::Error as StdIoError;
