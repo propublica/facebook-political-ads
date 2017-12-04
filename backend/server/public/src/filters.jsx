@@ -20,10 +20,12 @@ const filterTarget = a(FILTER_TARGET);
 const TOGGLE_TARGET = 'toggle_target';
 const TOGGLE_ADVERTISER = 'toggle_advertiser';
 const TOGGLE_ENTITY = 'toggle_entity';
+const RESET_DROPDOWNS = 'reset_dropdowns';
 
 const toggleTarget = () => ({ type: TOGGLE_TARGET });
 const toggleAdvertiser = () => ({ type: TOGGLE_ADVERTISER });
 const toggleEntity = () => ({ type: TOGGLE_ENTITY });
+const resetDropdowns = () => ({ type: RESET_DROPDOWNS });
 
 const filters = (state = {}, action) => {
   switch(action.type) {
@@ -33,6 +35,8 @@ const filters = (state = {}, action) => {
     return { ...state, advertiser: !state.advertiser };
   case TOGGLE_ENTITY:
     return { ...state, entity: !state.entity };
+  case RESET_DROPDOWNS:
+    return {};
   default:
     return state;
   }
@@ -143,5 +147,6 @@ export {
   Filters, entities, advertisers, targets,
   newEntities, newAdvertisers, newTargets,
   serializeAdvertisers, serializeTargets, serializeEntities,
-  filterAdvertiser, filterEntity, filterTarget, filters
+  filterAdvertiser, filterEntity, filterTarget, filters,
+  resetDropdowns
 };

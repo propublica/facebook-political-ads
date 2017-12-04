@@ -5,7 +5,7 @@ import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
 import { NEW_ADS, search, refresh, newSearch, deserialize } from 'utils.js';
 import throttle from "lodash/throttle";
-import { Filters, entities, targets, advertisers, filters } from 'filters.jsx';
+import { Filters, entities, targets, advertisers, filters, resetDropdowns } from 'filters.jsx';
 import { go, t } from 'i18n.js';
 import { lastPage, pageIndex, pageCount } from 'pagination.js';
 import { range } from 'lodash';
@@ -98,8 +98,8 @@ Pagination = connect(
   })
 )(Pagination);
 
-let App = ({ads, onKeyUp, pageIndex, search}) => (
-  <div id="app">
+let App = ({ads, onKeyUp, pageIndex, search, onClick}) => (
+  <div id="app" onClick={onClick}>
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
     <form id="facebook-pac-browser">
       <fieldset className="prefabs">
@@ -128,7 +128,8 @@ App = connect(
       e.preventDefault();
       dispatch(pageCount.setPage(0));
       dispatch(newSearch(e.target.value.length ? e.target.value : null));
-    }, 1000)
+    }, 1000),
+    onClick: () => dispatch(resetDropdowns())
   })
 )(App);
 
