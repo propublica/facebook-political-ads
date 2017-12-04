@@ -3,7 +3,7 @@ import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
-import { NEW_ADS, search, refresh, newSearch } from 'utils.js';
+import { NEW_ADS, search, refresh, newSearch, deserialize } from 'utils.js';
 import throttle from "lodash/throttle";
 import { Filters, entities, targets, advertisers } from 'filters.jsx';
 import { go, t } from 'i18n.js';
@@ -121,6 +121,7 @@ go(() => {
     </Provider>,
     document.querySelector("#graphic")
   );
-  refresh(store);
-  store.subscribe(() => refresh(store));
+
+  deserialize(store.dispatch);
+  refresh(store).then(() => store.subscribe(() => refresh(store)));
 });
