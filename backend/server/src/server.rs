@@ -210,7 +210,6 @@ impl AdServer {
                     );
                 }
             }
-            warn!("couldn't get {}", path);
             Ok(Response::new().with_status(StatusCode::NotFound))
         });
         Box::new(future)
@@ -425,6 +424,11 @@ impl AdServer {
     pub fn start() {
         dotenv().ok();
         start_logging();
+
+        if let Ok(root) = env::var("ROOT") {
+            env::set_current_dir(&root).expect(&format!("Couldn't change directory to {}", root));
+        }
+
         let addr = env::var("HOST").expect("HOST must be set").parse().expect(
             "Error parsing HOST",
         );
