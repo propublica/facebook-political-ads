@@ -1,5 +1,5 @@
 import 'url-search-params-polyfill';
-import { isLastPage, notLastPage } from 'pagination.js';
+import { isLastPage, notLastPage, pageCount } from 'pagination.js';
 import {
   newAdvertisers, newEntities, newTargets,
   serializeAdvertisers, serializeTargets, serializeEntities,
@@ -66,6 +66,7 @@ const deserialize = (dispatch) => {
   if(params.has("search")) {
     dispatch(newSearch(params.get("search")));
   }
+
   if(params.has("entities")) {
     const entities = JSON.parse(params.get("entities"));
     dispatch(newEntities(entities));
@@ -73,6 +74,7 @@ const deserialize = (dispatch) => {
       dispatch(filterEntity(it));
     });
   }
+
   if(params.has("targeting")) {
     const targeting = JSON.parse(params.get("targeting"));
     dispatch(newTargets(targeting));
@@ -80,12 +82,17 @@ const deserialize = (dispatch) => {
       dispatch(filterTarget(it));
     });
   }
+
   if(params.has("advertiser")) {
     const advertisers = JSON.parse(params.get("advertiser")).map((advertiser) => ({ advertiser }));
     dispatch(newAdvertisers(advertisers));
     advertisers.map((advertiser) => {
       dispatch(filterAdvertiser(advertiser));
     });
+  }
+
+  if(params.has("page")) {
+    dispatch(pageCount.setPage(parseInt(params.get("page"), 10)));
   }
 };
 

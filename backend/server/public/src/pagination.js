@@ -1,6 +1,6 @@
 const PAGE_NEXT = 'page_next';
 const PAGE_PREV = 'page_prev';
-const PAGE_CLEAR = 'page_clear';
+const SET_PAGE = 'set_page';
 
 const pageCount = {
   pageNext() {
@@ -9,8 +9,8 @@ const pageCount = {
   pagePrev() {
     return { type: PAGE_PREV };
   },
-  pageClear() {
-    return { type: PAGE_CLEAR };
+  setPage(i) {
+    return { type: SET_PAGE, value: i};
   }
 };
 const IS_LAST_PAGE = 'is_last_page';
@@ -45,11 +45,11 @@ const pageIndex = (state = 0, action) => {
     } else {
       return 0;
     }
-  case PAGE_CLEAR:
-    return 0;
+  case SET_PAGE:
+    return action.value;
   default:
     return state;
   }
 };
 
-export { pageCount, lastPage, pageIndex, isLastPage, notLastPage} ;
+export { pageCount, lastPage, pageIndex, isLastPage, notLastPage };
