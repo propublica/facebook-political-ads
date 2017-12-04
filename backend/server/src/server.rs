@@ -23,7 +23,6 @@ use start_logging;
 use serde_json;
 use std::collections::HashMap;
 use std::env;
-use std::borrow::Cow;
 use std::error::Error as StdError;
 use std::io::ErrorKind as StdIoErrorKind;
 use std::io::Error as StdIoError;
@@ -104,9 +103,10 @@ impl Service for AdServer {
                 |request| self.mark_ad(request),
             )),
             // Public
-            (&Method::Get, "/facebook-ads/") => Either::B(self.lock_down(req, || {
-                self.get_file("public/index.html", ContentType::html())
-            })),
+            (&Method::Get, "/facebook-ads/") => Either::B(self.get_file(
+                "public/index.html",
+                ContentType::html(),
+            )),
             (&Method::Get, "/facebook-ads/index.js") => Either::B(self.get_file(
                 "public/dist/index.js",
                 ContentType(mime::TEXT_JAVASCRIPT),
@@ -174,30 +174,6 @@ macro_rules! spawn_with_clone {
 // method that works. I should ask on stack overflow or something.
 type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
 impl AdServer {
-    fn lock_down<F>(&self, req: Request, callback: F) -> ResponseFuture
-    where
-        F: Fn() -> ResponseFuture,
-    {
-        let lang = req.query().and_then(|q| {
-            form_urlencoded::parse(q.as_bytes())
-                .filter(|pair| pair.0 == Cow::Borrowed("lang"))
-                .map(|pair| pair.1.to_string())
-                .nth(0)
-        });
-
-
-        if let Some(lang) = lang.or(AdServer::get_lang_from_headers(req.headers())) {
-            if lang == "de-DE" || lang == "en-US" {
-                return callback();
-            }
-        }
-
-        Box::new(future::ok(
-            Response::new().with_status(StatusCode::Unauthorized),
-        ))
-    }
-
-
     fn auth<F>(&self, req: Request, callback: F) -> ResponseFuture
     where
         F: Fn(Request) -> ResponseFuture,
