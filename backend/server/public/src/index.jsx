@@ -5,7 +5,7 @@ import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
 import { NEW_ADS, search, refresh, newSearch, deserialize } from 'utils.js';
 import throttle from "lodash/throttle";
-import { Filters, entities, targets, advertisers, filters, resetDropdowns } from 'filters.jsx';
+import { Filters, entities, targets, advertisers, filters } from 'filters.jsx';
 import { go, t } from 'i18n.js';
 import { lastPage, pageIndex, pageCount } from 'pagination.js';
 import { range } from 'lodash';
@@ -69,7 +69,7 @@ let Pagination = ({ pageIndex, prev, next, set }) => (
   <nav className="pagination">
     <ul>
       <li><a href="" onClick={prev}>←</a></li>
-      {range(Math.max(0, pageIndex - 3), pageIndex + 3).map((i) => {
+      {range(Math.max(0, pageIndex - 3), pageIndex + 4).map((i) => {
         return (i === pageIndex ?
           <li key={i} className="current">{pageIndex + 1}</li> :
           <li key={i} ><a href="" onClick={(e) => set(e, i + 1)}>{i + 1}</a></li>);
