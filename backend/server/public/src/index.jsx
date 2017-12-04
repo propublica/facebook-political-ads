@@ -5,7 +5,7 @@ import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
 import { NEW_ADS, search, refresh } from 'utils.js';
 import throttle from "lodash/throttle";
-import { Filters } from 'filters.jsx';
+import { Filters, entities, targets, advertisers } from 'filters.jsx';
 import { go, t } from 'i18n.js';
 import { lastPage, pageIndex, pageCount } from 'pagination.js';
 
@@ -22,7 +22,10 @@ const reducer = combineReducers({
   ads,
   pageIndex,
   lastPage,
-  search
+  search,
+  entities,
+  advertisers,
+  targets
 });
 
 const middleware = [thunkMiddleware, createLogger()];

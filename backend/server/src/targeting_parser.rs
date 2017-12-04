@@ -3,7 +3,7 @@ use nom::IResult;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Targeting {
-    targeting_type: String,
+    target: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub segment: Option<String>,
 }
@@ -11,7 +11,7 @@ pub struct Targeting {
 impl Targeting {
     fn new(targeting: &str, segment: Option<&str>) -> Self {
         Targeting {
-            targeting_type: targeting.to_string(),
+            target: targeting.to_string(),
             segment: match segment {
                 Some(s) => Some(s.to_string()),
                 None => None,
