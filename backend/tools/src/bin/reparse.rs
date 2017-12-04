@@ -15,7 +15,7 @@ use futures_cpupool::CpuPool;
 use hyper::Client;
 use hyper_tls::HttpsConnector;
 use r2d2_diesel::ConnectionManager;
-use r2d2::{Pool, Config};
+use r2d2::Pool;
 use server::models::Ad;
 use server::start_logging;
 use std::env;
@@ -27,7 +27,6 @@ fn main() {
     start_logging();
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let config = Config::default();
     let manager = ConnectionManager::<PgConnection>::new(database_url);
     let db_pool = Pool::builder().build(manager).expect(
         "Failed to create pool.",
