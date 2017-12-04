@@ -22,7 +22,6 @@ fn main() {
         .load::<Ad>(&conn)
         .unwrap();
     for ad in dbads {
-        println!("{:?}", get_targets(ad.targeting.clone()));
         let document = kuchiki::parse_html().one(ad.html.clone());
         diesel::update(ads.find(ad.id))
             .set((
