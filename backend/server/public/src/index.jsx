@@ -30,7 +30,6 @@ const reducer = enableBatching(combineReducers({
 
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(applyMiddleware(...middleware)));
-const div = document.createElement('div');
 
 const Targeting = ({ targeting }) => (
   <div className="targeting_info">
@@ -60,7 +59,7 @@ let Term = ({ search, term, dispatch }) => (
 );
 Term = connect()(Term);
 
-let App = ({ads, onKeyUp, pageIndex, search}) => (
+let App = ({ads, onKeyUp, search}) => (
   <div id="app">
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
     <form id="facebook-pac-browser" onSubmit={(e) => e.preventDefault()}>
@@ -76,17 +75,17 @@ let App = ({ads, onKeyUp, pageIndex, search}) => (
     </form>
     <div className="facebook-pac-ads">
       {ads.length > 0 ?
-        <Pagination page={pageIndex} /> :
+        <Pagination /> :
         <p className="no_ads">No results for your query.</p>}
       <div id="ads">
         {ads.map((ad) => <Ad ad={ad} key={ad.id} />)}
       </div>
-      <Pagination page={pageIndex} />
+      <Pagination />
     </div>
   </div>
 );
 App = connect(
-  (state) => state,
+  ({ ads, search }) => ({ ads, search }),
   (dispatch) => ({
     onKeyUp: debounce((e) => {
       e.preventDefault();

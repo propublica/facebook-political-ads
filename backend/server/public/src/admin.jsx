@@ -4,7 +4,13 @@ import thunkMiddleware from 'redux-thunk';
 import persistState from 'redux-localstorage';
 import { Provider, connect } from 'preact-redux';
 import { createLogger } from 'redux-logger';
-import { headers, NEW_ADS, refresh, search, deserialize } from 'utils.js';
+import { headers, NEW_ADS, refresh, newSearch, search, enableBatching, deserialize } from 'utils.js';
+import { entities, targets, advertisers, filters } from 'filters.jsx';
+import { Pagination, pagination } from 'pagination.js';
+
+
+import { go } from 'i18n.js';
+
 import { debounce } from "lodash";
 
 const HIDE_AD = "hide_ad";
@@ -105,10 +111,17 @@ const ads = (state = [], action) => {
   }
 };
 
-const reducer = combineReducers({
-  credentials,
+const reducer = enableBatching(combineReducers({
   ads,
-});
+  search,
+  entities,
+  advertisers,
+  targets,
+  filters,
+  pagination,
+  credentials
+}));
+
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(...[persistState(), applyMiddleware(...middleware)]));
 
@@ -157,6 +170,7 @@ const Ad = ({ad, onClick}) => (
 let Ads = ({ads, onClick, onKeyUp}) => (
   <div id="ads">
     <input id="search" placeholder="Search for ads" onKeyUp={onKeyUp} />
+    <Pagination />
     {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} />)}
   </div>
 );
@@ -168,7 +182,7 @@ Ads = connect(
     onClick: (ad) => dispatch(suppressAd(ad)),
     onKeyUp: debounce((e) => {
       e.preventDefault();
-      dispatch(search(store, e.target.value.length ? e.target.value : null));
+      dispatch(newSearch(e.target.value.length ? e.target.value : null));
     }, 1000)
   })
 )(Ads);
@@ -194,11 +208,13 @@ let App = ({credentials}) => (
 );
 App = connect((state) => state)(App);
 
-
-render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.body
-);
-refresh(store);
+go(() => {
+  render(
+    <Provider store={store}>
+      <App />
+    </Provider>,
+    document.body
+  );
+  deserialize(store.dispatch);
+  refresh(store).then(() => store.subscribe(() => refresh(store)));
+});
