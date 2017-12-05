@@ -130,8 +130,9 @@ const refresh = (store, url = "/facebook-ads/ads") => {
     if(!loaded) {
       path = url + window.location.search;
     } else {
-      if(cleanSearch.get("page") === params.get("page"))
-        return dispatch(setPage(0));
+      if(cleanSearch.get("page") === params.get("page")) {
+        params.set("page", 0);
+      }
       let query = params.toString().length > 0 ? `?${params.toString()}` : '';
       history.pushState({}, "", `${window.location.pathname}${query}`);
     }
@@ -146,6 +147,7 @@ const refresh = (store, url = "/facebook-ads/ads") => {
           newAdvertisers(ads.advertisers),
           newTargets(ads.targets),
           setTotal(ads.total),
+          setPage(parseInt(params.get("page"), 0) || 0)
         ));
         loaded = true;
       });
