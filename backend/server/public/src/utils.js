@@ -1,5 +1,5 @@
 import 'url-search-params-polyfill';
-import { setTotal, setPage } from 'pagination.js';
+import { setTotal, setPage } from 'pagination.jsx';
 import {
   newAdvertisers, newEntities, newTargets,
   serializeAdvertisers, serializeTargets, serializeEntities,
