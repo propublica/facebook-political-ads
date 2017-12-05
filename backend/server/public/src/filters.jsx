@@ -76,6 +76,7 @@ const targets = makeReducer("targets", "target");
 
 const s = (plural, singular, map) => {
   return (params, state) => {
+    console.log(params, state);
     const items = state[plural]
       .filter((it) => it.active)
       .map((it) => map ? map(it[singular]) : it[singular]);
