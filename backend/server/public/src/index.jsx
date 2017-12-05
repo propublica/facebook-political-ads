@@ -75,7 +75,9 @@ let App = ({ads, onKeyUp, pageIndex, search}) => (
       <Filters />
     </form>
     <div className="facebook-pac-ads">
-      <Pagination page={pageIndex} />
+      {ads.length > 0 ?
+        <Pagination page={pageIndex} /> :
+        <p className="no_ads">No results for your query.</p>}
       <div id="ads">
         {ads.map((ad) => <Ad ad={ad} key={ad.id} />)}
       </div>

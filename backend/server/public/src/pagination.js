@@ -30,20 +30,18 @@ const pagination = (state = { page: 0, total: 0 }, action) => {
   }
 };
 
-let Pagination = ({ page, prev, next, set, total }) => {
-  if(total === 0) return (<p className="no_ads">No results for your query.</p>);
-  return (<nav className="pagination">
-    <ul>
-      { page > 0 ? <li><a href="" onClick={prev}>←</a></li> : ''}
-      {range(Math.max(0, page - 2), min({ page: page + 3, total: total })).map((i) => {
-        return (i === page ?
-          <li key={i} className="current">{page + 1}</li> :
-          <li key={i}><a href="" onClick={(e) => set(e, i)}>{i + 1}</a></li>);
-      })}
-      { page + 1 < total ? <li><a href="" onClick={next}>→</a></li> : ''}
-    </ul>
-  </nav>);
-};
+let Pagination = ({ page, prev, next, set, total }) => (<nav className="pagination">
+  <ul>
+    { page > 0 ? <li><a href="" onClick={prev}>←</a></li> : ''}
+    {range(Math.max(0, page - 2), min({ page: page + 3, total: total })).map((i) => {
+      return (i === page ?
+        <li key={i} className="current">{page + 1}</li> :
+        <li key={i}><a href="" onClick={(e) => set(e, i)}>{i + 1}</a></li>);
+    })}
+    { page + 1 < total ? <li><a href="" onClick={next}>→</a></li> : ''}
+  </ul>
+</nav>);
+
 Pagination = connect(
   ({ pagination }) => pagination,
   (dispatch) => ({
