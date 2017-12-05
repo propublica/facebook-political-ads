@@ -8,7 +8,7 @@ import { NEW_ADS, search, refresh, newSearch, deserialize, enableBatching } from
 import { debounce } from "lodash";
 import { Filters, entities, targets, advertisers, filters } from 'filters.jsx';
 import { go, t } from 'i18n.js';
-import { Pagination, pagination } from 'pagination.js';
+import { Pagination, pagination } from 'pagination.jsx';
 
 const ads = (state = [], action) => {
   switch(action.type) {

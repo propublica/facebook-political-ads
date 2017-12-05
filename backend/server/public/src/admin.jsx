@@ -7,7 +7,7 @@ import { Provider, connect } from 'react-redux';
 import { createLogger } from 'redux-logger';
 import { headers, NEW_ADS, refresh, newSearch, search, enableBatching, deserialize } from 'utils.js';
 import { entities, targets, advertisers, filters } from 'filters.jsx';
-import { Pagination, pagination } from 'pagination.js';
+import { Pagination, pagination } from 'pagination.jsx';
 
 
 import { go } from 'i18n.js';
