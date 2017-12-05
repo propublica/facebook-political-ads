@@ -575,6 +575,10 @@ article {
   }
 }
 
+._5mfr .img {
+  display: none;
+}
+
 .lock.img { // 'Public' globe
   display: inline-block;
   width: 12px;
@@ -587,6 +591,10 @@ article {
 
 .userContent { // Post text
   clear: both;
+}
+// emojis
+.userContent img, .mbs._6m6 img, ._6a img {
+  display: none;
 }
 
 .text_exposed_show { // Truncated post text
