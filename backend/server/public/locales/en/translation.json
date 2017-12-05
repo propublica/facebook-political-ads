@@ -4,5 +4,8 @@
   "target_audience": "Filter by targeting",
   "related_terms": "Filter by terms",
   "advertiser": "Filter by advertiser",
-  "search": "Search"
+  "search": "Search",
+  "Retargeting": "Lookalike Audience",
+  "Agency": "Data Broker",
+  "Segment": "Behavior"
 }
