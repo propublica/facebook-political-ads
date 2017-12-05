@@ -96,6 +96,7 @@ You can customize, for example font sizes, with `[lang]` and `[data-locale]` CSS
 * [Hjælp os med at kortlægge politiske reklamer på Facebook](https://www.information.dk/indland/2017/11/hjaelp-kortlaegge-politiske-reklamer-paa-facebook)
 * [Facebook Allowed Political Ads That Were Actually Scams and Malware](https://www.propublica.org/article/facebook-political-ads-malware-scams-misleading)
 * [Political Ads on Facebook](http://projects.propublica.org/facebook-ads/)
+* [Helfen Sie uns, verdeckte Polit-Werbung zu enttarnen](https://www.republik.ch/updates/polit-werbung-enttarnen)
 
 
 ## Where We Need Your Help
