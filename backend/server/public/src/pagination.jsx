@@ -1,5 +1,5 @@
-import { h } from 'preact';
-import { connect } from 'preact-redux';
+import React from 'react';
+import { connect } from 'react-redux';
 import { range } from 'lodash';
 
 const NEXT_PAGE = 'next_page';
@@ -41,7 +41,6 @@ let Pagination = ({ page, prev, next, set, total }) => (<nav className="paginati
     { page + 1 < total ? <li><a href="" onClick={next}>→</a></li> : ''}
   </ul>
 </nav>);
-
 Pagination = connect(
   ({ pagination }) => pagination,
   (dispatch) => ({
