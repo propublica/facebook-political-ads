@@ -1,8 +1,9 @@
-import { h, render } from 'preact';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import persistState from 'redux-localstorage';
-import { Provider, connect } from 'preact-redux';
+import { Provider, connect } from 'react-redux';
 import { createLogger } from 'redux-logger';
 import { headers, NEW_ADS, refresh, newSearch, search, enableBatching, deserialize } from 'utils.js';
 import { entities, targets, advertisers, filters } from 'filters.jsx';
@@ -209,7 +210,7 @@ let App = ({credentials}) => (
 App = connect((state) => state)(App);
 
 go(() => {
-  render(
+  ReactDOM.render(
     <Provider store={store}>
       <App />
     </Provider>,

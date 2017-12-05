@@ -1,7 +1,8 @@
-import { h, render } from 'preact';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
-import { Provider, connect } from 'preact-redux';
+import { Provider, connect } from 'react-redux';
 import { createLogger } from 'redux-logger';
 import { NEW_ADS, search, refresh, newSearch, deserialize, enableBatching } from 'utils.js';
 import { debounce } from "lodash";
@@ -95,7 +96,7 @@ App = connect(
 )(App);
 
 go(() => {
-  render(
+  ReactDOM.render(
     <Provider store={store}>
       <App />
     </Provider>,

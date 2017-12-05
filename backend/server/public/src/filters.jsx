@@ -1,5 +1,5 @@
-import { h } from 'preact';
-import { connect } from 'preact-redux';
+import React from 'react';
+import { connect } from 'react-redux';
 import { t } from 'i18n.js';
 
 const NEW_ENTITIES = 'new_entities';
