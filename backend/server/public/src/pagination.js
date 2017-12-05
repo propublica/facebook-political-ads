@@ -35,7 +35,7 @@ let Pagination = ({ page, prev, next, set, total }) => {
   return (<nav className="pagination">
     <ul>
       { page > 0 ? <li><a href="" onClick={prev}>←</a></li> : ''}
-      {range(Math.max(0, page - 2), min({ page: page + 3, total: total + 1 })).map((i) => {
+      {range(Math.max(0, page - 2), min({ page: page + 3, total: total })).map((i) => {
         return (i === page ?
           <li key={i} className="current">{page + 1}</li> :
           <li key={i}><a href="" onClick={(e) => set(e, i)}>{i + 1}</a></li>);

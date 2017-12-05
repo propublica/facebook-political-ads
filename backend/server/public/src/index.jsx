@@ -34,10 +34,9 @@ const div = document.createElement('div');
 
 const Targeting = ({ targeting }) => (
   <div className="targeting_info">
-    <h3>Targeting Information</h3>
     <div
       className="targeting"
-      dangerouslySetInnerHTML={{__html:targeting}} />
+      dangerouslySetInnerHTML={{__html:'<h3>Targeting Information</h3>' + targeting}} />
   </div>
 );
 
