@@ -119,18 +119,19 @@ const enableBatching = (reducer) => {
   };
 };
 
-
+// this is horrid, todo cleanup
 let loaded = false;
 const refresh = (store, url = "/facebook-ads/ads") => {
   const dispatch = store.dispatch;
   const params = serialize(store, dispatch);
   let path = `${url}?${params.toString()}`;
   const cleanSearch = (new URLSearchParams(window.location.search));
-
   if(!loaded || (cleanSearch.toString() !== params.toString())) {
     if(!loaded) {
       path = url + window.location.search;
     } else {
+      if(cleanSearch.get("page") === params.get("page"))
+        return dispatch(setPage(0));
       let query = params.toString().length > 0 ? `?${params.toString()}` : '';
       history.pushState({}, "", `${window.location.pathname}${query}`);
     }
