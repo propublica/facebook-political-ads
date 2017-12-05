@@ -68,7 +68,8 @@ const checkSponsor = (node) => {
       'Sponsorlu',
       'إعلان مُموَّل',
       'Sponsoreret',
-      'Sponsorizzata'
+      'Sponsorizzata',
+      'Chartered'      
     ].some((sponsor) => a.textContent === sponsor);
   });
 };
