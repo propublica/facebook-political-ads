@@ -69,8 +69,9 @@ const checkSponsor = (node) => {
       'إعلان مُموَّل',
       'Sponsoreret',
       'Sponsorizzata',
-      'Chartered'      
-    ].some((sponsor) => a.textContent === sponsor);
+      'Chartered'
+    ].some((sponsor) => a.textContent === sponsor ||
+           window.getComputedStyle(a, ':after').getPropertyValue('content') === sponsor);
   });
 };
 
