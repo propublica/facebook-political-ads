@@ -60,7 +60,9 @@ const cleanAd = (html) => {
 };
 
 const checkSponsor = (node) => {
-  return Array.from(node.querySelectorAll("a")).some((a) => {
+  return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some((a) => {
+    const text = a.textContent;
+    const style = window.getComputedStyle(a, ':after').getPropertyValue('content');
     return [
       'Sponsored',
       'Gesponsert',
@@ -70,8 +72,10 @@ const checkSponsor = (node) => {
       'Sponsoreret',
       'Sponsorizzata',
       'Chartered'
-    ].some((sponsor) => a.textContent === sponsor ||
-           window.getComputedStyle(a, ':after').getPropertyValue('content') === sponsor);
+    ].some((sponsor) => {
+      if(text === sponsor || style === `"${sponsor}"`) return true;
+      return false;
+    });
   });
 };
 
@@ -273,7 +277,7 @@ const timeline = (node) => {
   // Finally we have something to save.
   return getTimelineId(parent, {
     html: cleanAd(node.children[0].outerHTML),
-    created_at: (new Date()).valueOf()
+    created_at: (new Date()).toString()
   });
 };
 
@@ -299,7 +303,7 @@ const sidebar = (node) => {
   // Then we just need to send the cleaned ad
   return getSidebarId(parent, {
     html: cleanAd(node.outerHTML),
-    created_at: (new Date()).valueOf()
+    created_at: (new Date()).toString()
   });
 };
 
