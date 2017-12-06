@@ -60,7 +60,7 @@ let Term = ({ search, term, dispatch }) => (
 );
 Term = connect()(Term);
 
-let App = ({ads, onKeyUp, search}) => (
+let App = ({ads, onKeyUp, search }) => (
   <div id="app">
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
     <form id="facebook-pac-browser" onSubmit={(e) => e.preventDefault()}>
@@ -71,13 +71,13 @@ let App = ({ads, onKeyUp, search}) => (
             .map((term) => <Term key={term} search={search} term={term} />)}
         </ul>
       </fieldset>
-      <input type="search" id="search" placeholder={t("search")} onKeyUp={onKeyUp} value={search} />
+      <input type="search" id="search" placeholder={t("search")} onChange={onKeyUp} />
       <Filters />
     </form>
     <div className="facebook-pac-ads">
       {ads.length > 0 ?
         <Pagination /> :
-        <p className="no_ads">No results for your query.</p>}
+        <p className="no_ads">No ads found for {search}.</p>}
       <div id="ads">
         {ads.map((ad) => <Ad ad={ad} key={ad.id} />)}
       </div>
@@ -85,13 +85,15 @@ let App = ({ads, onKeyUp, search}) => (
     </div>
   </div>
 );
+const throttledDispatch = debounce((dispatch, input) => {dispatch(newSearch(input));}, 750);
+
 App = connect(
   ({ ads, search }) => ({ ads, search }),
   (dispatch) => ({
-    onKeyUp: debounce((e) => {
+    onKeyUp: (e) => {
       e.preventDefault();
-      dispatch(newSearch(e.target.value.length ? e.target.value : null));
-    }, 750)
+      throttledDispatch(dispatch, e.target.value.length ? e.target.value : null);
+    }
   })
 )(App);
 
