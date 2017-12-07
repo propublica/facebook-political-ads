@@ -13,7 +13,10 @@ chrome.runtime.onMessage.addListener((ads) => {
     const saving = ads.filter((ad) => !saved.has(ad.id)).map(adForRequest);
     const success = () => console.log("saved");
     const failure = (e) => console.log(e);
-    if(saving.length > 0) sendAds(saving, store.language || getBrowserLocale()).then(success, failure);
+    if(saving.length > 0) {
+      sendAds(saving, store.language || getBrowserLocale())
+        .then(success, failure);
+    }
   } catch(e) {
     console.log(e);
   }

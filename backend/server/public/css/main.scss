@@ -416,7 +416,7 @@ article {
     &:focus {
       color: white;
       background-color: $link-color;
-      border-color: $link-color;
+      border: 1px solid $link-color;
     }
   }
 }
@@ -458,6 +458,12 @@ article {
   p + p {
     margin-top: 6px;
   }
+  .no_ads {
+    text-align: center;
+    font-size: 16px;
+    padding: 16px;
+    font-weight: bold;
+  }
 }
 
 ._4uoz { // Targeting info
@@ -480,7 +486,11 @@ article {
 ._4-i0._26c5,
 ._4uor._52jw,
 ._4uou,
-._5lnf.uiOverlayFooter._5a8u._4866 { // Excess targeting info
+._5lnf.uiOverlayFooter._5a8u._4866,
+._4ubd._3tsq,
+.hidden_elem,
+._567v._3bw,
+._35sk { // Excess targeting info and video ads
   display: none;
 }
 
@@ -503,19 +513,19 @@ article {
 }
 
 .message {
-  margin: 12px auto;
+  margin: 12px auto 0;
   border-radius: 4px;
   min-width: 308px;
   max-width: 500px;
 }
 
 .targeting_info {
-  background-color: white;
-  padding: 12px;
-
+  max-width: 500px;
+  margin: 0 auto 12px;
   h3 {
     font-weight: bold;
-    margin: 0 0 5px;
+    padding-left: 12px;
+    margin-top: 6px;
   }
 
   .targeting {
@@ -575,6 +585,10 @@ article {
   }
 }
 
+._5mfr .img {
+  display: none;
+}
+
 .lock.img { // 'Public' globe
   display: inline-block;
   width: 12px;
@@ -587,6 +601,10 @@ article {
 
 .userContent { // Post text
   clear: both;
+}
+// emojis
+.userContent img, .mbs._6m6 img, ._6a img {
+  display: none;
 }
 
 .text_exposed_show { // Truncated post text

@@ -1,5 +1,5 @@
 import { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR } from 'parser';
-import throttle from 'lodash/throttle';
+import debounce from 'lodash/debounce';
 
 let running = false;
 const sendAds = function() {
@@ -25,5 +25,5 @@ const sendAds = function() {
   });
 };
 
-let a = new MutationObserver(throttle(sendAds, 1000));
+let a = new MutationObserver(debounce(sendAds, 1000));
 a.observe(document.body, {childList: true, subtree:true});

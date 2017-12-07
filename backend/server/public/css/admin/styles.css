@@ -114,3 +114,17 @@ img {
   border-radius: 0.3rem;
   border: 0.1rem solid #ddd;
 }
+
+.pagination {
+  display: block;
+  text-align: center;
+}
+
+.pagination li {
+  display: inline-block;
+}
+
+.pagination li a, .pagination .current {
+  padding: 0.5rem;
+  text-decoration: none;
+}

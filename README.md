@@ -1,6 +1,6 @@
 # Facebook Political Ad Collector
 
-This is the source code behind our project to collect political ads on Facebook. Built versions are available for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/) and [Chrome](https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl).
+This is the source code behind our project to collect political ads on Facebook. Built versions are available for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/) and [Chrome](https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl). You can browse the American ads we've collected at [ProPublica](http://projects.propublica.org/facebook-ads/), and the Australian ads over on the [Guardian's website](https://www.theguardian.com/technology/ng-interactive/2017/oct/25/revealed-how-australians-are-targeted-with-political-advertising-on-facebook).
 
 We're asking our readers to use this extension when they are browsing Facebook. While they are on Facebook a background script runs to collect ads they see. The extension shows those ads to users and asks them to decide whether or not a particular ad is political. Serverside, we use those ratings to train a naive bayes classifier that then automatically rates the other ads we've collected. The extension also asks the server for the most recent ads that the classifier thinks are political so that users can see political ads they haven't seen. We're careful to protect our user's privacy by not sending identifying information to our backend server.
 
@@ -94,6 +94,9 @@ You can customize, for example font sizes, with `[lang]` and `[data-locale]` CSS
 * [Adani posts weird video ad on Facebook to fend off Carmichael criticism](https://www.theguardian.com/business/2017/oct/21/adani-posts-weird-video-ad-on-facebook-to-fend-off-carmichael-criticism)
 * [How Malcolm Turnbull, GetUp and Adani are using Facebook ads to push their agenda](https://www.theguardian.com/technology/2017/oct/25/how-malcolm-turnbull-getup-and-adani-are-using-facebook-ads-to-push-their-agenda)
 * [Hjælp os med at kortlægge politiske reklamer på Facebook](https://www.information.dk/indland/2017/11/hjaelp-kortlaegge-politiske-reklamer-paa-facebook)
+* [Facebook Allowed Political Ads That Were Actually Scams and Malware](https://www.propublica.org/article/facebook-political-ads-malware-scams-misleading)
+* [Political Ads on Facebook](http://projects.propublica.org/facebook-ads/)
+* [Helfen Sie uns, verdeckte Polit-Werbung zu enttarnen](https://www.republik.ch/updates/polit-werbung-enttarnen)
 
 
 ## Where We Need Your Help
