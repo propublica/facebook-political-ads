@@ -64,6 +64,7 @@ pub struct ApiResponse {
     targets: Vec<Targets>,
     entities: Vec<Entities>,
     advertisers: Vec<Advertisers>,
+    total: i64,
 }
 
 impl Service for AdServer {
@@ -266,14 +267,18 @@ impl AdServer {
             let advertisers =
                 spawn_with_clone!(pool; lang, db_pool, options;
                                   Advertisers::get(&lang, &db_pool, &options));
+            let total =
+                spawn_with_clone!(pool; lang, db_pool, options;
+                                          Ad::get_total(&lang, &db_pool, &options));
 
-            let future = ads.join4(targets, entities, advertisers)
-                .map(|(ads, targeting, entities, advertisers)| {
+            let future = ads.join5(targets, entities, advertisers, total)
+                .map(|(ads, targeting, entities, advertisers, total)| {
                     serde_json::to_string(&ApiResponse {
                         ads: ads,
                         targets: targeting,
                         entities: entities,
                         advertisers: advertisers,
+                        total: total,
                     }).map(|serialized| {
                         Response::new()
                             .with_header(ContentLength(serialized.len() as u64))
@@ -424,6 +429,11 @@ impl AdServer {
     pub fn start() {
         dotenv().ok();
         start_logging();
+
+        if let Ok(root) = env::var("ROOT") {
+            env::set_current_dir(&root).expect(&format!("Couldn't change directory to {}", root));
+        }
+
         let addr = env::var("HOST").expect("HOST must be set").parse().expect(
             "Error parsing HOST",
         );

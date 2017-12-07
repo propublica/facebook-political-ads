@@ -1,5 +1,5 @@
-import { h } from 'preact';
-import { connect } from 'preact-redux';
+import React from 'react';
+import { connect } from 'react-redux';
 import { t } from 'i18n.js';
 
 const NEW_ENTITIES = 'new_entities';
@@ -20,10 +20,12 @@ const filterTarget = a(FILTER_TARGET);
 const TOGGLE_TARGET = 'toggle_target';
 const TOGGLE_ADVERTISER = 'toggle_advertiser';
 const TOGGLE_ENTITY = 'toggle_entity';
+const RESET_DROPDOWNS = 'reset_dropdowns';
 
 const toggleTarget = () => ({ type: TOGGLE_TARGET });
 const toggleAdvertiser = () => ({ type: TOGGLE_ADVERTISER });
 const toggleEntity = () => ({ type: TOGGLE_ENTITY });
+const resetDropdowns = () => ({ type: RESET_DROPDOWNS });
 
 const filters = (state = {}, action) => {
   switch(action.type) {
@@ -33,6 +35,8 @@ const filters = (state = {}, action) => {
     return { ...state, advertiser: !state.advertiser };
   case TOGGLE_ENTITY:
     return { ...state, entity: !state.entity };
+  case RESET_DROPDOWNS:
+    return {};
   default:
     return state;
   }
@@ -90,17 +94,19 @@ const Filter = ({ data, title, activate, toggle, active }) => (
   <div className={ active ? "active filter" : "filter" }>
     <h3 className="filter-title" onClick={toggle}>{title}</h3>
     <fieldset className="filter-options">
-      {data.map((filter) => <li key={filter.key + "-li"}>
-        <input
-          type="checkbox"
-          name={filter.key}
-          checked={filter.active}
-          key={filter.key}
-          onChange={() => activate(filter)} />
-        <label
-          htmlFor={filter.key}
-          onClick={ () => activate(filter)}>{filter.key} ({filter.count})</label>
-      </li>)}
+      <ul>
+        {data.map((filter) => <li key={filter.key + "-li"}>
+          <input
+            type="checkbox"
+            name={filter.key}
+            checked={filter.active}
+            key={filter.key}
+            onChange={() => activate(filter)} />
+          <label
+            htmlFor={filter.key}
+            onClick={() => activate(filter)}>{t(filter.key)} ({filter.count})</label>
+        </li>)}
+      </ul>
     </fieldset>
   </div>
 );
@@ -141,5 +147,6 @@ export {
   Filters, entities, advertisers, targets,
   newEntities, newAdvertisers, newTargets,
   serializeAdvertisers, serializeTargets, serializeEntities,
-  filterAdvertiser, filterEntity, filterTarget, filters
+  filterAdvertiser, filterEntity, filterTarget, filters,
+  resetDropdowns
 };

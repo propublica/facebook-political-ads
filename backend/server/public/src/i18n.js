@@ -12,6 +12,9 @@ const go = (cb) => i18.init({
   fallbackLng: 'en',
   backend: {
     loadPath: '/facebook-ads/locales/{{lng}}/{{ns}}.json'
+  },
+  detection: {
+    caches: []
   }
 }, (err, t_) => {
   _ = t_;

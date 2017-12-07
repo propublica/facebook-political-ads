@@ -1,11 +1,18 @@
-import { h, render } from 'preact';
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import persistState from 'redux-localstorage';
-import { Provider, connect } from 'preact-redux';
+import { Provider, connect } from 'react-redux';
 import { createLogger } from 'redux-logger';
-import { headers, NEW_ADS, refresh, search } from 'utils.js';
-import throttle from "lodash/throttle";
+import { headers, NEW_ADS, refresh, newSearch, search, enableBatching, deserialize } from 'utils.js';
+import { entities, targets, advertisers, filters } from 'filters.jsx';
+import { Pagination, pagination } from 'pagination.jsx';
+
+
+import { go } from 'i18n.js';
+
+import { debounce } from "lodash";
 
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
@@ -105,10 +112,17 @@ const ads = (state = [], action) => {
   }
 };
 
-const reducer = combineReducers({
-  credentials,
+const reducer = enableBatching(combineReducers({
   ads,
-});
+  search,
+  entities,
+  advertisers,
+  targets,
+  filters,
+  pagination,
+  credentials
+}));
+
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(...[persistState(), applyMiddleware(...middleware)]));
 
@@ -145,10 +159,9 @@ const Ad = ({ad, onClick}) => (
       </tr>
       <tr>
         <td colSpan="2">
-          {ad.suppressed ? "Suppressed" :
-            <button onClick={function() { return onClick(ad); }}>
+          {ad.suppressed ? "Suppressed" : <button onClick={function() { return onClick(ad); }}>
               Suppress
-            </button>}
+          </button>}
         </td>
       </tr>
     </table>
@@ -158,19 +171,21 @@ const Ad = ({ad, onClick}) => (
 let Ads = ({ads, onClick, onKeyUp}) => (
   <div id="ads">
     <input id="search" placeholder="Search for ads" onKeyUp={onKeyUp} />
+    <Pagination />
     {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} />)}
   </div>
 );
+const throttledDispatch = debounce((dispatch, input) => {dispatch(newSearch(input));}, 750);
 Ads = connect(
   (state) => ({
     ads: state.ads.filter((ad) => !ad.suppressed)
   }),
   (dispatch) => ({
     onClick: (ad) => dispatch(suppressAd(ad)),
-    onKeyUp: throttle((e) => {
+    onKeyUp: (e) => {
       e.preventDefault();
-      dispatch(search(store, e.target.value.length ? e.target.value : null));
-    }, 1000)
+      throttledDispatch(dispatch, e.target.value.length ? e.target.value : null);
+    }
   })
 )(Ads);
 
@@ -195,11 +210,13 @@ let App = ({credentials}) => (
 );
 App = connect((state) => state)(App);
 
-
-render(
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  document.body
-);
-refresh(store);
+go(() => {
+  ReactDOM.render(
+    <Provider store={store}>
+      <App />
+    </Provider>,
+    document.body
+  );
+  deserialize(store.dispatch);
+  refresh(store).then(() => store.subscribe(() => refresh(store)));
+});
