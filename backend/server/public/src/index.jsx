@@ -60,7 +60,7 @@ let Term = ({ search, term, dispatch }) => (
 );
 Term = connect()(Term);
 
-let App = ({ads, onKeyUp, search }) => (
+let App = ({ ads, onKeyUp, search }) => (
   <div id="app">
     <p dangerouslySetInnerHTML={{__html: t("guff")}} />
     <form id="facebook-pac-browser" onSubmit={(e) => e.preventDefault()}>
@@ -71,7 +71,7 @@ let App = ({ads, onKeyUp, search }) => (
             .map((term) => <Term key={term} search={search} term={term} />)}
         </ul>
       </fieldset>
-      <input type="search" id="search" placeholder={t("search")} onChange={onKeyUp} />
+      <input type="search" id="search" placeholder={t("search")} onChange={onKeyUp} search={search} />
       <Filters />
     </form>
     <div className="facebook-pac-ads">
@@ -81,7 +81,7 @@ let App = ({ads, onKeyUp, search }) => (
       <div id="ads">
         {ads.map((ad) => <Ad ad={ad} key={ad.id} />)}
       </div>
-      <Pagination />
+      {ads.length > 0 ? <Pagination /> : ''}
     </div>
   </div>
 );

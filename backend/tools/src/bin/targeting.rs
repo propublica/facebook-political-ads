@@ -18,7 +18,7 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let conn = PgConnection::establish(&database_url).unwrap();
     let dbads: Vec<Ad> = ads.order(created_at.desc())
-        .filter(political_probability.gt(0.70))
+        //.filter(political_probability.gt(0.70))
         .filter(suppressed.eq(false))
         .load::<Ad>(&conn)
         .unwrap();

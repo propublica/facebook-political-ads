@@ -521,7 +521,6 @@ pub fn get_advertiser(targeting: Option<String>, document: &kuchiki::NodeRef) ->
     }
 }
 
-
 #[derive(Insertable)]
 #[table_name = "ads"]
 pub struct NewAd<'a> {
