@@ -31,7 +31,9 @@ def classify(ctx, newest, lang):
         if lang:
             query = query + " and lang = '{}'".format(lang)
         else:
-            langs = ','.join(classifiers.keys())
+            langs = map(lambda x: "'{}'".format(x), classifiers.keys())
+            langs = ','.join(langs)
+
             query = query + " and lang in ({})".format(langs)
     else:
         print("Running every")
