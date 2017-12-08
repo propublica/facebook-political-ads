@@ -6,25 +6,25 @@ authors = ["Jeff Larson <thejefflarson@gmail.com>"]
 [dependencies]
 chrono = { version = "^0.4.0", features = ["serde"] }
 diesel = { version = "^0.99", features = ["chrono", "postgres", "serde_json", "large-tables"] }
-diesel_infer_schema = { version = "0.99.0", features = ["postgres"] }
+diesel_infer_schema = { version = "^0.99.0", features = ["postgres"] }
 diesel_full_text_search = "^0.99.0"
 dotenv = "^0.10.1"
 error-chain = "^0.11.0"
 futures = "^0.1.17"
 futures-cpupool = "^0.1.5"
-hyper = "^0.11.2"
+hyper = "^0.11.8"
 hyper-tls = "^0.1.2"
-jsonwebtoken = "^2.0.3"
+jsonwebtoken = "^4.0.0"
 kuchiki = "^0.6.0"
 log = "^0.3.8"
 log4rs = "^0.7.0"
 nom = "3.2.1"
 r2d2 = "^0.8"
 r2d2-diesel = "^0.99.0"
-rusoto_core = "0.28.0"
-rusoto_credential = "0.8.0"
-rusoto_s3 = "0.28.0"
-serde = "^1.0.19"
+rusoto_core = "^0.30.0"
+rusoto_credential = "0.9.2"
+rusoto_s3 = "^0.30.0"
+serde = "^1.0.23"
 serde_json = "^1.0.6"
 serde_derive = "^1.0.21"
 tokio-core = "^0.1.10"
