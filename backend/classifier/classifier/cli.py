@@ -19,6 +19,7 @@ def cli(ctx, base):
     """
     ctx.obj["base"] = click.format_filename(base)
 
+
 cli.add_command(classify)
 cli.add_command(build)
 cli.add_command(diagnostics)

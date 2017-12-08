@@ -10,7 +10,6 @@ import records
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
@@ -19,23 +18,31 @@ from sqlalchemy.sql import text
 DB = records.Database()
 CLASSIFIER = "MultinomialNB"
 
+
 def equalize_classes(predictor, response):
     """
     Equalize classes in training data for better representation.
     """
     return SMOTE().fit_sample(predictor, response)
 
+
 def get_vectorizer(conf):
     """
-    Return a HashingVectorizer, which we're using so that we don't need to serialize one.
+    Return a HashingVectorizer, which we're using so that we don't
+    need to serialize one.
     """
-    return HashingVectorizer(alternate_sign=False, n_features=conf["n_features"])
+    return HashingVectorizer(
+        alternate_sign=False,
+        n_features=conf["n_features"]
+    )
+
 
 def get_classifier():
     """
     Return a classifier instance
     """
     return get_classifiers()[CLASSIFIER]
+
 
 def get_classifiers():
     """
@@ -46,6 +53,7 @@ def get_classifiers():
         "LogisticRegression": LogisticRegression(),
         "RandomForest": RandomForestClassifier()
     }
+
 
 def train_classifier(classifier, vectorizer, base, language):
     """
@@ -70,11 +78,13 @@ def train_classifier(classifier, vectorizer, base, language):
     print(classification_report(y_test, classifier.predict(x_test)))
     return classifier
 
+
 def classifier_path(base):
     """
     Return the path to our serialized classifier
     """
     return os.path.join(base, "classifier.dill")
+
 
 def get_html_text(html):
     """
@@ -86,6 +96,7 @@ def get_html_text(html):
 
     return ""
 
+
 def get_targets(html):
     """
     Return bolded targeting parameters
@@ -96,6 +107,7 @@ def get_targets(html):
 
     return ""
 
+
 def get_profile_links(html):
     """
     Return the links in an ad.
@@ -103,9 +115,11 @@ def get_profile_links(html):
     if html:
         doc = BeautifulSoup(html, "html.parser")
         return " ".join([a["href"] for a in
-                         doc.find_all('a', href=True) if "facebook.com" in a["href"]])
+                         doc.find_all('a', href=True)
+                         if "facebook.com" in a["href"]])
 
     return ""
+
 
 def get_text(advert):
     """
@@ -115,24 +129,30 @@ def get_text(advert):
                      get_targets(advert["targeting"]),
                      get_profile_links(advert["html"])])
 
+
 def confs(base):
     """
     Read all the configuration files for our various supported languages.
     """
     for directory in glob(os.path.join(base, "*/")):
-        with open(os.path.join(directory, "classifier_config.json"), 'r') as conf:
+        config = os.path.join(directory, "classifier_config.json")
+        with open(config, 'r') as conf:
             yield (directory, json.load(conf))
+
 
 def entities_confs(base):
     """
-    Read all the entity configuration files for our various supported languages.
+    Read all the entity configuration files for our various supported
+    languages.
     """
     for directory in glob(os.path.join(base, "*/")):
         if os.path.isfile(os.path.join(directory, "entities_config.json")):
-            with open(os.path.join(directory, "entities_config.json"), 'r') as conf:
+            config = os.path.join(directory, "entities_config.json")
+            with open(config, 'r') as conf:
                 yield (directory, json.load(conf))
         else:
             yield (directory, False)
+
 
 def load_ads_from_psql(lang):
     """

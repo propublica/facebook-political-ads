@@ -168,17 +168,18 @@ const Ad = ({ad, onClick}) => (
   </div>
 );
 
-let Ads = ({ads, onClick, onKeyUp}) => (
+let Ads = ({ ads, onClick, onKeyUp, search }) => (
   <div id="ads">
-    <input id="search" placeholder="Search for ads" onKeyUp={onKeyUp} />
+    <input id="search" placeholder="Search for ads" onKeyUp={onKeyUp} search={search} />
     <Pagination />
     {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} />)}
   </div>
 );
 const throttledDispatch = debounce((dispatch, input) => {dispatch(newSearch(input));}, 750);
 Ads = connect(
-  (state) => ({
-    ads: state.ads.filter((ad) => !ad.suppressed)
+  ({ ads, search }) => ({
+    ads: ads.filter((ad) => !ad.suppressed),
+    search
   }),
   (dispatch) => ({
     onClick: (ad) => dispatch(suppressAd(ad)),
