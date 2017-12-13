@@ -28,6 +28,21 @@ const newAds = (ads) => ({
   value: ads
 });
 
+const SET_LANG = "set_lang";
+const setLang = (lang) => ({
+  type: SET_LANG,
+  value: lang
+});
+
+const lang = (state = null, action) => {
+  switch(action.type) {
+  case SET_LANG:
+    return action.value;
+  default:
+    return state;
+  }
+};
+
 const NEW_SEARCH = "new_search";
 const newSearch = (query) => ({
   type: NEW_SEARCH,
@@ -56,6 +71,10 @@ const serialize = (store) => {
 
   if(state.pagination.page) {
     params.set("page", state.pagination.page);
+  }
+
+  if(state.lang) {
+    params.set("lang", state.lang);
   }
 
   return params;
@@ -94,6 +113,10 @@ const deserialize = (dispatch) => {
 
   if(params.has("page")) {
     actions.push(setPage(parseInt(params.get("page"), 10)));
+  }
+
+  if(params.has("lang")) {
+    actions.push(setLang(params.get("lang")));
   }
 
   dispatch(batch(...actions));
@@ -154,4 +177,4 @@ const refresh = (store, url = "/facebook-ads/ads") => {
   }
 };
 
-export { headers, newAds, NEW_ADS, search, refresh, newSearch, deserialize, enableBatching };
+export { headers, newAds, NEW_ADS, search, refresh, newSearch, deserialize, enableBatching, lang };
