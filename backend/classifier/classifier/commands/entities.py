@@ -6,7 +6,7 @@ import json
 from bs4 import BeautifulSoup
 import click
 import spacy
-import en_core_web_lg
+import en_core_web_sm
 from classifier.utilities import DB, entities_confs
 
 # from LAWhttps://spacy.io/usage/linguistic-features#section-named-entities
@@ -32,7 +32,7 @@ def entities(ctx):
             lang = directory.split('/')[1]
 
             print("running entity extraction for %s" % lang)
-            nlp = en_core_web_lg.load()
+            nlp = en_core_web_sm.load()
             ads = DB.query("select * from ads where political_probability > 0.70 and lang = '%s' and entities = '[]'::jsonb" % lang)
             query = "update ads set entities=:entities where id=:id"
             updates = []
