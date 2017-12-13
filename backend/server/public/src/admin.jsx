@@ -5,7 +5,10 @@ import thunkMiddleware from 'redux-thunk';
 import persistState from 'redux-localstorage';
 import { Provider, connect } from 'react-redux';
 import { createLogger } from 'redux-logger';
-import { headers, NEW_ADS, refresh, newSearch, search, enableBatching, deserialize } from 'utils.js';
+import {
+  headers, NEW_ADS, refresh, newSearch, search,
+  enableBatching, deserialize, lang
+} from 'utils.js';
 import { entities, targets, advertisers, filters } from 'filters.jsx';
 import { Pagination, pagination } from 'pagination.jsx';
 
@@ -120,11 +123,12 @@ const reducer = enableBatching(combineReducers({
   targets,
   filters,
   pagination,
-  credentials
+  credentials,
+  lang
 }));
 
 const middleware = [thunkMiddleware, createLogger()];
-const store = createStore(reducer, compose(...[persistState(), applyMiddleware(...middleware)]));
+const store = createStore(reducer, compose(...[persistState("credentials"), applyMiddleware(...middleware)]));
 
 const Ad = ({ad, onClick}) => (
   <div className="ad">
