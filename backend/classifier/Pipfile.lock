@@ -9,9 +9,9 @@
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
-            "platform_release": "17.2.0",
+            "platform_release": "17.3.0",
             "platform_system": "Darwin",
-            "platform_version": "Darwin Kernel Version 17.2.0: Fri Sep 29 18:27:05 PDT 2017; root:xnu-4570.20.62~3/RELEASE_X86_64",
+            "platform_version": "Darwin Kernel Version 17.3.0: Thu Nov  9 18:09:22 PST 2017; root:xnu-4570.31.3~1/RELEASE_X86_64",
             "python_full_version": "3.6.2",
             "python_version": "3.6",
             "sys_platform": "darwin"
@@ -119,10 +119,10 @@
         },
         "html5lib": {
             "hashes": [
-                "sha256:b8934484cf22f1db684c0fae27569a0db404d0208d20163fbf51cc537245d008",
-                "sha256:ee747c0ffd3028d2722061936b5c65ee4fe13c8e4613519b4447123fc4546298"
+                "sha256:20b159aa3badc9d5ee8f5c647e5efd02ed2a66ab8d354930bd9ff139fc1dc0a3",
+                "sha256:66cb0dcfdbbc4f9c3ba1a63fdb511ffdbd4f513b2b6d81b80cd26ce6b3fb3736"
             ],
-            "version": "==0.999999999"
+            "version": "==1.0.1"
         },
         "idna": {
             "hashes": [
@@ -133,10 +133,10 @@
         },
         "imbalanced-learn": {
             "hashes": [
-                "sha256:a10c52cdf027c66405dce7f88efffa19b9c0b75fa2c647a78bf3fc8278a16708",
-                "sha256:5dfd6773b5f5e067ebcc6b032907ce721227a2f2eb0b684f3b169c65a10b5257"
+                "sha256:c75d21d4a3b57dbb9cb1df73d8e61b59ac2172e09ab91f38b8094ce99e9566b7",
+                "sha256:01240921b36cf7c1f98b57259799d9c52760d6a9c9cf1a5792d86f9d33a8e648"
             ],
-            "version": "==0.3.1"
+            "version": "==0.3.2"
         },
         "jdcal": {
             "hashes": [
@@ -203,10 +203,10 @@
         },
         "odfpy": {
             "hashes": [
-                "sha256:6db9bb1c9ea2d55d60e508a1318fd285442a8342b785704ea08598a260875a83",
-                "sha256:6f8163f8464868cff9421a058f25566e41d73c8f7e849c021b86630941b44366"
+                "sha256:ab1d67311b3c42dfad1063692c419c137fd6d5a6f0c6380d13758c2593a2b8c9",
+                "sha256:6bcaf3b23aa9e49ed8c8c177266539b211add4e02402748a994451482a10cb1b"
             ],
-            "version": "==1.3.5"
+            "version": "==1.3.6"
         },
         "openpyxl": {
             "hashes": [
@@ -401,9 +401,9 @@
         },
         "spacy": {
             "hashes": [
-                "sha256:5afe364a5f48cd7a7a9346db18ed3232147f3ae3722d3dabdc3dd2e86ea9944a"
+                "sha256:4a47371b50232a1fa05f50cb83da4cc04a857dd0941e5d4f90fa8778e8c00e15"
             ],
-            "version": "==2.0.3"
+            "version": "==2.0.5"
         },
         "sqlalchemy": {
             "hashes": [
@@ -425,9 +425,9 @@
         },
         "thinc": {
             "hashes": [
-                "sha256:28d06bc0e6d921cab2dd6197249c3aed15b2563c0e4166a9970d4f409dab1e81"
+                "sha256:9a1deb850285f76efaf0ae38b605a137a3978826282cc57dcc1e66b779402a76"
             ],
-            "version": "==6.10.1"
+            "version": "==6.10.2"
         },
         "toolz": {
             "hashes": [
@@ -437,10 +437,10 @@
         },
         "tqdm": {
             "hashes": [
-                "sha256:733ce813ab83e17a03da34043c6265e29f6731e3cbbbe305b12694ced0af6770",
-                "sha256:7ca803c2ea268c6bdb541e2dac74a3af23cf4bf7b4132a6a78926d255f8c8df1"
+                "sha256:4c041f8019f7be65b8028ddde9a836f7ccc51c4637f1ff2ba9b5813d38d19d5a",
+                "sha256:df32e6f127dc0ccbc675eadb33f749abbcb8f174c5cb9ec49c0cdb73aa737377"
             ],
-            "version": "==4.19.4"
+            "version": "==4.19.5"
         },
         "ujson": {
             "hashes": [
