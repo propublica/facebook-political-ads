@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "93d6ea4d7c2908c3193d1431787971655b24541cd4e59efe598702a41856e38c"
+            "sha256": "590f90fa6eee58500af6406fe73e467f322605d8b38320d9879106df26894244"
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
@@ -95,8 +95,8 @@
             ],
             "version": "==0.6.2"
         },
-        "en-core-web-lg": {
-            "file": "https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-2.0.0/en_core_web_lg-2.0.0.tar.gz"
+        "en-core-web-sm": {
+            "file": "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz"
         },
         "et-xmlfile": {
             "hashes": [
