@@ -18,3 +18,4 @@ classifier.json
 Dockerfile
 .sass-cache
 __pycache__
+*.pyc

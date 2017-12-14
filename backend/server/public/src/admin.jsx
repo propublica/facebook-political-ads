@@ -162,6 +162,22 @@ const Ad = ({ad, onClick}) => (
         </td>
       </tr>
       <tr>
+        <td>
+          likelihood
+        </td>
+        <td>
+          {ad.political_probability}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          impressions
+        </td>
+        <td>
+          {ad.impressions}
+        </td>
+      </tr>
+      <tr>
         <td colSpan="2">
           {ad.suppressed ? "Suppressed" : <button onClick={function() { return onClick(ad); }}>
               Suppress
