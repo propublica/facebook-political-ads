@@ -156,14 +156,15 @@ const refresh = (store, url = "/facebook-ads/ads") => {
       if(cleanSearch.get("page") === params.get("page")) {
         params.delete("page");
       }
-      let query = params.toString().length > 0 ? `?${params.toString()}` : '';
-      history.pushState({}, "", `${window.location.pathname}${query}`);
     }
+    let query = params.toString().length > 0 ? `?${params.toString()}` : '';
     return fetch(path, {
       method: "GET",
       headers: headers(store.getState().credentials)
     }).then((res) => res.json())
       .then((ads) => {
+        if(!loaded)
+          history.pushState({}, "", `${window.location.pathname}${query}`);
         dispatch(batch(
           newAds(ads.ads),
           newEntities(ads.entities),
