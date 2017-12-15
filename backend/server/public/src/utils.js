@@ -170,7 +170,8 @@ const refresh = (store, url = "/facebook-ads/ads") => {
           newAdvertisers(ads.advertisers),
           newTargets(ads.targets),
           setTotal(ads.total),
-          setPage(parseInt(params.get("page"), 0) || 0)
+          setPage(parseInt(params.get("page"), 0) || 0),
+          setLang(params.get("lang") || "en-US")
         ));
         loaded = true;
       });
