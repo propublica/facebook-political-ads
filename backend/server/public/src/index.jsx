@@ -4,7 +4,7 @@ import { applyMiddleware, combineReducers, compose, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import { Provider, connect } from 'react-redux';
 import { createLogger } from 'redux-logger';
-import { NEW_ADS, search, refresh, newSearch, deserialize, enableBatching } from 'utils.js';
+import { NEW_ADS, search, refresh, newSearch, deserialize, enableBatching, lang } from 'utils.js';
 import { debounce } from "lodash";
 import { Filters, entities, targets, advertisers, filters } from 'filters.jsx';
 import { go, t } from 'i18n.js';
@@ -26,7 +26,8 @@ const reducer = enableBatching(combineReducers({
   advertisers,
   targets,
   filters,
-  pagination
+  pagination,
+  lang
 }));
 
 const middleware = [thunkMiddleware, createLogger()];

@@ -10,16 +10,9 @@ const auth = (credentials) => (credentials ?
   {"Authorization": `Bearer ${credentials.token}`} :
   {});
 
-const headers = (credentials) => Object.assign({}, auth(credentials), language());
+const headers = (credentials, lang) => Object.assign({}, auth(credentials), language(lang));
 
-const language = () => {
-  const params = new URLSearchParams(location.search);
-  if(params.get("lang")) {
-    return {"Accept-Language": params.get("lang") + ";q=1.0"};
-  } else if(!["en-US", "de-DE"].includes(navigator.langage)) {
-    return {"Accept-Language": "en-US;q=1.0"};
-  }
-};
+const language = (lang) => ({"Accept-Language": lang + ";q=1.0"});
 
 const NEW_ADS = "new_ads";
 
@@ -37,7 +30,7 @@ const setLang = (lang) => ({
 const lang = (state = null, action) => {
   switch(action.type) {
   case SET_LANG:
-    return action.value;
+    return ['en-US', 'de-DE'].includes(action.value) ? action.value : 'en-US';
   default:
     return state;
   }
@@ -73,7 +66,7 @@ const serialize = (store) => {
     params.set("page", state.pagination.page);
   }
 
-  if(state.lang) {
+  if(state.lang === 'de-DE') {
     params.set("lang", state.lang);
   }
 
@@ -112,12 +105,11 @@ const deserialize = (dispatch) => {
   }
 
   if(params.has("page")) {
+    actions.push(setTotal(10000));
     actions.push(setPage(parseInt(params.get("page"), 10)));
   }
 
-  if(params.has("lang")) {
-    actions.push(setLang(params.get("lang")));
-  }
+  actions.push(setLang(params.get("lang") || 'en-US'));
 
   dispatch(batch(...actions));
 };
@@ -161,7 +153,7 @@ const refresh = (store, url = "/facebook-ads/ads") => {
     }
     return fetch(path, {
       method: "GET",
-      headers: headers(store.getState().credentials)
+      headers: headers(store.getState().credentials, store.getState().lang)
     }).then((res) => res.json())
       .then((ads) => {
         dispatch(batch(
@@ -170,8 +162,7 @@ const refresh = (store, url = "/facebook-ads/ads") => {
           newAdvertisers(ads.advertisers),
           newTargets(ads.targets),
           setTotal(ads.total),
-          setPage(parseInt(params.get("page"), 0) || 0),
-          setLang(params.get("lang") || "en-US")
+          setPage(parseInt(params.get("page"), 0) || 0)
         ));
         loaded = true;
       });
