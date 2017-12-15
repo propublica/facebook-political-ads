@@ -30,7 +30,7 @@ const setLang = (lang) => ({
 const lang = (state = null, action) => {
   switch(action.type) {
   case SET_LANG:
-    return ['en-US', 'de-DE'].includes(action.value) ? action.value : 'en-US';
+    return action.value;
   default:
     return state;
   }
