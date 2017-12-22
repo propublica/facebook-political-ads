@@ -162,11 +162,11 @@ def load_ads_from_psql(lang):
       select
         html,
         targeting,
-        political::float / (political::float + not_political::float) as score,
+        political::float / ((political::float + not_political::float) + 0.01) as score,
         suppressed
       from ads
         where lang = '{}'
-        and (political + not_political) > 0;
+        and ((political + not_political) > 0 or suppressed = true);
      """.format(text(lang)))
 
     data = []
