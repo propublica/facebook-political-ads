@@ -1,5 +1,5 @@
 {
   "language": "da-DK",
-  "n_features": 100000,
+  "n_features": 500000,
   "classifier_type": "MultinomialNB"
 }
