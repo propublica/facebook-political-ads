@@ -33,7 +33,8 @@ def get_vectorizer(conf):
     """
     return HashingVectorizer(
         alternate_sign=False,
-        n_features=conf["n_features"]
+        n_features=conf["n_features"],
+        ngram_range=(1, 3)
     )
 
 
@@ -67,7 +68,7 @@ def train_classifier(classifier, vectorizer, base, language):
     print("num seeds: {}".format(len(data)))
     data.extend(load_ads_from_psql(language))
     print("num unique samples: {}".format(len(data)))
-    train, test = train_test_split(data)
+    train, test = train_test_split(data, test_size=0.1)
     x_train, y_train = zip(*train)
     x_test, y_test = zip(*test)
     x_train = vectorizer.transform(x_train)
