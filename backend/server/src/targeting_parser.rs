@@ -353,7 +353,7 @@ pub fn collect_advertiser(thing: &str) -> Option<String> {
     }
 }
 
-fn parse_targeting(thing: &str) -> Result<Vec<TargetingParsed>> {
+pub fn parse_targeting(thing: &str) -> Result<Vec<TargetingParsed>> {
     match get_targeting(thing) {
         IResult::Done(_, result) => Ok(result),
         IResult::Error(e) => Err(e.into()),
@@ -395,11 +395,11 @@ mod tests {
             IResult::Done("", Some(TargetingParsed::Age("26 to 62")))
         );
         assert_eq!(
-            region("United States</b>"),
+            region("live in United States</b>"),
             IResult::Done("</b>", vec![Some(TargetingParsed::Region("United States"))])
         );
         assert_eq!(
-            city_state("Burlington, North Carolina</b>"),
+            city_state("near Burlington, North Carolina</b>"),
             IResult::Done(
                 "</b>",
                 vec![
@@ -421,33 +421,5 @@ mod tests {
                 ],
             )
         );
-    }
-
-    #[test]
-    fn test_all() {
-        use dotenv::dotenv;
-        use diesel::prelude::*;
-        use diesel::pg::PgConnection;
-        use models::Ad;
-        use schema::ads::dsl::*;
-        use std::env;
-        dotenv().ok();
-        let database_url = env::var("DATABASE_URL").unwrap();
-        let connection = PgConnection::establish(&database_url).unwrap();
-        let adverts = ads.filter(targeting.is_not_null())
-            .filter(lang.eq("en-US"))
-            .limit(1000)
-            .load::<Ad>(&connection)
-            .unwrap();
-
-        for ad in adverts {
-            let t = ad.clone().targeting.unwrap();
-            let targts = parse_targeting(&t);
-            if targts.is_err() {
-                println!("{:?}", ad.clone().targeting);
-
-                assert!(false);
-            }
-        }
     }
 }
