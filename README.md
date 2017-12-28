@@ -13,6 +13,8 @@ We're open sourcing this project because we'd love your help. Collecting these a
 
 ## Build and Develop Locally
 
+### Extension
+
 The extension popup is a [preact](https://preactjs.com/) application and you can build a development version by running the following:
 
     cd extension
@@ -27,6 +29,8 @@ and any changes will automatically refresh the extension.
 
 In Chrome you'll need to add an unpacked extension by following these [directions](https://developer.chrome.com/extensions/getstarted).
 
+### Backend
+
 The backend server is a rust application that runs on top of [diesel](https://diesel.rs) and [hyper](https://hyper.rs/). You'll need the diesel command line interface to get started and to create the database:
 
     cargo install diesel_cli
@@ -37,6 +41,28 @@ You can kick the tires by running:
     cd backend/server
     cargo build
     cargo run
+
+This will give a server running at `0.0.0.0:8080`. You will also need to build the backend's static resources. To do this:
+
+    cd backend/server/public
+    npm install
+    npm run watch
+
+This will build the required static assets (javascript & css) to view the admin console at `0.0.0.0:8080/facebook-ads`.
+
+The backend has both unit and integration tests. You will need to set up a test database alongside your actual database in order to run the integration tests. To do this, you will need to the same as above, but substitute out the database test URL:
+
+    diesel database setup --database-url postgres://localhost/facebook_ads_test
+
+Note that the value for `--database-url` came from the `TEST_DATABASE_URL` value set in the `.env` file. Make sure that the urls match before you run the tests!
+
+Additionally, because the integration tests use the database, we want to make sure that they aren't run in parallel, so to run the tests:
+
+    RUST_TEST_THREADS=1 cargo test
+
+This will run the tests in sequence, avoiding parallelism errors for tests that require the database.
+
+### Classifier
 
 We train the classifier using python and scikit learn and the source is in `backend/classifier/`. We're using [pipenv](http://docs.pipenv.org/en/latest/) to track dependencies. To get started you can run:
 
