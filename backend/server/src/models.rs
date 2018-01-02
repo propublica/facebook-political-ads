@@ -662,21 +662,4 @@ mod tests {
         assert_eq!(images.images.len(), saved_ad.images.len());
         assert!(images.thumbnail.unwrap() != saved_ad.thumbnail);
     }
-
-    #[test]
-    fn getting_targets() {
-        use dotenv::dotenv;
-        use std::env;
-
-        dotenv().ok();
-        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-        let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
-        let db_pool = Pool::builder().build(manager).expect(
-            "Failed to create pool.",
-        );
-
-        let options: HashMap<String, String> = HashMap::new();
-        let t: Result<Vec<Targets>> = Targets::get("en-US", &db_pool, &options);
-        assert!(t.unwrap().iter().nth(0).is_some());
-    }
 }
