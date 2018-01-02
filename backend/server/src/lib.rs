@@ -39,7 +39,7 @@ pub mod schema;
 pub mod server;
 pub mod targeting_parser;
 
-use log::LogLevelFilter;
+use log::LevelFilter;
 use log4rs::append::console::ConsoleAppender;
 use log4rs::config::{Appender, Config as LogConfig, Logger, Root};
 use std::string;
@@ -48,10 +48,10 @@ pub fn start_logging() {
     let stdout = ConsoleAppender::builder().build();
     let config = LogConfig::builder()
         .appender(Appender::builder().build("stdout", Box::new(stdout)))
-        .logger(Logger::builder().build("hyper", LogLevelFilter::Info))
-        .logger(Logger::builder().build("server", LogLevelFilter::Info))
+        .logger(Logger::builder().build("hyper", LevelFilter::Info))
+        .logger(Logger::builder().build("server", LevelFilter::Info))
         .build(Root::builder().appender("stdout").build(
-            LogLevelFilter::Error,
+            LevelFilter::Error,
         ))
         .expect("Log config didn't work");
     log4rs::init_config(config).expect("Logging encountered an error.");
