@@ -34,7 +34,7 @@ use tokio_core::reactor::{Core, Handle};
 use tokio_postgres::{Connection, TlsMode};
 use tokio_timer::Timer;
 use unicase::Ascii;
-use url::form_urlencoded;
+use url::{Url, form_urlencoded};
 
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
@@ -307,9 +307,11 @@ impl AdServer {
     // web server, otherwise we're making a new connection on every request.
     fn stream_ads(&self) -> ResponseFuture {
         let handle = self.handle.clone();
+        let url = Url::parse(&self.database_url.clone()).unwrap();
+        let database_url = url.as_str();
 
         let notifications = Connection::connect(
-            self.database_url.clone(),
+            database_url,
             TlsMode::None,
             &self.handle.clone(),
         ).then(|c| c.unwrap().batch_execute("listen ad_update"))
