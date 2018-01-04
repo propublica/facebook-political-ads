@@ -2,52 +2,53 @@
 // before sending to the server. It also removes any attributes that
 // could have personal data so we end up with a clean dom tree.
 const selectors = [
-  'video',
-  'input',
-  'button',
-  'iframe',
+  "video",
+  "input",
+  "button",
+  "iframe",
   'a[href=""]',
-  '.accessible_elem',
-  '.uiLikePagebutton',
-  '.uiPopOver',
-  '.uiCloseButton',
-  '.uiChevronSelectorButton',
-  'h5._1qbu',
-  '.commentable_item'
-].join(', ');
+  ".accessible_elem",
+  ".uiLikePagebutton",
+  ".uiPopOver",
+  ".uiCloseButton",
+  ".uiChevronSelectorButton",
+  "h5._1qbu",
+  ".commentable_item"
+].join(", ");
 
-const TIMELINE_SELECTOR = '.fbUserContent, .fbUserPost, ._5pcr';
-const SIDEBAR_SELECTOR = '.ego_unit';
+const TIMELINE_SELECTOR = ".fbUserContent, .fbUserPost, ._5pcr";
+const SIDEBAR_SELECTOR = ".ego_unit";
 
-const cleanAd = (html) => {
+const cleanAd = html => {
   let node = document.createElement("div");
   node.innerHTML = html;
 
   // We're not saving video ads for now, we don't need buttons, hidden forms,
   // or like links
-  Array.from(node.querySelectorAll(selectors))
-    .forEach((i) => i.remove());
+  Array.from(node.querySelectorAll(selectors)).forEach(i => i.remove());
 
   // remove attributes
-  const killAttrs = (node) => {
+  const killAttrs = node => {
     Array.from(node.attributes).forEach(attr => {
-      if(attr.name !== "id" &&
-         attr.name !== "class" &&
-         attr.name !== "src" &&
-         attr.name !== "href")
+      if (
+        attr.name !== "id" &&
+        attr.name !== "class" &&
+        attr.name !== "src" &&
+        attr.name !== "href"
+      )
         node.removeAttribute(attr.name);
       // remove tracking get variables from links and l.facebook.com
-      if(attr.name === "href") {
+      if (attr.name === "href") {
         try {
           let url = new URL(attr.value);
-          if(url.host === 'l.facebook.com')
+          if (url.host === "l.facebook.com")
             url = new URL(new URLSearchParams(url.search).get("u"));
-          if(url.origin && url.pathname) {
+          if (url.origin && url.pathname) {
             node.setAttribute(attr.name, url.origin + url.pathname);
           } else {
             node.removeAttribute(attr.name);
           }
-        } catch(e) {
+        } catch (e) {
           node.removeAttribute(attr.name);
         }
       }
@@ -56,35 +57,45 @@ const cleanAd = (html) => {
     Array.from(node.children).forEach(killAttrs);
   };
   Array.from(node.children).forEach(killAttrs);
-  return node.innerHTML.replace(/&amp;/g, '&');
+  return node.innerHTML.replace(/&amp;/g, "&");
 };
 
-const checkSponsor = (node) => {
-  return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some((a) => {
-    const text = a.textContent;
-    const style = window.getComputedStyle(a, ':after').getPropertyValue('content');
-    return [
-      'Sponsored',
-      'Gesponsert',
-      'Sponsrad',
-      'Sponsorlu',
-      'إعلان مُموَّل',
-      'Sponsoreret',
-      'Sponsorizzata',
-      'Chartered'
-    ].some((sponsor) => {
-      if(text === sponsor || style === `"${sponsor}"`) return true;
-      return false;
-    });
-  });
+const checkSponsor = node => {
+  return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
+    a => {
+      const text = a.textContent;
+      const style = window
+        .getComputedStyle(a, ":after")
+        .getPropertyValue("content");
+      return [
+        "Sponsored",
+        "Gesponsert",
+        "Sponsrad",
+        "Sponsorlu",
+        "Sponsoroitu",
+        "إعلان مُموَّل",
+        "Sponsoreret",
+        "Sponsorizzata",
+        "Chartered"
+      ].some(sponsor => {
+        if (text === sponsor || style === `"${sponsor}"`) return true;
+        return false;
+      });
+    }
+  );
 };
 
 // We have to do this because content scripts can't read window variables
-const grabVariable = (fn, args)  => {
+const grabVariable = (fn, args) => {
   let script = document.createElement("script");
-  script.textContent = 'localStorage.setItem("pageVariable", (' + fn + ').apply(this, ' + JSON.stringify(args) + '));';
-  script.setAttribute('id', 'pageVariable');
-  (document.head||document.documentElement).appendChild(script);
+  script.textContent =
+    'localStorage.setItem("pageVariable", (' +
+    fn +
+    ").apply(this, " +
+    JSON.stringify(args) +
+    "));";
+  script.setAttribute("id", "pageVariable");
+  (document.head || document.documentElement).appendChild(script);
   script.remove();
   return localStorage.getItem("pageVariable");
 };
@@ -93,22 +104,27 @@ const grabVariable = (fn, args)  => {
 // blocked by facebook.
 let targetingBlocked = false;
 let targetingCache = new Map();
-const getTargeting = (ad) => {
-  if(ad.targeting) {
-    if(targetingCache.has(ad.targeting)) return {
-      ...ad,
-      targeting: targetingCache.get(ad.targeting)
-    };
+const getTargeting = ad => {
+  if (ad.targeting) {
+    if (targetingCache.has(ad.targeting))
+      return {
+        ...ad,
+        targeting: targetingCache.get(ad.targeting)
+      };
     const url = ad.targeting;
     delete ad.targeting;
-    if(targetingBlocked) return ad;
-    return new Promise((resolve) => {
+    if (targetingBlocked) return ad;
+    return new Promise(resolve => {
       let req = new XMLHttpRequest();
       req.onreadystatechange = function() {
-        if(req.readyState === 4) {
+        if (req.readyState === 4) {
           try {
-            const targeting = cleanAd(JSON.parse(req.response.replace('for (;;);', ''))["jsmods"]["markup"][0][1]["__html"]);
-            if(!targeting) {
+            const targeting = cleanAd(
+              JSON.parse(req.response.replace("for (;;);", ""))["jsmods"][
+                "markup"
+              ][0][1]["__html"]
+            );
+            if (!targeting) {
               return resolve(ad);
             }
             targetingCache.set(url, targeting);
@@ -116,33 +132,36 @@ const getTargeting = (ad) => {
               ...ad,
               targeting
             });
-          } catch(e) {
+          } catch (e) {
             targetingBlocked = true;
-            setTimeout(() => targetingBlocked = false, 15 * 60 * 100);
+            setTimeout(() => (targetingBlocked = false), 15 * 60 * 100);
             resolve(ad);
           }
         }
       };
 
       // This is all built out from a close reading of facebook's code.
-      let built = grabVariable((url) => {
-        let parsed = new (window.require('URI'))(url);
-        localStorage.setItem('url', url);
-        let req = new window.AsyncRequest()
-          .setURI(url)
-          .setData(parsed)
-          .setMethod('GET')
-          .setRelativeTo(document.body)
-          .setNectarModuleDataSafe(document.body)
-          .setReadOnly(true);
-        Object.assign(req.data, {__asyncDialog: 1});
-        Object.assign(req.data, window.require('getAsyncParams')(req.method));
-        req._setUserActionID();
-        req.setNewSerial();
-        return req.uri.addQueryData(req.data).toString();
-      }, [url]);
+      let built = grabVariable(
+        url => {
+          let parsed = new (window.require("URI"))(url);
+          localStorage.setItem("url", url);
+          let req = new window.AsyncRequest()
+            .setURI(url)
+            .setData(parsed)
+            .setMethod("GET")
+            .setRelativeTo(document.body)
+            .setNectarModuleDataSafe(document.body)
+            .setReadOnly(true);
+          Object.assign(req.data, { __asyncDialog: 1 });
+          Object.assign(req.data, window.require("getAsyncParams")(req.method));
+          req._setUserActionID();
+          req.setNewSerial();
+          return req.uri.addQueryData(req.data).toString();
+        },
+        [url]
+      );
       // AsyncRequest builds out the correct targeting url
-      req.open('GET', "https://www.facebook.com" + built, true);
+      req.open("GET", "https://www.facebook.com" + built, true);
       req.send();
     });
   } else {
@@ -150,27 +169,29 @@ const getTargeting = (ad) => {
   }
 };
 
-
 // We want to minimize the impact of a user's experience using facebook, so this function tries to
 // restore the state of the page when the extension clicks around.
-const refocus = (cb) => {
+const refocus = cb => {
   const focus = document.activeElement;
   cb();
-  if(focus) focus.focus();
+  if (focus) focus.focus();
 };
 
 // All of the menus on Facebook are asynchronously opened so we have to use a observer here to make
 // sure we can grab the targeting urls. There's a ton of state here, so we should probably try and
 // collapse it at some point.
 let adCache = new Map();
-const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => ((resolve, reject) => {
+const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
+  resolve,
+  reject
+) => {
   let cb = (record, self) => {
     const menu = menuFilter();
-    if(!menu) return null;
+    if (!menu) return null;
     const li = Array.from(menu.querySelectorAll("li")).filter(filter)[0];
-    if(!li) return null;
+    if (!li) return null;
     const endpoint = li.querySelector("a");
-    if(!endpoint) return null;
+    if (!endpoint) return null;
     const url = endpoint.getAttribute("ajaxify");
     refocus(() => toggle.click());
     self.disconnect();
@@ -181,40 +202,47 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => ((reso
         targeting: url
       };
 
-      if(resolved.id) {
+      if (resolved.id) {
         adCache.set(toggleId, resolved);
         resolve(resolved);
       } else {
         reject("No ad id");
       }
-    } catch(e) {
+    } catch (e) {
       reject(e);
     }
   };
-  new MutationObserver(cb).observe(document, {childList: true, subtree:true});
+  new MutationObserver(cb).observe(document, {
+    childList: true,
+    subtree: true
+  });
   refocus(() => toggle.click());
-});
-
+};
 
 // Grab an id from a timeline ad which is hidden in a async popup.
 const getTimelineId = (parent, ad) => {
   const control = parent.querySelector(".uiPopover");
-  if(!control && control.id === "")
-    return Promise.resolve(ad);
+  if (!control && control.id === "") return Promise.resolve(ad);
 
   const toggle = control.querySelector("a");
-  if(!toggle)
-    return Promise.resolve(ad);
+  if (!toggle) return Promise.resolve(ad);
 
-  if(adCache.has(toggle.id))
-    return Promise.resolve(adCache.get(toggle.id));
+  if (adCache.has(toggle.id)) return Promise.resolve(adCache.get(toggle.id));
 
   // this is async, we have to wait until our popup shows up.
-  let promise = new Promise(parseMenu(ad, ".uiLayer", toggle, toggle.id,
-    () => Array.from(document.querySelectorAll(".uiLayer")).filter((a) => (
-      a.getAttribute("data-ownerid") === toggle.id)
-    )[0],
-    (it) => it.getAttribute("data-feed-option-name") === "FeedAdSeenReasonOption"),
+  let promise = new Promise(
+    parseMenu(
+      ad,
+      ".uiLayer",
+      toggle,
+      toggle.id,
+      () =>
+        Array.from(document.querySelectorAll(".uiLayer")).filter(
+          a => a.getAttribute("data-ownerid") === toggle.id
+        )[0],
+      it =>
+        it.getAttribute("data-feed-option-name") === "FeedAdSeenReasonOption"
+    )
   ).then(getTargeting);
   return promise;
 };
@@ -223,97 +251,99 @@ const getTimelineId = (parent, ad) => {
 // use the one in the encoded url in case that the dom one goes away.
 const getSidebarId = (parent, ad) => {
   const control = parent.querySelector(".uiSelector");
-  if(!control)
-    return Promise.resolve(ad);
+  if (!control) return Promise.resolve(ad);
   //Replicating getTimelineId.
   // Since the sidebar DOM structure is slightly different we need to pull out
   // the toggle Id from the data-gt attribute.
-  const toggle = control.querySelector('a');
-  if(!toggle)
-    return Promise.resolve(ad);
+  const toggle = control.querySelector("a");
+  if (!toggle) return Promise.resolve(ad);
 
-  const toggleData = JSON.parse(toggle.getAttribute('data-gt'));
-  if(!toggleData["data_to_log"])
-    return Promise.resolve(ad);
+  const toggleData = JSON.parse(toggle.getAttribute("data-gt"));
+  if (!toggleData["data_to_log"]) return Promise.resolve(ad);
 
   const toggleId = toggleData["data_to_log"]["ad_id"];
-  if (!toggleId)
-    return Promise.resolve(ad);
+  if (!toggleId) return Promise.resolve(ad);
 
-  if (adCache.has(toggleId))
-    return Promise.resolve(adCache.get(toggleId));
+  if (adCache.has(toggleId)) return Promise.resolve(adCache.get(toggleId));
 
-  let promise = new Promise(parseMenu(ad, ".uiMenu", toggle, toggleId,
-    () => control,
-    (it) => it.getAttribute("data-label") === "Why am I seeing this?")
+  let promise = new Promise(
+    parseMenu(
+      ad,
+      ".uiMenu",
+      toggle,
+      toggleId,
+      () => control,
+      it => it.getAttribute("data-label") === "Why am I seeing this?"
+    )
   ).then(getTargeting);
 
   return promise;
 };
 
-const timeline = (node) => {
+const timeline = node => {
   // First we check if it is actually a sponsored post
-  if(!checkSponsor(node)) return Promise.resolve(false);
+  if (!checkSponsor(node)) return Promise.resolve(false);
 
   // And then we try to grab the parent container that has a hyperfeed id
   let parent = node;
-  while(parent) {
+  while (parent) {
     let id = parent.getAttribute("id");
-    if(id && id.startsWith("hyperfeed")) break;
+    if (id && id.startsWith("hyperfeed")) break;
     parent = parent.parentElement;
   }
 
   // If we've walked off the top of the parent heirarchy that's an error
-  if(!parent) return Promise.resolve(false);
+  if (!parent) return Promise.resolve(false);
 
   // Also if there's nothing to save that's an error
-  if(node.children.length === 0) return Promise.resolve(false);
+  if (node.children.length === 0) return Promise.resolve(false);
 
   // Check to see that we have the innermost fbUserContent, this cuts out like's
   // and shares.
-  if(node.querySelector(TIMELINE_SELECTOR))
+  if (node.querySelector(TIMELINE_SELECTOR))
     node = node.querySelector(TIMELINE_SELECTOR);
 
   // Finally we have something to save.
   return getTimelineId(parent, {
     html: cleanAd(node.children[0].outerHTML),
-    created_at: (new Date()).toString()
+    created_at: new Date().toString()
   });
 };
 
 // Sidebar ads are a bit more complicated.
-const sidebar = (node) => {
+const sidebar = node => {
   // Although first we still need to make sure we are in a sponsored box;
   let parent = node;
-  while(parent) {
-    if(checkSponsor(parent)) break;
+  while (parent) {
+    if (checkSponsor(parent)) break;
     parent = parent.parentElement;
   }
 
   // As before it is an error if we haven't found a sponsor node.
-  if(!(parent &&
-       parent.classList &&
-       parent.classList.contains('ego_section'))) return Promise.resolve(false);
+  if (!(parent && parent.classList && parent.classList.contains("ego_section")))
+    return Promise.resolve(false);
 
   // Sanity check to make sure we have a salvageable id
-  if(!node.hasAttribute("data-ego-fbid")) return Promise.resolve(false);
+  if (!node.hasAttribute("data-ego-fbid")) return Promise.resolve(false);
 
   // and we have childnodes
-  if(!node.children.length === 0) return Promise.resolve(false);
+  if (!node.children.length === 0) return Promise.resolve(false);
   // Then we just need to send the cleaned ad
   return getSidebarId(parent, {
     html: cleanAd(node.outerHTML),
-    created_at: (new Date()).toString()
+    created_at: new Date().toString()
   });
 };
 
 // We are careful here to only accept a valid timeline ad or sidebar ad
 const parser = function(node) {
-  if(node.classList.contains("fbUserContent") ||
-     node.classList.contains("fbUserPost") ||
-     node.classList.contains("_5pcr")) {
+  if (
+    node.classList.contains("fbUserContent") ||
+    node.classList.contains("fbUserPost") ||
+    node.classList.contains("_5pcr")
+  ) {
     return timeline(node);
-  } else if(node.classList.contains('ego_unit')) {
+  } else if (node.classList.contains("ego_unit")) {
     return sidebar(node);
   } else {
     return Promise.resolve(false);
@@ -323,5 +353,5 @@ const parser = function(node) {
 module.exports = {
   parser,
   TIMELINE_SELECTOR,
-  SIDEBAR_SELECTOR,
+  SIDEBAR_SELECTOR
 };
