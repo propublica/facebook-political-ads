@@ -1,13 +1,10 @@
 {
   "sourceMaps": true,
   "presets": [
-    ["env", {
-      "modules": false
-    }]
+    ["env"]
   ],
   "plugins": [
     ["transform-react-jsx"],
-    ["transform-object-rest-spread"],
-    ["external-helpers"]
+    ["transform-object-rest-spread"]
   ]
 }
