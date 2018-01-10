@@ -167,6 +167,7 @@ body {
   font-size: 0.75rem;
   display: flow-root;
   transition: box-shadow 1s;
+  pointer-events: none;
 }
 
 .ad-content a {
@@ -639,3 +640,11 @@ h6 a:hover {
   float: left;
 }
 
+._5pcp._5lel._232_ {
+  width: 150px;
+}
+
+.uiStreamPrivacy.inlineBlock.fbStreamPrivacy.fbPrivacyAudienceIndicator._5pcq {
+  display: inline-block;
+  float: left;  
+}
