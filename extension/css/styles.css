@@ -167,6 +167,9 @@ body {
   font-size: 0.75rem;
   display: flow-root;
   transition: box-shadow 1s;
+}
+
+.ad a {
   pointer-events: none;
 }
 
@@ -636,15 +639,12 @@ h6 a:hover {
   color: rgb(144, 148, 156);
 }
 
-.uiStreamPrivacy.inlineBlock.fbStreamPrivacy.fbPrivacyAudienceIndicator {
-  float: left;
-}
-
-._5pcp._5lel._232_ {
-  width: 150px;
-}
-
 .uiStreamPrivacy.inlineBlock.fbStreamPrivacy.fbPrivacyAudienceIndicator._5pcq {
   display: inline-block;
   float: left;  
+}
+
+._5pcp._5lel._232_ {
+  display: flex;
+  align-content: flex-start;
 }
