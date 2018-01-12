@@ -48,7 +48,7 @@ This will give a server running at `0.0.0.0:8080`. You will also need to build t
     npm install
     npm run watch
 
-This will build the required static assets (javascript & css) to view the admin console at `0.0.0.0:8080/facebook-ads`.
+This will build the required static assets (javascript & css) to view the admin console at `0.0.0.0:8080/facebook-ads/`.
 
 The backend has both unit and integration tests. You will need to set up a test database alongside your actual database in order to run the integration tests. To do this, you will need to the same as above, but substitute out the database test URL:
 
