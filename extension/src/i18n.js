@@ -4,13 +4,13 @@ import countries from "i18n-iso-countries";
 
 // active ones get prioritised in the ui (pull downs)
 // ISO 3166-1 Alpha-2 (upper case)
-export const activeCountries = ["DK", "DE", "CH", "US", "IT", "AU"];
+export const activeCountries = ["DK", "DE", "CH", "US", "IT", "AU", "NL"];
 // ISO 639-1 (2 characters, lower case)
-export const activeLanguages = ["da", "de", "en", "it"];
+export const activeLanguages = ["da", "de", "en", "it", "nl"];
 
 // load country names in our languages
 activeLanguages
-  .concat(["fr", "fi", "nl", "sv"])
+  .concat(["fr", "sv"])
   .forEach(lang =>
     countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
   );

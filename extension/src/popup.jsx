@@ -182,20 +182,14 @@ const insertAdFields = ads =>
     ...ad,
     image: getImage(ad.html),
     message: getAdMessage(ad.html),
-    title: getTitle(ad.html)
+    title: getTitle(ad.html),
+    raw: ad.html
   }));
 
 // Views
-const Ad = ({ title, message, id, image }) => (
+const Ad = ({ title, message, id, image, raw }) => (
   <div className="ad" id={id}>
-    <div className="chiclet">{image ? <img src={image} /> : ""}</div>
-    <div className="ad-display">
-      <div className="advertiser">{title}</div>
-      <div
-        className="ad-content"
-        dangerouslySetInnerHTML={{ __html: message }}
-      />
-    </div>
+    <div className="ad-display" dangerouslySetInnerHTML={{ __html: raw }} />
   </div>
 );
 
@@ -224,17 +218,19 @@ const RatingForm = withI18n(({ getMessage, rating, action, question }) => (
 // Ads to be rated and sent to the server
 const Rating = withI18n(({ getMessage, rating, action, question }) => (
   <div className="rating">
-    <Ad
-      title={rating.title}
-      message={rating.message}
-      id={rating.id}
-      image={rating.image}
-    />
     {"rating" in rating ? (
       <b className="political">{getMessage("political")}</b>
     ) : (
       <RatingForm action={action} rating={rating} question={question} />
     )}
+    <br />
+    <Ad
+      title={rating.title}
+      message={rating.message}
+      id={rating.id}
+      image={rating.image}
+      raw={rating.raw}
+    />
   </div>
 ));
 

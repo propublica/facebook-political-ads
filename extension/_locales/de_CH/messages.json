@@ -1,4 +1,12 @@
 {
+  "name": {
+    "message": "Facebook Political Ad Collector",
+    "description": "Extension name"
+  },
+  "description": {
+    "message":"Sucht nach politischer Werbung auf Facebook",
+    "description": "Description of the extension"
+  },
   "political": {
     "message": "Politische Werbung",
     "description": "Label for political radio button"
