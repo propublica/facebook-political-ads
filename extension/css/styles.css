@@ -163,7 +163,6 @@ body {
 
 .ad {
   background-color: #fff;
-  border-bottom: 1px solid #efefef;
   font-size: 0.75rem;
   display: flow-root;
   transition: box-shadow 1s;
@@ -171,27 +170,16 @@ body {
 
 .ad a {
   pointer-events: none;
+  color: #365899;
 }
 
 .ad-content a {
   pointer-events: none;
   cursor: default;
-  color: #1f5881;
 }
 
 .ad .advertiser {
   font-weight: 500;
-}
-
-.ad .chiclet {
-  float: left;
-  margin-right: 0.4rem;
-  height: 100%;
-}
-
-.ad .chiclet img {
-  min-width: 50px;
-  max-width: 100px;
 }
 
 a:focus {
@@ -199,7 +187,8 @@ a:focus {
 }
 
 .rater, b.political {
-  padding: 0.2rem 0.2rem 0;
+  padding: 0.2rem 0.2rem 0.3rem;
+  border-bottom: 1px solid #dddfe2;
 }
 
 .rater button, #tos button, #language .button {
@@ -305,33 +294,6 @@ a:focus {
 /* FACEBOOK AD STYLES
 /* -----------------------------------------------------------------------------*/
 
-.facebook-pac-ads {
-  font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 19px;
-  text-align: left;
-  padding: colspan(g,4) 12px;
-  background-color: #e9ebee;
-}
-
-.facebook-pac-ads a {
-    color: rgb(54, 88, 153);
-    border: none;
-}
-.facebook-pac-ads a:hover, .facebook-pac-ads a:focus {
-  border: none;
-}
-
-.facebook-pac-ads p + p {
-  margin-top: 6px;
-}
-.facebook-pac-ads .no_ads {
-  text-align: center;
-  font-size: 16px;
-  padding: 16px;
-  font-weight: bold;
-}
-
 .scaledImageFitWidth, ._3chq, ._46-h, ._46-i, ._4lpf {
   max-width: 100%;
 }
@@ -386,39 +348,11 @@ a:focus {
 .message {
   margin: 12px auto 0;
   border-radius: 4px;
-  min-width: 308px;
-  max-width: 500px;
 }
 
-.targeting_info {
-  max-width: 500px;
-  margin: 0 auto 12px;
-}
-
-.targeting_info h3 {
-  font-weight: bold;
-  padding-left: 12px;
-  margin-top: 6px;
-}
-
-.targeting_info .targeting b {
-  font-weight: bold;
-}
-
-._1dwg._1w_m { /* Timeline ad wrapper div */
-  max-width: 500px;
-  border: 1px solid #dddfe2;
-}
-
-.ego_unit { /* Sidebar ad wrapper div */
-  max-width: 308px;
-  border: 1px solid #dddfe2;
-}
 
 
 /* NEWS FEED ADS */
-
-
 ._5pb8._1yz2._8o._8s.lfloat._ohe, ._38vo { /* Profile pic wrapper */
   display: block;
   float: left;
@@ -467,13 +401,7 @@ a:focus {
 }
 
 .lock.img { /* 'Public' globe */
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  /*background-image: url(../images/fb-globe.png);*/
-  background-repeat: no-repeat;
-  background-size: 100%;
-  vertical-align: -2px;
+  display: none;
 }
 
 .userContent { /* Post text */
@@ -586,7 +514,7 @@ a:focus {
   display: none;
 }
 
-h6 a { 
+h6 a {
   text-decoration: none;
   font-weight: bold;
   color: #365899;
@@ -628,7 +556,7 @@ h6 a:hover {
 
 .uiStreamPrivacy.inlineBlock.fbStreamPrivacy.fbPrivacyAudienceIndicator._5pcq {
   display: inline-block;
-  float: left;  
+  float: left;
 }
 
 ._5pcp._5lel._232_ {
