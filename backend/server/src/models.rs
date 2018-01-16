@@ -484,6 +484,18 @@ impl Ad {
         )?)
     }
 
+    pub fn get_ad(
+        conn: &Pool<ConnectionManager<PgConnection>>,
+        adid: &str,
+    ) -> Result<Ad> {
+        use schema::ads::dsl::*;
+
+        let connection = conn.get()?;
+        // let adid = options.get("id").expect("get_ad_query requires an ad id");
+        let ad = Ok(ads.find(adid).first(&*connection)?);
+        ad
+    }
+
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
         use schema::ads::dsl::*;
         let connection = conn.get()?;

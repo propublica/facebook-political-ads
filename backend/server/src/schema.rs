@@ -1,1 +1,2 @@
-infer_schema!("dotenv:DATABASE_URL");
+infer_schema!("postgres://localhost/facebook_ads");
+//"env:DATABASE_URL"
