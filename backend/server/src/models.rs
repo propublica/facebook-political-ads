@@ -540,6 +540,7 @@ pub struct NewAd<'a> {
     targeting: Option<String>,
     pub targets: Option<Value>,
     advertiser: Option<String>,
+    page: Option<String>,
 }
 
 impl<'a> NewAd<'a> {
@@ -568,6 +569,9 @@ impl<'a> NewAd<'a> {
             targeting: ad.targeting.clone(),
             targets: get_targets(ad.targeting.clone()),
             advertiser: get_advertiser(ad.targeting.clone(), &document),
+            page: get_advertiser_link(&document).ok().and_then(|l| {
+                l.attributes.borrow().get("href").map(|i| i.to_string())
+            }),
         })
     }
 
