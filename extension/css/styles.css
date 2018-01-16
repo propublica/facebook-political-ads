@@ -22,6 +22,7 @@ time, mark, audio, video {
   font-size: 100%;
   font: inherit;
   vertical-align: baseline;
+  text-decoration: none;
 }
 
 /* HTML5 display-role reset for older browsers */
@@ -168,6 +169,10 @@ body {
   transition: box-shadow 1s;
 }
 
+.ad a {
+  pointer-events: none;
+}
+
 .ad-content a {
   pointer-events: none;
   cursor: default;
@@ -294,4 +299,339 @@ a:focus {
 
 #language p {
   margin: 0.4rem 0;
+}
+
+/* -----------------------------------------------------------------------------
+/* FACEBOOK AD STYLES
+/* -----------------------------------------------------------------------------*/
+
+.facebook-pac-ads {
+  font-family: -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 19px;
+  text-align: left;
+  padding: colspan(g,4) 12px;
+  background-color: #e9ebee;
+}
+
+.facebook-pac-ads a {
+    color: rgb(54, 88, 153);
+    border: none;
+}
+.facebook-pac-ads a:hover, .facebook-pac-ads a:focus {
+  border: none;
+}
+
+.facebook-pac-ads p + p {
+  margin-top: 6px;
+}
+.facebook-pac-ads .no_ads {
+  text-align: center;
+  font-size: 16px;
+  padding: 16px;
+  font-weight: bold;
+}
+
+.scaledImageFitWidth, ._3chq, ._46-h, ._46-i, ._4lpf {
+  max-width: 100%;
+}
+
+._4uoz { /* Targeting info */
+  color: lightne(#333, 45%); /* $text-color-low-contrast; */
+  max-width: 500px;
+  padding: 0 12px;
+  margin: 12px auto 24px auto;
+}
+._4uoz a {
+  display: none;
+}
+._4uoz b {
+  color: #333; /* $text-color; */
+  font-weight: bold;
+}
+._4uoz ._4hcd {
+  margin-top: 6px;
+}
+
+
+._4-i0._26c5,
+._4uor._52jw,
+._4uou,
+._5lnf.uiOverlayFooter._5a8u._4866,
+._4ubd._3tsq,
+.hidden_elem,
+._567v._3bw,
+._35sk { /* Excess targeting info and video ads */
+  display: none;
+}
+
+._1dwg._1w_m, /* Timeline ad wrapper div */
+.ego_unit {   /* Sidebar ad wrapper div */
+  background-color: white;
+  padding: 12px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+._1dwg._1w_m ._1dwg._1w_m, ._1dwg._1w_m .ego_unit {
+  display: block;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+.message {
+  margin: 12px auto 0;
+  border-radius: 4px;
+  min-width: 308px;
+  max-width: 500px;
+}
+
+.targeting_info {
+  max-width: 500px;
+  margin: 0 auto 12px;
+}
+
+.targeting_info h3 {
+  font-weight: bold;
+  padding-left: 12px;
+  margin-top: 6px;
+}
+
+.targeting_info .targeting b {
+  font-weight: bold;
+}
+
+._1dwg._1w_m { /* Timeline ad wrapper div */
+  max-width: 500px;
+  border: 1px solid #dddfe2;
+}
+
+.ego_unit { /* Sidebar ad wrapper div */
+  max-width: 308px;
+  border: 1px solid #dddfe2;
+}
+
+
+/* NEWS FEED ADS */
+
+
+._5pb8._1yz2._8o._8s.lfloat._ohe, ._38vo { /* Profile pic wrapper */
+  display: block;
+  float: left;
+  width: 32px;
+  margin-right: 8px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+._38vo {
+  max-height: 32px;
+}
+
+._38vo img {
+  max-height: 32px;
+}
+
+._5x46, ._3dp ._29k { /* Profile name wrapper */
+  margin-bottom: 6px;
+}
+
+._5x46 a:hover, ._3dp a:hover, ._29k a:hover,
+._5x46 a:focus, ._3dp a:focus, ._29k a:focus {
+  text-decoration: underline;
+}
+
+._5pbw { /* Profile name */
+  font-weight: bold;
+}
+
+._5pcp._5lel._232_, ._5paw { /* 'Sponsored' */
+  font-size: 12px;
+  color: rgb(144, 148, 156);
+}
+
+._5pcp._5lel._232_ div, ._5paw div {
+    display: inline;
+}
+
+._5pcp._5lel._232_ a, ._5paw a {
+  color: inherit;
+}
+
+._5mfr .img {
+  display: none;
+}
+
+.lock.img { /* 'Public' globe */
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  /*background-image: url(../images/fb-globe.png);*/
+  background-repeat: no-repeat;
+  background-size: 100%;
+  vertical-align: -2px;
+}
+
+.userContent { /* Post text */
+  clear: both;
+}
+/* emojis */
+.userContent img, .mbs._6m6 img, ._6a img {
+  display: none;
+}
+
+.text_exposed_show { /* Truncated post text */
+  display: none;
+}
+
+.mtm, ._dcs { /* Article wrap */
+  margin-top: 10px;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.mtm .mtm, .mtm ._dcs, ._dcs ._dcs, ._dcs .mtm {
+  margin-top: 0;
+  border: none;
+}
+
+/* Video (and slideshow?) wrap */
+._150c > * {
+  display: none;
+}
+._150c > img:first-of-type {
+  display: block;
+}
+
+._2a2q ._5dec._xcx { /* Slideshow images */
+  display: none;
+}
+
+._2a2q ._5dec._xcx:first-child {
+  display: block;
+}
+
+._6ks > a { /* Article image wrap */
+  display: block;
+}
+
+.fbStoryAttachmentImage { /* Article image */
+}
+
+/* ._6m3._--6, */
+._3ekx._29_4 { /* Article description wrap */
+  padding: 12px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+._5qf- { /* Profile metadata */
+  display: none;
+}
+
+._5s6c { /* Article hed */
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  font-size: 18px;
+  line-height: 22px;
+  margin-bottom: 5px;
+}
+
+.5s6c a {
+  color: inherit;
+}
+
+._6m7._3bt9, ._5q4r { /* Article dek */
+  font-size: 12px;
+  line-height: 16px;
+}
+
+._59tj._2iau, ._1s4d { /* Article URL/CTA wrap */
+  vertical-align: bottom;
+  padding-top: 5px;
+}
+
+._522u.rfloat._ohf, ._275-._4s-8.rfloat._ohf { /* CTA button */
+  display: inline-block;
+  float: right;
+  margin-left: 10px;
+}
+
+._522u.rfloat._ohf a, ._275-._4s-8.rfloat._ohf  a {
+  display: block;
+  color: rgb(75, 79, 86);
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 22px;
+  padding: 0 8px;
+  background-color: rgb(246, 247, 249);
+  border: 1px solid rgb(206, 208, 212);
+  border-radius: 2px;
+}
+._522u.rfloat._ohf a:hover, ._275-._4s-8.rfloat._ohf a:hover,
+ ._522u.rfloat._ohf a:focus, ._275-._4s-8.rfloat._ohf a:focus {
+   background-color: #e9ebee;
+ }
+
+._6lz._6mb, ._275y { /* Article URL */
+  color: rgb(144, 148, 156);
+  font-size: 12px;
+  line-height: 11px;
+  text-transform: uppercase;
+  padding-top: 13px;
+}
+
+._5g-l, ._5tc6, ._1-m5 { /* 'Not affiliated with Facebook' */
+  display: none;
+}
+
+h6 a { 
+  text-decoration: none;
+  font-weight: bold;
+  color: #365899;
+}
+
+h6 a:hover {
+  text-decoration: underline;
+}
+
+
+/* SIDEBAR ADS */
+
+.ego_unit { /* Sidebar ad */
+  font-size: 13px;
+  line-height: 16px;
+}
+
+  /* These all use different class names, hence the delightful muck below. Fun! */
+
+.ego_unit  div > div > a > div > div:nth-child(2) { /* Sidebar ad hed/URL wrapper*/
+    padding-top: 10px;
+}
+
+.ego_unit div > div > a > div > div:nth-child(4) { /* Sidebar ad article dek */
+  color: rgb(144, 148, 156);
+}
+
+.fwb.fcg > a, .d_1pw5dh0kri {
+  color: #365899;
+}
+
+.mbs._6m6._2cnj._5s6c > a {
+  color: #333;
+}
+
+.y_1pw5dh0kr_ {
+  color: rgb(144, 148, 156);
+}
+
+.uiStreamPrivacy.inlineBlock.fbStreamPrivacy.fbPrivacyAudienceIndicator._5pcq {
+  display: inline-block;
+  float: left;  
+}
+
+._5pcp._5lel._232_ {
+  display: flex;
+  align-content: flex-start;
 }
