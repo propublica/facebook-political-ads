@@ -187,7 +187,7 @@ const insertAdFields = ads =>
   }));
 
 // Views
-const Ad = ({ title, message, id, image, raw }) => (
+const Ad = ({ id, raw }) => (
   <div className="ad" id={id}>
     <div className="ad-display" dangerouslySetInnerHTML={{ __html: raw }} />
   </div>
@@ -223,7 +223,6 @@ const Rating = withI18n(({ getMessage, rating, action, question }) => (
     ) : (
       <RatingForm action={action} rating={rating} question={question} />
     )}
-    <br />
     <Ad
       title={rating.title}
       message={rating.message}

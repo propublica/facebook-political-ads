@@ -4,9 +4,9 @@ import countries from "i18n-iso-countries";
 
 // active ones get prioritised in the ui (pull downs)
 // ISO 3166-1 Alpha-2 (upper case)
-export const activeCountries = ["DK", "DE", "CH", "US", "IT", "AU", "NL"];
+export const activeCountries = ["DK", "DE", "CH", "US", "IT", "AU", "NL", "FI"];
 // ISO 639-1 (2 characters, lower case)
-export const activeLanguages = ["da", "de", "en", "it", "nl"];
+export const activeLanguages = ["da", "de", "en", "it", "nl", "fi"];
 
 // load country names in our languages
 activeLanguages
