@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["Jeff Larson <thejefflarson@gmail.com>"]
 
 [dependencies]
+chrono = { version = "^0.4.0", features = ["serde"] }
 csv = "^1.0.0-beta.5"
 diesel = { version = "^1.0.0", features = ["postgres"] }
 docopt = "^0.8.1"
@@ -13,8 +14,9 @@ futures-cpupool = "^0.1.5"
 hyper = "^0.11.8"
 hyper-tls = "^0.1.2"
 kuchiki = "^0.6.0"
-serde = "^1.0.16"
-serde_derive = "^1.0.16"
+serde = "^1.0.23"
+serde_json = "^1.0.6"
+serde_derive = "^1.0.21"
 r2d2 = "^0.8.1"
 r2d2-diesel = "^1.0.0"
 rusoto_core = "^0.30.0"
