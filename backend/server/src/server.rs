@@ -18,6 +18,7 @@ use jsonwebtoken::{decode, Validation};
 use models::{Ad, Advertisers, Aggregate, Entities, NewAd, Targets};
 use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
+use regex::Regex;
 use start_logging;
 use serde_json;
 use std::collections::HashMap;
@@ -77,6 +78,8 @@ impl Service for AdServer {
     // This is not at all RESTful, but I'd rather not deal with regexes. Maybe soon
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
+        let restfulre = Regex::new(r"^/facebook-ads/ads/?(\d+)?$").unwrap();
+
         match (req.method(), req.path()) {
             (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
                 Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
@@ -135,13 +138,34 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/locales/de/translation.json") => Either::B(
                 self.get_file("public/locales/de/translation.json", ContentType::json()),
             ),
-            (&Method::Get, "/facebook-ads/ad") => Either::B(self.get_ad(req)),
-            (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
+            // (&Method::Get, "/facebook-ads/ad") => Either::B(self.get_ad(req)),
+            // (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads()),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
+            (&Method::Get, _) => match restfulre.captures(&req.path().to_owned()){ // I'm sure I will understand why I needed to call to_owned() here better later, but for now, this is how to avoid borrowing-related issues.
+                Some(ads_match) => {
+                    match ads_match.get(1) {
+                        Some(id_match) => {
+                            match id_match.as_str() {
+                                "" | "/" => {
+                                    Either::B(self.get_ads(req))
+                                },
+                                _ => {
+                                    println!("{}", req.path());
+                                    Either::B(self.get_ad(req))
+                                }
+                            }
+                        },
+                        None => {
+                            Either::B(self.get_ads(req))
+                        }
+                    }
+                }
+                None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound)))
+            },
             _ => Either::A(future::ok(
                 Response::new().with_status(StatusCode::NotFound),
             )),
@@ -227,19 +251,14 @@ impl AdServer {
     }
 
     fn get_ad(&self, req: Request) -> ResponseFuture {
-        let adid_cow = req.query()
-            .map(|q| {
-                form_urlencoded::parse(q.as_bytes()) // these are key-val pairs.
-                        .find(|pair| {
-                            pair.0 == "id"
-                        }).unwrap_or_default().1
-            })
-            .unwrap_or_default()
-            .into_owned();
+        // hopefully temporary, until I figure out the Lifetimes issue // FIXME
+        let restfulre = Regex::new(r"^/facebook-ads/ads/?(\d+)?$").unwrap();
+        let adid = restfulre.captures(req.path().clone()).unwrap().get(1).unwrap().as_str().to_owned(); // again, temporary, but we know that this match works since that's how we got here.
+
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
         let ad = spawn_with_clone!(pool; db_pool;
-                        Ad::get_ad(&db_pool, &adid_cow)
+                        Ad::get_ad(&db_pool, &adid)
                     );
         let future = ad.map(|ad| {
             serde_json::to_string(&ApiResponse {
@@ -258,10 +277,9 @@ impl AdServer {
             })
                 .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
         }).map_err(|e| {
-                warn!("{:?}", e);
-                hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-            });
-
+            warn!("{:?}", e);
+            hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+        });
         Box::new(future)
     }
 
@@ -270,13 +288,13 @@ impl AdServer {
             let options = req.query()
                 .map(|q| {
                     form_urlencoded::parse(q.as_bytes())
-                        .into_owned() // do we need this? we can compare Cows and strings. -JBFM
+                        .into_owned()
                         .filter(|pair| {
                             pair.0 == "search" || pair.0 == "page" || pair.0 == "targets" ||
                                 pair.0 == "advertisers" ||
                                 pair.0 == "entities"    || pair.0 == "id"
                         })
-                        .collect::<HashMap<_, _>>()
+                        .collect::<HashMap<_, _>>() // transforms the Vector of tuples into a HashMap.
                 })
                 .unwrap_or_default();
 
