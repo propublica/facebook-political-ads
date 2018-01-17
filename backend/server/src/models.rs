@@ -128,7 +128,7 @@ impl Images {
             .filter(|i| ad.thumbnail.contains(i.path()))
             .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches('/'))
             .nth(0);
-
+ 
         let mut rest = images.to_owned();
         if let Some(thumb) = thumb.clone() {
             rest.retain(|x| !thumb.contains(x.path()))
