@@ -17,6 +17,9 @@ import { go } from 'i18n.js';
 
 import { debounce } from "lodash";
 
+// I'll figure out a better way to do this but I'm learning React so 🐻 with me.
+const searchParams = new URLSearchParams(location.search);
+console.log(searchParams);
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
 const LOGOUT = "logout";
@@ -36,11 +39,11 @@ const createJWT = (username, password) => {
   return window.crypto.subtle.importKey(
     "raw",
     encoder.encode(password),
-    {name: "HMAC", hash: {name: "SHA-256"}},
+    { name: "HMAC", hash: { name: "SHA-256" } },
     false,
     ["sign"]
-  ).then(key => window.crypto.subtle.sign({name: 'HMAC'}, key, encoded))
-    .then(signature => ({token: `${base}.${b64(String.fromCharCode.apply(null, new Uint8Array(signature)))}`}));
+  ).then(key => window.crypto.subtle.sign({ name: 'HMAC' }, key, encoded))
+    .then(signature => ({ token: `${base}.${b64(String.fromCharCode.apply(null, new Uint8Array(signature)))}` }));
 };
 
 const hideAd = (ad) => ({
@@ -56,7 +59,7 @@ const suppressAd = (ad) => {
       body: ad.id,
       headers: headers(getState().credentials)
     }).then((resp) => {
-      if(resp.ok) {
+      if (resp.ok) {
         console.log("suppressed");
       } else {
         dispatch(logout());
@@ -81,7 +84,7 @@ const authorize = (username, password) => {
       method: "POST",
       headers: headers(token)
     }).then((resp) => {
-      if(resp.ok) {
+      if (resp.ok) {
         dispatch(login(token));
       }
     });
@@ -89,29 +92,30 @@ const authorize = (username, password) => {
 };
 
 const credentials = (state = {}, action) => {
-  switch(action.type) {
-  case LOGIN:
-    return action.value;
-  case LOGOUT:
-    return {};
-  default:
-    return state;
+  switch (action.type) {
+    case LOGIN:
+      return action.value;
+    case LOGOUT:
+      return {};
+    default:
+      return state;
   }
 };
 
+// this is a reducer.
 const ads = (state = [], action) => {
-  switch(action.type) {
-  case NEW_ADS:
-    return action.value;
-  case HIDE_AD:
-    return state.map(ad => {
-      if(ad.id === action.id) {
-        return { ...ad, suppressed: true };
-      }
-      return ad;
-    });
-  default:
-    return state;
+  switch (action.type) {
+    case NEW_ADS:
+      return action.value;
+    case HIDE_AD:
+      return state.map(ad => {
+        if (ad.id === action.id) {
+          return { ...ad, suppressed: true };
+        }
+        return ad;
+      });
+    default:
+      return state;
   }
 };
 
@@ -130,63 +134,84 @@ const reducer = enableBatching(combineReducers({
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(...[persistState("credentials"), applyMiddleware(...middleware)]));
 
-const Ad = ({ad, onClick}) => (
+const Ad = ({ ad, onClick }) => (
   <div className="ad">
     <table>
-      <tr>
-        <td>id</td>
-        <td>{ad.id}</td>
-      </tr>
-      <tr>
-        <td>first seen</td>
-        <td>{new Date(Date.parse(ad.created_at)).toString()}</td>
-      </tr>
-      <tr>
-        <td>title</td>
-        <td>{ad.title}</td>
-      </tr>
-      <tr>
-        <td>text</td>
-        <td dangerouslySetInnerHTML={{__html: ad.html}} />
-      </tr>
-      <tr>
-        <td>targeting</td>
-        <td dangerouslySetInnerHTML={{__html: ad.targeting}} />
-      </tr>
-      <tr>
-        <td>
-          political / not political
+      <tbody>
+        <tr>
+          <td>id</td>
+          <td>{ad.id}</td>
+        </tr>
+        <tr>
+          <td>first seen</td>
+          <td>{new Date(Date.parse(ad.created_at)).toString()}</td>
+        </tr>
+        <tr>
+          <td>title</td>
+          <td>{ad.title}</td>
+        </tr>
+        <tr>
+          <td>text</td>
+          <td dangerouslySetInnerHTML={{ __html: ad.html }} />
+        </tr>
+        <tr>
+          <td>targeting</td>
+          <td dangerouslySetInnerHTML={{ __html: ad.targeting }} />
+        </tr>
+        <tr>
+          <td>
+            political / not political
         </td>
-        <td>
-          {ad.political} / {ad.not_political}
+          <td>
+            {ad.political} / {ad.not_political}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            likelihood
         </td>
-      </tr>
-      <tr>
-        <td>
-          likelihood
+          <td>
+            {ad.political_probability}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            impressions
         </td>
-        <td>
-          {ad.political_probability}
-        </td>
-      </tr>
-      <tr>
-        <td>
-          impressions
-        </td>
-        <td>
-          {ad.impressions}
-        </td>
-      </tr>
-      <tr>
-        <td colSpan="2">
-          {ad.suppressed ? "Suppressed" : <button onClick={function() { return onClick(ad); }}>
+          <td>
+            {ad.impressions}
+          </td>
+        </tr>
+        <tr>
+          <td colSpan="2">
+            {ad.suppressed ? "Suppressed" : <button onClick={function () { return onClick(ad); }}>
               Suppress
           </button>}
-        </td>
-      </tr>
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 );
+
+let AdDetail = ({ ad }) => {
+  if (ad) {
+    return (<div id="ad">
+      <input id="search" placeholder="Search for ads" />
+
+      <Ad ad={ad} />
+
+    </div>);
+  } else {
+    return (<div><h2>Uh oh, an ad with that ID couldn't be found!</h2></div>);
+  }
+};
+
+AdDetail = connect(
+  ({ ads }) => ({
+    ad: ads.filter((ad) => ad.id == searchParams.get("detail"))[0]
+  })
+)(AdDetail);
 
 let Ads = ({ ads, onClick, onKeyUp, search }) => (
   <div id="ads">
@@ -195,7 +220,7 @@ let Ads = ({ ads, onClick, onKeyUp, search }) => (
     {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} />)}
   </div>
 );
-const throttledDispatch = debounce((dispatch, input) => {dispatch(newSearch(input));}, 750);
+const throttledDispatch = debounce((dispatch, input) => { dispatch(newSearch(input)); }, 750);
 Ads = connect(
   ({ ads, search }) => ({
     ads: ads.filter((ad) => !ad.suppressed),
@@ -217,16 +242,18 @@ let Login = ({ dispatch }) => {
     dispatch(authorize(email.value, password.value));
   };
   return <form id="login" onSubmit={onLogin} >
-    <input id="email" type="text" ref={(node) => email = node } placeholder="email" />
-    <input id="password" type="password" ref={(node) => password = node } placeholder="password" />
+    <input id="email" type="text" ref={(node) => email = node} placeholder="email" />
+    <input id="password" type="password" ref={(node) => password = node} placeholder="password" />
     <input id="submit" type="submit" value="login" />
   </form>;
 };
 Login = connect()(Login);
 
-let App = ({credentials}) => (
+
+let App = ({ credentials }) => (
   <div id="app">
-    {credentials && credentials.token ? <Ads /> : <Login />}
+    <h1><a href="/facebook-ads/admin?">FBPAC Admin</a></h1>
+    {credentials && credentials.token ? (searchParams.get("detail") ? <AdDetail /> : <Ads />) : <Login />}
   </div>
 );
 App = connect((state) => state)(App);
@@ -236,7 +263,7 @@ go(() => {
     <Provider store={store}>
       <App />
     </Provider>,
-    document.body
+    document.querySelector("#react-root")
   );
   deserialize(store.dispatch);
   refresh(store).then(() => store.subscribe(() => refresh(store)));
