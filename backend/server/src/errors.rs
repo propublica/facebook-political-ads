@@ -1,4 +1,4 @@
-use r2d2::Error as R2Error;
+use diesel::r2d2::PoolError as R2Error;
 use diesel::result::Error as DieselError;
 use serde_json::Error as SerdeError;
 use string::FromUtf8Error;

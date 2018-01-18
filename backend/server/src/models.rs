@@ -5,7 +5,7 @@ use diesel::dsl::sql;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use diesel::types::{BigInt, Text};
+use diesel::sql_types::{BigInt, Text};
 use diesel_full_text_search::*;
 use errors::*;
 use futures::{Future, stream, Stream};
@@ -18,7 +18,7 @@ use kuchiki::iter::{Select, Elements, Descendants};
 use kuchiki::traits::*;
 use url::Url;
 use targeting_parser::{collect_targeting, collect_advertiser, Targeting};
-use r2d2_diesel::ConnectionManager;
+use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::{default_tls_client, Region};
 use rusoto_credential::DefaultCredentialsProvider;
@@ -128,7 +128,6 @@ impl Images {
             .filter(|i| ad.thumbnail.contains(i.path()))
             .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches('/'))
             .nth(0);
- 
         let mut rest = images.to_owned();
         if let Some(thumb) = thumb.clone() {
             rest.retain(|x| !thumb.contains(x.path()))
