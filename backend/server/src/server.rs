@@ -1,4 +1,6 @@
 use diesel::pg::PgConnection;
+use diesel::r2d2::ConnectionManager;
+use r2d2::Pool;
 use dotenv::dotenv;
 use errors::*;
 use futures::future;
@@ -17,8 +19,6 @@ use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
 use models::{Aggregate, Advertisers, NewAd, Ad, Targets, Entities};
-use r2d2_diesel::ConnectionManager;
-use r2d2::Pool;
 use start_logging;
 use serde_json;
 use std::collections::HashMap;

@@ -20,7 +20,6 @@ extern crate log4rs;
 #[macro_use]
 extern crate nom;
 extern crate r2d2;
-extern crate r2d2_diesel;
 extern crate rusoto_core;
 extern crate rusoto_credential;
 extern crate rusoto_s3;
