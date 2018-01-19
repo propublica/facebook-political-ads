@@ -7,7 +7,8 @@ import { Provider, connect } from 'react-redux';
 import { createLogger } from 'redux-logger';
 import {
   headers, NEW_ADS, refresh, newSearch, search,
-  enableBatching, deserialize, lang
+  enableBatching, deserialize, lang,
+  GOT_THAT_AD, getOneAd
 } from 'utils.js';
 import { entities, targets, advertisers, filters } from 'filters.jsx';
 import { Pagination, pagination } from 'pagination.jsx';
@@ -18,11 +19,13 @@ import { go } from 'i18n.js';
 import { debounce } from "lodash";
 
 // I'll figure out a better way to do this but I'm learning React so 🐻 with me.
+// we're probably going to want a router? maybe?
 const searchParams = new URLSearchParams(location.search);
-console.log(searchParams);
+
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
 const LOGOUT = "logout";
+const GET_ONE_AD = "GET_ONE_AD";
 
 const b64 = (thing) => btoa(thing).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 const createJWT = (username, password) => {
@@ -50,6 +53,11 @@ const hideAd = (ad) => ({
   type: HIDE_AD,
   id: ad.id
 });
+
+// const getOneAd = (ad_id) => ({
+//   type: GET_ONE_AD,
+//   id: ad_id
+// })
 
 const suppressAd = (ad) => {
   return (dispatch, getState) => {
@@ -119,8 +127,20 @@ const ads = (state = [], action) => {
   }
 };
 
+const permalinked_ad = (state = {}, action) => {
+  switch (action.type) {
+    case GOT_THAT_AD:
+      return Object.assign({}, state, { ad: action.ad, requested_ad_loaded: true })
+    case GET_ONE_AD:
+      return Object.assign({}, state, { requested_id: action.id, requested_ad_loaded: false })
+    default:
+      return state;
+  }
+}
+
 const reducer = enableBatching(combineReducers({
   ads,
+  permalinked_ad,
   search,
   entities,
   advertisers,
@@ -208,9 +228,10 @@ let AdDetail = ({ ad }) => {
 };
 
 AdDetail = connect(
-  ({ ads }) => ({
-    ad: ads.filter((ad) => ad.id == searchParams.get("detail"))[0]
-  })
+  ({ permalinked_ad }) => (
+    { // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
+      ad: permalinked_ad.ad
+    })
 )(AdDetail);
 
 let Ads = ({ ads, onClick, onKeyUp, search }) => (
@@ -265,6 +286,10 @@ go(() => {
     </Provider>,
     document.querySelector("#react-root")
   );
+
   deserialize(store.dispatch);
+  if (searchParams.get("detail")) {
+    store.dispatch(getOneAd(store, searchParams.get("detail")));
+  }
   refresh(store).then(() => store.subscribe(() => refresh(store)));
 });
