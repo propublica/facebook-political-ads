@@ -5,7 +5,6 @@ extern crate futures_cpupool;
 extern crate hyper;
 extern crate hyper_tls;
 extern crate r2d2;
-extern crate r2d2_diesel;
 extern crate tokio_core;
 
 use diesel::pg::PgConnection;
@@ -14,7 +13,7 @@ use dotenv::dotenv;
 use futures_cpupool::CpuPool;
 use hyper::Client;
 use hyper_tls::HttpsConnector;
-use r2d2_diesel::ConnectionManager;
+use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
 use server::models::Ad;
 use server::start_logging;
