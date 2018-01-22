@@ -8,7 +8,7 @@ import { createLogger } from 'redux-logger';
 import {
   headers, NEW_ADS, refresh, newSearch, search,
   enableBatching, deserialize, lang,
-  GOT_THAT_AD, getOneAd
+  GOT_THAT_AD, REQUESTING_ONE_AD, COULDNT_GET_THAT_AD, getOneAd
 } from 'utils.js';
 import { entities, targets, advertisers, filters } from 'filters.jsx';
 import { Pagination, pagination } from 'pagination.jsx';
@@ -131,7 +131,9 @@ const permalinked_ad = (state = {}, action) => {
   switch (action.type) {
     case GOT_THAT_AD:
       return Object.assign({}, state, { ad: action.ad, requested_ad_loaded: true })
-    case GET_ONE_AD:
+    case COULDNT_GET_THAT_AD:
+      return Object.assign({}, state, { ad: null, requested_ad_loaded: true })
+    case REQUESTING_ONE_AD:
       return Object.assign({}, state, { requested_id: action.id, requested_ad_loaded: false })
     default:
       return state;
@@ -154,13 +156,13 @@ const reducer = enableBatching(combineReducers({
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(...[persistState("credentials"), applyMiddleware(...middleware)]));
 
-const Ad = ({ ad, onClick }) => (
+const Ad = ({ ad, onClick, onPermalinkClick }) => (
   <div className="ad">
     <table>
       <tbody>
         <tr>
           <td>id</td>
-          <td>{ad.id}</td>
+          <td><a href={"?detail=" + ad.id} onClick={(e) => { e.preventDefault(); onPermalinkClick(ad.id) }}>{ad.id}</a></td>
         </tr>
         <tr>
           <td>first seen</td>
@@ -214,44 +216,57 @@ const Ad = ({ ad, onClick }) => (
   </div>
 );
 
-let AdDetail = ({ ad }) => {
-  if (ad) {
-    return (<div id="ad">
-      <input id="search" placeholder="Search for ads" />
+let AdDetail = ({ ad, requested_ad_loaded }) => {
+  if (requested_ad_loaded) {
+    if (ad) {
+      return (<div id="ad">
+        <input id="search" placeholder="Search for ads" />
 
-      <Ad ad={ad} />
+        <Ad ad={ad} />
 
-    </div>);
+      </div>);
+    } else {
+      return (<div><h2>Uh oh, an ad with that ID couldn't be found!</h2></div>);
+    }
   } else {
-    return (<div><h2>Uh oh, an ad with that ID couldn't be found!</h2></div>);
+    return (<div><h2>Loading...</h2></div>)
   }
 };
 
 AdDetail = connect(
-  ({ permalinked_ad }) => (
+  ({ permalinked_ad, requested_ad_loaded }) => (
     { // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
-      ad: permalinked_ad.ad
+      ad: permalinked_ad.ad,
+      requested_ad_loaded: permalinked_ad.requested_ad_loaded
     })
 )(AdDetail);
 
-let Ads = ({ ads, onClick, onKeyUp, search }) => (
+let Ads = ({ ads, onClick, onKeyUp, onPermalinkClick, search }) => (
   <div id="ads">
     <input id="search" placeholder="Search for ads" onKeyUp={onKeyUp} search={search} />
     <Pagination />
-    {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} />)}
+    {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} onPermalinkClick={onPermalinkClick} />)}
   </div>
 );
 const throttledDispatch = debounce((dispatch, input) => { dispatch(newSearch(input)); }, 750);
 Ads = connect(
   ({ ads, search }) => ({
     ads: ads.filter((ad) => !ad.suppressed),
+    credentials, // these are needed for eventually creating links
+    lang, // these are needed for eventually creating links
     search
   }),
-  (dispatch) => ({
+  (dispatch, ownProps) => ({
     onClick: (ad) => dispatch(suppressAd(ad)),
     onKeyUp: (e) => {
       e.preventDefault();
       throttledDispatch(dispatch, e.target.value.length ? e.target.value : null);
+    },
+    onPermalinkClick: (ad_id) => {
+      history.pushState({
+        id: 'permalink'
+      }, null, window.location.pathname + '?detail=' + ad_id);
+      dispatch(getOneAd(ad_id, ownProps.credentials, ownProps.lang))
     }
   })
 )(Ads);
@@ -271,12 +286,13 @@ let Login = ({ dispatch }) => {
 Login = connect()(Login);
 
 
-let App = ({ credentials }) => (
-  <div id="app">
+let App = ({ credentials, permalinked_ad }) => {
+  let mainThing = (Object.keys(permalinked_ad).length === 0 ? <Ads /> : <AdDetail />);
+  return (<div id="app">
     <h1><a href="/facebook-ads/admin?">FBPAC Admin</a></h1>
-    {credentials && credentials.token ? (searchParams.get("detail") ? <AdDetail /> : <Ads />) : <Login />}
-  </div>
-);
+    {credentials && credentials.token ? mainThing : <Login />}
+  </div>)
+};
 App = connect((state) => state)(App);
 
 go(() => {
@@ -288,8 +304,8 @@ go(() => {
   );
 
   deserialize(store.dispatch);
-  if (searchParams.get("detail")) {
-    store.dispatch(getOneAd(store, searchParams.get("detail")));
-  }
+  // if (searchParams.get("detail")) {c
+  store.dispatch(getOneAd(searchParams.get("detail"), store.getState().credentials, store.getState().lang));
+  // }
   refresh(store).then(() => store.subscribe(() => refresh(store)));
 });

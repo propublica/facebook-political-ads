@@ -20,11 +20,24 @@ const newAds = (ads) => ({
   value: ads
 });
 
-const GOT_THAT_AD = "GOT_THAT_AD2";
-const gotOneAd = (ad) => ({
+const GOT_THAT_AD = "GOT_THAT_AD";
+const receiveOneAd = (ad) => ({
   type: GOT_THAT_AD,
   ad: ad
 })
+
+const REQUESTING_ONE_AD = "REQUESTING_ONE_AD";
+const requestingOneAd = (ad_id) => ({
+  type: REQUESTING_ONE_AD,
+  ad_id: ad_id
+})
+
+const COULDNT_GET_THAT_AD = "COULDNT_GET_THAT_AD";
+const couldnt_get_that_ad = (ad_id) => ({
+  type: COULDNT_GET_THAT_AD,
+  ad_id: ad_id
+})
+
 
 const SET_LANG = "set_lang";
 const setLang = (lang) => ({
@@ -139,24 +152,24 @@ const enableBatching = (reducer) => {
   };
 };
 
-// return Object.assign({}, state, { ad: action.ad })
-// return Object.assign({}, state, { requested_id: action.id, requested_ad_loaded: false })
-let oneAdLoaded = false; // wtf is this?
-const getOneAd = (store, ad_id, url = "/facebook-ads/ads") => {
-  // const dispatch = store.dispatch;
-  // let ad_id = store.ad_id;
+let oneAdLoaded = false; // what is this?
+// getOneAd() and refresh() are thunk action creators.
+const getOneAd = (ad_id, credentials, lang, url = "/facebook-ads/ads") => {
   if (!ad_id)
     return () => null;
+
   let path = `${url}/${ad_id}`
-  // if (true || !oneAdLoaded) {
-  return (dispatch) => fetch(path, {
-    method: "GET",
-    headers: headers(store.getState().credentials, store.getState().lang)
-  }).then((res) => res.json())
-    .then((ads) => { // it's really just one ad.
-      dispatch(gotOneAd(ads.ads[0]));
-    })
-  // }
+  return (dispatch) => {
+    dispatch(requestingOneAd(ad_id));
+
+    fetch(path, {
+      method: "GET",
+      headers: headers(credentials, lang)
+    }).then((res) => res.json())
+      .then((ads) => { // it's really just one ad, but in an array...
+        dispatch(receiveOneAd(ads.ads[0]));
+      })
+  }
 }
 
 // this is horrid, todo cleanup
@@ -174,7 +187,7 @@ const refresh = (store, url = "/facebook-ads/ads") => {
         params.delete("page");
       }
       let query = params.toString().length > 0 ? `?${params.toString()}` : '';
-      history.pushState({}, "", `${window.location.pathname}${query}`);
+      history.pushState({ "search": query }, "", `${window.location.pathname}${query}`);
     }
     return fetch(path, {
       method: "GET",
@@ -194,4 +207,4 @@ const refresh = (store, url = "/facebook-ads/ads") => {
   }
 };
 
-export { headers, newAds, NEW_ADS, search, getOneAd, GOT_THAT_AD, refresh, newSearch, deserialize, enableBatching, lang };
+export { headers, newAds, NEW_ADS, search, getOneAd, GOT_THAT_AD, REQUESTING_ONE_AD, COULDNT_GET_THAT_AD, refresh, newSearch, deserialize, enableBatching, lang };
