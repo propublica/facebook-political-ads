@@ -12,22 +12,42 @@ def fetch_page(pagename, total_posts, graph):
     """
     Grab a selection of posts by page
     """
-    try:
-        posts = graph.request('/'+pagename+'/posts')
-    except facebook.GraphAPIError as err:
-        print("%s" % err)
-        return []
+    graph_retries = 0
+    while True:
+        try:
+            posts = graph.request('/'+pagename+'/posts')
+        except facebook.GraphAPIError as err:
+            print("%s" % err)
+            return []
+        except requests.exceptions.ConnectionError:
+            if retries < 3:
+                retries += 1
+            else: 
+                break
+        break
     page_count = 0
     post_bodies = []
     while posts:
         for post in posts['data']:
             if 'message' in post:
-                post_bodies.append(post['message'] + ' https://www.facebook.com/' + pagename + '/')
+                post_bodies.append(post['message'] + ' https://graph.facebook.com//' + pagename + '/')
                 if len(post_bodies) >= total_posts:
                     break
         if 'paging' in posts and len(post_bodies) < total_posts:
             if 'next' in posts['paging']:
-                posts = requests.get(posts['paging']['next']).json()
+                next_url = posts['paging']['next']
+                if next_url[0] == "/":
+                    next_url = "https://www.facebook.com" + next_url
+                retries = 0
+                while True:
+                    try: 
+                        posts = requests.get(next_url).json()
+                    except (json.decoder.JSONDecodeError, requests.exceptions.ConnectionError):
+                        if retries < 3:
+                            retries += 1
+                        else:
+                            break
+                    break
                 page_count += 1
             else:
                 break
