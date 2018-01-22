@@ -6,7 +6,7 @@ authors = ["Jeff Larson <thejefflarson@gmail.com>"]
 [dependencies]
 chrono = { version = "^0.4.0", features = ["serde"] }
 csv = "^1.0.0-beta.5"
-diesel = { version = "^1.0.0", features = ["postgres"] }
+diesel = { version = "^1.1.1", features = ["postgres", "r2d2"] }
 docopt = "^0.8.1"
 dotenv = "^0.10.1"
 futures = "^0.1.15"
@@ -17,8 +17,7 @@ kuchiki = "^0.6.0"
 serde = "^1.0.23"
 serde_json = "^1.0.6"
 serde_derive = "^1.0.21"
-r2d2 = "^0.8.1"
-r2d2-diesel = "^1.0.0"
+r2d2 = "^0.8.2"
 rusoto_core = "^0.30.0"
 rusoto_credential = "^0.9.2"
 rusoto_s3 = "^0.30.0"
