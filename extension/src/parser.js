@@ -63,6 +63,8 @@ const cleanAd = html => {
 const checkSponsor = node => {
   return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
     a => {
+      const canary = a.querySelectorAll("._2lgs");
+      Array.from(canary).forEach(canary => canary.remove(canary));
       const text = a.textContent;
       const style = window
         .getComputedStyle(a, ":after")
