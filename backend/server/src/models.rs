@@ -474,7 +474,7 @@ impl Ad {
 
         if let Some(p) = options.get("page") {
             let raw_offset = p.parse::<usize>().unwrap_or_default() * 20;
-            let offset = if raw_offset > 1000 { 1000 } else { raw_offset };
+            let offset = if raw_offset > 10000 { 10000 } else { raw_offset };
             query = query.offset(offset as i64);
         }
 
