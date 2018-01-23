@@ -453,6 +453,7 @@ const dispatchToProps = dispatch => ({
   onAcceptClick: e => {
     e.preventDefault();
     dispatch(acceptTerms());
+    getAds(store.getState().language, resp => dispatch(newAds(resp)));
   }
 });
 
@@ -473,8 +474,12 @@ store.subscribe(() => updateBadge(store.getState().ratings || []));
 
 // Refresh our ads by first filtering out ones the user has seen, and then merging like with
 // ratings.
-getAds(store.getState().language, resp => {
-  const set = new Set();
-  getUnratedRatings(store.getState().ratings).map(rating => set.add(rating.id));
-  store.dispatch(newAds(resp.filter(ad => !set.has(ad.id))));
-});
+if (store.getState().terms) {
+  getAds(store.getState().language, resp => {
+    const set = new Set();
+    getUnratedRatings(store.getState().ratings).map(rating =>
+      set.add(rating.id)
+    );
+    store.dispatch(newAds(resp.filter(ad => !set.has(ad.id))));
+  });
+}
