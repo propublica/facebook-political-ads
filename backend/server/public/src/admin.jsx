@@ -54,11 +54,6 @@ const hideAd = (ad) => ({
   id: ad.id
 });
 
-// const getOneAd = (ad_id) => ({
-//   type: GET_ONE_AD,
-//   id: ad_id
-// })
-
 const suppressAd = (ad) => {
   return (dispatch, getState) => {
     dispatch(hideAd(ad));
@@ -128,13 +123,17 @@ const ads = (state = [], action) => {
 };
 
 const permalinked_ad = (state = {}, action) => {
+  let new_ad_obj = {}
   switch (action.type) {
     case GOT_THAT_AD:
-      return Object.assign({}, state, { ad: action.ad, requested_ad_loaded: true })
+      new_ad_obj[action.ad.id] = Object.assign({}, action.ad, { loaded: true });
+      return Object.assign({}, state, { requested_ad_id: action.ad.id, ads: Object.assign({}, state.ads, new_ad_obj) })
     case COULDNT_GET_THAT_AD:
-      return Object.assign({}, state, { ad: null, requested_ad_loaded: true })
+      new_ad_obj[action.ad_id] = { loaded: true, failed: true };
+      return Object.assign({}, state, { requested_ad_id: action.ad_id, ads: Object.assign({}, state.ads, new_ad_obj) });
     case REQUESTING_ONE_AD:
-      return Object.assign({}, state, { requested_id: action.id, requested_ad_loaded: false })
+      new_ad_obj[action.ad_id] = { loaded: false };
+      return Object.assign({}, state, { requested_ad_id: action.ad_id, ads: Object.assign({}, state.ads, new_ad_obj) });
     default:
       return state;
   }
@@ -156,7 +155,7 @@ const reducer = enableBatching(combineReducers({
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(reducer, compose(...[persistState("credentials"), applyMiddleware(...middleware)]));
 
-const Ad = ({ ad, onClick, onPermalinkClick }) => (
+const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
   <div className="ad">
     <table>
       <tbody>
@@ -206,7 +205,7 @@ const Ad = ({ ad, onClick, onPermalinkClick }) => (
         </tr>
         <tr>
           <td colSpan="2">
-            {ad.suppressed ? "Suppressed" : <button onClick={function () { return onClick(ad); }}>
+            {ad.suppressed ? "Suppressed" : <button onClick={function () { return onSuppressClick(ad); }}>
               Suppress
           </button>}
           </td>
@@ -216,13 +215,13 @@ const Ad = ({ ad, onClick, onPermalinkClick }) => (
   </div>
 );
 
-let AdDetail = ({ ad, requested_ad_loaded }) => {
-  if (requested_ad_loaded) {
-    if (ad) {
+let AdDetail = ({ ads, requested_ad_id, onSuppressClick, onPermalinkClick }) => {
+  if (ads && ads[requested_ad_id].loaded) {
+    if (ads[requested_ad_id].id) {
       return (<div id="ad">
         <input id="search" placeholder="Search for ads" />
 
-        <Ad ad={ad} />
+        <Ad ad={ads[requested_ad_id]} onSuppressClick={onSuppressClick} onPermalinkClick={onPermalinkClick} />
 
       </div>);
     } else {
@@ -234,18 +233,28 @@ let AdDetail = ({ ad, requested_ad_loaded }) => {
 };
 
 AdDetail = connect(
-  ({ permalinked_ad, requested_ad_loaded }) => (
+  ({ permalinked_ad }) => (
     { // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
-      ad: permalinked_ad.ad,
-      requested_ad_loaded: permalinked_ad.requested_ad_loaded
-    })
+      ads: permalinked_ad.ads,
+      requested_ad_id: permalinked_ad.requested_ad_id,
+
+    }),
+  (dispatch) => ({ // ownProps is available as a second argument here.
+    onSuppressClick: (ad) => dispatch(suppressAd(ad)),
+    onPermalinkClick: (ad_id) => {
+      history.pushState({
+        id: 'permalink'
+      }, null, window.location.pathname + '?detail=' + ad_id);
+      dispatch(getOneAd(ad_id))
+    }
+  })
 )(AdDetail);
 
-let Ads = ({ ads, onClick, onKeyUp, onPermalinkClick, search }) => (
+let Ads = ({ ads, onSuppressClick, onKeyUp, onPermalinkClick, search }) => (
   <div id="ads">
     <input id="search" placeholder="Search for ads" onKeyUp={onKeyUp} search={search} />
     <Pagination />
-    {ads.map((ad) => <Ad ad={ad} key={ad.id} onClick={onClick} onPermalinkClick={onPermalinkClick} />)}
+    {ads.map((ad) => <Ad ad={ad} key={ad.id} onSuppressClick={onSuppressClick} onPermalinkClick={onPermalinkClick} />)}
   </div>
 );
 const throttledDispatch = debounce((dispatch, input) => { dispatch(newSearch(input)); }, 750);
@@ -257,7 +266,7 @@ Ads = connect(
     search
   }),
   (dispatch, ownProps) => ({
-    onClick: (ad) => dispatch(suppressAd(ad)),
+    onSuppressClick: (ad) => dispatch(suppressAd(ad)),
     onKeyUp: (e) => {
       e.preventDefault();
       throttledDispatch(dispatch, e.target.value.length ? e.target.value : null);
@@ -266,7 +275,7 @@ Ads = connect(
       history.pushState({
         id: 'permalink'
       }, null, window.location.pathname + '?detail=' + ad_id);
-      dispatch(getOneAd(ad_id, ownProps.credentials, ownProps.lang))
+      dispatch(getOneAd(ad_id))
     }
   })
 )(Ads);
@@ -287,7 +296,7 @@ Login = connect()(Login);
 
 
 let App = ({ credentials, permalinked_ad }) => {
-  let mainThing = (Object.keys(permalinked_ad).length === 0 ? <Ads /> : <AdDetail />);
+  let mainThing = (permalinked_ad.requested_ad_id ? <AdDetail /> : <Ads />);
   return (<div id="app">
     <h1><a href="/facebook-ads/admin?">FBPAC Admin</a></h1>
     {credentials && credentials.token ? mainThing : <Login />}
@@ -304,8 +313,8 @@ go(() => {
   );
 
   deserialize(store.dispatch);
-  // if (searchParams.get("detail")) {c
-  store.dispatch(getOneAd(searchParams.get("detail"), store.getState().credentials, store.getState().lang));
-  // }
+  store.dispatch(getOneAd(searchParams.get("detail")));
+
+  // store.dispatch(refresh());
   refresh(store).then(() => store.subscribe(() => refresh(store)));
 });

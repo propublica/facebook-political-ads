@@ -154,17 +154,23 @@ const enableBatching = (reducer) => {
 
 let oneAdLoaded = false; // what is this?
 // getOneAd() and refresh() are thunk action creators.
-const getOneAd = (ad_id, credentials, lang, url = "/facebook-ads/ads") => {
+const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
   if (!ad_id)
     return () => null;
 
   let path = `${url}/${ad_id}`
-  return (dispatch) => {
+  return (dispatch, getState) => {
+    // TODO: get lang and credentials from getState
+    let state = getState()
+
+    if (state.permalinked_ad.ads && state.permalinked_ad.ads[ad_id] && state.permalinked_ad.ads[ad_id].id) {
+      return Promise.resolve(dispatch(receiveOneAd({ ads: [state.permalinked_ad.ads[ad_id]] })))
+    }
     dispatch(requestingOneAd(ad_id));
 
     fetch(path, {
       method: "GET",
-      headers: headers(credentials, lang)
+      headers: headers(state.credentials, state.lang)
     }).then((res) => res.json())
       .then((ads) => { // it's really just one ad, but in an array...
         dispatch(receiveOneAd(ads.ads[0]));
@@ -187,7 +193,9 @@ const refresh = (store, url = "/facebook-ads/ads") => {
         params.delete("page");
       }
       let query = params.toString().length > 0 ? `?${params.toString()}` : '';
-      history.pushState({ "search": query }, "", `${window.location.pathname}${query}`);
+      if (!store.getState().permalinked_ad.requested_ad_id) { // if we're viewing a permalinked ad, don't change the query (but we can still do the refresh in teh backgorund.)
+        history.pushState({ "search": query }, "", `${window.location.pathname}${query}`);
+      }
     }
     return fetch(path, {
       method: "GET",
