@@ -70,6 +70,10 @@ We train the classifier using python and scikit learn and the source is in `back
     pipenv install
     pipenv shell
 
+To download the seeds for the classifier, you'll need a Facebook app and you'll run the seed command like this.:
+
+    FACEBOOK_APP_ID=whatever FACEBOOK_APP_SECRET=whatever DATABASE_URL=postgres://whatever/facebook_ads ./classify seed en-US`
+
 And to build the classifier you'll want to run:
 
     ./classify build
