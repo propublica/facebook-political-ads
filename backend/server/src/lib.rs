@@ -3,8 +3,8 @@ extern crate chrono;
 #[macro_use]
 extern crate diesel;
 extern crate diesel_full_text_search;
-#[macro_use]
-extern crate diesel_infer_schema;
+// #[macro_use] // commented out because now we're using print-schema in schema.rs
+// extern crate diesel_infer_schema;
 extern crate dotenv;
 #[macro_use]
 extern crate error_chain;
