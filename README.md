@@ -50,6 +50,8 @@ This will give a server running at `localhost:8080`. You will also need to build
 
 This will build the required static assets (javascript & css) to view the admin console at `localhost:8080/facebook-ads/`.
 
+If you make any changes to the database, after you run the migration, you'll want to update `the schema with diesel print-schema > src/schema.rs`.
+
 The backend has both unit and integration tests. You will need to set up a test database alongside your actual database in order to run the integration tests. To do this, you will need to the same as above, but substitute out the database test URL:
 
     diesel database setup --database-url postgres://localhost/facebook_ads_test
