@@ -483,6 +483,17 @@ impl Ad {
         )?)
     }
 
+    pub fn get_ad(
+        conn: &Pool<ConnectionManager<PgConnection>>,
+        adid: String,
+    ) -> Result<Ad> {
+        use schema::ads::dsl::*;
+
+        let connection = conn.get()?;
+        let ad = Ok(ads.find(adid).first(&*connection)?); // `load::<Ad>` instead of `first` would get us a Vec<Ad> instead of an <Ad>
+        ad
+    }
+
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
         use schema::ads::dsl::*;
         let connection = conn.get()?;

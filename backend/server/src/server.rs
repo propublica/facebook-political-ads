@@ -8,17 +8,19 @@ use futures_cpupool::CpuPool;
 use futures::future::{Either, FutureResult};
 use futures::{Future, Sink, Stream};
 use hyper;
-use hyper::{Body, Client, Chunk, Method, StatusCode};
+use hyper::{Body, Chunk, Client, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::Headers;
-use hyper::header::{AcceptLanguage, ContentLength, ContentType, Authorization, Bearer, Vary,
-                    AccessControlAllowOrigin, CacheControl, CacheDirective,
-                    Connection as HttpConnection};
+use hyper::header::{AcceptLanguage, AccessControlAllowOrigin, Authorization, Bearer, CacheControl,
+                    CacheDirective, Connection as HttpConnection, ContentLength, ContentType, Vary};
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
-use models::{Aggregate, Advertisers, NewAd, Ad, Targets, Entities};
+use models::{Ad, Advertisers, Aggregate, Entities, NewAd, Targets};
+use r2d2_diesel::ConnectionManager;
+use r2d2::Pool;
+use regex::Regex;
 use start_logging;
 use serde_json;
 use std::collections::HashMap;
@@ -34,7 +36,7 @@ use tokio_core::reactor::{Core, Handle};
 use tokio_postgres::{Connection, TlsMode};
 use tokio_timer::Timer;
 use unicase::Ascii;
-use url::{Url, form_urlencoded};
+use url::{form_urlencoded, Url};
 
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
@@ -78,15 +80,16 @@ impl Service for AdServer {
     // This is not at all RESTful, but I'd rather not deal with regexes. Maybe soon
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
+        let restfulre = Regex::new(r"^/facebook-ads/ads/?(\d+)?$").unwrap();
+
         match (req.method(), req.path()) {
             (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
                 Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
             })),
             // Admin
-            (&Method::Get, "/facebook-ads/admin") => Either::B(self.get_file(
-                "public/admin.html",
-                ContentType::html(),
-            )),
+            (&Method::Get, "/facebook-ads/admin") => {
+                Either::B(self.get_file("public/admin.html", ContentType::html()))
+            }
             (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file(
                 "public/dist/admin.js",
                 ContentType(mime::TEXT_JAVASCRIPT),
@@ -99,15 +102,14 @@ impl Service for AdServer {
                 "public/css/admin/styles.css",
                 ContentType(mime::TEXT_CSS),
             )),
-            (&Method::Post, "/facebook-ads/admin/ads") => Either::B(self.auth(
-                req,
-                |request| self.mark_ad(request),
-            )),
+            (&Method::Post, "/facebook-ads/admin/ads") => {
+                Either::B(self.auth(req, |request| self.mark_ad(request)))
+            }
+
             // Public
-            (&Method::Get, "/facebook-ads/") => Either::B(self.get_file(
-                "public/index.html",
-                ContentType::html(),
-            )),
+            (&Method::Get, "/facebook-ads/") => {
+                Either::B(self.get_file("public/index.html", ContentType::html()))
+            }
             (&Method::Get, "/facebook-ads/index.js") => Either::B(self.get_file(
                 "public/dist/index.js",
                 ContentType(mime::TEXT_JAVASCRIPT),
@@ -133,30 +135,39 @@ impl Service for AdServer {
                 ContentType::json(),
             )),
             (&Method::Get, "/facebook-ads/locales/en/translation.json") => Either::B(
-                self.get_file(
-                    "public/locales/en/translation.json",
-                    ContentType::json(),
-                ),
+                self.get_file("public/locales/en/translation.json", ContentType::json()),
             ),
             (&Method::Get, "/facebook-ads/locales/de/translation.json") => Either::B(
-                self.get_file(
-                    "public/locales/de/translation.json",
-                    ContentType::json(),
-                ),
+                self.get_file("public/locales/de/translation.json", ContentType::json()),
             ),
-            (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads()),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
-            (&Method::Get, "/facebook-ads/heartbeat") => Either::A(
-                future::ok(Response::new().with_status(
-                    StatusCode::Ok,
-                )),
-            ),
-            _ => {
-                Either::A(future::ok(
-                    Response::new().with_status(StatusCode::NotFound),
-                ))
+            (&Method::Get, "/facebook-ads/heartbeat") => {
+                Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
+            (&Method::Get, _) => match restfulre.captures(&req.path().to_owned()){ // I'm sure I will understand why I needed to call to_owned() here better later, but for now, this is how to avoid borrowing-related issues.
+                Some(ads_match) => {
+                    match ads_match.get(1) {
+                        Some(id_match) => {
+                            match id_match.as_str() {
+                                "" | "/" => {
+                                    Either::B(self.get_ads(req))
+                                },
+                                _ => {
+                                    Either::B(self.get_ad(id_match.as_str().into()))
+                                }
+                            }
+                        },
+                        None => {
+                            Either::B(self.get_ads(req))
+                        }
+                    }
+                }
+                None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound)))
+            },
+            _ => Either::A(future::ok(
+                Response::new().with_status(StatusCode::NotFound),
+            )),
         }
     }
 }
@@ -179,11 +190,11 @@ impl AdServer {
     where
         F: Fn(Request) -> ResponseFuture,
     {
-        let auth = req.headers().get::<Authorization<Bearer>>().and_then(
-            |token| {
+        let auth = req.headers()
+            .get::<Authorization<Bearer>>()
+            .and_then(|token| {
                 decode::<Admin>(&token.token, self.password.as_ref(), &Validation::default()).ok()
-            },
-        );
+            });
 
         if auth.is_some() {
             info!("Login {:?}", auth);
@@ -227,8 +238,8 @@ impl AdServer {
             });
             if let Some(l) = lang {
                 Some(
-                    l.clone().item.language.unwrap() + "-" +
-                        &l.clone().item.region.unwrap().to_uppercase(),
+                    l.clone().item.language.unwrap() + "-"
+                        + &l.clone().item.region.unwrap().to_uppercase(),
                 )
             } else {
                 languages[0].clone().item.language
@@ -236,6 +247,35 @@ impl AdServer {
         } else {
             None
         }
+    }
+
+    fn get_ad(&self, adid: String) -> ResponseFuture {
+        let db_pool = self.db_pool.clone();
+        let pool = self.pool.clone();
+        let ad = spawn_with_clone!(pool; db_pool, adid;
+                        Ad::get_ad(&db_pool, adid)
+                    );
+        let future = ad.map(|ad| {
+            serde_json::to_string(&ApiResponse {
+                ads: vec![ad],
+                targets: Vec::<Targets>::new(),
+                entities: Vec::<Entities>::new(),
+                advertisers: Vec::<Advertisers>::new(),
+                total: 1,
+            }).map(|serialized| {
+                Response::new()
+                    .with_header(ContentLength(serialized.len() as u64))
+                    .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
+                    .with_header(ContentType::json())
+                    .with_header(AccessControlAllowOrigin::Any)
+                    .with_body(serialized)
+            })
+                .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
+        }).map_err(|e| {
+            warn!("{:?}", e);
+            hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+        });
+        Box::new(future)
     }
 
     fn get_ads(&self, req: Request) -> ResponseFuture {
@@ -247,28 +287,23 @@ impl AdServer {
                         .filter(|pair| {
                             pair.0 == "search" || pair.0 == "page" || pair.0 == "targets" ||
                                 pair.0 == "advertisers" ||
-                                pair.0 == "entities"
+                                pair.0 == "entities"    || pair.0 == "id"
                         })
-                        .collect::<HashMap<_, _>>()
+                        .collect::<HashMap<_, _>>() // transforms the Vector of tuples into a HashMap.
                 })
                 .unwrap_or_default();
 
             let db_pool = self.db_pool.clone();
             let pool = self.pool.clone();
-            let ads =
-                spawn_with_clone!(pool; lang, db_pool, options;
+            let ads = spawn_with_clone!(pool; lang, db_pool, options;
                                         Ad::get_ads(&lang, &db_pool, &options));
-            let targets =
-                spawn_with_clone!(pool; lang, db_pool, options;
+            let targets = spawn_with_clone!(pool; lang, db_pool, options;
                                             Targets::get(&lang, &db_pool, &options));
-            let entities =
-                spawn_with_clone!(pool; lang, db_pool, options;
+            let entities = spawn_with_clone!(pool; lang, db_pool, options;
                                   Entities::get(&lang, &db_pool, &options));
-            let advertisers =
-                spawn_with_clone!(pool; lang, db_pool, options;
+            let advertisers = spawn_with_clone!(pool; lang, db_pool, options;
                                   Advertisers::get(&lang, &db_pool, &options));
-            let total =
-                spawn_with_clone!(pool; lang, db_pool, options;
+            let total = spawn_with_clone!(pool; lang, db_pool, options;
                                           Ad::get_total(&lang, &db_pool, &options));
 
             let future = ads.join5(targets, entities, advertisers, total)
@@ -310,11 +345,8 @@ impl AdServer {
         let url = Url::parse(&self.database_url.clone()).unwrap();
         let database_url = url.as_str();
 
-        let notifications = Connection::connect(
-            database_url,
-            TlsMode::None,
-            &self.handle.clone(),
-        ).then(|c| c.unwrap().batch_execute("listen ad_update"))
+        let notifications = Connection::connect(database_url, TlsMode::None, &self.handle.clone())
+            .then(|c| c.unwrap().batch_execute("listen ad_update"))
             .map(move |c| {
                 let timer = Timer::default()
                     .interval(Duration::from_millis(1000))
@@ -404,6 +436,7 @@ impl AdServer {
         ads.collect::<Result<Vec<Ad>>>()
     }
 
+    // for suppressin' ads.
     fn mark_ad(&self, req: Request) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
@@ -436,16 +469,17 @@ impl AdServer {
             env::set_current_dir(&root).expect(&format!("Couldn't change directory to {}", root));
         }
 
-        let addr = env::var("HOST").expect("HOST must be set").parse().expect(
-            "Error parsing HOST",
-        );
+        let addr = env::var("HOST")
+            .expect("HOST must be set")
+            .parse()
+            .expect("Error parsing HOST");
 
         let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
         let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
-        let db_pool = Pool::builder().build(manager).expect(
-            "Failed to create pool.",
-        );
+        let db_pool = Pool::builder()
+            .build(manager)
+            .expect("Failed to create pool.");
         let pool = CpuPool::new_num_cpus();
 
         let mut core = Core::new().unwrap();
@@ -453,9 +487,9 @@ impl AdServer {
         let listener = TcpListener::bind(&addr, &handle).expect("Couldn't start server.");
         let connector =
             HttpsConnector::new(4, &core.handle()).expect("Couldn't build HttpsConnector");
-        let client = Client::configure().connector(connector).build(
-            &core.handle(),
-        );
+        let client = Client::configure()
+            .connector(connector)
+            .build(&core.handle());
 
         let server = listener.incoming().for_each(|(sock, addr)| {
             let s = AdServer {
