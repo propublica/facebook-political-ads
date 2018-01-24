@@ -7,19 +7,37 @@ import {
 } from 'filters.jsx';
 
 const auth = (credentials) => (credentials ?
-  {"Authorization": `Bearer ${credentials.token}`} :
+  { "Authorization": `Bearer ${credentials.token}` } :
   {});
 
 const headers = (credentials, lang) => Object.assign({}, auth(credentials), language(lang));
 
-const language = (lang) => ({"Accept-Language": lang + ";q=1.0"});
+const language = (lang) => ({ "Accept-Language": lang + ";q=1.0" });
 
 const NEW_ADS = "new_ads";
-
 const newAds = (ads) => ({
   type: NEW_ADS,
   value: ads
 });
+
+const GOT_THAT_AD = "GOT_THAT_AD";
+const receiveOneAd = (ad) => ({
+  type: GOT_THAT_AD,
+  ad: ad
+})
+
+const REQUESTING_ONE_AD = "REQUESTING_ONE_AD";
+const requestingOneAd = (ad_id) => ({
+  type: REQUESTING_ONE_AD,
+  ad_id: ad_id
+})
+
+const COULDNT_GET_THAT_AD = "COULDNT_GET_THAT_AD";
+const couldnt_get_that_ad = (ad_id) => ({
+  type: COULDNT_GET_THAT_AD,
+  ad_id: ad_id
+})
+
 
 const SET_LANG = "set_lang";
 const setLang = (lang) => ({
@@ -28,11 +46,11 @@ const setLang = (lang) => ({
 });
 
 const lang = (state = null, action) => {
-  switch(action.type) {
-  case SET_LANG:
-    return action.value;
-  default:
-    return state;
+  switch (action.type) {
+    case SET_LANG:
+      return action.value;
+    default:
+      return state;
   }
 };
 
@@ -43,11 +61,11 @@ const newSearch = (query) => ({
 });
 
 const search = (state = null, action) => {
-  switch(action.type) {
-  case NEW_SEARCH:
-    return action.value;
-  default:
-    return state;
+  switch (action.type) {
+    case NEW_SEARCH:
+      return action.value;
+    default:
+      return state;
   }
 };
 
@@ -55,18 +73,18 @@ const serialize = (store) => {
   let params = new URLSearchParams();
   const state = store.getState();
 
-  if(state.search) {
+  if (state.search) {
     params.set("search", state.search);
   }
 
   params = [serializeAdvertisers, serializeTargets, serializeEntities]
     .reduce((params, cb) => cb(params, state), params);
 
-  if(state.pagination.page) {
+  if (state.pagination.page) {
     params.set("page", state.pagination.page);
   }
 
-  if(state.lang === 'de-DE') {
+  if (state.lang === 'de-DE') {
     params.set("lang", state.lang);
   }
 
@@ -76,11 +94,11 @@ const serialize = (store) => {
 const deserialize = (dispatch) => {
   const params = new URLSearchParams(window.location.search);
   const actions = [];
-  if(params.has("search")) {
+  if (params.has("search")) {
     actions.push(newSearch(params.get("search")));
   }
 
-  if(params.has("entities")) {
+  if (params.has("entities")) {
     const entities = JSON.parse(params.get("entities"));
     actions.push(newEntities(entities));
     entities.map((it) => {
@@ -88,7 +106,7 @@ const deserialize = (dispatch) => {
     });
   }
 
-  if(params.has("targets")) {
+  if (params.has("targets")) {
     const targeting = JSON.parse(params.get("targets"));
     actions.push(newTargets(targeting));
     targeting.map((it) => {
@@ -96,7 +114,7 @@ const deserialize = (dispatch) => {
     });
   }
 
-  if(params.has("advertisers")) {
+  if (params.has("advertisers")) {
     const advertisers = JSON.parse(params.get("advertisers")).map((advertiser) => ({ advertiser }));
     actions.push(newAdvertisers(advertisers));
     advertisers.map((advertiser) => {
@@ -104,7 +122,7 @@ const deserialize = (dispatch) => {
     });
   }
 
-  if(params.has("page")) {
+  if (params.has("page")) {
     actions.push(setTotal(10000));
     actions.push(setPage(parseInt(params.get("page"), 10)));
   }
@@ -126,13 +144,38 @@ const batch = (...actions) => {
 const enableBatching = (reducer) => {
   return function batchingReducer(state, action) {
     switch (action.type) {
-    case BATCH:
-      return action.actions.reduce(batchingReducer, state);
-    default:
-      return reducer(state, action);
+      case BATCH:
+        return action.actions.reduce(batchingReducer, state);
+      default:
+        return reducer(state, action);
     }
   };
 };
+
+let oneAdLoaded = false; // what is this?
+// getOneAd() and refresh() are thunk action creators.
+const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
+  if (!ad_id)
+    return () => null;
+
+  let path = `${url}/${ad_id}`
+  return (dispatch, getState) => {
+    let state = getState()
+
+    if (state.permalinked_ad.ads && state.permalinked_ad.ads[ad_id] && state.permalinked_ad.ads[ad_id].id) {
+      return Promise.resolve(dispatch(receiveOneAd({ ads: [state.permalinked_ad.ads[ad_id]] })))
+    }
+    dispatch(requestingOneAd(ad_id));
+
+    fetch(path, {
+      method: "GET",
+      headers: headers(state.credentials, state.lang)
+    }).then((res) => res.json())
+      .then((ads) => { // it's really just one ad, but in an array...
+        dispatch(receiveOneAd(ads.ads[0]));
+      })
+  }
+}
 
 // this is horrid, todo cleanup
 let loaded = false;
@@ -141,15 +184,17 @@ const refresh = (store, url = "/facebook-ads/ads") => {
   const params = serialize(store, dispatch);
   let path = `${url}?${params.toString()}`;
   const cleanSearch = (new URLSearchParams(window.location.search));
-  if(!loaded || (cleanSearch.toString() !== params.toString())) {
-    if(!loaded) {
+  if (!loaded || (cleanSearch.toString() !== params.toString())) {
+    if (!loaded) {
       path = url + window.location.search;
     } else {
-      if(cleanSearch.get("page") === params.get("page")) {
+      if (cleanSearch.get("page") === params.get("page")) {
         params.delete("page");
       }
       let query = params.toString().length > 0 ? `?${params.toString()}` : '';
-      history.pushState({}, "", `${window.location.pathname}${query}`);
+      if (!store.getState().permalinked_ad.requested_ad_id) { // if we're viewing a permalinked ad, don't change the query (but we can still do the refresh in teh backgorund.)
+        history.pushState({ "search": query }, "", `${window.location.pathname}${query}`);
+      }
     }
     return fetch(path, {
       method: "GET",
@@ -169,4 +214,4 @@ const refresh = (store, url = "/facebook-ads/ads") => {
   }
 };
 
-export { headers, newAds, NEW_ADS, search, refresh, newSearch, deserialize, enableBatching, lang };
+export { headers, newAds, NEW_ADS, search, getOneAd, GOT_THAT_AD, REQUESTING_ONE_AD, COULDNT_GET_THAT_AD, refresh, newSearch, deserialize, enableBatching, lang };

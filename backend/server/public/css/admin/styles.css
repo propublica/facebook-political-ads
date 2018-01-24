@@ -128,3 +128,10 @@ img {
   padding: 0.5rem;
   text-decoration: none;
 }
+
+#app {
+  max-width: 1234px;
+  width: 98%;
+  margin-left: auto;
+  margin-right: auto;
+}
