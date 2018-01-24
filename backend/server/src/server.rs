@@ -138,8 +138,6 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/locales/de/translation.json") => Either::B(
                 self.get_file("public/locales/de/translation.json", ContentType::json()),
             ),
-            // (&Method::Get, "/facebook-ads/ad") => Either::B(self.get_ad(req)),
-            // (&Method::Get, "/facebook-ads/ads") => Either::B(self.get_ads(req)),
             (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads()),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => {
@@ -154,8 +152,7 @@ impl Service for AdServer {
                                     Either::B(self.get_ads(req))
                                 },
                                 _ => {
-                                    println!("{}", req.path());
-                                    Either::B(self.get_ad(req))
+                                    Either::B(self.get_ad(id_match.as_str().into()))
                                 }
                             }
                         },
@@ -250,15 +247,11 @@ impl AdServer {
         }
     }
 
-    fn get_ad(&self, req: Request) -> ResponseFuture {
-        // hopefully temporary, until I figure out the Lifetimes issue // FIXME
-        let restfulre = Regex::new(r"^/facebook-ads/ads/?(\d+)?$").unwrap();
-        let adid = restfulre.captures(req.path().clone()).unwrap().get(1).unwrap().as_str().to_owned(); // again, temporary, but we know that this match works since that's how we got here.
-
+    fn get_ad(&self, adid: String) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
-        let ad = spawn_with_clone!(pool; db_pool;
-                        Ad::get_ad(&db_pool, &adid)
+        let ad = spawn_with_clone!(pool; db_pool, adid;
+                        Ad::get_ad(&db_pool, adid)
                     );
         let future = ad.map(|ad| {
             serde_json::to_string(&ApiResponse {

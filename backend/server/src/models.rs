@@ -486,7 +486,7 @@ impl Ad {
 
     pub fn get_ad(
         conn: &Pool<ConnectionManager<PgConnection>>,
-        adid: &str,
+        adid: String,
     ) -> Result<Ad> {
         use schema::ads::dsl::*;
 
