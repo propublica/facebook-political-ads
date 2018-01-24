@@ -1,6 +1,5 @@
 use diesel::pg::PgConnection;
 use diesel::r2d2::ConnectionManager;
-use r2d2::Pool;
 use dotenv::dotenv;
 use errors::*;
 use futures::future;
@@ -18,7 +17,6 @@ use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
 use models::{Ad, Advertisers, Aggregate, Entities, NewAd, Targets};
-use r2d2_diesel::ConnectionManager;
 use r2d2::Pool;
 use regex::Regex;
 use start_logging;
