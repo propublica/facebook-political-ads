@@ -316,5 +316,5 @@ go(() => {
   store.dispatch(getOneAd(searchParams.get("detail")));
 
   // store.dispatch(refresh());
-  refresh(store).then(() => store.subscribe(() => refresh(store)));
+  refresh(store).then(() => store.subscribe(() => refresh(store))); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
 });

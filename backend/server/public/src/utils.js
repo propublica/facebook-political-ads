@@ -160,7 +160,6 @@ const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
 
   let path = `${url}/${ad_id}`
   return (dispatch, getState) => {
-    // TODO: get lang and credentials from getState
     let state = getState()
 
     if (state.permalinked_ad.ads && state.permalinked_ad.ads[ad_id] && state.permalinked_ad.ads[ad_id].id) {
