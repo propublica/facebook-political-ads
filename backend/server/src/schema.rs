@@ -1,6 +1,3 @@
-// infer_schema!("postgres://localhost/facebook_ads");
-// "env:DATABASE_URL"
-
 // $ diesel print-schema, then copy-paste it here.
 table! {
     ads (id) {
