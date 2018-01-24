@@ -9,6 +9,10 @@ dist
 memos
 target
 /backend/server/Dockerfile
+/backend/classifier/.python-version
+/backend/classifier/Dockerfile.cron
+/backend/classifier/deploy-ecs-cron.sh
+.vscode/
 deploy.sh
 /papers
 /extension/web-ext-artifacts/*
@@ -16,4 +20,6 @@ classifier.json
 Dockerfile
 .sass-cache
 __pycache__
+*.code-workspace
 *.pyc
+passwords.txt
