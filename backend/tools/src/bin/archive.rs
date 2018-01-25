@@ -1,7 +1,16 @@
+extern crate chrono;
 extern crate csv;
+extern crate dotenv;
 extern crate diesel;
 #[macro_use]
 extern crate serde_derive;
+extern crate serde_json;
+extern crate server;
+
+use dotenv::dotenv;
+use server::start_logging;
+use server::models::Ad;
+use std::env;
 
 #[derive(Debug, Serialize)]
 struct Record {
@@ -15,7 +24,7 @@ struct Record {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
     pub lang: String,
-    pub images: Vec<String>,
+    pub images: Option<String>,
     pub impressions: i32,
     pub political_probability: f64,
     pub targeting: Option<String>,
@@ -44,6 +53,7 @@ impl From<Ad> for Record {
             impressions: ad.impressions,
             political_probability: ad.political_probability,
             targeting: ad.targeting,
+            advertiser: ad.advertiser,
             page: ad.page
         }
     }
