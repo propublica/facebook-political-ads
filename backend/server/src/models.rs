@@ -407,7 +407,7 @@ impl Ad {
         Ok(count)
     }
 
-    pub(self) fn get_ads_query<'a>(
+    pub fn get_ads_query<'a>(
         language: &'a str,
         options: &HashMap<String, String>,
     ) -> BoxedQuery<'a, Pg> {

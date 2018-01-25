@@ -14,7 +14,9 @@ use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use server::start_logging;
 use server::models::Ad;
+use std::collections::HashMap;
 use std::env;
+use std::io;
 
 #[derive(Debug, Serialize)]
 struct Record {
@@ -69,5 +71,11 @@ fn main() {
     start_logging();
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let conn = PgConnection::establish(&database_url).unwrap();
-    
+    let mut wtr = csv::Writer::from_writer(io::stdout());
+    let query = Ad::get_ads_query("en-US", &HashMap::new());
+    let dbads = query.load::<Ad>(&conn).unwrap();
+    for ad in dbads {
+        wtr.serialize(Record::from(ad)).unwrap();
+    }
+    wtr.flush().unwrap();
 }
