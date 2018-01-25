@@ -120,7 +120,6 @@ pub struct Images {
     message: String,
     html: String,
 }
-
 impl Images {
     fn from_ad(ad: &Ad, images: &[Uri]) -> Result<Images> {
         let thumb = images
@@ -343,7 +342,7 @@ impl Ad {
                 // we do this in a worker thread because rusoto isn't on
                 // Hyper async yet.
                 pool.spawn_fn(move || {
-                    if tuple.1.host().unwrap() != "pp-facebook-ads.s3.amazonaws.com" {
+                    if tuple.1.host().unwrap_or_default() != "pp-facebook-ads.s3.amazonaws.com" {
                         let credentials = DefaultCredentialsProvider::new()
                             .map_err(|e| { warn!("could not access credentials {:?}", e); e })?;
                         let tls = default_tls_client()?;
@@ -379,9 +378,9 @@ impl Ad {
                     Ok(())
                 })
             })
-            .map_err(|e| {
+            .or_else(|e| {
                 warn!("{:?}", e);
-                ()
+                Ok(())
             });
         Box::new(future)
     }
