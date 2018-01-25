@@ -102,7 +102,6 @@ impl Service for AdServer {
             (&Method::Post, "/facebook-ads/admin/ads") => {
                 Either::B(self.auth(req, |request| self.mark_ad(request)))
             }
-
             // Public
             (&Method::Get, "/facebook-ads/") => {
                 Either::B(self.get_file("public/index.html", ContentType::html()))
@@ -142,7 +141,9 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/heartbeat") => {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
-            (&Method::Get, _) => match restfulre.captures(&req.path().to_owned()){ // I'm sure I will understand why I needed to call to_owned() here better later, but for now, this is how to avoid borrowing-related issues.
+            // I'm sure I will understand why I needed to call to_owned() here better later,
+            // but for now, this is how to avoid borrowing-related issues.
+            (&Method::Get, _) => match restfulre.captures(&req.path().to_owned()){ 
                 Some(ads_match) => {
                     match ads_match.get(1) {
                         Some(id_match) => {
@@ -205,6 +206,7 @@ impl AdServer {
     }
 
     fn get_file(&self, path: &str, content_type: ContentType) -> ResponseFuture {
+        info!("Getting file {:?}", path);
         let pool = self.pool.clone();
         let path = path.to_string();
         let future = pool.spawn_fn(move || {
@@ -235,11 +237,11 @@ impl AdServer {
             });
             if let Some(l) = lang {
                 Some(
-                    l.clone().item.language.unwrap() + "-"
-                        + &l.clone().item.region.unwrap().to_uppercase(),
+                    l.clone().item.language.unwrap_or_default() + "-"
+                        + &l.clone().item.region.unwrap_or_default().to_uppercase(),
                 )
             } else {
-                languages[0].clone().item.language
+                Some(String::from("en-US"))
             }
         } else {
             None
