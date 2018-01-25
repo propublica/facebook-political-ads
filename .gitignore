@@ -8,7 +8,6 @@ dist
 /extension/*.zip
 memos
 target
-/backend/server/.dockerignore
 /backend/server/Dockerfile
 /backend/classifier/.python-version
 /backend/classifier/Dockerfile.cron
@@ -18,7 +17,6 @@ deploy.sh
 /papers
 /extension/web-ext-artifacts/*
 classifier.json
-/backend/.dockerignore
 Dockerfile
 .sass-cache
 __pycache__
