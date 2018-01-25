@@ -235,11 +235,11 @@ impl AdServer {
             });
             if let Some(l) = lang {
                 Some(
-                    l.clone().item.language.unwrap() + "-"
-                        + &l.clone().item.region.unwrap().to_uppercase(),
+                    l.clone().item.language.unwrap_or_default() + "-"
+                        + &l.clone().item.region.unwrap_or_default().to_uppercase(),
                 )
             } else {
-                languages[0].clone().item.language
+                Some(String::from("en-US"))
             }
         } else {
             None
