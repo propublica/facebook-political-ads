@@ -7,6 +7,10 @@ extern crate serde_derive;
 extern crate serde_json;
 extern crate server;
 
+use chrono::DateTime;
+use chrono::offset::Utc;
+use diesel::prelude::*;
+use diesel::pg::PgConnection;
 use dotenv::dotenv;
 use server::start_logging;
 use server::models::Ad;
