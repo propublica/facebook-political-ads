@@ -29,7 +29,6 @@ use std::io::Error as StdIoError;
 use std::fs::File;
 use std::io::Read;
 use std::time::Duration;
-use tokio_core::net::TcpListener;
 use tokio_core::reactor::{Core, Handle};
 use tokio_postgres::{Connection, TlsMode};
 use tokio_timer::Timer;
@@ -482,28 +481,29 @@ impl AdServer {
 
         let mut core = Core::new().unwrap();
         let handle = core.handle();
-        let listener = TcpListener::bind(&addr, &handle).expect("Couldn't start server.");
         let connector =
             HttpsConnector::new(4, &core.handle()).expect("Couldn't build HttpsConnector");
         let client = Client::configure()
             .connector(connector)
             .build(&core.handle());
-
-        let server = listener.incoming().for_each(|(sock, addr)| {
-            let s = AdServer {
+        // from: https://hyper.rs/guides/server/response_strategies/
+        let server_handle = handle.clone();
+        let server = Http::new().serve_addr_handle(&addr, &server_handle, move || {
+            Ok(AdServer {
                 pool: pool.clone(),
                 db_pool: db_pool.clone(),
                 handle: handle.clone(),
                 client: client.clone(),
                 password: admin_password.clone(),
                 database_url: database_url.clone(),
-            };
-            Http::new().bind_connection(&handle, sock, addr, s);
-
+            })
+        }).unwrap();
+        let h2 = server_handle.clone();
+        server_handle.spawn(server.for_each(move |conn| {
+            h2.spawn(conn.map(|_| ()).map_err(|err| warn!("server error: {:?}", err)));
             Ok(())
-        });
-
+        }).map_err(|_| ()));
         println!("Listening on http://{} with 1 thread.", addr);
-        core.run(server).unwrap();
+        core.run(future::empty::<(), ()>()).unwrap();
     }
 }

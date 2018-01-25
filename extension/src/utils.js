@@ -9,7 +9,7 @@ const adForRequest = ad => ({
 const endpoint =
   process.env.NODE_ENV === "production"
     ? "https://projects.propublica.org/facebook-ads/ads"
-    : "https://localhost:8080/facebook-ads/ads";
+    : "http://localhost:8080/facebook-ads/ads";
 
 const headers = language =>
   new Headers({
