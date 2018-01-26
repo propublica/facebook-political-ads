@@ -1,5 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { BrowserRouter, withRouter, Route } from 'react-router-dom'
+
 import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
 import thunkMiddleware from 'redux-thunk';
 import persistState from 'redux-localstorage';
@@ -17,10 +19,6 @@ import { Pagination, pagination } from 'pagination.jsx';
 import { go } from 'i18n.js';
 
 import { debounce } from "lodash";
-
-// I'll figure out a better way to do this but I'm learning React so 🐻 with me.
-// we're probably going to want a router? maybe?
-const searchParams = new URLSearchParams(location.search);
 
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
@@ -215,24 +213,40 @@ const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
   </div>
 );
 
-let AdDetail = ({ ads, requested_ad_id, onSuppressClick, onPermalinkClick }) => {
-  if (ads && ads[requested_ad_id].loaded) {
-    if (ads[requested_ad_id].id) {
-      return (<div id="ad">
-        <input id="search" placeholder="Search for ads" />
-
-        <Ad ad={ads[requested_ad_id]} onSuppressClick={onSuppressClick} onPermalinkClick={onPermalinkClick} />
-
-      </div>);
-    } else {
-      return (<div><h2>Uh oh, an ad with that ID couldn't be found!</h2></div>);
-    }
-  } else {
-    return (<div><h2>Loading...</h2></div>)
+class AdDetail extends React.Component {
+  constructor(props) {
+    super(props);
   }
-};
 
-AdDetail = connect(
+  componentDidMount() {
+    console.log(this.props);
+    let ad_id = null;
+    if (this.props.match) {
+      ad_id = this.props.match.params.ad_id;
+    } else {
+      ad_id = this.props.requested_ad_id; // really state.permalinked_ad.requested_ad_id
+    }
+    store.dispatch(getOneAd(ad_id));
+  }
+
+  render() {
+    if (this.props.ads && this.props.ads[this.props.requested_ad_id].loaded) {
+      if (this.props.ads[this.props.requested_ad_id].id) {
+        return (<div id="ad">
+          <input id="search" placeholder="Search for ads" />
+
+          <Ad ad={this.props.ads[this.props.requested_ad_id]} onSuppressClick={this.props.onSuppressClick} onPermalinkClick={this.props.onPermalinkClick} />
+
+        </div>);
+      } else {
+        return (<div><h2>Uh oh, an ad with that ID couldn't be found!</h2></div>);
+      }
+    } else {
+      return (<div><h2>Loading...</h2></div>)
+    }
+  }
+}
+AdDetail = withRouter(connect(
   ({ permalinked_ad }) => (
     { // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
       ads: permalinked_ad.ads,
@@ -248,7 +262,7 @@ AdDetail = connect(
       dispatch(getOneAd(ad_id))
     }
   })
-)(AdDetail);
+)(AdDetail));
 
 let Ads = ({ ads, onSuppressClick, onKeyUp, onPermalinkClick, search }) => (
   <div id="ads">
@@ -258,7 +272,7 @@ let Ads = ({ ads, onSuppressClick, onKeyUp, onPermalinkClick, search }) => (
   </div>
 );
 const throttledDispatch = debounce((dispatch, input) => { dispatch(newSearch(input)); }, 750);
-Ads = connect(
+Ads = withRouter(connect(
   ({ ads, search }) => ({
     ads: ads.filter((ad) => !ad.suppressed),
     credentials, // these are needed for eventually creating links
@@ -278,7 +292,7 @@ Ads = connect(
       dispatch(getOneAd(ad_id))
     }
   })
-)(Ads);
+)(Ads));
 
 let Login = ({ dispatch }) => {
   let email, password;
@@ -294,26 +308,36 @@ let Login = ({ dispatch }) => {
 };
 Login = connect()(Login);
 
+let LoggedInApp = () => {
+  return (<div>
+    <Route exact path="/facebook-ads/admin" component={Ads} />
+    <Route exact path="/facebook-ads/admin/" component={Ads} />
+    <Route exact path="/facebook-ads/admin/ads" component={Ads} />
+    <Route exact path="/facebook-ads/admin/ads/" component={Ads} />
+    <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
+  </div>)
+}
 
 let App = ({ credentials, permalinked_ad }) => {
-  let mainThing = (permalinked_ad.requested_ad_id ? <AdDetail /> : <Ads />);
+  // (permalinked_ad.requested_ad_id ? <AdDetail /> : <Ads />);
   return (<div id="app">
     <h1><a href="/facebook-ads/admin?">FBPAC Admin</a></h1>
-    {credentials && credentials.token ? mainThing : <Login />}
+    {credentials && credentials.token ? <LoggedInApp /> : <Login />}
   </div>)
 };
-App = connect((state) => state)(App);
+App = withRouter(connect((state) => state)(App));
 
 go(() => {
   ReactDOM.render(
-    <Provider store={store}>
-      <App />
-    </Provider>,
+    <BrowserRouter>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </BrowserRouter>,
     document.querySelector("#react-root")
   );
 
   deserialize(store.dispatch);
-  store.dispatch(getOneAd(searchParams.get("detail")));
 
   // store.dispatch(refresh());
   refresh(store).then(() => store.subscribe(() => refresh(store))); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
