@@ -77,16 +77,15 @@ impl Service for AdServer {
     // This is not at all RESTful, but I'd rather not deal with regexes. Maybe soon
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
-        let restfulre = Regex::new(r"^/facebook-ads/ads/?(\d+)?$").unwrap();
+        let api_restful_regex =    Regex::new(r"^/facebook-ads/ads/?(\d+)?$").unwrap();
+        let admin_restful_regex =  Regex::new(r"^/facebook-ads/admin/?(.*)?$").unwrap();
+        let public_restful_regex = Regex::new(r"^/facebook-ads(/?)$").unwrap(); // TODO: this will never serve a 404 and will always render the index...
 
         match (req.method(), req.path()) {
             (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
                 Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
             })),
             // Admin
-            (&Method::Get, "/facebook-ads/admin") => {
-                Either::B(self.get_file("public/admin.html", ContentType::html()))
-            }
             (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file(
                 "public/dist/admin.js",
                 ContentType(mime::TEXT_JAVASCRIPT),
@@ -102,10 +101,7 @@ impl Service for AdServer {
             (&Method::Post, "/facebook-ads/admin/ads") => {
                 Either::B(self.auth(req, |request| self.mark_ad(request)))
             }
-            // Public
-            (&Method::Get, "/facebook-ads/") => {
-                Either::B(self.get_file("public/index.html", ContentType::html()))
-            }
+
             (&Method::Get, "/facebook-ads/index.js") => Either::B(self.get_file(
                 "public/dist/index.js",
                 ContentType(mime::TEXT_JAVASCRIPT),
@@ -141,18 +137,22 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/heartbeat") => {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
+
+            // TODO: this hella nested way of applying several regexes to the URL is gross.
+            // I'd like at least to make it less nested.
+            //
             // I'm sure I will understand why I needed to call to_owned() here better later,
             // but for now, this is how to avoid borrowing-related issues.
-            (&Method::Get, _) => match restfulre.captures(&req.path().to_owned()){ 
-                Some(ads_match) => {
-                    match ads_match.get(1) {
-                        Some(id_match) => {
-                            match id_match.as_str() {
+            (&Method::Get, _) => match api_restful_regex.captures(&req.path().to_owned()){ 
+                Some(ads_api_match) => {
+                    match ads_api_match.get(1) {
+                        Some(ads_api_id_match) => {
+                            match ads_api_id_match.as_str() {
                                 "" | "/" => {
                                     Either::B(self.get_ads(req))
                                 },
                                 _ => {
-                                    Either::B(self.get_ad(id_match.as_str().into()))
+                                    Either::B(self.get_ad(ads_api_id_match.as_str().into()))
                                 }
                             }
                         },
@@ -161,7 +161,24 @@ impl Service for AdServer {
                         }
                     }
                 }
-                None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound)))
+
+                // the snippet below is basically the same as this:
+                // (&Method::Get, "/facebook-ads/admin") => {
+                //     Either::B(self.get_file("public/admin.html", ContentType::html()))   }
+                // except it matches regardless of what comes after /admin (including nothing)
+                None => match admin_restful_regex.captures(&req.path().to_owned()){
+                    Some(admin_match) => {
+                        // if it matches the admin route at all, it'll be handled by React / react-router
+                        println!("{}", admin_match.get(1).map_or("", |m| m.as_str()));
+                        Either::B(self.get_file("public/admin.html", ContentType::html()))
+                    }
+                    None => match public_restful_regex.captures(&req.path().to_owned()){
+                        Some(_) => Either::B(self.get_file("public/index.html", ContentType::html())),
+                        None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound)))
+                    }
+                    
+                    
+                }
             },
             _ => Either::A(future::ok(
                 Response::new().with_status(StatusCode::NotFound),

@@ -102,8 +102,8 @@ let App = ({ ads, onKeyUp, search }) => (
       {ads.length > 0 ? (
         <Pagination />
       ) : (
-        <p className="no_ads">No ads found for {search}.</p>
-      )}
+          <p className="no_ads">No ads found for {search}.</p>
+        )}
       <div id="ads">{ads.map(ad => <Ad ad={ad} key={ad.id} />)}</div>
       {ads.length > 0 ? <Pagination /> : ""}
     </div>
