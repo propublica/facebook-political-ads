@@ -1,8 +1,10 @@
 const path = require('path');
 const webpack = require('webpack');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-const ENV = 'production';
+const ENV = (process.env.NODE_ENV == "dev" || process.env.NODE_ENV) == "development" ? "development" : 'production';
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+
+
 
 const extractSass = new ExtractTextPlugin({
   filename: "styles.css",
@@ -25,24 +27,24 @@ module.exports = [{
       test: /\.jsx$/,
       use: ["source-map-loader"],
       enforce: "pre"
-    },{
+    }, {
       test: /\.jsx?$/,
       exclude: /node_modules/,
       use: 'babel-loader'
     }]
   },
   plugins: [
-    new webpack.optimize.ModuleConcatenationPlugin(),
+    ENV == "production" ? new webpack.optimize.ModuleConcatenationPlugin() : null,
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(ENV)
     }),
-    new UglifyJSPlugin({
+    ENV == "production" ? new UglifyJSPlugin({
       sourceMap: true
-    })
-  ],
+    }) : null
+  ].filter(Boolean),
   devtool: 'source-map'
-},{
+}, {
   entry: "admin.jsx",
   context: path.resolve(__dirname, "src"),
   resolve: {
@@ -58,14 +60,14 @@ module.exports = [{
       test: /\.jsx$/,
       use: ["source-map-loader"],
       enforce: "pre"
-    },{
+    }, {
       test: /\.jsx?$/,
       exclude: /node_modules/,
       use: 'babel-loader'
     }]
   },
   plugins: [
-    new webpack.optimize.ModuleConcatenationPlugin(),
+    ENV == "production" ? new webpack.optimize.ModuleConcatenationPlugin() : null,
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(ENV)
@@ -73,9 +75,9 @@ module.exports = [{
     new UglifyJSPlugin({
       sourceMap: true
     })
-  ],
+  ].filter(Boolean),
   devtool: 'source-map'
-},{
+}, {
   entry: "beacons.js",
   context: path.resolve(__dirname, "src"),
   output: {
@@ -86,14 +88,14 @@ module.exports = [{
     modules: ["src"]
   },
   plugins: [
-    new webpack.optimize.ModuleConcatenationPlugin(),
+    ENV == "production" ? new webpack.optimize.ModuleConcatenationPlugin() : null,
     new webpack.NoEmitOnErrorsPlugin(),
-    new UglifyJSPlugin({
+    ENV == "production" ? new UglifyJSPlugin({
       sourceMap: true
-    })
-  ],
+    }) : null
+  ].filter(Boolean),
   devtool: 'source-map'
-},{
+}, {
   entry: "main.scss",
   context: path.resolve(__dirname, "css"),
   resolve: {
@@ -118,7 +120,7 @@ module.exports = [{
           }
         }]
       })
-    },{
+    }, {
       test: /\.(woff2|woff|svg|png)$/,
       use: {
         loader: 'url-loader'
@@ -127,6 +129,6 @@ module.exports = [{
   },
   plugins: [
     extractSass
-  ],
+  ].filter(Boolean),
   devtool: 'source-map'
 }];
