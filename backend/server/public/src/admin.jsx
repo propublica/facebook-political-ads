@@ -278,7 +278,8 @@ Ads = connect(
     ads: ads.filter(ad => !ad.suppressed),
     credentials, // these are needed for eventually creating links
     lang, // these are needed for eventually creating links
-    search
+    search,
+    pagination
   }),
   dispatch => ({
     onSuppressClick: ad => dispatch(suppressAd(ad)),
