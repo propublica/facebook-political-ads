@@ -255,24 +255,19 @@ impl AdServer {
                         Ad::get_ad(&db_pool, adid)
                     );
         let future = ad.map(|ad| {
-            serde_json::to_string(&ApiResponse {
-                ads: vec![ad],
-                targets: Vec::<Targets>::new(),
-                entities: Vec::<Entities>::new(),
-                advertisers: Vec::<Advertisers>::new(),
-                total: 1,
-            }).map(|serialized| {
-                Response::new()
+            let resp = serde_json::to_string(&ad);
+            match resp {
+                Ok(serialized) => Response::new()
                     .with_header(ContentLength(serialized.len() as u64))
                     .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
                     .with_header(ContentType::json())
                     .with_header(AccessControlAllowOrigin::Any)
-                    .with_body(serialized)
-            })
-                .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
-        }).map_err(|e| {
-            warn!("{:?}", e);
-            hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+                    .with_body(serialized),
+                Err(e) => {
+                    warn!("{:?}", e);    
+                    Response::new().with_status(StatusCode::InternalServerError)
+                }
+            }
         });
         Box::new(future)
     }

@@ -180,9 +180,8 @@ const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
       headers: headers(state.credentials, state.lang)
     })
       .then(res => res.json())
-      .then(ads => {
-        // it's really just one ad, but in an array...
-        dispatch(receiveOneAd(ads.ads[0]));
+      .then(ad => {
+        dispatch(receiveOneAd(ad));
       });
   };
 };
