@@ -196,6 +196,16 @@ const refresh = (store, url = "/facebook-ads/ads") => {
   if (!loaded || cleanSearch.toString() !== params.toString()) {
     if (!loaded) {
       path = url + window.location.search;
+    } else {
+      if (cleanSearch.get("page") === params.get("page")) {
+        params.delete("page");
+      }
+      let query = params.toString().length > 0 ? `?${params.toString()}` : "";
+      history.pushState(
+        { search: query },
+        "",
+        `${window.location.pathname}${query}`
+      );
     }
     return fetch(path, {
       method: "GET",

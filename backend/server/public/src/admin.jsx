@@ -347,8 +347,6 @@ go(() => {
   const searchParams = new URLSearchParams(location.search);
   if (searchParams.get("detail")) {
     store.dispatch(getOneAd(searchParams.get("detail")));
-  } else {
-    store.dispatch(refresh());
   }
   // anytime anything changes, then make the ajax request whenever the user changes the facets they
   // want.
