@@ -264,10 +264,12 @@ impl AdServer {
                     .with_header(AccessControlAllowOrigin::Any)
                     .with_body(serialized),
                 Err(e) => {
-                    warn!("{:?}", e);    
+                    warn!("{:?}", e);
                     Response::new().with_status(StatusCode::InternalServerError)
                 }
             }
+        }).map_err(|e| {
+            hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
         });
         Box::new(future)
     }

@@ -16,7 +16,6 @@ import {
   lang,
   GOT_THAT_AD,
   REQUESTING_ONE_AD,
-  COULDNT_GET_THAT_AD,
   getOneAd
 } from "utils.js";
 import { entities, targets, advertisers, filters } from "filters.jsx";
@@ -25,10 +24,6 @@ import { Pagination, pagination } from "pagination.jsx";
 import { go } from "i18n.js";
 
 import { debounce } from "lodash";
-
-// I'll figure out a better way to do this but I'm learning React so 🐻 with me.
-// we're probably going to want a router? maybe?
-const searchParams = new URLSearchParams(location.search);
 
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
@@ -149,12 +144,6 @@ const permalinked_ad = (state = {}, action) => {
         requested_ad_id: action.ad.id,
         ads: Object.assign({}, state.ads, new_ad_obj)
       });
-    case COULDNT_GET_THAT_AD:
-      new_ad_obj[action.ad_id] = { loaded: true, failed: true };
-      return Object.assign({}, state, {
-        requested_ad_id: action.ad_id,
-        ads: Object.assign({}, state.ads, new_ad_obj)
-      });
     case REQUESTING_ONE_AD:
       new_ad_obj[action.ad_id] = { loaded: false };
       return Object.assign({}, state, {
@@ -255,64 +244,14 @@ const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
   </div>
 );
 
-let AdDetail = ({
+let Ads = ({
   ads,
-  requested_ad_id,
   onSuppressClick,
-  onPermalinkClick
-}) => {
-  if (ads && ads[requested_ad_id].loaded) {
-    if (ads[requested_ad_id].id) {
-      return (
-        <div id="ad">
-          <input id="search" placeholder="Search for ads" />
-
-          <Ad
-            ad={ads[requested_ad_id]}
-            onSuppressClick={onSuppressClick}
-            onPermalinkClick={onPermalinkClick}
-          />
-        </div>
-      );
-    } else {
-      return (
-        <div>
-          <h2>Uh oh, an ad with that ID couldn't be found!</h2>
-        </div>
-      );
-    }
-  } else {
-    return (
-      <div>
-        <h2>Loading...</h2>
-      </div>
-    );
-  }
-};
-
-AdDetail = connect(
-  ({ permalinked_ad }) => ({
-    // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
-    ads: permalinked_ad.ads,
-    requested_ad_id: permalinked_ad.requested_ad_id
-  }),
-  dispatch => ({
-    // ownProps is available as a second argument here.
-    onSuppressClick: ad => dispatch(suppressAd(ad)),
-    onPermalinkClick: ad_id => {
-      history.pushState(
-        {
-          id: "permalink"
-        },
-        null,
-        window.location.pathname + "?detail=" + ad_id
-      );
-      dispatch(getOneAd(ad_id));
-    }
-  })
-)(AdDetail);
-
-let Ads = ({ ads, onSuppressClick, onKeyUp, onPermalinkClick, search }) => (
+  onKeyUp,
+  onPermalinkClick,
+  search,
+  pagination
+}) => (
   <div id="ads">
     <input
       id="search"
@@ -320,7 +259,7 @@ let Ads = ({ ads, onSuppressClick, onKeyUp, onPermalinkClick, search }) => (
       onKeyUp={onKeyUp}
       search={search}
     />
-    <Pagination />
+    {pagination ? <Pagination /> : ""}
     {ads.map(ad => (
       <Ad
         ad={ad}
@@ -351,13 +290,6 @@ Ads = connect(
       );
     },
     onPermalinkClick: ad_id => {
-      history.pushState(
-        {
-          id: "permalink"
-        },
-        null,
-        window.location.pathname + "?detail=" + ad_id
-      );
       dispatch(getOneAd(ad_id));
     }
   })
@@ -389,14 +321,13 @@ let Login = ({ dispatch }) => {
 };
 Login = connect()(Login);
 
-let App = ({ credentials, permalinked_ad }) => {
-  let mainThing = permalinked_ad.requested_ad_id ? <AdDetail /> : <Ads />;
+let App = ({ credentials }) => {
   return (
     <div id="app">
       <h1>
         <a href="/facebook-ads/admin?">FBPAC Admin</a>
       </h1>
-      {credentials && credentials.token ? mainThing : <Login />}
+      {credentials && credentials.token ? <Ads /> : <Login />}
     </div>
   );
 };
@@ -411,8 +342,15 @@ go(() => {
   );
 
   deserialize(store.dispatch);
-  store.dispatch(getOneAd(searchParams.get("detail")));
-
-  // store.dispatch(refresh());
-  refresh(store).then(() => store.subscribe(() => refresh(store))); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
+  // I'll figure out a better way to do this but I'm learning React so 🐻 with me.
+  // we're probably going to want a router? maybe?
+  const searchParams = new URLSearchParams(location.search);
+  if (searchParams.get("detail")) {
+    store.dispatch(getOneAd(searchParams.get("detail")));
+  } else {
+    store.dispatch(refresh());
+  }
+  // anytime anything changes, then make the ajax request whenever the user changes the facets they
+  // want.
+  refresh(store).then(() => store.subscribe(() => refresh(store)));
 });
