@@ -239,7 +239,6 @@ export {
   getOneAd,
   GOT_THAT_AD,
   REQUESTING_ONE_AD,
-  COULDNT_GET_THAT_AD,
   refresh,
   newSearch,
   deserialize,
