@@ -15,18 +15,18 @@ const setTotal = (total) => ({ type: SET_TOTAL, value: total });
 const min = (state) => Math.min(state.page, state.total);
 const pagination = (state = { page: 0, total: 0 }, action) => {
   switch(action.type) {
-  case NEXT_PAGE:
-    return { ...state, page: min({ ...state, page: state.page + 1 }) };
-  case PREV_PAGE:
-    return { ...state, page: Math.max(state.page - 1, 0) };
-  case SET_PAGE:
-    return { ...state, page: min({ page: action.value, total: state.total })};
-  case SET_TOTAL: {
-    const total = Math.ceil(action.value / PER_PAGE);
-    return { total, page: min({ total: total, page: state.page }) };
-  }
-  default:
-    return state;
+    case NEXT_PAGE:
+      return { ...state, page: min({ ...state, page: state.page + 1 }) };
+    case PREV_PAGE:
+      return { ...state, page: Math.max(state.page - 1, 0) };
+    case SET_PAGE:
+      return { ...state, page: min({ page: action.value, total: state.total })};
+    case SET_TOTAL: {
+      const total = Math.ceil(action.value / PER_PAGE);
+      return { total, page: min({ total: total, page: state.page }) };
+    }
+    default:
+      return state;
   }
 };
 

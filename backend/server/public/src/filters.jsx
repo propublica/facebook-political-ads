@@ -29,43 +29,43 @@ const resetDropdowns = () => ({ type: RESET_DROPDOWNS });
 
 const filters = (state = {}, action) => {
   switch(action.type) {
-  case TOGGLE_TARGET:
-    return { ...state, target: !state.target };
-  case TOGGLE_ADVERTISER:
-    return { ...state, advertiser: !state.advertiser };
-  case TOGGLE_ENTITY:
-    return { ...state, entity: !state.entity };
-  case RESET_DROPDOWNS:
-    return {};
-  default:
-    return state;
+    case TOGGLE_TARGET:
+      return { ...state, target: !state.target };
+    case TOGGLE_ADVERTISER:
+      return { ...state, advertiser: !state.advertiser };
+    case TOGGLE_ENTITY:
+      return { ...state, entity: !state.entity };
+    case RESET_DROPDOWNS:
+      return {};
+    default:
+      return state;
   }
 };
 
 const makeReducer = (plural, singular) => {
   return (state = [], action) => {
     switch(action.type) {
-    case `new_${plural}`: {
-      const lookup = new Set(state.filter((filter) => filter.active).map((it) => it[singular]));
-      return action.value.map((filter) => ({
-        ...filter,
-        key: filter[singular],
-        active: lookup.has(filter[singular])
-      }));
-    }
-    case `filter_${singular}`:
-      return state.map((filter) => {
-        if(filter[singular] === action.value[singular]) {
-          return {
-            ...filter,
-            active: !filter.active
-          };
-        } else {
-          return filter;
-        }
-      });
-    default:
-      return state;
+      case `new_${plural}`: {
+        const lookup = new Set(state.filter((filter) => filter.active).map((it) => it[singular]));
+        return action.value.map((filter) => ({
+          ...filter,
+          key: filter[singular],
+          active: lookup.has(filter[singular])
+        }));
+      }
+      case `filter_${singular}`:
+        return state.map((filter) => {
+          if(filter[singular] === action.value[singular]) {
+            return {
+              ...filter,
+              active: !filter.active
+            };
+          } else {
+            return filter;
+          }
+        });
+      default:
+        return state;
     }
   };
 };
