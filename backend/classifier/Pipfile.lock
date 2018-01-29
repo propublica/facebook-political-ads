@@ -5,15 +5,15 @@
         },
         "host-environment-markers": {
             "implementation_name": "cpython",
-            "implementation_version": "3.4.3",
+            "implementation_version": "3.6.2",
             "os_name": "posix",
             "platform_machine": "x86_64",
             "platform_python_implementation": "CPython",
             "platform_release": "17.3.0",
             "platform_system": "Darwin",
             "platform_version": "Darwin Kernel Version 17.3.0: Thu Nov  9 18:09:22 PST 2017; root:xnu-4570.31.3~1/RELEASE_X86_64",
-            "python_full_version": "3.4.3",
-            "python_version": "3.4",
+            "python_full_version": "3.6.2",
+            "python_version": "3.6",
             "sys_platform": "darwin"
         },
         "pipfile-spec": 6,
@@ -42,10 +42,10 @@
         },
         "certifi": {
             "hashes": [
-                "sha256:244be0d93b71e93fc0a0a479862051414d0e00e16435707e5bf5000f92e04694",
-                "sha256:5ec74291ca1136b40f0379e1128ff80e866597e4e2c1e755739a913bbc3613c0"
+                "sha256:14131608ad2fd56836d33a71ee60fa1c82bc9d2c8d98b7bdbc631fe1b3cd1296",
+                "sha256:edbc3f203427eef571f79a7692bb160a2b0f7ccaa31953e99bd17e307cf63f7d"
             ],
-            "version": "==2017.11.5"
+            "version": "==2018.1.18"
         },
         "chardet": {
             "hashes": [
@@ -144,22 +144,6 @@
             ],
             "version": "==1.3"
         },
-        "msgpack": {
-            "hashes": [
-                "sha256:b34ced36f7b6aa1c3bcf7afe9f250f11f34d846dd6b611fe3c59f43d459253f0",
-                "sha256:a86985805e19f735defd4949cda5d322deb6f24003497f046b72e52e3d8c0429",
-                "sha256:6bc7da25b2361a9be1358dd8dc2278b97c27f23cbabcb4ee46c762311150815a",
-                "sha256:7db61f4c5db938d4106eb5c17c470085e372d934ef135e4feaa60eb4e4ac63a0",
-                "sha256:14c97f87ac5320c56d3cdb75bdbe8560aa063a0d575fc4e0fb241a2c50f75a0e",
-                "sha256:be1d264613a16532efe534c59d1f44d724e3d5fb90739ac1a672e83ad03ad95f",
-                "sha256:70ae8875af5377e0fd14c7fc1ddcb484a68d0e9864084574220349dd8d4f9335",
-                "sha256:f5141e564b92d13c7e9378959bb7918b2e56015ae4076ea6224e0381be4ea345",
-                "sha256:c7aa35c66ed276bf4a4220531abcee84992b9a312d76afb920d4cbae73d142c4",
-                "sha256:c165c44abc98ac8ccf921a5f0506b60180a20896815c6ff8c275d7646eb20702",
-                "sha256:9ed78ef17937222b0467566487bab1ca1bb28158f66c6528ff3d5aced93ff49d"
-            ],
-            "version": "==0.5.0"
-        },
         "msgpack-numpy": {
             "hashes": [
                 "sha256:6947df61826a2917e38dbe07957a0c70dc82dce93ec38153dae850fdd21a4583",
@@ -169,10 +153,9 @@
         },
         "msgpack-python": {
             "hashes": [
-                "sha256:4f4d9f98941a2c4fba76c4157b309b304e30dddd2fc351770f85639c455df5cc",
-                "sha256:cb31b95ed684e9b2bee184ea58bcbb27ba008123cf8c62a4bb8c281af79ecd89"
+                "sha256:69aa1eb0e13be1d3bd495ca937eae66df4431126f5cfd5491dc40370e5644853"
             ],
-            "version": "==0.5.0"
+            "version": "==0.5.1"
         },
         "murmurhash": {
             "hashes": [
@@ -217,9 +200,9 @@
         },
         "openpyxl": {
             "hashes": [
-                "sha256:95e007f4d121f4fd73f39a6d74a883c75e9fa9d96de91d43c1641c103c3a9b18"
+                "sha256:0ff2e0c2c85cbf42e82dd223e7f2401a62dc73c18cd9e5dd7763dc6c8014ebde"
             ],
-            "version": "==2.4.9"
+            "version": "==2.5.0"
         },
         "pathlib": {
             "hashes": [
@@ -414,9 +397,9 @@
         },
         "sqlalchemy": {
             "hashes": [
-                "sha256:7dda3e0b1b12215e3bb05368d1abbf7d747112a43738e0a4e6deb466b83fd88e"
+                "sha256:64b4720f0a8e033db0154d3824f5bf677cf2797e11d44743cf0aebd2a0499d9d"
             ],
-            "version": "==1.2.0"
+            "version": "==1.2.2"
         },
         "tablib": {
             "hashes": [
