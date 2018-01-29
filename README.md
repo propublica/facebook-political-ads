@@ -25,7 +25,7 @@ If you are a Firefox user you can open a clean browser instance with:
 
     npm run ff
 
-and any changes will automatically refresh the extension.
+and any changes will automatically refresh the extension. (You'll need webpack installed globally.)
 
 In Chrome you'll need to add an unpacked extension by following these [directions](https://developer.chrome.com/extensions/getstarted).
 
