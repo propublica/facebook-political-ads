@@ -225,6 +225,8 @@ const refresh = (store, url = "/facebook-ads/ads") => {
         );
         loaded = true;
       });
+  }else {
+    return Promise.resolve();
   }
 };
 
