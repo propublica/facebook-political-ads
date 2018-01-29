@@ -1,31 +1,40 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 import { BrowserRouter, withRouter, Route } from 'react-router-dom'
-
-import { applyMiddleware, compose, combineReducers, createStore } from 'redux';
-import thunkMiddleware from 'redux-thunk';
-import persistState from 'redux-localstorage';
-import { Provider, connect } from 'react-redux';
-import { createLogger } from 'redux-logger';
+import { applyMiddleware, compose, combineReducers, createStore } from "redux";
+import thunkMiddleware from "redux-thunk";
+import persistState from "redux-localstorage";
+import { Provider, connect } from "react-redux";
+import { createLogger } from "redux-logger";
 import {
-  headers, NEW_ADS, refresh, newSearch, search,
-  enableBatching, deserialize, lang,
-  GOT_THAT_AD, REQUESTING_ONE_AD, COULDNT_GET_THAT_AD, getOneAd
-} from 'utils.js';
-import { entities, targets, advertisers, filters } from 'filters.jsx';
-import { Pagination, pagination } from 'pagination.jsx';
+  headers,
+  NEW_ADS,
+  refresh,
+  newSearch,
+  search,
+  enableBatching,
+  deserialize,
+  lang,
+  GOT_THAT_AD,
+  REQUESTING_ONE_AD,
+  getOneAd
+} from "utils.js";
+import { entities, targets, advertisers, filters } from "filters.jsx";
+import { Pagination, pagination } from "pagination.jsx";
 
-
-import { go } from 'i18n.js';
+import { go } from "i18n.js";
 
 import { debounce } from "lodash";
 
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
 const LOGOUT = "logout";
-const GET_ONE_AD = "GET_ONE_AD";
 
-const b64 = (thing) => btoa(thing).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+const b64 = thing =>
+  btoa(thing)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 const createJWT = (username, password) => {
   const encoder = new TextEncoder();
   const header = {
@@ -37,29 +46,35 @@ const createJWT = (username, password) => {
   };
   const base = `${b64(JSON.stringify(header))}.${b64(JSON.stringify(payload))}`;
   const encoded = encoder.encode(base);
-  return window.crypto.subtle.importKey(
+  return window.crypto.subtle
+    .importKey(
     "raw",
     encoder.encode(password),
     { name: "HMAC", hash: { name: "SHA-256" } },
     false,
     ["sign"]
-  ).then(key => window.crypto.subtle.sign({ name: 'HMAC' }, key, encoded))
-    .then(signature => ({ token: `${base}.${b64(String.fromCharCode.apply(null, new Uint8Array(signature)))}` }));
+    )
+    .then(key => window.crypto.subtle.sign({ name: "HMAC" }, key, encoded))
+    .then(signature => ({
+      token: `${base}.${b64(
+        String.fromCharCode.apply(null, new Uint8Array(signature))
+      )}`
+    }));
 };
 
-const hideAd = (ad) => ({
+const hideAd = ad => ({
   type: HIDE_AD,
   id: ad.id
 });
 
-const suppressAd = (ad) => {
+const suppressAd = ad => {
   return (dispatch, getState) => {
     dispatch(hideAd(ad));
     return fetch("/facebook-ads/admin/ads", {
       method: "POST",
       body: ad.id,
       headers: headers(getState().credentials)
-    }).then((resp) => {
+    }).then(resp => {
       if (resp.ok) {
         console.log("suppressed");
       } else {
@@ -69,7 +84,7 @@ const suppressAd = (ad) => {
   };
 };
 
-const login = (credentials) => ({
+const login = credentials => ({
   type: LOGIN,
   value: credentials
 });
@@ -80,16 +95,17 @@ const logout = () => ({
 
 const authorize = (username, password) => {
   // create jwt
-  return (dispatch) => createJWT(username, password).then(token => {
-    return fetch("/facebook-ads/login", {
-      method: "POST",
-      headers: headers(token)
-    }).then((resp) => {
-      if (resp.ok) {
-        dispatch(login(token));
-      }
+  return dispatch =>
+    createJWT(username, password).then(token => {
+      return fetch("/facebook-ads/login", {
+        method: "POST",
+        headers: headers(token)
+      }).then(resp => {
+        if (resp.ok) {
+          dispatch(login(token));
+        }
+      });
     });
-  });
 };
 
 const credentials = (state = {}, action) => {
@@ -121,37 +137,45 @@ const ads = (state = [], action) => {
 };
 
 const permalinked_ad = (state = {}, action) => {
-  let new_ad_obj = {}
+  let new_ad_obj = {};
   switch (action.type) {
     case GOT_THAT_AD:
       new_ad_obj[action.ad.id] = Object.assign({}, action.ad, { loaded: true });
-      return Object.assign({}, state, { requested_ad_id: action.ad.id, ads: Object.assign({}, state.ads, new_ad_obj) })
-    case COULDNT_GET_THAT_AD:
-      new_ad_obj[action.ad_id] = { loaded: true, failed: true };
-      return Object.assign({}, state, { requested_ad_id: action.ad_id, ads: Object.assign({}, state.ads, new_ad_obj) });
+      return Object.assign({}, state, {
+        requested_ad_id: action.ad.id,
+        ads: Object.assign({}, state.ads, new_ad_obj)
+      });
     case REQUESTING_ONE_AD:
       new_ad_obj[action.ad_id] = { loaded: false };
-      return Object.assign({}, state, { requested_ad_id: action.ad_id, ads: Object.assign({}, state.ads, new_ad_obj) });
+      return Object.assign({}, state, {
+        requested_ad_id: action.ad_id,
+        ads: Object.assign({}, state.ads, new_ad_obj)
+      });
     default:
       return state;
   }
-}
+};
 
-const reducer = enableBatching(combineReducers({
-  ads,
-  permalinked_ad,
-  search,
-  entities,
-  advertisers,
-  targets,
-  filters,
-  pagination,
-  credentials,
-  lang
-}));
+const reducer = enableBatching(
+  combineReducers({
+    ads,
+    permalinked_ad,
+    search,
+    entities,
+    advertisers,
+    targets,
+    filters,
+    pagination,
+    credentials,
+    lang
+  })
+);
 
 const middleware = [thunkMiddleware, createLogger()];
-const store = createStore(reducer, compose(...[persistState("credentials"), applyMiddleware(...middleware)]));
+const store = createStore(
+  reducer,
+  compose(...[persistState("credentials"), applyMiddleware(...middleware)])
+);
 
 const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
   <div className="ad">
@@ -159,7 +183,17 @@ const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
       <tbody>
         <tr>
           <td>id</td>
-          <td><a href={"?detail=" + ad.id} onClick={(e) => { e.preventDefault(); onPermalinkClick(ad.id) }}>{ad.id}</a></td>
+          <td>
+            <a
+              href={"?detail=" + ad.id}
+              onClick={e => {
+                e.preventDefault();
+                onPermalinkClick(ad.id);
+              }}
+            >
+              {ad.id}
+            </a>
+          </td>
         </tr>
         <tr>
           <td>first seen</td>
@@ -178,34 +212,32 @@ const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
           <td dangerouslySetInnerHTML={{ __html: ad.targeting }} />
         </tr>
         <tr>
-          <td>
-            political / not political
-        </td>
+          <td>political / not political</td>
           <td>
             {ad.political} / {ad.not_political}
           </td>
         </tr>
         <tr>
-          <td>
-            likelihood
-        </td>
-          <td>
-            {ad.political_probability}
-          </td>
+          <td>likelihood</td>
+          <td>{ad.political_probability}</td>
         </tr>
         <tr>
-          <td>
-            impressions
-        </td>
-          <td>
-            {ad.impressions}
-          </td>
+          <td>impressions</td>
+          <td>{ad.impressions}</td>
         </tr>
         <tr>
           <td colSpan="2">
-            {ad.suppressed ? "Suppressed" : <button onClick={function () { return onSuppressClick(ad); }}>
-              Suppress
-          </button>}
+            {ad.suppressed ? (
+              "Suppressed"
+            ) : (
+                <button
+                  onClick={function () {
+                    return onSuppressClick(ad);
+                  }}
+                >
+                  Suppress
+              </button>
+              )}
           </td>
         </tr>
       </tbody>
@@ -264,47 +296,81 @@ AdDetail = withRouter(connect(
   })
 )(AdDetail));
 
-let Ads = ({ ads, onSuppressClick, onKeyUp, onPermalinkClick, search }) => (
-  <div id="ads">
-    <input id="search" placeholder="Search for ads" onKeyUp={onKeyUp} search={search} />
-    <Pagination />
-    {ads.map((ad) => <Ad ad={ad} key={ad.id} onSuppressClick={onSuppressClick} onPermalinkClick={onPermalinkClick} />)}
-  </div>
-);
-const throttledDispatch = debounce((dispatch, input) => { dispatch(newSearch(input)); }, 750);
+let Ads = ({
+  ads,
+  onSuppressClick,
+  onKeyUp,
+  onPermalinkClick,
+  search,
+  pagination
+}) => (
+    <div id="ads">
+      <input
+        id="search"
+        placeholder="Search for ads"
+        onKeyUp={onKeyUp}
+        search={search}
+      />
+      {pagination ? <Pagination /> : ""}
+      {ads.map(ad => (
+        <Ad
+          ad={ad}
+          key={ad.id}
+          onSuppressClick={onSuppressClick}
+          onPermalinkClick={onPermalinkClick}
+        />
+      ))}
+    </div>
+  );
+const throttledDispatch = debounce((dispatch, input) => {
+  dispatch(newSearch(input));
+}, 750);
 Ads = withRouter(connect(
   ({ ads, search }) => ({
-    ads: ads.filter((ad) => !ad.suppressed),
+    ads: ads.filter(ad => !ad.suppressed),
     credentials, // these are needed for eventually creating links
     lang, // these are needed for eventually creating links
-    search
+    search,
+    pagination
   }),
-  (dispatch, ownProps) => ({
-    onSuppressClick: (ad) => dispatch(suppressAd(ad)),
-    onKeyUp: (e) => {
+  dispatch => ({
+    onSuppressClick: ad => dispatch(suppressAd(ad)),
+    onKeyUp: e => {
       e.preventDefault();
-      throttledDispatch(dispatch, e.target.value.length ? e.target.value : null);
+      throttledDispatch(
+        dispatch,
+        e.target.value.length ? e.target.value : null
+      );
     },
-    onPermalinkClick: (ad_id) => {
-      history.pushState({
-        id: 'permalink'
-      }, null, window.location.pathname + '?detail=' + ad_id);
-      dispatch(getOneAd(ad_id))
+    onPermalinkClick: ad_id => {
+      dispatch(getOneAd(ad_id));
     }
   })
 )(Ads));
 
 let Login = ({ dispatch }) => {
   let email, password;
-  const onLogin = (e) => {
+  const onLogin = e => {
     e.preventDefault();
     dispatch(authorize(email.value, password.value));
   };
-  return <form id="login" onSubmit={onLogin} >
-    <input id="email" type="text" ref={(node) => email = node} placeholder="email" />
-    <input id="password" type="password" ref={(node) => password = node} placeholder="password" />
-    <input id="submit" type="submit" value="login" />
-  </form>;
+  return (
+    <form id="login" onSubmit={onLogin}>
+      <input
+        id="email"
+        type="text"
+        ref={node => (email = node)}
+        placeholder="email"
+      />
+      <input
+        id="password"
+        type="password"
+        ref={node => (password = node)}
+        placeholder="password"
+      />
+      <input id="submit" type="submit" value="login" />
+    </form>
+  );
 };
 Login = connect()(Login);
 
