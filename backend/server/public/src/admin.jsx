@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, withRouter, Route } from 'react-router-dom'
+import { BrowserRouter, withRouter, Route } from 'react-router-dom';
 import { applyMiddleware, compose, combineReducers, createStore } from "redux";
 import thunkMiddleware from "redux-thunk";
 import persistState from "redux-localstorage";
@@ -48,11 +48,11 @@ const createJWT = (username, password) => {
   const encoded = encoder.encode(base);
   return window.crypto.subtle
     .importKey(
-    "raw",
-    encoder.encode(password),
-    { name: "HMAC", hash: { name: "SHA-256" } },
-    false,
-    ["sign"]
+      "raw",
+      encoder.encode(password),
+      { name: "HMAC", hash: { name: "SHA-256" } },
+      false,
+      ["sign"]
     )
     .then(key => window.crypto.subtle.sign({ name: "HMAC" }, key, encoded))
     .then(signature => ({
@@ -230,14 +230,14 @@ const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
             {ad.suppressed ? (
               "Suppressed"
             ) : (
-                <button
-                  onClick={function () {
-                    return onSuppressClick(ad);
-                  }}
-                >
+              <button
+                onClick={function () {
+                  return onSuppressClick(ad);
+                }}
+              >
                   Suppress
               </button>
-              )}
+            )}
           </td>
         </tr>
       </tbody>
@@ -271,10 +271,10 @@ class AdDetail extends React.Component {
 
         </div>);
       } else {
-        return (<div><h2>Uh oh, an ad with that ID couldn't be found!</h2></div>);
+        return (<div><h2>Uh oh, an ad with that ID couldn&apos;t be found!</h2></div>);
       }
     } else {
-      return (<div><h2>Loading...</h2></div>)
+      return (<div><h2>Loading...</h2></div>);
     }
   }
 }
@@ -291,7 +291,7 @@ AdDetail = withRouter(connect(
       history.pushState({
         id: 'permalink'
       }, null, window.location.pathname + '?detail=' + ad_id);
-      dispatch(getOneAd(ad_id))
+      dispatch(getOneAd(ad_id));
     }
   })
 )(AdDetail));
@@ -304,24 +304,24 @@ let Ads = ({
   search,
   pagination
 }) => (
-    <div id="ads">
-      <input
-        id="search"
-        placeholder="Search for ads"
-        onKeyUp={onKeyUp}
-        search={search}
+  <div id="ads">
+    <input
+      id="search"
+      placeholder="Search for ads"
+      onKeyUp={onKeyUp}
+      search={search}
+    />
+    {pagination ? <Pagination /> : ""}
+    {ads.map(ad => (
+      <Ad
+        ad={ad}
+        key={ad.id}
+        onSuppressClick={onSuppressClick}
+        onPermalinkClick={onPermalinkClick}
       />
-      {pagination ? <Pagination /> : ""}
-      {ads.map(ad => (
-        <Ad
-          ad={ad}
-          key={ad.id}
-          onSuppressClick={onSuppressClick}
-          onPermalinkClick={onPermalinkClick}
-        />
-      ))}
-    </div>
-  );
+    ))}
+  </div>
+);
 const throttledDispatch = debounce((dispatch, input) => {
   dispatch(newSearch(input));
 }, 750);
@@ -381,15 +381,15 @@ let LoggedInApp = () => {
     <Route exact path="/facebook-ads/admin/ads" component={Ads} />
     <Route exact path="/facebook-ads/admin/ads/" component={Ads} />
     <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
-  </div>)
-}
+  </div>);
+};
 
-let App = ({ credentials, permalinked_ad }) => {
+let App = ({ credentials }) => {
   // (permalinked_ad.requested_ad_id ? <AdDetail /> : <Ads />);
   return (<div id="app">
     <h1><a href="/facebook-ads/admin?">FBPAC Admin</a></h1>
     {credentials && credentials.token ? <LoggedInApp /> : <Login />}
-  </div>)
+  </div>);
 };
 App = withRouter(connect((state) => state)(App));
 
