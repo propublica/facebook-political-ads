@@ -31,6 +31,7 @@ module.exports = {
     "react/jsx-indent-props": ["error", 2],
     "react/prop-types": 0,
     eqeqeq: 1,
-    quotes: [2, "double"]
+    quotes: [2, "double"],
+    object-curly-spacing: ["error", "always"]
   }
 };
