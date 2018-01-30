@@ -81,7 +81,7 @@ const deserialize = dispatch => {
   if (params.has("search")) {
     actions.push(newSearch(params.get("search")));
   }
-
+  
   if (params.has("entities")) {
     const entities = JSON.parse(params.get("entities"));
     actions.push(newEntities(entities));
