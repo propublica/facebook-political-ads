@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-const ENV = (process.env.NODE_ENV == "dev" || process.env.NODE_ENV) == "development" ? "development" : 'production';
+const ENV = (process.env.NODE_ENV === "dev" || process.env.NODE_ENV) === "development" ? "development" : 'production';
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 
@@ -34,12 +34,12 @@ module.exports = [{
     }]
   },
   plugins: [
-    ENV == "production" ? new webpack.optimize.ModuleConcatenationPlugin() : null,
+    ENV === "production" ? new webpack.optimize.ModuleConcatenationPlugin() : null,
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(ENV)
     }),
-    ENV == "production" ? new UglifyJSPlugin({
+    ENV === "production" ? new UglifyJSPlugin({
       sourceMap: true
     }) : null
   ].filter(Boolean),
@@ -67,7 +67,7 @@ module.exports = [{
     }]
   },
   plugins: [
-    ENV == "production" ? new webpack.optimize.ModuleConcatenationPlugin() : null,
+    ENV === "production" ? new webpack.optimize.ModuleConcatenationPlugin() : null,
     new webpack.NoEmitOnErrorsPlugin(),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(ENV)
@@ -88,9 +88,9 @@ module.exports = [{
     modules: ["src"]
   },
   plugins: [
-    ENV == "production" ? new webpack.optimize.ModuleConcatenationPlugin() : null,
+    ENV === "production" ? new webpack.optimize.ModuleConcatenationPlugin() : null,
     new webpack.NoEmitOnErrorsPlugin(),
-    ENV == "production" ? new UglifyJSPlugin({
+    ENV === "production" ? new UglifyJSPlugin({
       sourceMap: true
     }) : null
   ].filter(Boolean),
