@@ -1,11 +1,11 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import {BrowserRouter, withRouter, Route, Link} from 'react-router-dom';
-import {applyMiddleware, compose, combineReducers, createStore} from 'redux';
-import thunkMiddleware from 'redux-thunk';
-import persistState from 'redux-localstorage';
-import {Provider, connect} from 'react-redux';
-import {createLogger} from 'redux-logger';
+import React from "react";
+import ReactDOM from "react-dom";
+import {BrowserRouter, withRouter, Route, Link} from "react-router-dom";
+import {applyMiddleware, compose, combineReducers, createStore} from "redux";
+import thunkMiddleware from "redux-thunk";
+import persistState from "redux-localstorage";
+import {Provider, connect} from "react-redux";
+import {createLogger} from "redux-logger";
 import {
   headers,
   NEW_ADS,
@@ -18,28 +18,28 @@ import {
   GOT_THAT_AD,
   REQUESTING_ONE_AD,
   getOneAd,
-} from 'utils.js';
-import {entities, targets, advertisers, filters} from 'filters.jsx';
-import {Pagination, pagination} from 'pagination.jsx';
+} from "utils.js";
+import {entities, targets, advertisers, filters} from "filters.jsx";
+import {Pagination, pagination} from "pagination.jsx";
 
-import {go} from 'i18n.js';
+import {go} from "i18n.js";
 
-import {debounce} from 'lodash';
+import {debounce} from "lodash";
 
-const HIDE_AD = 'hide_ad';
-const LOGIN = 'login';
-const LOGOUT = 'logout';
+const HIDE_AD = "hide_ad";
+const LOGIN = "login";
+const LOGOUT = "logout";
 
 const b64 = thing =>
   btoa(thing)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '');
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 const createJWT = (username, password) => {
   const encoder = new TextEncoder();
   const header = {
-    alg: 'HS256',
-    typ: 'JWT',
+    alg: "HS256",
+    typ: "JWT",
   };
   const payload = {
     username,
@@ -48,13 +48,13 @@ const createJWT = (username, password) => {
   const encoded = encoder.encode(base);
   return window.crypto.subtle
     .importKey(
-      'raw',
+      "raw",
       encoder.encode(password),
-      {name: 'HMAC', hash: {name: 'SHA-256'}},
+      {name: "HMAC", hash: {name: "SHA-256"}},
       false,
-      ['sign']
+      ["sign"]
     )
-    .then(key => window.crypto.subtle.sign({name: 'HMAC'}, key, encoded))
+    .then(key => window.crypto.subtle.sign({name: "HMAC"}, key, encoded))
     .then(signature => ({
       token: `${base}.${b64(
         String.fromCharCode.apply(null, new Uint8Array(signature))
@@ -70,13 +70,13 @@ const hideAd = ad => ({
 const suppressAd = ad => {
   return (dispatch, getState) => {
     dispatch(hideAd(ad));
-    return fetch('/facebook-ads/admin/ads', {
-      method: 'POST',
+    return fetch("/facebook-ads/admin/ads", {
+      method: "POST",
       body: ad.id,
       headers: headers(getState().credentials),
     }).then(resp => {
       if (resp.ok) {
-        console.log('suppressed');
+        console.log("suppressed");
       } else {
         dispatch(logout());
       }
@@ -97,8 +97,8 @@ const authorize = (username, password) => {
   // create jwt
   return dispatch =>
     createJWT(username, password).then(token => {
-      return fetch('/facebook-ads/login', {
-        method: 'POST',
+      return fetch("/facebook-ads/login", {
+        method: "POST",
         headers: headers(token),
       }).then(resp => {
         if (resp.ok) {
@@ -174,7 +174,7 @@ const reducer = enableBatching(
 const middleware = [thunkMiddleware, createLogger()];
 const store = createStore(
   reducer,
-  compose(...[persistState('credentials'), applyMiddleware(...middleware)])
+  compose(...[persistState("credentials"), applyMiddleware(...middleware)])
 );
 
 const Ad = ({ad, onSuppressClick}) => (
@@ -220,7 +220,7 @@ const Ad = ({ad, onSuppressClick}) => (
         <tr>
           <td colSpan="2">
             {ad.suppressed ? (
-              'Suppressed'
+              "Suppressed"
             ) : (
               <button
                 onClick={function() {
@@ -237,12 +237,7 @@ const Ad = ({ad, onSuppressClick}) => (
 );
 
 class AdDetail extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   componentDidMount() {
-    console.log(this.props);
     let ad_id = null;
     if (this.props.match) {
       // `match` is from React Router -- it's the bit of the URL that matches.
@@ -316,7 +311,7 @@ class Ads extends React.Component {
           onKeyUp={this.props.onKeyUp}
           search={this.props.search}
         />
-        {this.props.pagination ? <Pagination /> : ''}
+        {this.props.pagination ? <Pagination /> : ""}
         {this.props.ads.map(ad => (
           <Ad
             ad={ad}
@@ -382,10 +377,9 @@ Login = connect()(Login);
 let LoggedInApp = () => {
   return (
     <div>
-      <Route exact path="/facebook-ads/admin" component={Ads} />{' '}
+      <Route exact path="/facebook-ads/admin" component={Ads} />{" "}
       {/* confusingly, despite being `exact`, this matches /facebook-ads/admin, without the trailing slash */}
       <Route exact path="/facebook-ads/admin/ads" component={Ads} />
-      <Route exact path="/facebook-ads/admin/ads/" component={Ads} />
       <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
     </div>
   );
@@ -411,6 +405,6 @@ go(() => {
         <App />
       </Provider>
     </BrowserRouter>,
-    document.querySelector('#react-root')
+    document.querySelector("#react-root")
   );
 });
