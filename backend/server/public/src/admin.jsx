@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, withRouter, Route, Link } from "react-router-dom";
-import { applyMiddleware, compose, combineReducers, createStore } from "redux";
+import {BrowserRouter, withRouter, Route, Link} from "react-router-dom";
+import {applyMiddleware, compose, combineReducers, createStore} from "redux";
 import thunkMiddleware from "redux-thunk";
 import persistState from "redux-localstorage";
 import {Provider, connect} from "react-redux";
@@ -225,8 +225,7 @@ const Ad = ({ad, onSuppressClick}) => (
               <button
                 onClick={function() {
                   return onSuppressClick(ad);
-                }}
-              >
+                }}>
                 Suppress
               </button>
             )}
@@ -283,14 +282,14 @@ class AdDetail extends React.Component {
 }
 AdDetail = withRouter(
   connect(
-    ({ permalinked_ad }) => ({
+    ({permalinked_ad}) => ({
       // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
       ads: permalinked_ad.ads,
-      requested_ad_id: permalinked_ad.requested_ad_id
+      requested_ad_id: permalinked_ad.requested_ad_id,
     }),
     dispatch => ({
       // ownProps is available as a second argument here.
-      onSuppressClick: ad => dispatch(suppressAd(ad))
+      onSuppressClick: ad => dispatch(suppressAd(ad)),
     })
   )(AdDetail)
 );
@@ -328,7 +327,7 @@ class Ads extends React.Component {
     );
   }
 
-  componentDidUnmount() {
+  componentWillUnmount() {
     if (this.unsubscribe) this.unsubscribe();
   }
 }
@@ -352,7 +351,7 @@ Ads = withRouter(
           dispatch,
           e.target.value.length ? e.target.value : null
         );
-      }
+      },
     })
   )(Ads)
 );
@@ -394,11 +393,7 @@ let LoggedInApp = () => {
   );
 };
 
-<<<<<<< HEAD
 let App = ({credentials}) => {
-=======
-let App = ({ credentials }) => {
->>>>>>> 2f99e87c99511b5236d605afabfa580edd0869fa
   return (
     <div id="app">
       <h1>
