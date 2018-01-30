@@ -152,7 +152,7 @@ impl Service for AdServer {
                                     Either::B(self.get_ads(req))
                                 },
                                 _ => {
-                                    Either::B(self.get_ad(ads_api_id_match.as_str().into()))
+                                    Either::B(self.get_ad(req, ads_api_id_match.as_str().into()))
                                 }
                             }
                         },
@@ -265,30 +265,40 @@ impl AdServer {
         }
     }
 
-    fn get_ad(&self, adid: String) -> ResponseFuture {
-        let db_pool = self.db_pool.clone();
-        let pool = self.pool.clone();
-        let ad = spawn_with_clone!(pool; db_pool, adid;
-                        Ad::get_ad(&db_pool, adid)
-                    );
-        let future = ad.map(|ad| {
-            let resp = serde_json::to_string(&ad);
-            match resp {
-                Ok(serialized) => Response::new()
-                    .with_header(ContentLength(serialized.len() as u64))
-                    .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
-                    .with_header(ContentType::json())
-                    .with_header(AccessControlAllowOrigin::Any)
-                    .with_body(serialized),
-                Err(e) => {
-                    warn!("{:?}", e);
-                    Response::new().with_status(StatusCode::InternalServerError)
+    fn get_ad(&self, req: Request, adid: String) -> ResponseFuture {
+        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
+            let db_pool = self.db_pool.clone();
+            let pool = self.pool.clone();
+            let mut options = HashMap::new();
+            options.insert(String::from("id"), adid);
+
+            let ad = spawn_with_clone!(pool; lang, db_pool, options;
+                            Ad::get_ad(&lang, &db_pool, &options)
+                        );
+            let future = ad.map(|ad| {
+                let resp = serde_json::to_string(&ad);
+                match resp {
+                    Ok(serialized) => Response::new()
+                        .with_header(ContentLength(serialized.len() as u64))
+                        .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
+                        .with_header(ContentType::json())
+                        .with_header(AccessControlAllowOrigin::Any)
+                        .with_body(serialized),
+                    Err(e) => {
+                        warn!("{:?}", e);
+                        Response::new().with_status(StatusCode::InternalServerError)
+                    }
                 }
-            }
-        }).map_err(|e| {
-            hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-        });
-        Box::new(future)
+            }).map_err(|e| {
+                hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+            });
+            Box::new(future)
+        } else {
+            Box::new(future::ok(
+                Response::new().with_status(StatusCode::BadRequest),
+            ))
+        }
+
     }
 
     fn get_ads(&self, req: Request) -> ResponseFuture {

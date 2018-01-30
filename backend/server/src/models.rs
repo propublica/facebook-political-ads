@@ -408,7 +408,7 @@ impl Ad {
 
     pub fn get_ads_query<'a>(
         language: &'a str,
-        options: &HashMap<String, String>,
+        options: &'a HashMap<String, String>,
     ) -> BoxedQuery<'a, Pg> {
         use schema::ads::dsl::*;
         let mut query = ads.filter(lang.eq(language))
@@ -416,6 +416,9 @@ impl Ad {
             .filter(suppressed.eq(false))
             .into_boxed();
 
+        if let Some(ad_id) = options.get("id") {
+            query = query.filter(id.eq(ad_id));
+        }
         if let Some(search) = options.get("search") {
             query = match &language[..2] {
                 "de" => {
@@ -483,14 +486,15 @@ impl Ad {
     }
 
     pub fn get_ad(
+        language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
-        adid: String,
+        options: &HashMap<String, String>,
     ) -> Result<Ad> {
-        use schema::ads::dsl::*;
-
         let connection = conn.get()?;
-        let ad = Ok(ads.find(adid).first(&*connection)?); // `load::<Ad>` instead of `first` would get us a Vec<Ad> instead of an <Ad>
-        ad
+        let query = Ad::get_ads_query(language, &options);
+        Ok(query.limit(1).first::<Ad>(
+            &*connection,
+        )?)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
