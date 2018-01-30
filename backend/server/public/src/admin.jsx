@@ -1,7 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
+<<<<<<< HEAD
 import {BrowserRouter, withRouter, Route, Link} from "react-router-dom";
 import {applyMiddleware, compose, combineReducers, createStore} from "redux";
+=======
+import { BrowserRouter, withRouter, Route, Link } from "react-router-dom";
+import { applyMiddleware, compose, combineReducers, createStore } from "redux";
+>>>>>>> 2f99e87c99511b5236d605afabfa580edd0869fa
 import thunkMiddleware from "redux-thunk";
 import persistState from "redux-localstorage";
 import {Provider, connect} from "react-redux";
@@ -225,7 +230,12 @@ const Ad = ({ad, onSuppressClick}) => (
               <button
                 onClick={function() {
                   return onSuppressClick(ad);
+<<<<<<< HEAD
                 }}>
+=======
+                }}
+              >
+>>>>>>> 2f99e87c99511b5236d605afabfa580edd0869fa
                 Suppress
               </button>
             )}
@@ -282,12 +292,23 @@ class AdDetail extends React.Component {
 }
 AdDetail = withRouter(
   connect(
+<<<<<<< HEAD
     ({permalinked_ad}) =>
       // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
       permalinked_ad,
     dispatch => ({
       // ownProps is available as a second argument here.
       onSuppressClick: ad => dispatch(suppressAd(ad)),
+=======
+    ({ permalinked_ad }) => ({
+      // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
+      ads: permalinked_ad.ads,
+      requested_ad_id: permalinked_ad.requested_ad_id
+    }),
+    dispatch => ({
+      // ownProps is available as a second argument here.
+      onSuppressClick: ad => dispatch(suppressAd(ad))
+>>>>>>> 2f99e87c99511b5236d605afabfa580edd0869fa
     })
   )(AdDetail)
 );
@@ -299,7 +320,9 @@ class Ads extends React.Component {
 
   componentDidMount() {
     deserialize(store.dispatch);
-    refresh(store).then(() => store.subscribe(() => refresh(store))); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
+    refresh(store).then(
+      () => (this.unsubscribe = store.subscribe(() => refresh(store)))
+    ); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
   }
 
   render() {
@@ -321,6 +344,13 @@ class Ads extends React.Component {
         ))}
       </div>
     );
+<<<<<<< HEAD
+=======
+  }
+
+  componentDidUnmount() {
+    if (this.unsubscribe) this.unsubscribe();
+>>>>>>> 2f99e87c99511b5236d605afabfa580edd0869fa
   }
 }
 
@@ -330,6 +360,7 @@ const throttledDispatch = debounce((dispatch, input) => {
 
 Ads = withRouter(
   connect(
+<<<<<<< HEAD
     ({ads, search, page, pagination}) => ({
       ads: ads.filter(ad => !ad.suppressed),
       search,
@@ -337,13 +368,29 @@ Ads = withRouter(
       page,
     }),
     dispatch => ({
+=======
+    ({ ads, search, page }) => ({
+      ads: ads.filter(ad => !ad.suppressed),
+      credentials, // these are needed for eventually creating links
+      lang, // these are needed for eventually creating links
+      search,
+      pagination,
+      page
+    }),
+    dispatch => ({
+      onSuppressClick: ad => dispatch(suppressAd(ad)),
+>>>>>>> 2f99e87c99511b5236d605afabfa580edd0869fa
       onKeyUp: e => {
         e.preventDefault();
         throttledDispatch(
           dispatch,
           e.target.value.length ? e.target.value : null
         );
+<<<<<<< HEAD
       },
+=======
+      }
+>>>>>>> 2f99e87c99511b5236d605afabfa580edd0869fa
     })
   )(Ads)
 );
@@ -380,12 +427,20 @@ let LoggedInApp = () => {
       <Route exact path="/facebook-ads/admin" component={Ads} />{" "}
       {/* confusingly, despite being `exact`, this matches /facebook-ads/admin, without the trailing slash */}
       <Route exact path="/facebook-ads/admin/ads" component={Ads} />
+<<<<<<< HEAD
+=======
+      <Route exact path="/facebook-ads/admin/ads/" component={Ads} />
+>>>>>>> 2f99e87c99511b5236d605afabfa580edd0869fa
       <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
     </div>
   );
 };
 
+<<<<<<< HEAD
 let App = ({credentials}) => {
+=======
+let App = ({ credentials }) => {
+>>>>>>> 2f99e87c99511b5236d605afabfa580edd0869fa
   return (
     <div id="app">
       <h1>
