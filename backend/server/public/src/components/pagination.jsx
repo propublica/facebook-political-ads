@@ -1,0 +1,59 @@
+import React from "react";
+import { connect } from "react-redux";
+import { range } from "lodash";
+import { prevPage, nextPage, setPage } from "actions.js";
+
+const Pagination = ({ page, prev, next, set, total }) => (
+  <nav className="pagination">
+    <ul>
+      {page > 0 ? (
+        <li>
+          <a href="" onClick={prev}>
+            ←
+          </a>
+        </li>
+      ) : (
+        ""
+      )}
+      {range(Math.max(0, page - 2), Math.min(page + 3, total)).map(i => {
+        return i === page ? (
+          <li key={i} className="current">
+            {page + 1}
+          </li>
+        ) : (
+          <li key={i}>
+            <a href="" onClick={e => set(e, i)}>
+              {i + 1}
+            </a>
+          </li>
+        );
+      })}
+      {page + 1 < total ? (
+        <li>
+          <a href="" onClick={next}>
+            →
+          </a>
+        </li>
+      ) : (
+        ""
+      )}
+    </ul>
+  </nav>
+);
+export default connect(
+  ({ pagination }) => pagination,
+  dispatch => ({
+    prev: e => {
+      e.preventDefault();
+      dispatch(prevPage());
+    },
+    next: e => {
+      e.preventDefault();
+      dispatch(nextPage());
+    },
+    set: (e, i) => {
+      e.preventDefault();
+      dispatch(setPage(i));
+    }
+  })
+)(Pagination);
