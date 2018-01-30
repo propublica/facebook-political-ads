@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest",
     "build": "parallel-webpack --progress",
-    "watch": "parallel-webpack -w --progress"
+    "watch": "parallel-webpack --watch --progress"
   },
   "author": "Jeff Larson <jeff.larson@propublica.org>",
   "license": "MIT",
