@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { BrowserRouter, withRouter, Route, Link } from 'react-router-dom';
+import { BrowserRouter, withRouter, Route, Link } from "react-router-dom";
 import { applyMiddleware, compose, combineReducers, createStore } from "redux";
 import thunkMiddleware from "redux-thunk";
 import persistState from "redux-localstorage";
@@ -223,11 +223,11 @@ const Ad = ({ ad, onSuppressClick }) => (
               "Suppressed"
             ) : (
               <button
-                onClick={function () {
+                onClick={function() {
                   return onSuppressClick(ad);
                 }}
               >
-                  Suppress
+                Suppress
               </button>
             )}
           </td>
@@ -256,31 +256,45 @@ class AdDetail extends React.Component {
   render() {
     if (this.props.ads && this.props.ads[this.props.requested_ad_id].loaded) {
       if (this.props.ads[this.props.requested_ad_id].id) {
-        return (<div id="ad">
-          <input id="search" placeholder="Search for ads" />
+        return (
+          <div id="ad">
+            <input id="search" placeholder="Search for ads" />
 
-          <Ad ad={this.props.ads[this.props.requested_ad_id]} onSuppressClick={this.props.onSuppressClick} />
-
-        </div>);
+            <Ad
+              ad={this.props.ads[this.props.requested_ad_id]}
+              onSuppressClick={this.props.onSuppressClick}
+            />
+          </div>
+        );
       } else {
-        return (<div><h2>Uh oh, an ad with that ID couldn&apos;t be found!</h2></div>);
+        return (
+          <div>
+            <h2>Uh oh, an ad with that ID couldn&apos;t be found!</h2>
+          </div>
+        );
       }
     } else {
-      return (<div><h2>Loading...</h2></div>);
+      return (
+        <div>
+          <h2>Loading...</h2>
+        </div>
+      );
     }
   }
 }
-AdDetail = withRouter(connect(
-  ({ permalinked_ad }) => (
-    { // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
+AdDetail = withRouter(
+  connect(
+    ({ permalinked_ad }) => ({
+      // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
       ads: permalinked_ad.ads,
-      requested_ad_id: permalinked_ad.requested_ad_id,
-
+      requested_ad_id: permalinked_ad.requested_ad_id
     }),
-  (dispatch) => ({ // ownProps is available as a second argument here.
-    onSuppressClick: (ad) => dispatch(suppressAd(ad))
-  })
-)(AdDetail));
+    dispatch => ({
+      // ownProps is available as a second argument here.
+      onSuppressClick: ad => dispatch(suppressAd(ad))
+    })
+  )(AdDetail)
+);
 
 class Ads extends React.Component {
   constructor(props) {
@@ -289,26 +303,34 @@ class Ads extends React.Component {
 
   componentDidMount() {
     deserialize(store.dispatch);
-    refresh(store).then(() => store.subscribe(() => refresh(store))); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
+    refresh(store).then(
+      () => (this.unsubscribe = store.subscribe(() => refresh(store)))
+    ); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
   }
 
   render() {
-    return (<div id="ads">
-      <input
-        id="search"
-        placeholder="Search for ads"
-        onKeyUp={this.props.onKeyUp}
-        search={this.props.search}
-      />
-      {this.props.pagination ? <Pagination /> : ""}
-      {this.props.ads.map(ad => (
-        <Ad
-          ad={ad}
-          key={ad.id}
-          onSuppressClick={this.props.onSuppressClick}
+    return (
+      <div id="ads">
+        <input
+          id="search"
+          placeholder="Search for ads"
+          onKeyUp={this.props.onKeyUp}
+          search={this.props.search}
         />
-      ))}
-    </div>);
+        {this.props.pagination ? <Pagination /> : ""}
+        {this.props.ads.map(ad => (
+          <Ad
+            ad={ad}
+            key={ad.id}
+            onSuppressClick={this.props.onSuppressClick}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  componentDidUnmount() {
+    if (this.unsubscribe) this.unsubscribe();
   }
 }
 
@@ -316,26 +338,28 @@ const throttledDispatch = debounce((dispatch, input) => {
   dispatch(newSearch(input));
 }, 750);
 
-Ads = withRouter(connect(
-  ({ ads, search, page }) => ({
-    ads: ads.filter(ad => !ad.suppressed),
-    credentials, // these are needed for eventually creating links
-    lang,        // these are needed for eventually creating links
-    search,
-    pagination,
-    page
-  }),
-  dispatch => ({
-    onSuppressClick: ad => dispatch(suppressAd(ad)),
-    onKeyUp: e => {
-      e.preventDefault();
-      throttledDispatch(
-        dispatch,
-        e.target.value.length ? e.target.value : null
-      );
-    }
-  })
-)(Ads));
+Ads = withRouter(
+  connect(
+    ({ ads, search, page }) => ({
+      ads: ads.filter(ad => !ad.suppressed),
+      credentials, // these are needed for eventually creating links
+      lang, // these are needed for eventually creating links
+      search,
+      pagination,
+      page
+    }),
+    dispatch => ({
+      onSuppressClick: ad => dispatch(suppressAd(ad)),
+      onKeyUp: e => {
+        e.preventDefault();
+        throttledDispatch(
+          dispatch,
+          e.target.value.length ? e.target.value : null
+        );
+      }
+    })
+  )(Ads)
+);
 
 let Login = ({ dispatch }) => {
   let email, password;
@@ -364,22 +388,29 @@ let Login = ({ dispatch }) => {
 Login = connect()(Login);
 
 let LoggedInApp = () => {
-  return (<div>
-    <Route exact path="/facebook-ads/admin" component={Ads} /> {/* confusingly, despite being `exact`, this matches /facebook-ads/admin, without the trailing slash */}
-    <Route exact path="/facebook-ads/admin/ads" component={Ads} />
-    <Route exact path="/facebook-ads/admin/ads/" component={Ads} />
-    <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
-  </div>);
+  return (
+    <div>
+      <Route exact path="/facebook-ads/admin" component={Ads} />{" "}
+      {/* confusingly, despite being `exact`, this matches /facebook-ads/admin, without the trailing slash */}
+      <Route exact path="/facebook-ads/admin/ads" component={Ads} />
+      <Route exact path="/facebook-ads/admin/ads/" component={Ads} />
+      <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
+    </div>
+  );
 };
 
 let App = ({ credentials }) => {
-  return (<div id="app">
-    <h1><Link to="/facebook-ads/admin">FBPAC Admin</Link></h1>
-    
-    {credentials && credentials.token ? <LoggedInApp /> : <Login />}
-  </div>);
+  return (
+    <div id="app">
+      <h1>
+        <Link to="/facebook-ads/admin">FBPAC Admin</Link>
+      </h1>
+
+      {credentials && credentials.token ? <LoggedInApp /> : <Login />}
+    </div>
+  );
 };
-App = withRouter(connect((state) => state)(App));
+App = withRouter(connect(state => state)(App));
 
 go(() => {
   ReactDOM.render(
