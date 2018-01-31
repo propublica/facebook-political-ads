@@ -141,6 +141,16 @@ describe("actions", () => {
 
 const mockStore = configureMockStore([thunk]);
 
+class TextEncoder {}
+TextEncoder.prototype.encode = jest.fn(() => "encoded");
+global.TextEncoder = TextEncoder;
+global.crypto = {
+  subtle: {
+    importKey: jest.fn(() => Promise.resolve("key")),
+    sign: jest.fn(() => Promise.resolve("signed"))
+  }
+};
+
 describe("async actions", () => {
   afterEach(() => {
     fetchMock.reset();
@@ -170,5 +180,21 @@ describe("async actions", () => {
     fetchMock.postOnce(url, { status: 401 }, { overwriteRoutes: true });
     await store.dispatch(actions.suppressAd(ad));
     expect(store.getActions()).toEqual([actions.hideAd(ad), actions.logout()]);
+  });
+
+  it("should allow a user to login", async () => {
+    fetchMock.postOnce("/facebook-ads/login", "ok");
+    const store = mockStore({});
+    await store.dispatch(actions.authorize("test", "test"));
+    expect(store.getActions()).toEqual([
+      actions.login({
+        token:
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QifQ."
+      })
+    ]);
+
+    expect(TextEncoder.prototype.encode.mock.calls).toHaveLength(2);
+    expect(crypto.subtle.importKey.mock.calls).toHaveLength(1);
+    expect(crypto.subtle.sign.mock.calls).toHaveLength(1);
   });
 });
