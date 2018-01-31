@@ -150,7 +150,7 @@ export const createJWT = (username, password) => {
   };
   const base = `${b64(JSON.stringify(header))}.${b64(JSON.stringify(payload))}`;
   const encoded = encoder.encode(base);
-  return window.crypto.subtle
+  return crypto.subtle
     .importKey(
       "raw",
       encoder.encode(password),
@@ -158,7 +158,7 @@ export const createJWT = (username, password) => {
       false,
       ["sign"]
     )
-    .then(key => window.crypto.subtle.sign({ name: "HMAC" }, key, encoded))
+    .then(key => crypto.subtle.sign({ name: "HMAC" }, key, encoded))
     .then(signature => ({
       token: `${base}.${b64(
         String.fromCharCode.apply(null, new Uint8Array(signature))
