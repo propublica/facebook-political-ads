@@ -31,12 +31,10 @@ export const newSearch = query => ({
 });
 
 export const BATCH = "batch";
-export const batch = (...actions) => {
-  return {
-    type: BATCH,
-    actions: actions
-  };
-};
+export const batch = (...actions) => ({
+  type: BATCH,
+  actions: actions
+});
 
 const a = type => arg => ({ type, value: arg });
 export const NEW_ENTITIES = "new_entities";
@@ -77,7 +75,6 @@ export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
   let path = `${url}/${ad_id}`;
   return (dispatch, getState) => {
     let state = getState();
-
     if (
       state.permalinked_ad &&
       state.permalinked_ad.ads &&
@@ -90,7 +87,7 @@ export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
     }
     dispatch(requestingOneAd(ad_id));
 
-    fetch(path, {
+    return fetch(path, {
       method: "GET",
       headers: headers(state.credentials, state.lang)
     })
@@ -103,8 +100,6 @@ export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
 
 // Admin actions
 export const HIDE_AD = "hide_ad";
-export const LOGIN = "login";
-export const LOGOUT = "logout";
 export const hideAd = ad => ({
   type: HIDE_AD,
   id: ad.id
@@ -127,11 +122,13 @@ export const suppressAd = ad => {
   };
 };
 
+export const LOGIN = "login";
 export const login = credentials => ({
   type: LOGIN,
   value: credentials
 });
 
+export const LOGOUT = "logout";
 export const logout = () => ({
   type: LOGOUT
 });
