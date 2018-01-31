@@ -150,13 +150,11 @@ impl Service for AdServer {
             (&Method::Get, _) => {
                 let my_path = req.path().to_owned();
                 let rest_matches: Vec<usize> = restful.matches(&my_path).into_iter().collect();
-                println!("{:?}", rest_matches);
                 match rest_matches.get(0) {
                     None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound))),
                     Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // admin, route the rest in React
                     Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // public site, route the rest in React
                     Some(&_) => { // api
-                        println!("{:?}", api_ad_id_restful_regex.captures(&my_path));
                         match api_ad_id_restful_regex.captures(&my_path) {
                             Some(ads_api_id_match) => Either::B(self.get_ad(req, ads_api_id_match.get(1).unwrap().as_str().into())),
                             None => Either::B(self.get_ads(req))
