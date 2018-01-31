@@ -19,6 +19,7 @@ use jsonwebtoken::{decode, Validation};
 use models::{Ad, Advertisers, Aggregate, Entities, NewAd, Targets};
 use r2d2::Pool;
 use regex::Regex;
+use regex::RegexSet;
 use start_logging;
 use serde_json;
 use std::collections::HashMap;
@@ -77,9 +78,12 @@ impl Service for AdServer {
     // This is not at all RESTful, but I'd rather not deal with regexes. Maybe soon
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
-        let api_restful_regex =    Regex::new(r"^/facebook-ads/ads/?(\d+)?$").unwrap();
-        let admin_restful_regex =  Regex::new(r"^/facebook-ads/admin/?(.*)?$").unwrap();
-        let public_restful_regex = Regex::new(r"^/facebook-ads(/?)$").unwrap(); // TODO: this will never serve a 404 and will always render the index...
+        let api_ad_id_restful_regex =    Regex::new(r"^/facebook-ads/ads/?(\d+)$").unwrap();
+        let restful = RegexSet::new(&[ // rudimentary routing.
+            r"^/facebook-ads/ads/?(\d+)?$",
+            r"^/facebook-ads/admin/?(.*)?$",
+            r"^/facebook-ads(/?)$" // TODO: this will never serve a 404 and will always render the index...
+        ]).unwrap();
 
         match (req.method(), req.path()) {
             (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
@@ -143,41 +147,21 @@ impl Service for AdServer {
             //
             // I'm sure I will understand why I needed to call to_owned() here better later,
             // but for now, this is how to avoid borrowing-related issues.
-            (&Method::Get, _) => match api_restful_regex.captures(&req.path().to_owned()){ 
-                Some(ads_api_match) => {
-                    match ads_api_match.get(1) {
-                        Some(ads_api_id_match) => {
-                            match ads_api_id_match.as_str() {
-                                "" | "/" => {
-                                    Either::B(self.get_ads(req))
-                                },
-                                _ => {
-                                    Either::B(self.get_ad(req, ads_api_id_match.as_str().into()))
-                                }
-                            }
-                        },
-                        None => {
-                            Either::B(self.get_ads(req))
+            (&Method::Get, _) => {
+                let my_path = req.path().to_owned();
+                let rest_matches: Vec<usize> = restful.matches(&my_path).into_iter().collect();
+                println!("{:?}", rest_matches);
+                match rest_matches.get(0) {
+                    None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound))),
+                    Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // admin, route the rest in React
+                    Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // public site, route the rest in React
+                    Some(&_) => { // api
+                        println!("{:?}", api_ad_id_restful_regex.captures(&my_path));
+                        match api_ad_id_restful_regex.captures(&my_path) {
+                            Some(ads_api_id_match) => Either::B(self.get_ad(req, ads_api_id_match.get(1).unwrap().as_str().into())),
+                            None => Either::B(self.get_ads(req))
                         }
-                    }
-                }
-
-                // the snippet below is basically the same as this:
-                // (&Method::Get, "/facebook-ads/admin") => {
-                //     Either::B(self.get_file("public/admin.html", ContentType::html()))   }
-                // except it matches regardless of what comes after /admin (including nothing)
-                None => match admin_restful_regex.captures(&req.path().to_owned()){
-                    Some(admin_match) => {
-                        // if it matches the admin route at all, it'll be handled by React / react-router
-                        println!("{}", admin_match.get(1).map_or("", |m| m.as_str()));
-                        Either::B(self.get_file("public/admin.html", ContentType::html()))
-                    }
-                    None => match public_restful_regex.captures(&req.path().to_owned()){
-                        Some(_) => Either::B(self.get_file("public/index.html", ContentType::html())),
-                        None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound)))
-                    }
-                    
-                    
+                    }, 
                 }
             },
             _ => Either::A(future::ok(
