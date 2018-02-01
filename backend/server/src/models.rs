@@ -489,12 +489,12 @@ impl Ad {
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
         options: &HashMap<String, String>,
-    ) -> Result<Ad> {
+    ) -> Result<Option<Ad>> {
         let connection = conn.get()?;
         let query = Ad::get_ads_query(language, &options);
         Ok(query.limit(1).first::<Ad>(
             &*connection,
-        )?)
+        ).optional()?) // returns a Result with value of Ok(Option(Ad)) OR a Result with value Err(somethin)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
