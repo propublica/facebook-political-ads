@@ -1,5 +1,5 @@
 import "url-search-params-polyfill";
-import { setTotal, setPage } from "pagination.jsx";
+import {setTotal, setPage} from "pagination.jsx";
 import {
   newAdvertisers,
   newEntities,
@@ -9,39 +9,39 @@ import {
   serializeEntities,
   filterAdvertiser,
   filterEntity,
-  filterTarget
+  filterTarget,
 } from "filters.jsx";
 
 const auth = credentials =>
-  credentials ? { Authorization: `Bearer ${credentials.token}` } : {};
+  credentials ? {Authorization: `Bearer ${credentials.token}`} : {};
 
 const headers = (credentials, lang) =>
   Object.assign({}, auth(credentials), language(lang));
 
-const language = lang => ({ "Accept-Language": lang + ";q=1.0" });
+const language = lang => ({"Accept-Language": lang + ";q=1.0"});
 
 const NEW_ADS = "new_ads";
 const newAds = ads => ({
   type: NEW_ADS,
-  value: ads
+  value: ads,
 });
 
 const GOT_THAT_AD = "GOT_THAT_AD";
 const receiveOneAd = ad => ({
   type: GOT_THAT_AD,
-  ad: ad
+  ad: ad,
 });
 
 const REQUESTING_ONE_AD = "REQUESTING_ONE_AD";
 const requestingOneAd = ad_id => ({
   type: REQUESTING_ONE_AD,
-  ad_id: ad_id
+  ad_id: ad_id,
 });
 
 const SET_LANG = "set_lang";
 const setLang = lang => ({
   type: SET_LANG,
-  value: lang
+  value: lang,
 });
 
 const lang = (state = null, action) => {
@@ -56,7 +56,7 @@ const lang = (state = null, action) => {
 const NEW_SEARCH = "new_search";
 const newSearch = query => ({
   type: NEW_SEARCH,
-  value: query
+  value: query,
 });
 
 const search = (state = null, action) => {
@@ -98,7 +98,7 @@ const deserialize = dispatch => {
   if (params.has("search")) {
     actions.push(newSearch(params.get("search")));
   }
-  
+
   if (params.has("entities")) {
     const entities = JSON.parse(params.get("entities"));
     actions.push(newEntities(entities));
@@ -117,7 +117,7 @@ const deserialize = dispatch => {
 
   if (params.has("advertisers")) {
     const advertisers = JSON.parse(params.get("advertisers")).map(
-      advertiser => ({ advertiser })
+      advertiser => ({advertiser})
     );
     actions.push(newAdvertisers(advertisers));
     advertisers.map(advertiser => {
@@ -139,7 +139,7 @@ const BATCH = "batch";
 const batch = (...actions) => {
   return {
     type: BATCH,
-    actions: actions
+    actions: actions,
   };
 };
 
@@ -170,14 +170,14 @@ const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
       state.permalinked_ad.ads[ad_id].id
     ) {
       return Promise.resolve(
-        dispatch(receiveOneAd({ ads: [state.permalinked_ad.ads[ad_id]] }))
+        dispatch(receiveOneAd({ads: [state.permalinked_ad.ads[ad_id]]}))
       );
     }
     dispatch(requestingOneAd(ad_id));
 
     fetch(path, {
       method: "GET",
-      headers: headers(state.credentials, state.lang)
+      headers: headers(state.credentials, state.lang),
     })
       .then(res => res.json())
       .then(ad => {
@@ -202,14 +202,14 @@ const refresh = (store, url = "/facebook-ads/ads") => {
       }
       let query = params.toString().length > 0 ? `?${params.toString()}` : "";
       history.pushState(
-        { search: query },
+        {search: query},
         "",
         `${window.location.pathname}${query}`
       );
     }
     return fetch(path, {
       method: "GET",
-      headers: headers(store.getState().credentials, store.getState().lang)
+      headers: headers(store.getState().credentials, store.getState().lang),
     })
       .then(res => res.json())
       .then(ads => {
@@ -225,6 +225,8 @@ const refresh = (store, url = "/facebook-ads/ads") => {
         );
         loaded = true;
       });
+  } else {
+    return Promise.resolve();
   }
 };
 
@@ -240,5 +242,5 @@ export {
   newSearch,
   deserialize,
   enableBatching,
-  lang
+  lang,
 };

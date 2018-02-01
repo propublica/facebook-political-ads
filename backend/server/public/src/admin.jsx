@@ -1,10 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { applyMiddleware, compose, combineReducers, createStore } from "redux";
+import {BrowserRouter, withRouter, Route, Link} from "react-router-dom";
+import {applyMiddleware, compose, combineReducers, createStore} from "redux";
 import thunkMiddleware from "redux-thunk";
 import persistState from "redux-localstorage";
-import { Provider, connect } from "react-redux";
-import { createLogger } from "redux-logger";
+import {Provider, connect} from "react-redux";
+import {createLogger} from "redux-logger";
 import {
   headers,
   NEW_ADS,
@@ -16,14 +17,14 @@ import {
   lang,
   GOT_THAT_AD,
   REQUESTING_ONE_AD,
-  getOneAd
+  getOneAd,
 } from "utils.js";
-import { entities, targets, advertisers, filters } from "filters.jsx";
-import { Pagination, pagination } from "pagination.jsx";
+import {entities, targets, advertisers, filters} from "filters.jsx";
+import {Pagination, pagination} from "pagination.jsx";
 
-import { go } from "i18n.js";
+import {go} from "i18n.js";
 
-import { debounce } from "lodash";
+import {debounce} from "lodash";
 
 const HIDE_AD = "hide_ad";
 const LOGIN = "login";
@@ -38,10 +39,10 @@ const createJWT = (username, password) => {
   const encoder = new TextEncoder();
   const header = {
     alg: "HS256",
-    typ: "JWT"
+    typ: "JWT",
   };
   const payload = {
-    username
+    username,
   };
   const base = `${b64(JSON.stringify(header))}.${b64(JSON.stringify(payload))}`;
   const encoded = encoder.encode(base);
@@ -49,21 +50,21 @@ const createJWT = (username, password) => {
     .importKey(
       "raw",
       encoder.encode(password),
-      { name: "HMAC", hash: { name: "SHA-256" } },
+      {name: "HMAC", hash: {name: "SHA-256"}},
       false,
       ["sign"]
     )
-    .then(key => window.crypto.subtle.sign({ name: "HMAC" }, key, encoded))
+    .then(key => window.crypto.subtle.sign({name: "HMAC"}, key, encoded))
     .then(signature => ({
       token: `${base}.${b64(
         String.fromCharCode.apply(null, new Uint8Array(signature))
-      )}`
+      )}`,
     }));
 };
 
 const hideAd = ad => ({
   type: HIDE_AD,
-  id: ad.id
+  id: ad.id,
 });
 
 const suppressAd = ad => {
@@ -72,7 +73,7 @@ const suppressAd = ad => {
     return fetch("/facebook-ads/admin/ads", {
       method: "POST",
       body: ad.id,
-      headers: headers(getState().credentials)
+      headers: headers(getState().credentials),
     }).then(resp => {
       if (resp.ok) {
         console.log("suppressed");
@@ -85,11 +86,11 @@ const suppressAd = ad => {
 
 const login = credentials => ({
   type: LOGIN,
-  value: credentials
+  value: credentials,
 });
 
 const logout = () => ({
-  type: LOGOUT
+  type: LOGOUT,
 });
 
 const authorize = (username, password) => {
@@ -98,7 +99,7 @@ const authorize = (username, password) => {
     createJWT(username, password).then(token => {
       return fetch("/facebook-ads/login", {
         method: "POST",
-        headers: headers(token)
+        headers: headers(token),
       }).then(resp => {
         if (resp.ok) {
           dispatch(login(token));
@@ -126,7 +127,7 @@ const ads = (state = [], action) => {
     case HIDE_AD:
       return state.map(ad => {
         if (ad.id === action.id) {
-          return { ...ad, suppressed: true };
+          return {...ad, suppressed: true};
         }
         return ad;
       });
@@ -139,19 +140,19 @@ const permalinked_ad = (state = {}, action) => {
   let new_ad_obj = {};
   switch (action.type) {
     case GOT_THAT_AD:
-      new_ad_obj[action.ad.id] = Object.assign({}, action.ad, { loaded: true });
+      new_ad_obj[action.ad.id] = Object.assign({}, action.ad, {loaded: true});
       return Object.assign({}, state, {
         requested_ad_id: action.ad.id,
-        ads: Object.assign({}, state.ads, new_ad_obj)
+        ads: Object.assign({}, state.ads, new_ad_obj),
       });
     case REQUESTING_ONE_AD:
-      new_ad_obj[action.ad_id] = { loaded: false };
+      new_ad_obj[action.ad_id] = {loaded: false};
       return Object.assign({}, state, {
         requested_ad_id: action.ad_id,
-        ads: Object.assign({}, state.ads, new_ad_obj)
+        ads: Object.assign({}, state.ads, new_ad_obj),
       });
     default:
-      return state;
+      return Object.assign({}, state, {ads: {}});
   }
 };
 
@@ -166,7 +167,7 @@ const reducer = enableBatching(
     filters,
     pagination,
     credentials,
-    lang
+    lang,
   })
 );
 
@@ -176,22 +177,14 @@ const store = createStore(
   compose(...[persistState("credentials"), applyMiddleware(...middleware)])
 );
 
-const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
+const Ad = ({ad, onSuppressClick}) => (
   <div className="ad">
     <table>
       <tbody>
         <tr>
           <td>id</td>
           <td>
-            <a
-              href={"?detail=" + ad.id}
-              onClick={e => {
-                e.preventDefault();
-                onPermalinkClick(ad.id);
-              }}
-            >
-              {ad.id}
-            </a>
+            <Link to={`/facebook-ads/admin/ads/${ad.id}`}>{ad.id}</Link>
           </td>
         </tr>
         <tr>
@@ -204,11 +197,11 @@ const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
         </tr>
         <tr>
           <td>text</td>
-          <td dangerouslySetInnerHTML={{ __html: ad.html }} />
+          <td dangerouslySetInnerHTML={{__html: ad.html}} />
         </tr>
         <tr>
           <td>targeting</td>
-          <td dangerouslySetInnerHTML={{ __html: ad.targeting }} />
+          <td dangerouslySetInnerHTML={{__html: ad.targeting}} />
         </tr>
         <tr>
           <td>political / not political</td>
@@ -232,8 +225,7 @@ const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
               <button
                 onClick={function() {
                   return onSuppressClick(ad);
-                }}
-              >
+                }}>
                 Suppress
               </button>
             )}
@@ -244,59 +236,127 @@ const Ad = ({ ad, onSuppressClick, onPermalinkClick }) => (
   </div>
 );
 
-let Ads = ({
-  ads,
-  onSuppressClick,
-  onKeyUp,
-  onPermalinkClick,
-  search,
-  pagination
-}) => (
-  <div id="ads">
-    <input
-      id="search"
-      placeholder="Search for ads"
-      onKeyUp={onKeyUp}
-      search={search}
-    />
-    {pagination ? <Pagination /> : ""}
-    {ads.map(ad => (
-      <Ad
-        ad={ad}
-        key={ad.id}
-        onSuppressClick={onSuppressClick}
-        onPermalinkClick={onPermalinkClick}
-      />
-    ))}
-  </div>
+class AdDetail extends React.Component {
+  componentDidMount() {
+    let ad_id = null;
+    if (this.props.match) {
+      // `match` is from React Router -- it's the bit of the URL that matches.
+      ad_id = this.props.match.params.ad_id;
+    } else {
+      ad_id = this.props.requested_ad_id; // really state.permalinked_ad.requested_ad_id
+    }
+    store.dispatch(getOneAd(ad_id));
+  }
+
+  render() {
+    if (
+      this.props.ads[this.props.requested_ad_id] &&
+      this.props.ads[this.props.requested_ad_id].loaded
+    ) {
+      if (this.props.ads[this.props.requested_ad_id].id) {
+        return (
+          <div id="ad">
+            <input id="search" placeholder="Search for ads" />
+
+            <Ad
+              ad={this.props.ads[this.props.requested_ad_id]}
+              onSuppressClick={this.props.onSuppressClick}
+            />
+          </div>
+        );
+      } else {
+        return (
+          <div>
+            <h2>Uh oh, an ad with that ID couldn&apos;t be found!</h2>
+          </div>
+        );
+      }
+    } else {
+      return (
+        <div>
+          <h2>Loading...</h2>
+        </div>
+      );
+    }
+  }
+}
+AdDetail = withRouter(
+  connect(
+    ({permalinked_ad}) => ({
+      // this is a mapStateToProps function. { ads } is destructuring the `store` hash and getting the `ads` element.
+      ads: permalinked_ad.ads,
+      requested_ad_id: permalinked_ad.requested_ad_id,
+    }),
+    dispatch => ({
+      // ownProps is available as a second argument here.
+      onSuppressClick: ad => dispatch(suppressAd(ad)),
+    })
+  )(AdDetail)
 );
+
+class Ads extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    deserialize(store.dispatch);
+    refresh(store).then(
+      () => (this.unsubscribe = store.subscribe(() => refresh(store)))
+    ); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
+  }
+
+  render() {
+    return (
+      <div id="ads">
+        <input
+          id="search"
+          placeholder="Search for ads"
+          onKeyUp={this.props.onKeyUp}
+          search={this.props.search}
+        />
+        {this.props.pagination ? <Pagination /> : ""}
+        {this.props.ads.map(ad => (
+          <Ad
+            ad={ad}
+            key={ad.id}
+            onSuppressClick={this.props.onSuppressClick}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribe) this.unsubscribe();
+  }
+}
+
 const throttledDispatch = debounce((dispatch, input) => {
   dispatch(newSearch(input));
 }, 750);
-Ads = connect(
-  ({ ads, search }) => ({
-    ads: ads.filter(ad => !ad.suppressed),
-    credentials, // these are needed for eventually creating links
-    lang, // these are needed for eventually creating links
-    search,
-    pagination
-  }),
-  dispatch => ({
-    onSuppressClick: ad => dispatch(suppressAd(ad)),
-    onKeyUp: e => {
-      e.preventDefault();
-      throttledDispatch(
-        dispatch,
-        e.target.value.length ? e.target.value : null
-      );
-    },
-    onPermalinkClick: ad_id => {
-      dispatch(getOneAd(ad_id));
-    }
-  })
-)(Ads);
 
-let Login = ({ dispatch }) => {
+Ads = withRouter(
+  connect(
+    ({ads, search, page, pagination}) => ({
+      ads: ads.filter(ad => !ad.suppressed),
+      search,
+      pagination,
+      page,
+    }),
+    dispatch => ({
+      onKeyUp: e => {
+        e.preventDefault();
+        throttledDispatch(
+          dispatch,
+          e.target.value.length ? e.target.value : null
+        );
+      },
+    })
+  )(Ads)
+);
+
+let Login = ({dispatch}) => {
   let email, password;
   const onLogin = e => {
     e.preventDefault();
@@ -322,34 +382,37 @@ let Login = ({ dispatch }) => {
 };
 Login = connect()(Login);
 
-let App = ({ credentials }) => {
+let LoggedInApp = () => {
   return (
-    <div id="app">
-      <h1>
-        <a href="/facebook-ads/admin?">FBPAC Admin</a>
-      </h1>
-      {credentials && credentials.token ? <Ads /> : <Login />}
+    <div>
+      <Route exact path="/facebook-ads/admin" component={Ads} />{" "}
+      {/* confusingly, despite being `exact`, this matches /facebook-ads/admin, without the trailing slash */}
+      <Route exact path="/facebook-ads/admin/ads" component={Ads} />
+      <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
     </div>
   );
 };
-App = connect(state => state)(App);
+
+let App = ({credentials}) => {
+  return (
+    <div id="app">
+      <h1>
+        <Link to="/facebook-ads/admin">FBPAC Admin</Link>
+      </h1>
+
+      {credentials && credentials.token ? <LoggedInApp /> : <Login />}
+    </div>
+  );
+};
+App = withRouter(connect(state => state)(App));
 
 go(() => {
   ReactDOM.render(
-    <Provider store={store}>
-      <App />
-    </Provider>,
+    <BrowserRouter>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </BrowserRouter>,
     document.querySelector("#react-root")
   );
-
-  deserialize(store.dispatch);
-  // I'll figure out a better way to do this but I'm learning React so 🐻 with me.
-  // we're probably going to want a router? maybe?
-  const searchParams = new URLSearchParams(location.search);
-  if (searchParams.get("detail")) {
-    store.dispatch(getOneAd(searchParams.get("detail")));
-  }
-  // anytime anything changes, then make the ajax request whenever the user changes the facets they
-  // want.
-  refresh(store).then(() => store.subscribe(() => refresh(store)));
 });
