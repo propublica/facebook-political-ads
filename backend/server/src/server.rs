@@ -78,12 +78,6 @@ impl Service for AdServer {
     // This is not at all RESTful, but I'd rather not deal with regexes. Maybe soon
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
-        let api_ad_id_restful_regex =    Regex::new(r"^/facebook-ads/ads/?(\d+)$").unwrap();
-        let restful = RegexSet::new(&[ // rudimentary routing.
-            r"^/facebook-ads/ads/?(\d+)?$",
-            r"^/facebook-ads/admin/?(.*)?$",
-            r"^/facebook-ads(/?)$" // TODO: this will never serve a 404 and will always render the index...
-        ]).unwrap();
 
         match (req.method(), req.path()) {
             (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
@@ -142,20 +136,27 @@ impl Service for AdServer {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
 
-            // TODO: this hella nested way of applying several regexes to the URL is gross.
-            // I'd like at least to make it less nested.
-            //
-            // I'm sure I will understand why I needed to call to_owned() here better later,
-            // but for now, this is how to avoid borrowing-related issues.
+            // Restful-ish routing. 
             (&Method::Get, _) => {
+                let restful = RegexSet::new(&[ // rudimentary routing. ORDER MATTERS. And we're using the index of these as the key for match below.
+                    r"^/facebook-ads/ads/?(\d+)?$",
+                    r"^/facebook-ads/admin/?(.*)?$",
+                    r"^/facebook-ads(/?)$" // TODO: this will never serve a 404 and will always render the index...
+                ]).unwrap();
+                let restful_collection_element_regex = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
+
+                // I'm sure I will understand why I needed to call to_owned() here better later,
+                // but for now, this is how to avoid borrowing-related issues.
                 let my_path = req.path().to_owned();
                 let rest_matches: Vec<usize> = restful.matches(&my_path).into_iter().collect();
                 match rest_matches.get(0) {
                     None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound))),
+
+                    // these indices match to the indices of `restful` above.
                     Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // admin, route the rest in React
                     Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // public site, route the rest in React
                     Some(&_) => { // api
-                        match api_ad_id_restful_regex.captures(&my_path) {
+                        match restful_collection_element_regex.captures(&my_path) {
                             Some(ads_api_id_match) => Either::B(self.get_ad(req, ads_api_id_match.get(1).unwrap().as_str().into())),
                             None => Either::B(self.get_ads(req))
                         }
@@ -274,6 +275,7 @@ impl AdServer {
             }).map_err(|e| {
                 hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
             });
+
             Box::new(future)
         } else {
             Box::new(future::ok(
