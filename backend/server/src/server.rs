@@ -258,18 +258,23 @@ impl AdServer {
             let ad = spawn_with_clone!(pool; lang, db_pool, options;
                             Ad::get_ad(&lang, &db_pool, &options)
                         );
-            let future = ad.map(|ad| {
-                let resp = serde_json::to_string(&ad);
-                match resp {
-                    Ok(serialized) => Response::new()
-                        .with_header(ContentLength(serialized.len() as u64))
-                        .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
-                        .with_header(ContentType::json())
-                        .with_header(AccessControlAllowOrigin::Any)
-                        .with_body(serialized),
-                    Err(e) => {
-                        warn!("{:?}", e);
-                        Response::new().with_status(StatusCode::InternalServerError)
+            let future = ad.map(|ad_option| {
+                match ad_option {
+                    None => Response::new().with_status(StatusCode::NotFound),
+                    Some(ad) => {
+                        let resp = serde_json::to_string(&ad);
+                        match resp {
+                            Ok(serialized) => Response::new()
+                                .with_header(ContentLength(serialized.len() as u64))
+                                .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
+                                .with_header(ContentType::json())
+                                .with_header(AccessControlAllowOrigin::Any)
+                                .with_body(serialized),
+                            Err(e) => {
+                                warn!("{:?}", e);
+                                Response::new().with_status(StatusCode::InternalServerError)
+                            }
+                        }
                     }
                 }
             }).map_err(|e| {
