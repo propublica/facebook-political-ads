@@ -1,0 +1,5 @@
+*/target
+target
+Dockerfile
+deploy.sh
+public/node_modules

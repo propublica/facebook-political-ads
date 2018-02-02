@@ -1,23 +1,16 @@
 import React from "react";
 import { connect } from "react-redux";
-import { getOneAd, suppressAd } from "actions.js";
+import { suppressAd } from "actions.js";
+import { Link } from "react-router-dom";
 
-let AdminAd = ({ ad, onSuppressClick, onPermalinkClick }) => (
+let AdminAd = ({ ad, onSuppressClick }) => (
   <div className="ad">
     <table>
       <tbody>
         <tr>
           <td>id</td>
           <td>
-            <a
-              href={"?detail=" + ad.id}
-              onClick={e => {
-                e.preventDefault();
-                onPermalinkClick(ad.id);
-              }}
-            >
-              {ad.id}
-            </a>
+            <Link to={`/facebook-ads/admin/ads/${ad.id}`}>{ad.id}</Link>
           </td>
         </tr>
         <tr>
@@ -71,10 +64,9 @@ let AdminAd = ({ ad, onSuppressClick, onPermalinkClick }) => (
 );
 
 AdminAd = connect(
-  () => {},
+  () => ({}),
   dispatch => ({
-    onSuppressClick: ad => dispatch(suppressAd(ad)),
-    onPermalinkClick: id => dispatch(getOneAd(id))
+    onSuppressClick: ad => dispatch(suppressAd(ad))
   })
 )(AdminAd);
 
