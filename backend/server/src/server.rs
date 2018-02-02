@@ -19,6 +19,7 @@ use jsonwebtoken::{decode, Validation};
 use models::{Ad, Advertisers, Aggregate, Entities, NewAd, Targets};
 use r2d2::Pool;
 use regex::Regex;
+use regex::RegexSet;
 use start_logging;
 use serde_json;
 use std::collections::HashMap;
@@ -77,16 +78,12 @@ impl Service for AdServer {
     // This is not at all RESTful, but I'd rather not deal with regexes. Maybe soon
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
-        let restfulre = Regex::new(r"^/facebook-ads/ads/?(\d+)?$").unwrap();
 
         match (req.method(), req.path()) {
             (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
                 Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
             })),
             // Admin
-            (&Method::Get, "/facebook-ads/admin") => {
-                Either::B(self.get_file("public/admin.html", ContentType::html()))
-            }
             (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file(
                 "public/dist/admin.js",
                 ContentType(mime::TEXT_JAVASCRIPT),
@@ -102,10 +99,7 @@ impl Service for AdServer {
             (&Method::Post, "/facebook-ads/admin/ads") => {
                 Either::B(self.auth(req, |request| self.mark_ad(request)))
             }
-            // Public
-            (&Method::Get, "/facebook-ads/") => {
-                Either::B(self.get_file("public/index.html", ContentType::html()))
-            }
+
             (&Method::Get, "/facebook-ads/index.js") => Either::B(self.get_file(
                 "public/dist/index.js",
                 ContentType(mime::TEXT_JAVASCRIPT),
@@ -141,27 +135,33 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/heartbeat") => {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
-            // I'm sure I will understand why I needed to call to_owned() here better later,
-            // but for now, this is how to avoid borrowing-related issues.
-            (&Method::Get, _) => match restfulre.captures(&req.path().to_owned()){ 
-                Some(ads_match) => {
-                    match ads_match.get(1) {
-                        Some(id_match) => {
-                            match id_match.as_str() {
-                                "" | "/" => {
-                                    Either::B(self.get_ads(req))
-                                },
-                                _ => {
-                                    Either::B(self.get_ad(id_match.as_str().into()))
-                                }
-                            }
-                        },
-                        None => {
-                            Either::B(self.get_ads(req))
+
+            // Restful-ish routing. 
+            (&Method::Get, _) => {
+                let restful = RegexSet::new(&[ // rudimentary routing. ORDER MATTERS. And we're using the index of these as the key for match below.
+                    r"^/facebook-ads/ads/?(\d+)?$",
+                    r"^/facebook-ads/admin/?(.*)?$",
+                    r"^/facebook-ads(/?)$" // TODO: this will never serve a 404 and will always render the index...
+                ]).unwrap();
+                let restful_collection_element_regex = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
+
+                // I'm sure I will understand why I needed to call to_owned() here better later,
+                // but for now, this is how to avoid borrowing-related issues.
+                let my_path = req.path().to_owned();
+                let rest_matches: Vec<usize> = restful.matches(&my_path).into_iter().collect();
+                match rest_matches.get(0) {
+                    None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound))),
+
+                    // these indices match to the indices of `restful` above.
+                    Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // admin, route the rest in React
+                    Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // public site, route the rest in React
+                    Some(&_) => { // api
+                        match restful_collection_element_regex.captures(&my_path) {
+                            Some(ads_api_id_match) => Either::B(self.get_ad(req, ads_api_id_match.get(1).unwrap().as_str().into())),
+                            None => Either::B(self.get_ads(req))
                         }
-                    }
+                    }, 
                 }
-                None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound)))
             },
             _ => Either::A(future::ok(
                 Response::new().with_status(StatusCode::NotFound),
@@ -248,30 +248,46 @@ impl AdServer {
         }
     }
 
-    fn get_ad(&self, adid: String) -> ResponseFuture {
-        let db_pool = self.db_pool.clone();
-        let pool = self.pool.clone();
-        let ad = spawn_with_clone!(pool; db_pool, adid;
-                        Ad::get_ad(&db_pool, adid)
-                    );
-        let future = ad.map(|ad| {
-            let resp = serde_json::to_string(&ad);
-            match resp {
-                Ok(serialized) => Response::new()
-                    .with_header(ContentLength(serialized.len() as u64))
-                    .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
-                    .with_header(ContentType::json())
-                    .with_header(AccessControlAllowOrigin::Any)
-                    .with_body(serialized),
-                Err(e) => {
-                    warn!("{:?}", e);
-                    Response::new().with_status(StatusCode::InternalServerError)
+    fn get_ad(&self, req: Request, adid: String) -> ResponseFuture {
+        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
+            let db_pool = self.db_pool.clone();
+            let pool = self.pool.clone();
+            let mut options = HashMap::new();
+            options.insert(String::from("id"), adid);
+
+            let ad = spawn_with_clone!(pool; lang, db_pool, options;
+                            Ad::get_ad(&lang, &db_pool, &options)
+                        );
+            let future = ad.map(|ad_option| {
+                match ad_option {
+                    None => Response::new().with_status(StatusCode::NotFound),
+                    Some(ad) => {
+                        let resp = serde_json::to_string(&ad);
+                        match resp {
+                            Ok(serialized) => Response::new()
+                                .with_header(ContentLength(serialized.len() as u64))
+                                .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
+                                .with_header(ContentType::json())
+                                .with_header(AccessControlAllowOrigin::Any)
+                                .with_body(serialized),
+                            Err(e) => {
+                                warn!("{:?}", e);
+                                Response::new().with_status(StatusCode::InternalServerError)
+                            }
+                        }
+                    }
                 }
-            }
-        }).map_err(|e| {
-            hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-        });
-        Box::new(future)
+            }).map_err(|e| {
+                hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+            });
+
+            Box::new(future)
+        } else {
+            Box::new(future::ok(
+                Response::new().with_status(StatusCode::BadRequest),
+            ))
+        }
+
     }
 
     fn get_ads(&self, req: Request) -> ResponseFuture {

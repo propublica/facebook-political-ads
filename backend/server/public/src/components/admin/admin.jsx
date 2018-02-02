@@ -1,7 +1,26 @@
 import React from "react";
 import { connect } from "react-redux";
+import { withRouter, Route } from "react-router-dom";
 import Ads from "components/admin/ads.jsx";
+import AdDetail from "components/admin/addetail.jsx";
 import Login from "components/admin/login.jsx";
+
+let LoggedInApp = () => {
+  return (
+    <div>
+      <Route exact path="/facebook-ads/admin" render={() => <Ads />} />
+      {/* confusingly, despite being `exact`, this matches /facebook-ads/admin, without the trailing slash */}
+      <Route
+        exact
+        path="/facebook-ads/admin/ads"
+        render={() => (
+          <Ads />
+        )} /* should be component={Ad} as soon as we figure out how to factor out this thing with store and subscribe */
+      />
+      <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
+    </div>
+  );
+};
 
 const Admin = ({ credentials }) => {
   return (
@@ -9,8 +28,10 @@ const Admin = ({ credentials }) => {
       <h1>
         <a href="/facebook-ads/admin?">FBPAC Admin</a>
       </h1>
-      {credentials && credentials.token ? <Ads /> : <Login />}
+      {credentials && credentials.token ? <LoggedInApp /> : <Login />}
     </div>
   );
 };
-export default connect(({ credentials }) => ({ credentials }))(Admin);
+export default withRouter(
+  connect(({ credentials }) => ({ credentials }))(Admin)
+);

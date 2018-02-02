@@ -157,3 +157,25 @@ export const credentials = (state = {}, action) => {
       return state;
   }
 };
+
+export const permalinked_ad = (state = {}, action) => {
+  let new_ad_obj = {};
+  switch (action.type) {
+    case GOT_THAT_AD:
+      new_ad_obj[action.ad.id] = { ...action.ad, ...{ loaded: true } };
+      return {
+        ...state,
+        requested_ad_id: action.ad.id,
+        ads: { ...state.ads, ...new_ad_obj }
+      };
+    case REQUESTING_ONE_AD:
+      new_ad_obj[action.ad_id] = { loaded: false };
+      return {
+        ...state,
+        requested_ad_id: action.ad_id,
+        ads: { ...state.ads, ...new_ad_obj }
+      };
+    default:
+      return { ...state, ...{ ads: {} } };
+  }
+};

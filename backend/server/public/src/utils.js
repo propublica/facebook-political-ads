@@ -11,7 +11,8 @@ import {
   newTargets,
   filterAdvertiser,
   filterEntity,
-  filterTarget
+  filterTarget,
+  BATCH
 } from "actions.js";
 
 const auth = credentials =>
@@ -81,7 +82,7 @@ const deserialize = dispatch => {
   if (params.has("search")) {
     actions.push(newSearch(params.get("search")));
   }
-  
+
   if (params.has("entities")) {
     const entities = JSON.parse(params.get("entities"));
     actions.push(newEntities(entities));
@@ -157,6 +158,8 @@ const refresh = (store, url = "/facebook-ads/ads") => {
         );
         loaded = true;
       });
+  } else {
+    return Promise.resolve();
   }
 };
 
