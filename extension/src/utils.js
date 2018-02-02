@@ -59,10 +59,13 @@ const updateBadge = ratings => {
   }
 };
 
-const getBrowserLocale = () => ({
-  language: navigator.language.split("-")[0],
-  country: navigator.language.split("-")[1]
-});
+const getBrowserLocale = () => {
+  const lang = navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language;
+  return {
+    language: lang.split("-")[0],
+    country: lang.split("-")[1]
+  };
+};
 
 export {
   sendAds,
