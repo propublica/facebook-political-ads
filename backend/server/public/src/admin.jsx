@@ -17,8 +17,7 @@ import {
   lang,
   ads,
   ad,
-  credentials,
-  permalinked_ad
+  credentials
 } from "reducers.js";
 import { go } from "i18n.js";
 import Admin from "components/admin/admin.jsx";
@@ -27,7 +26,6 @@ const reducer = enableBatching(
   combineReducers({
     ads,
     ad,
-    permalinked_ad,
     search,
     entities,
     advertisers,

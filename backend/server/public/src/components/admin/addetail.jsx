@@ -18,17 +18,14 @@ class AdDetail extends React.Component {
 
   render() {
     console.log(this.props);
-    if (
-      this.props.ads[this.props.requested_ad_id] &&
-      this.props.ads[this.props.requested_ad_id].loaded
-    ) {
-      if (this.props.ads[this.props.requested_ad_id].id) {
+    if (this.props.ad) {
+      if (this.props.ad.id) {
         return (
           <div id="ad">
             <input id="search" placeholder="Search for ads" />
 
             <Ad
-              ad={this.props.ads[this.props.requested_ad_id]}
+              ad={this.props.ad}
               onSuppressClick={this.props.onSuppressClick}
             />
           </div>
@@ -51,10 +48,9 @@ class AdDetail extends React.Component {
 }
 AdDetail = withRouter(
   connect(
-    ({ permalinked_ad }) => ({
-      // this is a mapStateToProps function. { permalinked_ad } is destructuring the `store` hash and getting the `ads` element.
-      ads: permalinked_ad.ads,
-      requested_ad_id: permalinked_ad.requested_ad_id
+    ({ ad }) => ({
+      // this is a mapStateToProps function. { ad } is destructuring the `store` hash and getting the `ads` element.
+      ad
     }),
     dispatch => ({
       // ownProps is available as a second argument here.

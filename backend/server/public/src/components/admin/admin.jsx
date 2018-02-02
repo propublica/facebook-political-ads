@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { withRouter, Route } from "react-router-dom";
+import { withRouter, Route, Link } from "react-router-dom";
 import Ads from "components/admin/ads.jsx";
 import AdDetail from "components/admin/addetail.jsx";
 import Login from "components/admin/login.jsx";
@@ -26,7 +26,7 @@ const Admin = ({ credentials }) => {
   return (
     <div id="app">
       <h1>
-        <a href="/facebook-ads/admin?">FBPAC Admin</a>
+        <Link to="/facebook-ads/admin">FBPAC Admin</Link>
       </h1>
       {credentials && credentials.token ? <LoggedInApp /> : <Login />}
     </div>
