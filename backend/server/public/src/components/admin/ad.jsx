@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { suppressAd } from "actions.js";
 import { Link } from "react-router-dom";
 
-let AdminAd = ({ ad, onSuppressClick }) => (
+export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
   <div className="ad">
     <table>
       <tbody>
@@ -63,11 +63,11 @@ let AdminAd = ({ ad, onSuppressClick }) => (
   </div>
 );
 
-AdminAd = connect(
+const AdminAd = connect(
   () => ({}),
   dispatch => ({
     onSuppressClick: ad => dispatch(suppressAd(ad))
   })
-)(AdminAd);
+)(AdminAdUnconnected);
 
 export default AdminAd;

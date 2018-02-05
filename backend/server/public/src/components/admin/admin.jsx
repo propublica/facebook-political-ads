@@ -5,7 +5,7 @@ import Ads from "components/admin/ads.jsx";
 import AdDetail from "components/admin/addetail.jsx";
 import Login from "components/admin/login.jsx";
 
-let LoggedInApp = () => {
+export const LoggedInApp = () => {
   return (
     <div>
       <Route exact path="/facebook-ads/admin" render={() => <Ads />} />
@@ -22,7 +22,7 @@ let LoggedInApp = () => {
   );
 };
 
-const Admin = ({ credentials }) => {
+export const AdminUnconnected = ({ credentials }) => {
   return (
     <div id="app">
       <h1>
@@ -33,5 +33,5 @@ const Admin = ({ credentials }) => {
   );
 };
 export default withRouter(
-  connect(({ credentials }) => ({ credentials }))(Admin)
+  connect(({ credentials }) => ({ credentials }))(AdminUnconnected)
 );

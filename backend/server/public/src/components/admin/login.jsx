@@ -2,7 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { authorize } from "actions.js";
 
-let Login = ({ dispatch }) => {
+export const LoginUnconnected = ({ dispatch }) => {
   let email, password;
   const onLogin = e => {
     e.preventDefault();
@@ -26,4 +26,5 @@ let Login = ({ dispatch }) => {
     </form>
   );
 };
-export default connect()(Login);
+const Login = connect()(LoginUnconnected);
+export default Login;
