@@ -75,11 +75,7 @@ export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
   let path = `${url}/${ad_id}`;
   return (dispatch, getState) => {
     let state = getState();
-    if (state.ad) {
-      return Promise.resolve(dispatch(receiveOneAd({ ads: [state.ad] })));
-    }
     dispatch(requestingOneAd(ad_id));
-
     return fetch(path, {
       method: "GET",
       headers: headers(state.credentials, state.lang)
