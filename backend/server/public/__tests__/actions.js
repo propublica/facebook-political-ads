@@ -164,9 +164,6 @@ describe("async actions", () => {
     let store = mockStore({});
     await store.dispatch(actions.getOneAd(ad.id));
     expect(store.getActions()).toEqual(expected);
-    store = mockStore({ permalinked_ad: { ads: { [ad.id]: ad } } });
-    await store.dispatch(actions.getOneAd(ad.id));
-    expect(store.getActions()).toEqual([actions.receiveOneAd({ ads: [ad] })]);
   });
 
   it("should suppress an ad", async () => {
