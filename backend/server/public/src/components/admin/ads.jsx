@@ -8,7 +8,7 @@ import { newSearch } from "actions.js";
 import { deserialize, refresh } from "utils.js";
 import PropTypes from "prop-types";
 
-class Ads extends React.Component {
+export class AdsUnconnected extends React.Component {
   constructor(props, context) {
     // this context stuff is bad and should be factored out once refresh is refactored.
     super(props, context);
@@ -55,9 +55,9 @@ const throttledDispatch = debounce((dispatch, input) => {
 }, 750);
 
 // this conAds.contextTypestext stuff is bad and should be factored out once refresh is refactored.
-Ads.contextTypes = { store: PropTypes.object }; // temporary, hopefully
+AdsUnconnected.contextTypes = { store: PropTypes.object }; // temporary, hopefully
 
-Ads = withRouter(
+const Ads = withRouter(
   connect(
     ({ ads, search, page, pagination }) => ({
       ads: ads.filter(ad => !ad.suppressed),
@@ -75,6 +75,6 @@ Ads = withRouter(
         );
       }
     })
-  )(Ads)
+  )(AdsUnconnected)
 );
 export default Ads;
