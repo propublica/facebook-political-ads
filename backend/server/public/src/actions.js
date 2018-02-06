@@ -102,9 +102,7 @@ export const suppressAd = ad => {
       body: ad.id,
       headers: headers(getState().credentials)
     }).then(resp => {
-      if (resp.ok) {
-        console.log("suppressed");
-      } else {
+      if (!resp.ok) {
         dispatch(logout());
       }
     });
