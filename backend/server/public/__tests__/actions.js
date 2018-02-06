@@ -157,7 +157,7 @@ describe("async actions", () => {
     fetchMock.restore();
   });
 
-  it("should get an ad on getOneAd and cache the results", async () => {
+  it("should get an ad on getOneAd", async () => {
     const ad = ads.ads[0];
     fetchMock.getOnce("/facebook-ads/ads/" + ad.id, JSON.stringify(ad));
     const expected = [actions.requestingOneAd(ad.id), actions.receiveOneAd(ad)];
