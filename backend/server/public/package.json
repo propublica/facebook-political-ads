@@ -24,6 +24,8 @@
     "babel-jest": "^22.1.0",
     "babel-loader": "^8.0.0-beta.0",
     "css-loader": "^0.28.9",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
     "eslint": "^4.16.0",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-jest": "^21.7.0",
