@@ -1,6 +1,6 @@
 import React from "react";
 import { MemoryRouter, StaticRouter, Route } from "react-router-dom";
-import Enzyme, { shallow, mount } from "enzyme";
+import Enzyme, { shallow } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import {
   LoggedInApp,

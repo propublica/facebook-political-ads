@@ -34,13 +34,15 @@ export class AdsUnconnected extends React.Component {
           search={this.props.search}
         />
         {this.props.pagination ? <Pagination /> : ""}
-        {this.props.ads.map(ad => (
-          <Ad
-            ad={ad}
-            key={ad.id}
-            onSuppressClick={this.props.onSuppressClick}
-          />
-        ))}
+        {this.props.ads
+          .filter(ad => !ad.suppressed)
+          .map(ad => (
+            <Ad
+              ad={ad}
+              key={ad.id}
+              onSuppressClick={this.props.onSuppressClick}
+            />
+          ))}
       </div>
     );
   }
@@ -60,7 +62,7 @@ AdsUnconnected.contextTypes = { store: PropTypes.object }; // temporary, hopeful
 const Ads = withRouter(
   connect(
     ({ ads, search, page, pagination }) => ({
-      ads: ads.filter(ad => !ad.suppressed),
+      ads,
       search,
       pagination,
       page
