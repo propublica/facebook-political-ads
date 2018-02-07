@@ -2,11 +2,11 @@ import React from "react";
 import { connect } from "react-redux";
 import { authorize } from "actions.js";
 
-export const LoginUnconnected = ({ dispatch }) => {
+export const LoginUnconnected = ({ authorize }) => {
   let email, password;
   const onLogin = e => {
     e.preventDefault();
-    dispatch(authorize(email.value, password.value));
+    authorize(email.value, password.value);
   };
   return (
     <form id="login" onSubmit={onLogin}>
@@ -26,5 +26,10 @@ export const LoginUnconnected = ({ dispatch }) => {
     </form>
   );
 };
-const Login = connect()(LoginUnconnected);
+const Login = connect(
+  () => {},
+  dispatch => ({
+    authorize: (email, password) => dispatch(authorize(email, password))
+  })
+)(LoginUnconnected);
 export default Login;
