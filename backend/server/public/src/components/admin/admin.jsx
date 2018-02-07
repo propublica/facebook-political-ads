@@ -8,15 +8,9 @@ import Login from "components/admin/login.jsx";
 export const LoggedInApp = () => {
   return (
     <div>
-      <Route exact path="/facebook-ads/admin" render={() => <Ads />} />
+      <Route exact path="/facebook-ads/admin" component={Ads} />
       {/* confusingly, despite being `exact`, this matches /facebook-ads/admin, without the trailing slash */}
-      <Route
-        exact
-        path="/facebook-ads/admin/ads"
-        render={() => (
-          <Ads />
-        )} /* should be component={Ad} as soon as we figure out how to factor out this thing with store and subscribe */
-      />
+      <Route exact path="/facebook-ads/admin/ads" component={Ads} />
       <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
     </div>
   );
