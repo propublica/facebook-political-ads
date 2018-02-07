@@ -29,7 +29,6 @@ describe("components", () => {
   describe("AdminAdUnconnected", () => {
     it("should render self and subcomponents", () => {
       const { enzymeWrapper } = setup();
-      console.log(enzymeWrapper);
       expect(enzymeWrapper.find("div").hasClass("ad")).toBe(true);
 
       expect(
