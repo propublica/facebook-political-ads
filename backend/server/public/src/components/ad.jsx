@@ -2,6 +2,7 @@ import React from "react";
 import Targeting from "./targeting.jsx";
 import { getOneAd } from "../actions.js";
 import { connect } from "react-redux";
+import { Link } from "react-router-dom";
 
 class Ad extends React.Component {
   componentDidMount() {
@@ -22,6 +23,9 @@ class Ad extends React.Component {
         <div className="message">
           <div dangerouslySetInnerHTML={{ __html: this.props.ad.html }} />
         </div>
+        <Link className="permalink" to={`/facebook-ads/ad/${this.props.ad.id}`}>
+          Permalink to this ad
+        </Link>
         {this.props.ad.targeting !== null ? (
           <Targeting targeting={this.props.ad.targeting} />
         ) : (

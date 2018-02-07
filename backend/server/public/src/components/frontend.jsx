@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, withRouter } from "react-router-dom";
 import Ad, { AdRedux } from "components/ad.jsx";
 import { Filters } from "components/filters.jsx";
 import Pagination from "components/pagination.jsx";
@@ -58,15 +58,17 @@ const throttledDispatch = debounce((dispatch, input) => {
   dispatch(newSearch(input));
 }, 750);
 
-export default connect(
-  ({ ads, search, ad }) => ({ ads, search, ad }),
-  dispatch => ({
-    onKeyUp: e => {
-      e.preventDefault();
-      throttledDispatch(
-        dispatch,
-        e.target.value.length ? e.target.value : null
-      );
-    }
-  })
-)(Frontend);
+export default withRouter(
+  connect(
+    ({ ads, search, ad }) => ({ ads, search, ad }),
+    dispatch => ({
+      onKeyUp: e => {
+        e.preventDefault();
+        throttledDispatch(
+          dispatch,
+          e.target.value.length ? e.target.value : null
+        );
+      }
+    })
+  )(Frontend)
+);
