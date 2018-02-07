@@ -141,7 +141,9 @@ impl Service for AdServer {
                 let restful = RegexSet::new(&[ // rudimentary routing. ORDER MATTERS. And we're using the index of these as the key for match below.
                     r"^/facebook-ads/ads/?(\d+)?$",
                     r"^/facebook-ads/admin/?(.*)?$",
-                    r"^/facebook-ads(/?)$" // TODO: this will never serve a 404 and will always render the index...
+                    r"^/facebook-ads(/?)$",
+                    r"^/facebook-ads/ad/?(\d+)?$"
+
                 ]).unwrap();
                 let restful_collection_element_regex = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
 
@@ -155,6 +157,7 @@ impl Service for AdServer {
                     // these indices match to the indices of `restful` above.
                     Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // admin, route the rest in React
                     Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // public site, route the rest in React
+                    Some(&3) => Either::B(self.get_file("public/index.html", ContentType::html())), // public site, route the rest in React
                     Some(&_) => { // api
                         match restful_collection_element_regex.captures(&my_path) {
                             Some(ads_api_id_match) => Either::B(self.get_ad(req, ads_api_id_match.get(1).unwrap().as_str().into())),
