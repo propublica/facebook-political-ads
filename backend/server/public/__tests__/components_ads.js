@@ -4,9 +4,10 @@ import Adapter from "enzyme-adapter-react-16";
 import { AdsUnconnected } from "../src/components/admin/ads.jsx";
 Enzyme.configure({ adapter: new Adapter() });
 
-function setup({ ads }) {
+function setup({ ads, pagination }) {
   const props = {
-    ads
+    ads,
+    pagination
   };
 
   const enzymeWrapper = shallow(<AdsUnconnected {...props} />, {
@@ -22,21 +23,40 @@ function setup({ ads }) {
 describe("components", () => {
   describe("AdminAdDetailUnconnected", () => {
     it("should not render any ads if it has no ads in props", () => {
-      const { enzymeWrapper } = setup({ ads: [] });
+      const { enzymeWrapper } = setup({
+        ads: [],
+        pagination: null
+      });
       expect(enzymeWrapper.find("Connect(AdminAdUnconnected)")).toHaveLength(0);
     });
     it("should not render suppressed ads", () => {
       const { enzymeWrapper } = setup({
-        ads: [{ suppressed: false }, { suppressed: true }]
+        ads: [{ id: 1, suppressed: false }, { id: 2, suppressed: true }],
+        pagination: null
       });
       expect(enzymeWrapper.find("Connect(AdminAdUnconnected)")).toHaveLength(1);
     });
     it("should render as many ads as are in props", () => {
       const { enzymeWrapper } = setup({
-        ads: [{ suppressed: false }, { suppressed: false }]
+        ads: [{ id: 1, suppressed: false }, { id: 2, suppressed: false }],
+        pagination: null
       });
       expect(enzymeWrapper.find("Connect(AdminAdUnconnected)")).toHaveLength(2);
     });
-    // TODO: this should also test the subscribe() stuff, but hopefully we'll factor that out soon.
+    it("should not render pagination if its not supplied", () => {
+      const { enzymeWrapper } = setup({
+        ads: [{ id: 1, suppressed: false }, { id: 2, suppressed: false }],
+        pagination: null
+      });
+      expect(enzymeWrapper.find("Connect(Pagination)")).toHaveLength(0);
+    });
+
+    it("should render pagination if its supplied", () => {
+      const { enzymeWrapper } = setup({
+        ads: [{ id: 1, suppressed: false }, { id: 2, suppressed: false }],
+        pagination: true
+      });
+      expect(enzymeWrapper.find("Connect(Pagination)")).toHaveLength(1);
+    });
   });
 });
