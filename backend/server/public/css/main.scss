@@ -3,15 +3,14 @@
 // -----------------------------------------------------------------------------
 
 // @import 'bourbon/bourbon';
-@import 'reset';
-@import 'mixins';
-@import 'colors';
-@import 'typography';
-@import 'grid-settings';
-@import 'josef';
+@import "reset";
+@import "mixins";
+@import "colors";
+@import "typography";
+@import "grid-settings";
+@import "josef";
 
-
-$image-assets: '../images';
+$image-assets: "../images";
 $cachebuster: random(1000000);
 
 // -----------------------------------------------------------------------------
@@ -47,22 +46,21 @@ body {
   color: $text-color;
   font-family: $fonts-serif;
   line-height: $line-height-base;
-  @media (-webkit-min-device-pixel-ratio: 2),
-  (min-resolution: 192dpi) {
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     color: $text-color-retina;
   }
 }
 
 article {
   a {
-    transition: .2s;
+    transition: 0.2s;
     color: $link-color;
     text-decoration: none;
     border-bottom: 1px solid rgba($link-color, 0);
 
     &:focus,
     &:hover {
-      border-bottom: 1px solid rgba($link-color, .6);
+      border-bottom: 1px solid rgba($link-color, 0.6);
     }
   }
 
@@ -118,11 +116,10 @@ article {
   }
 
   @include breakpoint-min(md) {
-
   }
 
   @include breakpoint-min(lg) {
-    padding: 0 (colspan(1,12) + colspan(g,12));
+    padding: 0 (colspan(1, 12) + colspan(g, 12));
   }
 }
 .hed {
@@ -173,34 +170,32 @@ article {
   margin-bottom: 1em;
 }
 
-
 // -----------------------------------------------------------------------------
 // FACEBOOK AD BROWSER FORM STYLES
 // -----------------------------------------------------------------------------
 
-
 #facebook-pac-browser {
   font-family: $fonts-sans;
   font-size: $scale-5;
-  margin: colspan(g,4) 0;
+  margin: colspan(g, 4) 0;
   @include clearfix;
   @include breakpoint-min(sm) {
-    width: colspan(4,6);
-    margin: colspan(g,6) auto;
+    width: colspan(4, 6);
+    margin: colspan(g, 6) auto;
   }
   @include breakpoint-min(md) {
     width: 100%;
-    margin: colspan(g,8) 0;
+    margin: colspan(g, 8) 0;
   }
   @include breakpoint-min(lg) {
     text-align: center;
-    width: colspan(12,8);
-    margin-left: -(colspan(2,8) + colspan(g,8));
+    width: colspan(12, 8);
+    margin-left: -(colspan(2, 8) + colspan(g, 8));
   }
   .prefabs {
     @include breakpoint-min(lg) {
-      width: colspan(8,12);
-      margin-left: colspan(2,12) + colspan(g,12);
+      width: colspan(8, 12);
+      margin-left: colspan(2, 12) + colspan(g, 12);
     }
     legend {
       margin-bottom: 0.5em;
@@ -234,24 +229,24 @@ article {
       background-color: $pp-blue;
     }
   }
-  input[type='search'] {
+  input[type="search"] {
     -webkit-appearance: textfield;
     width: 100%;
     font-size: $scale-7;
     background-color: $bg-low-contrast;
     padding: 0.5em;
-    margin: colspan(g,4) 0;
+    margin: colspan(g, 4) 0;
     border: $border;
     // border: 2px solid $pp-blue;
     @include breakpoint-min(md) {
-      margin: colspan(g,6) 0;
+      margin: colspan(g, 6) 0;
     }
     @include breakpoint-min(lg) {
       display: block;
       text-align: center;
-      width: colspan(6,12);
-      margin: colspan(g,12) 0;
-      margin-left: colspan(3,12) + colspan(g,12);
+      width: colspan(6, 12);
+      margin: colspan(g, 12) 0;
+      margin-left: colspan(3, 12) + colspan(g, 12);
       // margin-left: auto;
       // margin-right: auto;
     }
@@ -289,9 +284,9 @@ article {
 
     @include breakpoint-min(lg) {
       float: left;
-      width: colspan(4,12);
+      width: colspan(4, 12);
       margin-bottom: 0;
-      margin-right: colspan(g,12);
+      margin-right: colspan(g, 12);
       &:last-child {
         margin-right: 0;
       }
@@ -303,9 +298,9 @@ article {
         z-index: 1001;
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
-        box-shadow: 0 0 2em rgba( $pp-blue, 0.4 );
+        box-shadow: 0 0 2em rgba($pp-blue, 0.4);
         &:after {
-          content: ' ▲';
+          content: " ▲";
         }
       }
       .filter-options {
@@ -322,7 +317,7 @@ article {
     border-radius: 0.25em;
     &:after {
       position: absolute;
-      content: ' ▼';
+      content: " ▼";
       font-size: 0.75em;
       bottom: 0.85em;
       right: 1em;
@@ -340,7 +335,7 @@ article {
     border-top: 1px solid $border-color;
     border-bottom-left-radius: 0.25em;
     border-bottom-right-radius: 0.25em;
-    box-shadow: 0 0 2em rgba( $pp-blue, 0.4 );
+    box-shadow: 0 0 2em rgba($pp-blue, 0.4);
     @include breakpoint-min(sm) {
       max-height: 26.25em;
     }
@@ -352,7 +347,7 @@ article {
         border: none;
       }
     }
-    input[type='checkbox'] {
+    input[type="checkbox"] {
       position: absolute;
       top: 0;
       bottom: 0;
@@ -380,7 +375,6 @@ article {
     margin: 1em 0;
   }
 }
-
 
 // -----------------------------------------------------------------------------
 // PAGINATION NAV
@@ -421,7 +415,6 @@ article {
   }
 }
 
-
 // -----------------------------------------------------------------------------
 // FACEBOOK AD STYLES
 // -----------------------------------------------------------------------------
@@ -431,21 +424,21 @@ article {
   font-size: 14px;
   line-height: 19px;
   text-align: left;
-  padding: colspan(g,4) 12px;
+  padding: colspan(g, 4) 12px;
   // background-color: #e9ebee;
   background-color: $bg-low-contrast;
   @include full-width;
   @include breakpoint-min(sm) {
-    padding-top: colspan(g,6);
-    padding-bottom: colspan(g,6);
+    padding-top: colspan(g, 6);
+    padding-bottom: colspan(g, 6);
   }
   @include breakpoint-min(md) {
-    padding-top: colspan(1,8);
-    padding-bottom: colspan(1,8);
+    padding-top: colspan(1, 8);
+    padding-bottom: colspan(1, 8);
   }
   @include breakpoint-min(lg) {
-    padding-top: colspan(g,8);
-    padding-bottom: colspan(g,8);
+    padding-top: colspan(g, 8);
+    padding-bottom: colspan(g, 8);
   }
   a {
     color: rgb(54, 88, 153);
@@ -466,7 +459,8 @@ article {
   }
 }
 
-._4uoz { // Targeting info
+._4uoz {
+  // Targeting info
   color: $text-color-low-contrast;
   max-width: 500px;
   padding: 0 12px;
@@ -490,12 +484,14 @@ article {
 ._4ubd._3tsq,
 .hidden_elem,
 ._567v._3bw,
-._35sk { // Excess targeting info and video ads
+._35sk {
+  // Excess targeting info and video ads
   display: none;
 }
 
 ._1dwg._1w_m, // Timeline ad wrapper div
-.ego_unit {   // Sidebar ad wrapper div
+.ego_unit {
+  // Sidebar ad wrapper div
   background-color: white;
   padding: 12px;
   margin: 0 auto;
@@ -535,22 +531,29 @@ article {
   }
 }
 
-._1dwg._1w_m { // Timeline ad wrapper div
+.permalink {
+  max-width: 500px;
+  margin: 0 auto 20px;
+  display: block;
+}
+
+._1dwg._1w_m {
+  // Timeline ad wrapper div
   max-width: 500px;
   border: 1px solid #dddfe2;
 }
 
-.ego_unit { // Sidebar ad wrapper div
+.ego_unit {
+  // Sidebar ad wrapper div
   max-width: 308px;
   border: 1px solid #dddfe2;
 }
 
-
 /* NEWS FEED ADS */
 
-
 ._5pb8._1yz2._8o._8s.lfloat._ohe,
-._38vo { // Profile pic wrapper
+._38vo {
+  // Profile pic wrapper
   display: block;
   float: left;
   width: 32px;
@@ -560,7 +563,8 @@ article {
 }
 
 ._5x46,
-._3dp._29k { // Profile name wrapper
+._3dp._29k {
+  // Profile name wrapper
   @include clearfix;
   margin-bottom: 6px;
   a:hover,
@@ -569,12 +573,14 @@ article {
   }
 }
 
-._5pbw { // Profile name
+._5pbw {
+  // Profile name
   font-weight: bold;
 }
 
 ._5pcp._5lel._232_,
-._5paw { // 'Sponsored'
+._5paw {
+  // 'Sponsored'
   font-size: 12px;
   color: rgb(144, 148, 156);
   div {
@@ -589,7 +595,8 @@ article {
   display: none;
 }
 
-.lock.img { // 'Public' globe
+.lock.img {
+  // 'Public' globe
   display: inline-block;
   width: 12px;
   height: 12px;
@@ -599,22 +606,27 @@ article {
   vertical-align: -2px;
 }
 
-.userContent { // Post text
+.userContent {
+  // Post text
   clear: both;
 }
 // emojis
-.userContent img, .mbs._6m6 img, ._6a img {
+.userContent img,
+.mbs._6m6 img,
+._6a img {
   display: none;
 }
 
-.text_exposed_show { // Truncated post text
+.text_exposed_show {
+  // Truncated post text
   display: none;
 }
 
 .mtm,
-._dcs { // Article wrap
+._dcs {
+  // Article wrap
   margin-top: 10px;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   .mtm,
   ._dcs {
     margin-top: 0;
@@ -622,7 +634,8 @@ article {
   }
 }
 
-._150c { // Video (and slideshow?) wrap
+._150c {
+  // Video (and slideshow?) wrap
   > * {
     display: none;
   }
@@ -631,32 +644,38 @@ article {
   }
 }
 
-._2a2q ._5dec._xcx { // Slideshow images
+._2a2q ._5dec._xcx {
+  // Slideshow images
   display: none;
   &:first-child {
     display: block;
   }
 }
 
-._6ks > a { // Article image wrap
+._6ks > a {
+  // Article image wrap
   display: block;
 }
 
-.fbStoryAttachmentImage { // Article image
+.fbStoryAttachmentImage {
+  // Article image
 }
 
 // ._6m3._--6,
-._3ekx._29_4 { // Article description wrap
+._3ekx._29_4 {
+  // Article description wrap
   padding: 12px;
-  border-top: 1px solid rgba(0,0,0,0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-._5qf- { // Profile metadata
+._5qf- {
+  // Profile metadata
   display: none;
 }
 
-._5s6c { // Article hed
-  font-family: Georgia, 'Times New Roman', Times, serif;
+._5s6c {
+  // Article hed
+  font-family: Georgia, "Times New Roman", Times, serif;
   font-size: 18px;
   line-height: 22px;
   margin-bottom: 5px;
@@ -666,20 +685,23 @@ article {
 }
 
 ._6m7._3bt9,
-._5q4r { // Article dek
+._5q4r {
+  // Article dek
   font-size: 12px;
   line-height: 16px;
 }
 
 ._59tj._2iau,
-._1s4d { // Article URL/CTA wrap
+._1s4d {
+  // Article URL/CTA wrap
   vertical-align: bottom;
   padding-top: 5px;
   @include clearfix;
 }
 
 ._522u.rfloat._ohf,
-._275-._4s-8.rfloat._ohf { // CTA button
+._275-._4s-8.rfloat._ohf {
+  // CTA button
   display: inline-block;
   float: right;
   margin-left: 10px;
@@ -701,7 +723,8 @@ article {
 }
 
 ._6lz._6mb,
-._275y { // Article URL
+._275y {
+  // Article URL
   color: rgb(144, 148, 156);
   font-size: 12px;
   line-height: 11px;
@@ -711,23 +734,26 @@ article {
 
 ._5g-l, // 'Suggested Post'
 ._5tc6,
-._1-m5 { // 'Not affiliated with Facebook'
+._1-m5 {
+  // 'Not affiliated with Facebook'
   display: none;
 }
 
-
 /* SIDEBAR ADS */
 
-.ego_unit { // Sidebar ad
+.ego_unit {
+  // Sidebar ad
   font-size: 13px;
   line-height: 16px;
 
   // These all use different class names, hence the delightful muck below. Fun!
 
-  div > div > a > div > div:nth-child(2) { // Sidebar ad hed/URL wrapper
+  div > div > a > div > div:nth-child(2) {
+    // Sidebar ad hed/URL wrapper
     padding-top: 10px;
   }
-  div > div > a > div > div:nth-child(4) { // Sidebar ad article dek
+  div > div > a > div > div:nth-child(4) {
+    // Sidebar ad article dek
     color: rgb(144, 148, 156);
   }
 }
@@ -736,7 +762,7 @@ article {
 // MAIN HEADER + NAV
 // -----------------------------------------------------------------------------
 
-header[role='banner'] {
+header[role="banner"] {
   position: fixed;
   top: 0;
   width: 100%;
@@ -750,7 +776,7 @@ header[role='banner'] {
   }
 }
 
-header[role='banner'] > h1 {
+header[role="banner"] > h1 {
   display: block;
   width: 150px;
   height: inherit;
@@ -765,12 +791,12 @@ header[role='banner'] > h1 {
     white-space: nowrap;
     overflow: hidden;
     height: inherit;
-    background: url('#{$image-assets}/pp-logo-dark.svg') 0 50% no-repeat;
+    background: url("#{$image-assets}/pp-logo-dark.svg") 0 50% no-repeat;
     background-size: contain;
   }
 }
 
-header[role='banner'] > h2 {
+header[role="banner"] > h2 {
   display: none;
   float: left;
   margin-top: 12px;
@@ -791,12 +817,12 @@ header[role='banner'] > h2 {
   }
 }
 
-header[role='banner'] > h2 a {
+header[role="banner"] > h2 a {
   text-decoration: none;
   color: black;
 }
 
-header[role='banner'] nav {
+header[role="banner"] nav {
   position: fixed;
   top: 0;
   right: 0.5em;
@@ -805,19 +831,19 @@ header[role='banner'] nav {
   -webkit-font-smoothing: antialiased;
 }
 
-header[role='banner'] nav ul {
+header[role="banner"] nav ul {
   list-style: none;
 }
 
-header[role='banner'] nav ul li {
+header[role="banner"] nav ul li {
   padding-bottom: inherit; // override global
 }
 
-header[role='banner'] nav ul li a {
+header[role="banner"] nav ul li a {
   color: $text-color;
 }
 
-header[role='banner'] nav .other-links {
+header[role="banner"] nav .other-links {
   display: none;
   position: relative;
   top: 0.5rem;
@@ -840,7 +866,7 @@ header[role='banner'] nav .other-links {
   }
 }
 
-header[role='banner'] nav .social-links {
+header[role="banner"] nav .social-links {
   display: inline-block;
   position: relative;
   top: 0.5rem;
@@ -858,25 +884,25 @@ header[role='banner'] nav .social-links {
 }
 
 nav .facebook a {
-  background: url('#{$image-assets}/nav-sprites-dark.svg') -1px 0 no-repeat;
+  background: url("#{$image-assets}/nav-sprites-dark.svg") -1px 0 no-repeat;
 }
 
 nav .twitter a {
-  background: url('#{$image-assets}/nav-sprites-dark.svg') 0 -50px no-repeat;
+  background: url("#{$image-assets}/nav-sprites-dark.svg") 0 -50px no-repeat;
 }
 
 nav .comment a {
-  background: url('#{$image-assets}/nav-sprites-dark.svg') -2px -100px no-repeat;
+  background: url("#{$image-assets}/nav-sprites-dark.svg") -2px -100px no-repeat;
 }
 
-header[role='banner'] nav .social-links li.comment a  {
+header[role="banner"] nav .social-links li.comment a {
   display: none;
   @include breakpoint-min(sm) {
     display: block;
   }
 }
 
-header[role='banner'] nav .donate-links {
+header[role="banner"] nav .donate-links {
   float: right;
   margin-left: 0.25rem;
   li {
