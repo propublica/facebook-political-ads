@@ -20,11 +20,11 @@
     "description": "Text for the 'Ads Others are Seeing' button in the extension."
   },
   "political": {
-    "message": "Politisk annons",
+    "message": "Politisk",
     "description": "Label for political radio button"
   },
   "normal": {
-    "message": "Vanlig annons",
+    "message": "Vanlig",
     "description": "Label for normal radio button"
   },
   "rating_question": {
