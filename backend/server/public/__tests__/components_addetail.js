@@ -28,23 +28,23 @@ describe("components", () => {
       const { props } = setup();
       expect(props.getOneAd.mock.calls).toHaveLength(1);
     });
-    it("should render the Loading thing when this.props.ad doesn't exist", () => {
-      const { enzymeWrapper } = setup({});
-      expect(enzymeWrapper.find("h2.loading").exists()).toEqual(true);
-      expect(enzymeWrapper.find("h2.notfound").exists()).toEqual(false);
-      expect(enzymeWrapper.find("#ad").exists()).toEqual(false);
-    });
     it("should render a Not Found thing when this.props.ad is empty", () => {
       const { enzymeWrapper } = setup({ ad: {} });
-      expect(enzymeWrapper.find("h2.loading").exists()).toEqual(false);
+      expect(enzymeWrapper.find("h2.error").exists()).toEqual(false);
       expect(enzymeWrapper.find("h2.notfound").exists()).toEqual(true);
       expect(enzymeWrapper.find("#ad").exists()).toEqual(false);
     });
     it("should render an Ad when this.props.ad exists and isn't empty", () => {
       const { enzymeWrapper } = setup({ ad: { id: 123456789 } });
-      expect(enzymeWrapper.find("h2.loading").exists()).toEqual(false);
+      expect(enzymeWrapper.find("h2.error").exists()).toEqual(false);
       expect(enzymeWrapper.find("h2.notfound").exists()).toEqual(false);
       expect(enzymeWrapper.find("#ad").exists()).toEqual(true);
+    });
+    it("should give an error if match is null", () => {
+      const { enzymeWrapper } = setup({ match: null });
+      expect(enzymeWrapper.find("h2.error").exists()).toEqual(true);
+      expect(enzymeWrapper.find("h2.notfound").exists()).toEqual(false);
+      expect(enzymeWrapper.find("#ad").exists()).toEqual(false);
     });
   });
 });
