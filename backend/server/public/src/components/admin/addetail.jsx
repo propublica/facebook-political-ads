@@ -10,8 +10,8 @@ export class AdDetailUnconnected extends React.Component {
     if (this.props.match) {
       // `match` is from React Router -- it's the bit of the URL that matches.
       ad_id = this.props.match.params.ad_id;
+      this.props.getOneAd(ad_id);
     }
-    this.props.getOneAd(ad_id);
   }
 
   render() {
@@ -39,7 +39,7 @@ export class AdDetailUnconnected extends React.Component {
     } else {
       return (
         <div>
-          <h2 className="loading">Loading...</h2>
+          <h2 className="error">Uh oh, something went wrong.</h2>
         </div>
       );
     }
