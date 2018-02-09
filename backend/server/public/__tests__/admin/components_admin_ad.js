@@ -2,7 +2,7 @@ import React from "react";
 import { StaticRouter } from "react-router-dom";
 import Enzyme, { mount } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
-import { AdminAdUnconnected } from "../src/components/admin/ad.jsx";
+import { AdminAdUnconnected } from "../../src/components/admin/ad.jsx";
 
 Enzyme.configure({ adapter: new Adapter() });
 
