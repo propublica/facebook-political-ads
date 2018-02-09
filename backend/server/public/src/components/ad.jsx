@@ -1,10 +1,9 @@
 import React from "react";
 import Targeting from "./targeting.jsx";
 import { Link } from "react-router-dom";
-
 const Ad = ({ ad }) =>
   ad ? (
-    <div>
+    <div className="ad">
       <div className="message">
         <div dangerouslySetInnerHTML={{ __html: ad.html }} />
       </div>

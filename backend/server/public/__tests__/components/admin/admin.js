@@ -5,9 +5,9 @@ import Adapter from "enzyme-adapter-react-16";
 import {
   LoggedInApp,
   AdminUnconnected
-} from "../src/components/admin/admin.jsx";
-import { Ads } from "../src/components/admin/ads.jsx";
-import { AdDetail } from "../src/components/admin/addetail.jsx";
+} from "../../../src/components/admin/admin.jsx";
+import { Ads } from "../../../src/components/admin/ads.jsx";
+import { AdDetail } from "../../../src/components/admin/addetail.jsx";
 
 Enzyme.configure({ adapter: new Adapter() });
 
