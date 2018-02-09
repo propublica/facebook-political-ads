@@ -10,7 +10,7 @@ import { newSearch } from "actions.js";
 import { debounce } from "lodash";
 import { t } from "i18n.js";
 
-let Frontend = ({ ads, onKeyUp, search }) => (
+export const FrontendUnconnected = ({ ads, onKeyUp, search }) => (
   <div id="app">
     <div dangerouslySetInnerHTML={{ __html: t("guff") }} />
     <Switch>
@@ -59,7 +59,7 @@ const throttledDispatch = debounce((dispatch, input) => {
   dispatch(newSearch(input));
 }, 750);
 
-export default withRouter(
+const Frontend = withRouter(
   connect(
     ({ ads, search, ad }) => ({ ads, search, ad }),
     dispatch => ({
@@ -71,5 +71,6 @@ export default withRouter(
         );
       }
     })
-  )(Frontend)
+  )(FrontendUnconnected)
 );
+export default Frontend;
