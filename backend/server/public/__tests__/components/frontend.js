@@ -20,7 +20,7 @@ function setup({ ads }) {
   };
 }
 describe("components", () => {
-  describe("AdminAdDetailUnconnected", () => {
+  describe("FrontendUnconnected", () => {
     it("should not render any ads if it has no ads in props", () => {
       go(() => {
         const { enzymeWrapper } = setup({
