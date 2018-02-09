@@ -8,7 +8,7 @@ import { newSearch } from "actions.js";
 import { debounce } from "lodash";
 import { t } from "i18n.js";
 
-let Frontend = ({ ads, onKeyUp, search }) => (
+export const FrontendUnconnected = ({ ads, onKeyUp, search }) => (
   <div id="app">
     <div dangerouslySetInnerHTML={{ __html: t("guff") }} />
     <form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
@@ -44,7 +44,7 @@ const throttledDispatch = debounce((dispatch, input) => {
   dispatch(newSearch(input));
 }, 750);
 
-export default connect(
+const Frontend = connect(
   ({ ads, search }) => ({ ads, search }),
   dispatch => ({
     onKeyUp: e => {
@@ -55,4 +55,5 @@ export default connect(
       );
     }
   })
-)(Frontend);
+)(FrontendUnconnected);
+export default Frontend;
