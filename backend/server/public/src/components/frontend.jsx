@@ -1,7 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Route, Switch, withRouter } from "react-router-dom";
-import Ad, { AdRedux } from "components/ad.jsx";
+import Ad from "components/ad.jsx";
+import AdDetail from "components/addetail.jsx";
 import { Filters } from "components/filters.jsx";
 import Pagination from "components/pagination.jsx";
 import Term from "components/term.jsx";
@@ -49,7 +50,7 @@ let Frontend = ({ ads, onKeyUp, search }) => (
           </div>
         </div>
       </Route>
-      <Route path="/facebook-ads/ad/:ad_id" component={AdRedux} />
+      <Route path="/facebook-ads/ad/:ad_id" component={AdDetail} />
     </Switch>
   </div>
 );
