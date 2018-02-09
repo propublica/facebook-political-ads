@@ -19,7 +19,7 @@ function setup() {
 }
 
 describe("components", () => {
-  describe("Ad", () => {
+  describe("Targeting", () => {
     it("should render self", () => {
       const { enzymeWrapper } = setup();
       expect(enzymeWrapper.find(".targeting_info").exists()).toBe(true);
