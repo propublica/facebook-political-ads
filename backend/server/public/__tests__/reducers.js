@@ -8,6 +8,24 @@ const suppressed = j().ads;
 const resp = j();
 suppressed[0].suppressed = true;
 
+describe("batch", () => {
+  const reducer = jest.fn();
+  const batched = reducers.enableBatching(reducer);
+
+  it("should batch actions", () => {
+    batched(
+      [],
+      actions.batch(actions.setLang("en-US"), actions.newSearch("Trump"))
+    );
+    expect(reducer.mock.calls.length).toBe(2);
+  });
+
+  it("should respond to regular actions", () => {
+    batched([], actions.setLang("en-US"));
+    expect(reducer.mock.calls.length).toBe(3);
+  });
+});
+
 describe("lang", () => {
   it("should set lang", () =>
     expect(reducers.lang(null, actions.setLang("en-US"))).toEqual("en-US"));
@@ -82,6 +100,11 @@ describe("filters", () => {
     ).toEqual({})
   );
 
+  it(
+    "should only respond to filter actions",
+    expect(reducers.filters(undefined, actions.newSearch("Trump"))).toEqual({})
+  );
+
   const testFilter = (
     label,
     collection,
@@ -104,6 +127,10 @@ describe("filters", () => {
       active: it[key] === collection[0][key]
     }));
     it(`should filter ${label}`, expect(filter).toEqual(filterOut));
+    it(
+      `should ignore non ${label} calls`,
+      expect(reducer([], actions.newSearch("Trump"))).toEqual([])
+    );
   };
 
   testFilter(
@@ -131,5 +158,55 @@ describe("filters", () => {
     "target",
     actions.newTargets,
     actions.filterTarget
+  );
+});
+
+describe("credentials", () => {
+  it(
+    "should login",
+    expect(reducers.credentials(null, actions.login({ login: "ok" }))).toEqual({
+      login: "ok"
+    })
+  );
+  it(
+    "should logout",
+    expect(reducers.credentials({ login: "ok" }, actions.logout())).toEqual({})
+  );
+  it(
+    "should ignore other actions",
+    expect(
+      reducers.credentials({ login: "ok" }, actions.newSearch("trump"))
+    ).toEqual({ login: "ok" })
+  );
+});
+
+describe("pagination", () => {
+  const initial = reducers.pagination(
+    reducers.pagination(undefined, {}),
+    actions.setTotal(20)
+  );
+  it("should set the total", expect(initial).toEqual({ page: 0, total: 1 }));
+
+  const inc = it => reducers.pagination(it, actions.nextPage());
+  const dec = it => reducers.pagination(it, actions.prevPage());
+
+  it(
+    "should increment the page",
+    expect(inc(initial)).toEqual({ page: 1, total: 1 })
+  );
+
+  it(
+    "should stop at the last page",
+    expect(inc(inc(initial))).toEqual({ page: 1, total: 1 })
+  );
+
+  it("should go back one page", expect(dec(inc(initial))).toEqual(initial));
+  it("should stop at the first page", expect(dec(initial)).toEqual(initial));
+  it(
+    "should set a page",
+    expect(reducers.pagination(initial, actions.setPage(20))).toEqual({
+      page: 1,
+      total: 1
+    })
   );
 });
