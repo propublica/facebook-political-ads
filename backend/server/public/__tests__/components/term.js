@@ -24,7 +24,7 @@ function setup(newProps = {}) {
 }
 
 describe("components", () => {
-  describe("Ad", () => {
+  describe("Term", () => {
     it("should render self", () => {
       const { enzymeWrapper } = setup();
       expect(enzymeWrapper.find("button.prefab").exists()).toBe(true);
