@@ -48,15 +48,19 @@ describe("components", () => {
         ads: [{ id: 1, suppressed: false }, { id: 2, suppressed: false }],
         pagination: null
       });
-      expect(enzymeWrapper.find("Connect(Pagination)")).toHaveLength(0);
+      expect(enzymeWrapper.find("Connect(PaginationUnconnected)")).toHaveLength(
+        0
+      );
     });
 
     it("should render pagination if its supplied", () => {
       const { enzymeWrapper } = setup({
         ads: [{ id: 1, suppressed: false }, { id: 2, suppressed: false }],
-        pagination: true
+        pagination: { prev: null, next: null, set: null, pages: 1, total: 10 }
       });
-      expect(enzymeWrapper.find("Connect(Pagination)")).toHaveLength(1);
+      expect(enzymeWrapper.find("Connect(PaginationUnconnected)")).toHaveLength(
+        1
+      );
     });
   });
 });
