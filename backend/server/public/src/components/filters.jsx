@@ -36,7 +36,7 @@ const Filter = ({ data, title, activate, toggle, active }) => (
   </div>
 );
 
-let Filters = ({
+const FiltersUnconnected = ({
   entities,
   advertisers,
   targets,
@@ -72,7 +72,7 @@ let Filters = ({
     />
   </div>
 );
-Filters = connect(
+const Filters = connect(
   ({ entities, advertisers, targets, filters }) => ({
     entities,
     advertisers,
@@ -87,6 +87,6 @@ Filters = connect(
     filterTarget: item => dispatch(filterTarget(item)),
     toggleTarget: () => dispatch(toggleTarget())
   })
-)(Filters);
+)(FiltersUnconnected);
 
-export { Filter, Filters };
+export { Filter, FiltersUnconnected, Filters };
