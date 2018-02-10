@@ -1,54 +1,18 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Route, Switch, withRouter } from "react-router-dom";
-import Ad from "components/ad.jsx";
 import AdDetail from "components/addetail.jsx";
-import { Filters } from "components/filters.jsx";
-import Pagination from "components/pagination.jsx";
-import Term from "components/term.jsx";
+import AdList from "components/adlist.jsx";
 import { newSearch } from "actions.js";
 import { debounce } from "lodash";
 import { t } from "i18n.js";
 
-export const FrontendUnconnected = ({ ads, onKeyUp, search }) => (
+export const FrontendUnconnected = () => (
   <div id="app">
     <div dangerouslySetInnerHTML={{ __html: t("guff") }} />
     <Switch>
-      <Route exact path="/facebook-ads">
+      <Route exact path="/facebook-ads" component={AdList}>
         {/* confusingly, despite being `exact`, this also matches /facebook-ads/, with the trailing slash */}
-        <div>
-          <form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
-            <fieldset className="prefabs">
-              <legend>{t("search_terms")}</legend>
-              <ul>
-                {[
-                  "Trump",
-                  "Obama",
-                  "Hillary",
-                  "Mueller",
-                  "Health",
-                  "Taxes"
-                ].map(term => <Term key={term} search={search} term={term} />)}
-              </ul>
-            </fieldset>
-            <input
-              type="search"
-              id="search"
-              placeholder={t("search")}
-              onChange={onKeyUp}
-            />
-            <Filters />
-          </form>
-          <div className="facebook-pac-ads">
-            {ads.length > 0 ? (
-              <Pagination />
-            ) : (
-              <p className="no_ads">No ads found for {search}.</p>
-            )}
-            <div id="ads">{ads.map(ad => <Ad ad={ad} key={ad.id} />)}</div>
-            {ads.length > 0 ? <Pagination /> : ""}
-          </div>
-        </div>
       </Route>
       <Route path="/facebook-ads/ad/:ad_id" component={AdDetail} />
     </Switch>
