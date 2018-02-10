@@ -17,12 +17,12 @@ describe("batch", () => {
       [],
       actions.batch(actions.setLang("en-US"), actions.newSearch("Trump"))
     );
-    expect(reducer.mock.calls.length).toBe(2);
+    expect(reducer.mock.calls).toHaveLength(2);
   });
 
   it("should respond to regular actions", () => {
     batched([], actions.setLang("en-US"));
-    expect(reducer.mock.calls.length).toBe(3);
+    expect(reducer.mock.calls).toHaveLength(3);
   });
 });
 
