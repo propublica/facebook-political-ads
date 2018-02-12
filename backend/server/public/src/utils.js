@@ -11,8 +11,7 @@ import {
   newTargets,
   filterAdvertiser,
   filterEntity,
-  filterTarget,
-  BATCH
+  filterTarget
 } from "actions.js";
 
 const auth = credentials =>
@@ -22,18 +21,6 @@ const headers = (credentials, lang) =>
   Object.assign({}, auth(credentials), language(lang));
 
 const language = lang => ({ "Accept-Language": lang + ";q=1.0" });
-
-// https://github.com/reactjs/redux/issues/911#issuecomment-149192251
-export const enableBatching = reducer => {
-  return function batchingReducer(state, action) {
-    switch (action.type) {
-      case BATCH:
-        return action.actions.reduce(batchingReducer, state);
-      default:
-        return reducer(state, action);
-    }
-  };
-};
 
 const s = (plural, singular, map) => {
   return (params, state) => {
@@ -77,7 +64,7 @@ const serialize = store => {
 };
 
 const deserialize = dispatch => {
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(location.search);
   const actions = [];
   if (params.has("search")) {
     actions.push(newSearch(params.get("search")));
@@ -116,7 +103,7 @@ const deserialize = dispatch => {
 
   actions.push(setLang(params.get("lang") || "en-US"));
 
-  dispatch(batch(...actions));
+  return dispatch(batch(...actions));
 };
 
 // this is horrid, todo cleanup
@@ -163,4 +150,4 @@ const refresh = (store, url = "/facebook-ads/ads") => {
   }
 };
 
-export { headers, refresh, deserialize };
+export { auth, language, headers, refresh, serialize, deserialize };
