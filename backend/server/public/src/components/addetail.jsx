@@ -3,16 +3,13 @@ import { connect } from "react-redux";
 import Ad from "components/ad.jsx";
 import { withRouter, Link } from "react-router-dom";
 import { getOneAd } from "../actions.js";
+import PropTypes from "prop-types"; // ES6
 
 export class AdDetailUnconnected extends React.Component {
   componentDidMount() {
-    // if this.props.ad, it's already been fetched.
-    // if !this.props.match, then something has gone wrong.
-    if (!(this.props.ad && this.props.ad.id) && this.props.match) {
-      const ad_id = this.props.match.params.ad_id;
-      // `match` is from React Router -- it's the bit of the URL that matches.
-      this.props.getOneAd(ad_id);
-    }
+    const ad_id = this.props.match.params.ad_id;
+    // `match` is from React Router -- it's the bit of the URL that matches.
+    this.props.getOneAd(ad_id);
   }
 
   render() {
@@ -48,6 +45,11 @@ export class AdDetailUnconnected extends React.Component {
     );
   }
 }
+AdDetailUnconnected.propTypes = {
+  match: PropTypes.object.isRequired,
+  ad: PropTypes.object
+};
+
 const AdDetail = withRouter(
   connect(
     ({ ad }) => ({

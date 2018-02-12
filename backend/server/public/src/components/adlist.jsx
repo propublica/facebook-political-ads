@@ -4,8 +4,12 @@ import Pagination from "components/pagination.jsx";
 import Term from "components/term.jsx";
 import Ad from "components/ad.jsx";
 import { t } from "i18n.js";
+import { connect } from "react-redux";
+import { newSearch } from "actions.js";
+import { debounce } from "lodash";
+import { withRouter } from "react-router-dom";
 
-const AdList = ({ ads, onKeyUp, search }) => (
+const AdListUnconnected = ({ ads, onKeyUp, search }) => (
   <div>
     <form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
       <fieldset className="prefabs">
@@ -34,5 +38,24 @@ const AdList = ({ ads, onKeyUp, search }) => (
       {ads.length > 0 ? <Pagination /> : ""}
     </div>
   </div>
+);
+
+const throttledDispatch = debounce((dispatch, input) => {
+  dispatch(newSearch(input));
+}, 750);
+
+const AdList = withRouter(
+  connect(
+    ({ ads, search }) => ({ ads, search }),
+    dispatch => ({
+      onKeyUp: e => {
+        e.preventDefault();
+        throttledDispatch(
+          dispatch,
+          e.target.value.length ? e.target.value : null
+        );
+      }
+    })
+  )(AdListUnconnected)
 );
 export default AdList;
