@@ -143,17 +143,14 @@ impl Service for AdServer {
                     r"^/facebook-ads/admin/?(.*)?$",
                     r"^/facebook-ads(/?)$",
                     r"^/facebook-ads/ad/?(\d+)?$"
-
                 ]).unwrap();
                 let restful_collection_element_regex = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
-
                 // I'm sure I will understand why I needed to call to_owned() here better later,
                 // but for now, this is how to avoid borrowing-related issues.
                 let my_path = req.path().to_owned();
                 let rest_matches: Vec<usize> = restful.matches(&my_path).into_iter().collect();
                 match rest_matches.get(0) {
                     None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound))),
-
                     // these indices match to the indices of `restful` above.
                     Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // admin, route the rest in React
                     Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // public site, route the rest in React
