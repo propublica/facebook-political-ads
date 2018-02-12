@@ -8,7 +8,6 @@ const sendAds = function() {
   let posts = Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)).concat(
     Array.from(document.querySelectorAll(TIMELINE_SELECTOR))
   );
-  posts = Array.from(document.querySelectorAll(TIMELINE_SELECTOR));
 
   let results = [];
   let scraper = posts.reduce(
