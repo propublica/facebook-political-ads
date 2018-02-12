@@ -29,10 +29,6 @@ describe("components", () => {
       });
       expect(props.getOneAd.mock.calls).toHaveLength(1);
     });
-    it("should not try to get the ad if props.ad.id exists already", () => {
-      const { props } = setup({ ad: { id: "1234567890" } });
-      expect(props.getOneAd.mock.calls).toHaveLength(0);
-    });
 
     it("should render a Not Found thing when this.props.ad is empty", () => {
       const { enzymeWrapper } = setup({ ad: {} });
@@ -41,12 +37,6 @@ describe("components", () => {
       expect(enzymeWrapper.find("#ad").exists()).toEqual(false);
     });
 
-    it("should give an error if match is null", () => {
-      const { enzymeWrapper } = setup({ ad: null, match: null });
-      expect(enzymeWrapper.find("h2.error").exists()).toEqual(true);
-      expect(enzymeWrapper.find("h2.notfound").exists()).toEqual(false);
-      expect(enzymeWrapper.find("#ad").exists()).toEqual(false);
-    });
     it("should render a Link to all ads", () => {
       const { enzymeWrapper } = setup();
       expect(enzymeWrapper.find(".all-link").exists()).toEqual(true);

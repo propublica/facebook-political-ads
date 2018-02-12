@@ -17,12 +17,12 @@ describe("batch", () => {
       [],
       actions.batch(actions.setLang("en-US"), actions.newSearch("Trump"))
     );
-    expect(reducer.mock.calls.length).toBe(2);
+    expect(reducer.mock.calls).toHaveLength(2);
   });
 
   it("should respond to regular actions", () => {
     batched([], actions.setLang("en-US"));
-    expect(reducer.mock.calls.length).toBe(3);
+    expect(reducer.mock.calls).toHaveLength(3);
   });
 });
 
@@ -60,7 +60,7 @@ describe("ad", () => {
     expect(reducers.ad(null, actions.receiveOneAd(ads[0]))).toEqual(ads[0]));
 
   it("should respond to REQUESTING_ONE_AD", () =>
-    expect(reducers.ad(null, actions.requestingOneAd(ads[0]))).toEqual(false));
+    expect(reducers.ad(null, actions.requestingOneAd(ads[0]))).toEqual(null));
 
   it(
     "should only respond to GOT_THAT_AD and REQUESTING_ONE_AD",

@@ -1,18 +1,20 @@
 import React from "react";
 import Enzyme, { shallow } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
-import { FrontendUnconnected } from "../../src/components/frontend.jsx";
+import { FrontEnd } from "../../src/components/frontend.jsx";
+import { MemoryRouter } from "react-router-dom";
 Enzyme.configure({ adapter: new Adapter() });
 import { go } from "i18n.js";
 
-function setup({ ads }) {
-  const props = {
-    ads
-  };
-
-  const enzymeWrapper = shallow(<FrontendUnconnected {...props} />, {
-    disableLifecycleMethods: true
-  });
+function setup(path) {
+  const props = {};
+  const enzymeWrapper = shallow(
+    <MemoryRouter initialEntries={[path]}>
+      <FrontEnd {...props} />
+    </MemoryRouter>
+  )
+    .dive()
+    .dive();
 
   return {
     props,
@@ -20,50 +22,27 @@ function setup({ ads }) {
   };
 }
 describe("components", () => {
-  describe("FrontendUnconnected", () => {
-    it("should not render any ads if it has no ads in props", () => {
+  describe("FrontEnd", () => {
+    it("should render itself", () => {
       go(() => {
         const { enzymeWrapper } = setup({
           ads: []
         });
-        expect(enzymeWrapper.find("Connect(AdminAdUnconnected)")).toHaveLength(
-          0
-        );
-      });
-    });
-    it("should render as many ads as are in props", () => {
-      go(() => {
-        const { enzymeWrapper } = setup({
-          ads: [{ id: 1 }, { id: 2 }]
-        });
-        expect(enzymeWrapper.find("Connect(AdminAdUnconnected)")).toHaveLength(
-          2
-        );
+        expect(enzymeWrapper.find("#app")).toHaveLength(1);
       });
     });
 
-    it("should not render pagination if there are zero ads", () => {
+    it("should render AdDetail on a detail route", () => {
       go(() => {
-        const { enzymeWrapper } = setup({
-          ads: []
-        });
-        expect(enzymeWrapper.find("Connect(Pagination)")).toHaveLength(0);
+        const { enzymeWrapper } = setup("facebook-ads/ad/1234567890");
+        expect(enzymeWrapper.find("Connect(AdDetail)")).toHaveLength(1);
       });
     });
 
-    it("should render pagination if there are >=1 ads", () => {
+    it("should render AdList on index routes", () => {
       go(() => {
-        const { enzymeWrapper } = setup({ ads: [{ id: 1 }, { id: 2 }] });
-        expect(enzymeWrapper.find("Connect(Pagination)")).toHaveLength(1);
-      });
-    });
-
-    it("should render at least one Term", () => {
-      go(() => {
-        const { enzymeWrapper } = setup({
-          ads: [{ id: 1 }, { id: 2 }]
-        });
-        expect(enzymeWrapper.find("Connect(Term)").exists()).toBe(true);
+        const { enzymeWrapper } = setup("facebook-ads/");
+        expect(enzymeWrapper.find("Connect(AdList)")).toHaveLength(1);
       });
     });
   });
