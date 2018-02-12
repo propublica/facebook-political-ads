@@ -16,7 +16,7 @@ const selectors = [
   ".commentable_item"
 ].join(", ");
 
-const TIMELINE_SELECTOR = ".fbUserContent, .fbUserPost, ._5pcr";
+const TIMELINE_SELECTOR = ".userContentWrapper";
 const SIDEBAR_SELECTOR = ".ego_unit";
 
 const cleanAd = html => {
@@ -63,7 +63,8 @@ const cleanAd = html => {
 const checkSponsor = node => {
   return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
     a => {
-      const canary = a.querySelectorAll("._2lgs");
+      a = a.cloneNode(true);
+      const canary = Array.from(a.querySelectorAll("._2lgs"));
       Array.from(canary).forEach(canary => canary.remove());
       const text = a.textContent;
       const style = window
@@ -214,9 +215,11 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
       reject(e);
     }
   };
-  new MutationObserver(cb).observe(document, {
+
+  new MutationObserver(cb).observe(document.querySelector("#globalContainer"), {
     childList: true,
-    subtree: true
+    subtree: true,
+    attributes: false
   });
   refocus(() => toggle.click());
 };
@@ -283,6 +286,7 @@ const getSidebarId = (parent, ad) => {
 };
 
 const timeline = node => {
+  const sponsor = checkSponsor(node);
   // First we check if it is actually a sponsored post
   if (!checkSponsor(node)) return Promise.resolve(false);
 
@@ -339,13 +343,10 @@ const sidebar = node => {
 
 // We are careful here to only accept a valid timeline ad or sidebar ad
 const parser = function(node) {
-  if (
-    node.classList.contains("fbUserContent") ||
-    node.classList.contains("fbUserPost") ||
-    node.classList.contains("_5pcr")
-  ) {
+  const list = node.classList;
+  if (list.contains("userContentWrapper") || list.contains("_5pcr")) {
     return timeline(node);
-  } else if (node.classList.contains("ego_unit")) {
+  } else if (list.contains("ego_unit")) {
     return sidebar(node);
   } else {
     return Promise.resolve(false);
