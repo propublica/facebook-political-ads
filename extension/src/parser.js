@@ -1,3 +1,8 @@
+import debounce from "lodash/debounce";
+
+const TIMELINE_SELECTOR = ".userContentWrapper";
+const SIDEBAR_SELECTOR = ".ego_unit";
+
 // This function cleans all the elements that could leak user data
 // before sending to the server. It also removes any attributes that
 // could have personal data so we end up with a clean dom tree.
@@ -15,9 +20,6 @@ const selectors = [
   "h5._1qbu",
   ".commentable_item"
 ].join(", ");
-
-const TIMELINE_SELECTOR = ".userContentWrapper";
-const SIDEBAR_SELECTOR = ".ego_unit";
 
 const cleanAd = html => {
   let node = document.createElement("div");
@@ -216,11 +218,14 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     }
   };
 
-  new MutationObserver(cb).observe(document.querySelector("#globalContainer"), {
-    childList: true,
-    subtree: true,
-    attributes: false
-  });
+  new MutationObserver(debounce(cb, 100)).observe(
+    document.querySelector("#globalContainer"),
+    {
+      childList: true,
+      subtree: true,
+      attributes: false
+    }
+  );
   refocus(() => toggle.click());
 };
 
