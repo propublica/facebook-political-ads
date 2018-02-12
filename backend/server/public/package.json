@@ -66,6 +66,7 @@
   "jest": {
     "modulePaths": [
       "<rootDir>/src/"
-    ]
+    ],
+    "testURL": "https://projects.propublica.org/facebook-ads/"
   }
 }
