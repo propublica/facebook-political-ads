@@ -15,9 +15,9 @@ export const TermUnconnected = ({ search, term, newSearch }) => (
   </li>
 );
 const Term = connect(
-  () => {},
-  dispatch => {
-    term => dispatch(newSearch(term));
-  }
+  () => ({}),
+  dispatch => ({
+    newSearch: term => dispatch(newSearch(term))
+  })
 )(TermUnconnected);
 export default Term;
