@@ -167,7 +167,8 @@ def load_ads_from_psql(lang):
         suppressed
       from ads
         where lang = '{}'
-        and ((political + not_political) > 0 or suppressed = true);
+        and ((political + not_political) > 0 or suppressed = true)
+      limit 100000;
      """.format(text(lang)))
 
     data = []
