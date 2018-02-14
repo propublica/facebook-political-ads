@@ -69,25 +69,6 @@ describe("components", () => {
     });
   });
 
-  // describe("AdminAds (lifecycle methods)", () => {
-  //   it("should call call deserialize on mount", () => {
-  //     const props = {
-  //       ads: [],
-  //       pagination: null,
-  //       deserialize: jest.fn()
-  //     };
-  //     const mockStore = configureMockStore();
-  //     const initialState = { ads: [{ id: "1234567890" }], pagination: null };
-  //     let store = mockStore(initialState);
-  //     shallow(
-  //       <Provider store={store}>
-  //         <AdsUnconnected {...props} />
-  //       </Provider>
-  //     ).dive();
-  //     expect(props.deserialize.mock.calls).toHaveLength(1);
-  //   });
-  // });
-
   describe("AdminAds", () => {
     const mockStore = configureMockStore();
     let store, wrapper;
