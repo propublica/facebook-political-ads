@@ -10,7 +10,12 @@ module.exports = {
   globals: {
     chrome: true
   },
-  extends: ["eslint:recommended", "plugin:react/recommended"],
+  extends: [
+    "eslint:recommended",
+    "plugin:prettier/recommended",
+    "plugin:react/recommended",
+    "plugin:jest/recommended"
+  ],
   parserOptions: {
     ecmaFeatures: {
       experimentalObjectRestSpread: true,
