@@ -56,27 +56,26 @@ const throttledDispatch = debounce((dispatch, input) => {
   dispatch(newSearch(input));
 }, 750);
 
-// this conAds.contextTypestext stuff is bad and should be factored out once refresh is refactored.
+// this AdsUnconnected.contextTypes stuff is bad and should be factored out once refresh is refactored.
 AdsUnconnected.contextTypes = { store: PropTypes.object }; // temporary, hopefully
 
-const Ads = withRouter(
-  connect(
-    ({ ads, search, page, pagination }) => ({
-      ads,
-      search,
-      pagination,
-      page
-    }),
-    dispatch => ({
-      deserialize: () => deserialize(dispatch),
-      onKeyUp: e => {
-        e.preventDefault();
-        throttledDispatch(
-          dispatch,
-          e.target.value.length ? e.target.value : null
-        );
-      }
-    })
-  )(AdsUnconnected)
-);
+export const AdsUnrouted = connect(
+  ({ ads, search, page, pagination }) => ({
+    ads,
+    search,
+    pagination,
+    page
+  }),
+  dispatch => ({
+    deserialize: () => deserialize(dispatch),
+    onKeyUp: e => {
+      e.preventDefault();
+      throttledDispatch(
+        dispatch,
+        e.target.value.length ? e.target.value : null
+      );
+    }
+  })
+)(AdsUnconnected);
+const Ads = withRouter(AdsUnrouted);
 export default Ads;

@@ -1,7 +1,12 @@
 import React from "react";
 import Enzyme, { shallow } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
-import { AdsUnconnected } from "../../../src/components/admin/ads.jsx";
+import {
+  AdsUnconnected,
+  AdsUnrouted
+} from "../../../src/components/admin/ads.jsx";
+import configureMockStore from "redux-mock-store";
+import { NEW_SEARCH } from "../../../src/actions.js";
 Enzyme.configure({ adapter: new Adapter() });
 
 function setup({ ads, pagination }) {
@@ -21,7 +26,7 @@ function setup({ ads, pagination }) {
 }
 
 describe("components", () => {
-  describe("AdminAdDetailUnconnected", () => {
+  describe("AdminAdsUnconnected", () => {
     it("should not render any ads if it has no ads in props", () => {
       const { enzymeWrapper } = setup({
         ads: [],
@@ -60,6 +65,50 @@ describe("components", () => {
       });
       expect(enzymeWrapper.find("Connect(PaginationUnconnected)")).toHaveLength(
         1
+      );
+    });
+  });
+
+  // describe("AdminAds (lifecycle methods)", () => {
+  //   it("should call call deserialize on mount", () => {
+  //     const props = {
+  //       ads: [],
+  //       pagination: null,
+  //       deserialize: jest.fn()
+  //     };
+  //     const mockStore = configureMockStore();
+  //     const initialState = { ads: [{ id: "1234567890" }], pagination: null };
+  //     let store = mockStore(initialState);
+  //     shallow(
+  //       <Provider store={store}>
+  //         <AdsUnconnected {...props} />
+  //       </Provider>
+  //     ).dive();
+  //     expect(props.deserialize.mock.calls).toHaveLength(1);
+  //   });
+  // });
+
+  describe("AdminAds", () => {
+    const mockStore = configureMockStore();
+    let store, wrapper;
+
+    it("should create a new search again when keyUp occurs", () => {
+      const initialState = { ads: [{ id: "1234567890" }], pagination: null };
+      store = mockStore(initialState);
+      wrapper = shallow(<AdsUnrouted store={store} />, {
+        disableLifecycleMethods: true
+      }).dive();
+      wrapper
+        .find("input")
+        .simulate("keyUp", { target: { value: "asdfa" }, preventDefault() {} });
+
+      const actions = store.getActions();
+      setTimeout(
+        () =>
+          expect(actions).toEqual([
+            expect.objectContaining({ type: NEW_SEARCH })
+          ]),
+        1000 // we wait because this is debounced.
       );
     });
   });
