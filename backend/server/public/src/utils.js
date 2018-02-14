@@ -1,72 +1,43 @@
 import "url-search-params-polyfill";
-import {setTotal, setPage} from "pagination.jsx";
 import {
+  batch,
+  setLang,
+  setTotal,
+  setPage,
+  newAds,
   newAdvertisers,
   newEntities,
+  newSearch,
   newTargets,
-  serializeAdvertisers,
-  serializeTargets,
-  serializeEntities,
   filterAdvertiser,
   filterEntity,
-  filterTarget,
-} from "filters.jsx";
+  filterTarget
+} from "actions.js";
 
 const auth = credentials =>
-  credentials ? {Authorization: `Bearer ${credentials.token}`} : {};
+  credentials ? { Authorization: `Bearer ${credentials.token}` } : {};
 
 const headers = (credentials, lang) =>
   Object.assign({}, auth(credentials), language(lang));
 
-const language = lang => ({"Accept-Language": lang + ";q=1.0"});
+const language = lang => ({ "Accept-Language": lang + ";q=1.0" });
 
-const NEW_ADS = "new_ads";
-const newAds = ads => ({
-  type: NEW_ADS,
-  value: ads,
-});
-
-const GOT_THAT_AD = "GOT_THAT_AD";
-const receiveOneAd = ad => ({
-  type: GOT_THAT_AD,
-  ad: ad,
-});
-
-const REQUESTING_ONE_AD = "REQUESTING_ONE_AD";
-const requestingOneAd = ad_id => ({
-  type: REQUESTING_ONE_AD,
-  ad_id: ad_id,
-});
-
-const SET_LANG = "set_lang";
-const setLang = lang => ({
-  type: SET_LANG,
-  value: lang,
-});
-
-const lang = (state = null, action) => {
-  switch (action.type) {
-    case SET_LANG:
-      return action.value;
-    default:
-      return state;
-  }
+const s = (plural, singular, map) => {
+  return (params, state) => {
+    if (!state[plural]) return params;
+    const items = state[plural]
+      .filter(it => it.active)
+      .map(it => (map ? map(it[singular]) : it[singular]));
+    if (items.length > 0) {
+      params.set(plural, JSON.stringify(items));
+    }
+    return params;
+  };
 };
 
-const NEW_SEARCH = "new_search";
-const newSearch = query => ({
-  type: NEW_SEARCH,
-  value: query,
-});
-
-const search = (state = null, action) => {
-  switch (action.type) {
-    case NEW_SEARCH:
-      return action.value;
-    default:
-      return state;
-  }
-};
+const serializeEntities = s("entities", "entity", entity => ({ entity }));
+const serializeAdvertisers = s("advertisers", "advertiser");
+const serializeTargets = s("targets", "target", target => ({ target }));
 
 const serialize = store => {
   let params = new URLSearchParams();
@@ -93,7 +64,7 @@ const serialize = store => {
 };
 
 const deserialize = dispatch => {
-  const params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(location.search);
   const actions = [];
   if (params.has("search")) {
     actions.push(newSearch(params.get("search")));
@@ -117,7 +88,7 @@ const deserialize = dispatch => {
 
   if (params.has("advertisers")) {
     const advertisers = JSON.parse(params.get("advertisers")).map(
-      advertiser => ({advertiser})
+      advertiser => ({ advertiser })
     );
     actions.push(newAdvertisers(advertisers));
     advertisers.map(advertiser => {
@@ -132,58 +103,7 @@ const deserialize = dispatch => {
 
   actions.push(setLang(params.get("lang") || "en-US"));
 
-  dispatch(batch(...actions));
-};
-
-const BATCH = "batch";
-const batch = (...actions) => {
-  return {
-    type: BATCH,
-    actions: actions,
-  };
-};
-
-// https://github.com/reactjs/redux/issues/911#issuecomment-149192251
-const enableBatching = reducer => {
-  return function batchingReducer(state, action) {
-    switch (action.type) {
-      case BATCH:
-        return action.actions.reduce(batchingReducer, state);
-      default:
-        return reducer(state, action);
-    }
-  };
-};
-
-// getOneAd() and refresh() are thunk action creators.
-const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
-  if (!ad_id) return () => null;
-
-  let path = `${url}/${ad_id}`;
-  return (dispatch, getState) => {
-    let state = getState();
-
-    if (
-      state.permalinked_ad &&
-      state.permalinked_ad.ads &&
-      state.permalinked_ad.ads[ad_id] &&
-      state.permalinked_ad.ads[ad_id].id
-    ) {
-      return Promise.resolve(
-        dispatch(receiveOneAd({ads: [state.permalinked_ad.ads[ad_id]]}))
-      );
-    }
-    dispatch(requestingOneAd(ad_id));
-
-    fetch(path, {
-      method: "GET",
-      headers: headers(state.credentials, state.lang),
-    })
-      .then(res => res.json())
-      .then(ad => {
-        dispatch(receiveOneAd(ad));
-      });
-  };
+  return dispatch(batch(...actions));
 };
 
 // this is horrid, todo cleanup
@@ -192,7 +112,7 @@ const refresh = (store, url = "/facebook-ads/ads") => {
   const dispatch = store.dispatch;
   const params = serialize(store, dispatch);
   let path = `${url}?${params.toString()}`;
-  const cleanSearch = new URLSearchParams(window.location.search);
+  const cleanSearch = new URLSearchParams(location.search);
   if (!loaded || cleanSearch.toString() !== params.toString()) {
     if (!loaded) {
       path = url + window.location.search;
@@ -201,15 +121,11 @@ const refresh = (store, url = "/facebook-ads/ads") => {
         params.delete("page");
       }
       let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-      history.pushState(
-        {search: query},
-        "",
-        `${window.location.pathname}${query}`
-      );
+      history.pushState({ search: query }, "", `${location.pathname}${query}`);
     }
     return fetch(path, {
       method: "GET",
-      headers: headers(store.getState().credentials, store.getState().lang),
+      headers: headers(store.getState().credentials, store.getState().lang)
     })
       .then(res => res.json())
       .then(ads => {
@@ -230,17 +146,4 @@ const refresh = (store, url = "/facebook-ads/ads") => {
   }
 };
 
-export {
-  headers,
-  newAds,
-  NEW_ADS,
-  search,
-  getOneAd,
-  GOT_THAT_AD,
-  REQUESTING_ONE_AD,
-  refresh,
-  newSearch,
-  deserialize,
-  enableBatching,
-  lang,
-};
+export { auth, language, headers, refresh, serialize, deserialize };
