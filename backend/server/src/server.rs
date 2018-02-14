@@ -135,6 +135,9 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/heartbeat") => {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
+            (&Method::Get, "/facebook-ads/ads/advertisers") => {
+                Either::B(self.get_advertisers(req))
+            }
 
             // Restful-ish routing. 
             (&Method::Get, _) => {
@@ -143,7 +146,7 @@ impl Service for AdServer {
                     r"^/facebook-ads/admin/?(.*)?$",
                     r"^/facebook-ads(/?)$" // TODO: this will never serve a 404 and will always render the index...
                 ]).unwrap();
-                let restful_collection_element_regex = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
+                let restful_collection_element_regex = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)|(topadvertisers)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
 
                 // I'm sure I will understand why I needed to call to_owned() here better later,
                 // but for now, this is how to avoid borrowing-related issues.
@@ -153,9 +156,9 @@ impl Service for AdServer {
                     None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound))),
 
                     // these indices match to the indices of `restful` above.
-                    Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // admin, route the rest in React
-                    Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // public site, route the rest in React
-                    Some(&_) => { // api
+                    Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // /facebook-ads/admin/ -> admin, route the rest in React
+                    Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // /facebook-ads -> public site, route the rest in React
+                    Some(&_) => { // /facebook-ads/ads/ -> api
                         match restful_collection_element_regex.captures(&my_path) {
                             Some(ads_api_id_match) => Either::B(self.get_ad(req, ads_api_id_match.get(1).unwrap().as_str().into())),
                             None => Either::B(self.get_ads(req))
@@ -290,6 +293,55 @@ impl AdServer {
 
     }
 
+    fn get_advertisers(&self, req: Request) -> ResponseFuture {
+        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
+            let options = HashMap::new();
+            let db_pool = self.db_pool.clone();
+            let pool = self.pool.clone();
+
+            fn advertiser_count_getter(a: &Advertisers) -> i64 {
+                a.count
+            }
+            let top_advertisers = spawn_with_clone!(pool; lang, db_pool, options; 
+                                                        Advertisers::get(&lang, &db_pool, &options, Some(1000)));
+            let future = top_advertisers.map(|advertisers| 
+                advertisers
+                .into_iter()
+                .filter(|advertiser| advertiser_count_getter(&advertiser) > 10 )
+                // Oddly, `.filter(|&advertiser| advertiser.count > 10)` didn't work. I kept getting `the type of this value must be known in this context` 
+                // So I had to define my own function. Don't really know why.
+                .collect::<Vec<Advertisers>>()
+            ).map(|advertisers|{
+                    serde_json::to_string(&ApiResponse {
+                        ads: Vec::new(),
+                        targets: Vec::new(),
+                        entities: Vec::new(),
+                        advertisers: advertisers,
+                        total: 0,
+                    }).map(|serialized| {
+                        Response::new()
+                            .with_header(ContentLength(serialized.len() as u64))
+                            .with_header(
+                                Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]),
+                            )
+                            .with_header(ContentType::json())
+                            .with_header(AccessControlAllowOrigin::Any)
+                            .with_body(serialized)
+                    })
+                        .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
+                })
+                .map_err(|e| {
+                    warn!("{:?}", e);
+                    hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+                });
+            Box::new(future)
+        }else {
+            Box::new(future::ok(
+                Response::new().with_status(StatusCode::BadRequest),
+            ))
+        }
+    }
+
     fn get_ads(&self, req: Request) -> ResponseFuture {
         if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
             let options = req.query()
@@ -310,11 +362,11 @@ impl AdServer {
             let ads = spawn_with_clone!(pool; lang, db_pool, options;
                                         Ad::get_ads(&lang, &db_pool, &options));
             let targets = spawn_with_clone!(pool; lang, db_pool, options;
-                                            Targets::get(&lang, &db_pool, &options));
+                                            Targets::get(&lang, &db_pool, &options, None));
             let entities = spawn_with_clone!(pool; lang, db_pool, options;
-                                  Entities::get(&lang, &db_pool, &options));
+                                  Entities::get(&lang, &db_pool, &options, None));
             let advertisers = spawn_with_clone!(pool; lang, db_pool, options;
-                                  Advertisers::get(&lang, &db_pool, &options));
+                                  Advertisers::get(&lang, &db_pool, &options, None));
             let total = spawn_with_clone!(pool; lang, db_pool, options;
                                           Ad::get_total(&lang, &db_pool, &options));
 

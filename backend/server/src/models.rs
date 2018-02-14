@@ -5,7 +5,7 @@ use diesel::dsl::sql;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use diesel::sql_types::{BigInt, Text};
+use diesel::sql_types::{BigInt, Text, Bool};
 use diesel_full_text_search::*;
 use errors::*;
 use futures::{Future, stream, Stream};
@@ -76,7 +76,7 @@ pub fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
 }
 
 // Only available in timeline ads
-pub fn get_advertiser_link(
+pub fn get_author_link(
     document: &kuchiki::NodeRef,
 ) -> Result<kuchiki::NodeDataRef<kuchiki::ElementData>> {
     document_select(document, ".fwb > a")?.nth(0).ok_or_else(
@@ -180,10 +180,36 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
         Self::field()
     }
 
+    fn recent_get(
+        language: &str,
+        conn: &Pool<ConnectionManager<PgConnection>>,
+        options: &HashMap<String, String>,
+        limit: Option<i64>,
+        interval: Option<&str>
+    ) -> Result<Vec<T>> {
+        let connection = conn.get()?;
+        let mut interval_str = String::from("created_at > NOW() - interval '");
+        interval_str.push_str(&interval.unwrap_or("1 month"));
+        interval_str.push_str("'");
+
+        let query = Ad::get_ads_query(language, options)
+            .select((
+                sql::<BigInt>("count(*) as count"),
+                sql::<Text>(Self::column()),
+            ))
+            .group_by(sql::<Text>(Self::field()))
+            .filter(sql::<Bool>(&interval_str))
+            .order(sql::<BigInt>("count desc"))
+            .filter(sql::<Text>(Self::null_check()).is_not_null())
+            .limit(limit.unwrap_or(20));
+        Ok(query.load::<T>(&*connection)?)
+    }
+
     fn get(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
         options: &HashMap<String, String>,
+        limit: Option<i64>
     ) -> Result<Vec<T>> {
         let connection = conn.get()?;
         let query = Ad::get_ads_query(language, options)
@@ -192,9 +218,10 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
                 sql::<Text>(Self::column()),
             ))
             .group_by(sql::<Text>(Self::field()))
+            /* Ideally we'd have a .having() here, but it's not implemented yet in Diesel. */
             .order(sql::<BigInt>("count desc"))
             .filter(sql::<Text>(Self::null_check()).is_not_null())
-            .limit(20);
+            .limit(limit.unwrap_or(20));
         Ok(query.load::<T>(&*connection)?)
     }
 }
@@ -207,8 +234,7 @@ pub struct Targets {
 
 impl<T> Aggregate<T> for Targets
 where
-    T: Queryable<(BigInt, Text), Pg>,
-{
+    T: Queryable<(BigInt, Text), Pg>{
     fn field() -> &'static str {
         "target"
     }
@@ -237,7 +263,7 @@ pub struct Entities {
 
 impl<T> Aggregate<T> for Entities
 where
-    T: Queryable<(BigInt, Text), Pg>,
+    T: Queryable<(BigInt, Text), Pg>
 {
     fn field() -> &'static str {
         "entity"
@@ -260,7 +286,7 @@ pub struct Advertisers {
 
 impl<T> Aggregate<T> for Advertisers
 where
-    T: Queryable<(BigInt, Text), Pg>,
+    T: Queryable<(BigInt, Text), Pg>
 {
     fn column() -> &'static str {
         "advertiser"
@@ -525,7 +551,7 @@ pub fn get_advertiser(targeting: Option<String>, document: &kuchiki::NodeRef) ->
     match targeting {
         Some(ref targeting) => {
             collect_advertiser(&targeting).or(
-                get_advertiser_link(document)
+                get_author_link(document)
                     .map(|a| a.text_contents())
                     .ok(),
             )
@@ -582,7 +608,7 @@ impl<'a> NewAd<'a> {
             targeting: ad.targeting.clone(),
             targets: get_targets(ad.targeting.clone()),
             advertiser: get_advertiser(ad.targeting.clone(), &document),
-            page: get_advertiser_link(&document).ok().and_then(|l| {
+            page: get_author_link(&document).ok().and_then(|l| {
                 l.attributes.borrow().get("href").map(|i| i.to_string())
             }),
         })
