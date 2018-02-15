@@ -27,7 +27,7 @@ export const LoginUnconnected = ({ authorize }) => {
   );
 };
 const Login = connect(
-  () => {},
+  () => ({}),
   dispatch => ({
     authorize: (email, password) => dispatch(authorize(email, password))
   })
