@@ -6,7 +6,6 @@ import thunkMiddleware from "redux-thunk";
 import persistState from "redux-localstorage";
 import { Provider } from "react-redux";
 import { createLogger } from "redux-logger";
-import { enableBatching } from "utils.js";
 import {
   entities,
   targets,
@@ -17,7 +16,8 @@ import {
   lang,
   ads,
   ad,
-  credentials
+  credentials,
+  enableBatching
 } from "reducers.js";
 import { go } from "i18n.js";
 import Admin from "components/admin/admin.jsx";
