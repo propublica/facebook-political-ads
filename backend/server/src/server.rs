@@ -144,21 +144,21 @@ impl Service for AdServer {
                 let restful = RegexSet::new(&[ // rudimentary routing. ORDER MATTERS. And we're using the index of these as the key for match below.
                     r"^/facebook-ads/ads/?(\d+)?$",
                     r"^/facebook-ads/admin/?(.*)?$",
-                    r"^/facebook-ads(/?)$" // TODO: this will never serve a 404 and will always render the index...
+                    r"^/facebook-ads(/?)$",
+                    r"^/facebook-ads/ad/?(\d+)?$"
                 ]).unwrap();
-                let restful_collection_element_regex = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)|(topadvertisers)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
-
+                let restful_collection_element_regex = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
                 // I'm sure I will understand why I needed to call to_owned() here better later,
                 // but for now, this is how to avoid borrowing-related issues.
                 let my_path = req.path().to_owned();
                 let rest_matches: Vec<usize> = restful.matches(&my_path).into_iter().collect();
                 match rest_matches.get(0) {
                     None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound))),
-
                     // these indices match to the indices of `restful` above.
-                    Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // /facebook-ads/admin/ -> admin, route the rest in React
+                    Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // /facebook-ads/admin/ ->admin, route the rest in React
                     Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // /facebook-ads -> public site, route the rest in React
-                    Some(&_) => { // /facebook-ads/ads/ -> api
+                    Some(&3) => Either::B(self.get_file("public/index.html", ContentType::html())), // /facebook-ads -> public site, route the rest in React
+                    Some(&_) => { // api
                         match restful_collection_element_regex.captures(&my_path) {
                             Some(ads_api_id_match) => Either::B(self.get_ad(req, ads_api_id_match.get(1).unwrap().as_str().into())),
                             None => Either::B(self.get_ads(req))
