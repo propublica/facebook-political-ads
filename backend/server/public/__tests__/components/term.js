@@ -1,7 +1,9 @@
 import React from "react";
-import Enzyme, { mount } from "enzyme";
+import Enzyme, { mount, shallow } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
-import { TermUnconnected } from "../../src/components/term.jsx";
+import Term, { TermUnconnected } from "../../src/components/term.jsx";
+import configureMockStore from "redux-mock-store";
+import { NEW_SEARCH } from "../../src/actions.js";
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -24,7 +26,7 @@ function setup(newProps = {}) {
 }
 
 describe("components", () => {
-  describe("Term", () => {
+  describe("TermUnconnected", () => {
     it("should render self", () => {
       const { enzymeWrapper } = setup();
       expect(enzymeWrapper.find("button.prefab").exists()).toBe(true);
@@ -45,6 +47,23 @@ describe("components", () => {
       const { props, enzymeWrapper } = setup();
       enzymeWrapper.find("button").simulate("click");
       expect(props.newSearch.mock.calls).toHaveLength(1);
+    });
+  });
+
+  describe("Term", () => {
+    const mockStore = configureMockStore();
+    let store, wrapper;
+    beforeEach(() => {
+      const initialState = {};
+      store = mockStore(initialState);
+      wrapper = shallow(<Term store={store} />).dive();
+    });
+
+    it("should create a new search again when button is clicked", () => {
+      wrapper.find("button").simulate("click");
+
+      const actions = store.getActions();
+      expect(actions).toEqual([expect.objectContaining({ type: NEW_SEARCH })]);
     });
   });
 });

@@ -1,7 +1,11 @@
 import React from "react";
-import Enzyme, { mount } from "enzyme";
+import Enzyme, { mount, shallow } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
-import { PaginationUnconnected } from "../../src/components/pagination.jsx";
+import Pagination, {
+  PaginationUnconnected
+} from "../../src/components/pagination.jsx";
+import configureMockStore from "redux-mock-store";
+import { NEXT_PAGE, PREV_PAGE, SET_PAGE } from "../../src/actions.js";
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -26,7 +30,7 @@ function setup(newProps = {}) {
 }
 
 describe("components", () => {
-  describe("Pagination", () => {
+  describe("PaginationUnconnected", () => {
     it("should render self", () => {
       const { enzymeWrapper } = setup();
       expect(enzymeWrapper.find("nav.pagination").exists()).toBe(true);
@@ -80,7 +84,7 @@ describe("components", () => {
         .find("nav.pagination li")
         .first()
         .find("a");
-      input.simulate("click");
+      input.simulate("click", { preventDefault() {} });
       expect(props.prev).toHaveBeenCalledTimes(1);
       expect(props.next).toHaveBeenCalledTimes(0);
       expect(props.set).toHaveBeenCalledTimes(0);
@@ -91,7 +95,7 @@ describe("components", () => {
         .find("nav.pagination li")
         .last()
         .find("a");
-      input.simulate("click");
+      input.simulate("click", { preventDefault() {} });
       expect(props.prev).toHaveBeenCalledTimes(0);
       expect(props.next).toHaveBeenCalledTimes(1);
       expect(props.set).toHaveBeenCalledTimes(0);
@@ -102,10 +106,52 @@ describe("components", () => {
         .find("nav.pagination li")
         .at(5)
         .find("a");
-      input.simulate("click");
+      input.simulate("click", { preventDefault() {} });
       expect(props.prev).toHaveBeenCalledTimes(0);
       expect(props.next).toHaveBeenCalledTimes(0);
       expect(props.set).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("Pagination", () => {
+    const mockStore = configureMockStore();
+    let store, wrapper;
+    beforeEach(() => {
+      const initialState = {
+        pagination: {
+          page: 2,
+          total: 4
+        }
+      };
+      store = mockStore(initialState);
+      wrapper = shallow(<Pagination store={store} />).dive();
+    });
+
+    it("should set off the PREV_PAGE action when the prev button is clicked", () => {
+      wrapper
+        .find("a")
+        .first()
+        .simulate("click", { preventDefault() {} });
+
+      const actions = store.getActions();
+      expect(actions).toEqual([expect.objectContaining({ type: PREV_PAGE })]);
+    });
+    it("should set off the PREV_PAGE action when the next button is clicked", () => {
+      wrapper
+        .find("a")
+        .last()
+        .simulate("click", { preventDefault() {} });
+
+      const actions = store.getActions();
+      expect(actions).toEqual([expect.objectContaining({ type: NEXT_PAGE })]);
+    });
+    it("should set off the SET_PAGE action when a page num button is clicked", () => {
+      wrapper
+        .find("a")
+        .at(1)
+        .simulate("click", { preventDefault() {} });
+      const actions = store.getActions();
+      expect(actions).toEqual([expect.objectContaining({ type: SET_PAGE })]);
     });
   });
 });

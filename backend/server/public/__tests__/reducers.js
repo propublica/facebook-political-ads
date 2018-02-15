@@ -60,7 +60,7 @@ describe("ad", () => {
     expect(reducers.ad(null, actions.receiveOneAd(ads[0]))).toEqual(ads[0]));
 
   it("should respond to REQUESTING_ONE_AD", () =>
-    expect(reducers.ad(null, actions.requestingOneAd(ads[0]))).toEqual(false));
+    expect(reducers.ad(null, actions.requestingOneAd(ads[0]))).toEqual(null));
 
   it(
     "should only respond to GOT_THAT_AD and REQUESTING_ONE_AD",

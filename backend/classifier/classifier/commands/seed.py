@@ -8,11 +8,12 @@ import facebook
 import requests
 from classifier.utilities import confs
 
+
 def fetch_page(pagename, total_posts, graph):
     """
     Grab a selection of posts by page
     """
-    graph_retries = 0
+    retries = 0
     while True:
         try:
             posts = graph.request('/'+pagename+'/posts')
@@ -22,7 +23,7 @@ def fetch_page(pagename, total_posts, graph):
         except requests.exceptions.ConnectionError:
             if retries < 3:
                 retries += 1
-            else: 
+            else:
                 break
         break
     page_count = 0
@@ -40,7 +41,7 @@ def fetch_page(pagename, total_posts, graph):
                     next_url = "https://www.facebook.com" + next_url
                 retries = 0
                 while True:
-                    try: 
+                    try:
                         posts = requests.get(next_url).json()
                     except (json.decoder.JSONDecodeError, requests.exceptions.ConnectionError):
                         if retries < 3:

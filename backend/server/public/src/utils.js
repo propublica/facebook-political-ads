@@ -112,7 +112,7 @@ const refresh = (store, url = "/facebook-ads/ads") => {
   const dispatch = store.dispatch;
   const params = serialize(store, dispatch);
   let path = `${url}?${params.toString()}`;
-  const cleanSearch = new URLSearchParams(window.location.search);
+  const cleanSearch = new URLSearchParams(location.search);
   if (!loaded || cleanSearch.toString() !== params.toString()) {
     if (!loaded) {
       path = url + window.location.search;
@@ -121,11 +121,7 @@ const refresh = (store, url = "/facebook-ads/ads") => {
         params.delete("page");
       }
       let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-      history.pushState(
-        { search: query },
-        "",
-        `${window.location.pathname}${query}`
-      );
+      history.pushState({ search: query }, "", `${location.pathname}${query}`);
     }
     return fetch(path, {
       method: "GET",
