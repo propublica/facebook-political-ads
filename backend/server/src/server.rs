@@ -135,9 +135,13 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/heartbeat") => {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
-            (&Method::Get, "/facebook-ads/ads/advertisers") => {
+            (&Method::Get, "/facebook-ads/ads/advertisers") => { // TODO: route these in the restful routing area.
                 Either::B(self.get_advertisers(req))
             }
+            (&Method::Get, "/facebook-ads/ads/recentadvertisers") => { // TODO: route these in the restful routing area.
+                Either::B(self.get_recent_advertisers(req))
+            }
+
 
             // Restful-ish routing. 
             (&Method::Get, _) => {
@@ -308,6 +312,57 @@ impl AdServer {
                 advertisers
                 .into_iter()
                 .filter(|advertiser| advertiser_count_getter(&advertiser) > 10 )
+                // Oddly, `.filter(|&advertiser| advertiser.count > 10)` didn't work. I kept getting `the type of this value must be known in this context` 
+                // So I had to define my own function. Don't really know why.
+                .collect::<Vec<Advertisers>>()
+            ).map(|advertisers|{
+                    serde_json::to_string(&ApiResponse {
+                        ads: Vec::new(),
+                        targets: Vec::new(),
+                        entities: Vec::new(),
+                        advertisers: advertisers,
+                        total: 0,
+                    }).map(|serialized| {
+                        Response::new()
+                            .with_header(ContentLength(serialized.len() as u64))
+                            .with_header(
+                                Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]),
+                            )
+                            .with_header(ContentType::json())
+                            .with_header(AccessControlAllowOrigin::Any)
+                            .with_body(serialized)
+                    })
+                        .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
+                })
+                .map_err(|e| {
+                    warn!("{:?}", e);
+                    hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+                });
+            Box::new(future)
+        }else {
+            Box::new(future::ok(
+                Response::new().with_status(StatusCode::BadRequest),
+            ))
+        }
+    }
+
+    // I deeply dislike that get_recent_advertisers and get_advertisers are *exactly* the same
+    // but for Advertisers::get vs Advertisers::recent_get
+    fn get_recent_advertisers(&self, req: Request) -> ResponseFuture {
+        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
+            let options = HashMap::new();
+            let db_pool = self.db_pool.clone();
+            let pool = self.pool.clone();
+
+            fn advertiser_count_getter(a: &Advertisers) -> i64 {
+                a.count
+            }
+            let top_advertisers = spawn_with_clone!(pool; lang, db_pool, options; 
+                                                        Advertisers::recent_get(&lang, &db_pool, &options, Some(1000), Some("1 month")));
+            let future = top_advertisers.map(|advertisers| 
+                advertisers
+                .into_iter()
+                .filter(|advertiser| advertiser_count_getter(&advertiser) >= 3 )
                 // Oddly, `.filter(|&advertiser| advertiser.count > 10)` didn't work. I kept getting `the type of this value must be known in this context` 
                 // So I had to define my own function. Don't really know why.
                 .collect::<Vec<Advertisers>>()

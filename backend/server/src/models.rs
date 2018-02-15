@@ -246,6 +246,7 @@ where
     fn null_check() -> &'static str {
         "targets"
     }
+
 }
 
 #[derive(Serialize, Deserialize)]

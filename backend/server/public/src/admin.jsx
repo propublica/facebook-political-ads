@@ -17,7 +17,8 @@ import {
   ads,
   ad,
   credentials,
-  enableBatching
+  enableBatching,
+  groupedAttribute
 } from "reducers.js";
 import { go } from "i18n.js";
 import Admin from "components/admin/admin.jsx";
@@ -33,7 +34,8 @@ const reducer = enableBatching(
     filters,
     pagination,
     credentials,
-    lang
+    lang,
+    groupedAttribute
   })
 );
 
