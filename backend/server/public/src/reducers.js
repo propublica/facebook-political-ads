@@ -69,7 +69,7 @@ export const ad = (state = {}, action) => {
     case GOT_THAT_AD:
       return action.ad;
     case REQUESTING_ONE_AD:
-      return false;
+      return null;
     default:
       return state;
   }
