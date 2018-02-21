@@ -72,7 +72,8 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let conn = PgConnection::establish(&database_url).unwrap();
     let mut wtr = csv::Writer::from_writer(io::stdout());
-    let query = Ad::get_ads_query("en-US", &HashMap::new());
+    let opts = HashMap::new();
+    let query = Ad::get_ads_query("en-US", &opts);
     let dbads = query.load::<Ad>(&conn).unwrap();
     for ad in dbads {
         wtr.serialize(Record::from(ad)).unwrap();

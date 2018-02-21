@@ -34,12 +34,9 @@ export class AdDetailUnconnected extends React.Component {
     }
     return (
       <div>
-        <p>
-          <br />
-          <Link className="all-link" to="/facebook-ads">
-            Return to list of all ads
-          </Link>
-        </p>
+        <Link className="prefab" to="/facebook-ads">
+          Return to list of all ads
+        </Link>
         <div className="facebook-pac-ads">{ad_or_error}</div>
       </div>
     );

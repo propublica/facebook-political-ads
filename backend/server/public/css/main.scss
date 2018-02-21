@@ -46,6 +46,7 @@ body {
   color: $text-color;
   font-family: $fonts-serif;
   line-height: $line-height-base;
+
   @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     color: $text-color-retina;
   }
@@ -122,6 +123,7 @@ article {
     padding: 0 (colspan(1, 12) + colspan(g, 12));
   }
 }
+
 .hed {
   font-size: $scale-9;
   font-weight: bold;
@@ -170,6 +172,29 @@ article {
   margin-bottom: 1em;
 }
 
+.prefab {
+  font-size: $scale-5;
+  color: $pp-blue;
+  font-family: $fonts-sans;
+  padding: 0.5em;
+  background-color: $bg-low-contrast;
+  border: none;
+  border-radius: 0.25em;
+  &:hover,
+  &:focus {
+    cursor: pointer;
+    color: white;
+    background-color: $link-color;
+  }
+  &.current,
+  &.current:hover,
+  &.current:focus {
+    cursor: default;
+    color: white;
+    background-color: $pp-blue;
+  }
+}
+
 // -----------------------------------------------------------------------------
 // FACEBOOK AD BROWSER FORM STYLES
 // -----------------------------------------------------------------------------
@@ -208,27 +233,7 @@ article {
       margin-right: 0.3em;
     }
   }
-  .prefab {
-    font-size: $scale-5;
-    color: $pp-blue;
-    padding: 0.5em;
-    background-color: $bg-low-contrast;
-    border: none;
-    border-radius: 0.25em;
-    &:hover,
-    &:focus {
-      cursor: pointer;
-      color: white;
-      background-color: $link-color;
-    }
-    &.current,
-    &.current:hover,
-    &.current:focus {
-      cursor: default;
-      color: white;
-      background-color: $pp-blue;
-    }
-  }
+
   input[type="search"] {
     -webkit-appearance: textfield;
     width: 100%;
@@ -489,7 +494,7 @@ article {
   display: none;
 }
 
-._1dwg._1w_m, // Timeline ad wrapper div
+._1dwg._1w_m,
 .ego_unit {
   // Sidebar ad wrapper div
   background-color: white;
@@ -536,15 +541,6 @@ article {
   margin: 0 auto 20px;
   display: block;
   text-align: right;
-}
-
-.all-link {
-  display: inline-block;
-  margin-bottom: 1em;
-  padding: 0.5em 1em;
-  border: 1px solid #d8d6d3;
-  border-radius: 0.25em;
-  color: #365899;
 }
 
 ._1dwg._1w_m {
@@ -742,8 +738,8 @@ article {
   padding-top: 13px;
 }
 
-._5g-l, // 'Suggested Post'
-._5tc6,
+._5g-l,
+// "Suggested Post" ._5tc6,
 ._1-m5 {
   // 'Not affiliated with Facebook'
   display: none;
