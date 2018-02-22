@@ -13,7 +13,7 @@ use dotenv::dotenv;
 use kuchiki::traits::*;
 use rusoto_core::{default_tls_client, Region};
 use rusoto_credential::DefaultCredentialsProvider;
-use rusoto_s3::{DeleteObjectRequest, S3Client, S3};
+use rusoto_s3::{DeleteObjectRequest, S3, S3Client};
 use server::models::*;
 use server::start_logging;
 use std::env;
