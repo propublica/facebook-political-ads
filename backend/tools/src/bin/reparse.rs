@@ -1,10 +1,10 @@
-extern crate server;
 extern crate diesel;
 extern crate dotenv;
 extern crate futures_cpupool;
 extern crate hyper;
 extern crate hyper_tls;
 extern crate r2d2;
+extern crate server;
 extern crate tokio_core;
 
 use diesel::pg::PgConnection;
@@ -27,19 +27,19 @@ fn main() {
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let manager = ConnectionManager::<PgConnection>::new(database_url);
-    let db_pool = Pool::builder().build(manager).expect(
-        "Failed to create pool.",
-    );
+    let db_pool = Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool.");
     let pool = CpuPool::new_num_cpus();
     let conn = db_pool.get().expect("Failed to get a connection");
     let mut core = Core::new().unwrap();
     let connector = HttpsConnector::new(4, &core.handle()).expect("Couldn't build HttpsConnector");
-    let client = Client::configure().connector(connector).build(
-        &core.handle(),
-    );
-    let dbads: Vec<Ad> = ads.order(created_at.desc()).load::<Ad>(&*conn).expect(
-        "Couldn't get ads",
-    );
+    let client = Client::configure()
+        .connector(connector)
+        .build(&core.handle());
+    let dbads: Vec<Ad> = ads.order(created_at.desc())
+        .load::<Ad>(&*conn)
+        .expect("Couldn't get ads");
 
     for ad in dbads {
         let db_pool = db_pool.clone();

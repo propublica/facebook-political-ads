@@ -29,7 +29,9 @@ pub fn connect_pool() -> Pool<ConnectionManager<PgConnection>> {
     dotenv().ok();
     let database_url = env::var("TEST_DATABASE_URL").unwrap();
     let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
-    Pool::builder().build(manager).expect("Failed to create pool.")
+    Pool::builder()
+        .build(manager)
+        .expect("Failed to create pool.")
 }
 
 pub fn seed(connection: &PgConnection) {
@@ -42,7 +44,7 @@ pub fn seed(connection: &PgConnection) {
         id: "1".to_string(),
         html: mock_html.to_string(),
         political: None,
-        targeting: Some(make_targeting())
+        targeting: Some(make_targeting()),
     };
 
     let new_ad: NewAd = NewAd::new(&post, &en).unwrap();
@@ -66,7 +68,9 @@ pub fn seed_political(connection: &PgConnection) {
 }
 
 pub fn unseed(connection: &PgConnection) {
-    diesel::delete(ads).execute(&*connection).expect("Error unseeding");
+    diesel::delete(ads)
+        .execute(&*connection)
+        .expect("Error unseeding");
 }
 
 fn make_targeting() -> String {

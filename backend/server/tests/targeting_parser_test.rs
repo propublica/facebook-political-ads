@@ -1,10 +1,10 @@
-extern crate server;
+extern crate chrono;
 extern crate diesel;
 extern crate dotenv;
-extern crate chrono;
-extern crate rand;
 extern crate r2d2;
 extern crate r2d2_diesel;
+extern crate rand;
+extern crate server;
 
 use diesel::prelude::*;
 use server::models::Ad;
@@ -19,8 +19,7 @@ fn test_parse_targeting() {
     let connection = common::connect();
     common::seed(&connection);
 
-    let adverts = ads
-        .filter(targeting.is_not_null())
+    let adverts = ads.filter(targeting.is_not_null())
         .filter(lang.eq("en-US"))
         .load::<Ad>(&connection)
         .unwrap();

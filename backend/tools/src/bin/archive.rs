@@ -1,7 +1,7 @@
 extern crate chrono;
 extern crate csv;
-extern crate dotenv;
 extern crate diesel;
+extern crate dotenv;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
@@ -60,11 +60,10 @@ impl From<Ad> for Record {
             political_probability: ad.political_probability,
             targeting: ad.targeting,
             advertiser: ad.advertiser,
-            page: ad.page
+            page: ad.page,
         }
     }
 }
-
 
 fn main() {
     dotenv().ok();
@@ -72,7 +71,8 @@ fn main() {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let conn = PgConnection::establish(&database_url).unwrap();
     let mut wtr = csv::Writer::from_writer(io::stdout());
-    let query = Ad::get_ads_query("en-US", &HashMap::new());
+    let opts = HashMap::new();
+    let query = Ad::get_ads_query("en-US", &opts);
     let dbads = query.load::<Ad>(&conn).unwrap();
     for ad in dbads {
         wtr.serialize(Record::from(ad)).unwrap();

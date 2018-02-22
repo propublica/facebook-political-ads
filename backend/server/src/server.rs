@@ -78,58 +78,49 @@ impl Service for AdServer {
     // This is not at all RESTful, but I'd rather not deal with regexes. Maybe soon
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
-
         match (req.method(), req.path()) {
             (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
                 Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
             })),
             // Admin
-            (&Method::Get, "/facebook-ads/admin.js") => Either::B(self.get_file(
-                "public/dist/admin.js",
-                ContentType(mime::TEXT_JAVASCRIPT),
-            )),
-            (&Method::Get, "/facebook-ads/admin.js.map") => Either::B(self.get_file(
-                "public/dist/admin.js.map",
-                ContentType::json(),
-            )),
-            (&Method::Get, "/facebook-ads/admin/styles.css") => Either::B(self.get_file(
-                "public/css/admin/styles.css",
-                ContentType(mime::TEXT_CSS),
-            )),
+            (&Method::Get, "/facebook-ads/admin.js") => {
+                Either::B(self.get_file("public/dist/admin.js", ContentType(mime::TEXT_JAVASCRIPT)))
+            }
+            (&Method::Get, "/facebook-ads/admin.js.map") => {
+                Either::B(self.get_file("public/dist/admin.js.map", ContentType::json()))
+            }
+            (&Method::Get, "/facebook-ads/admin/styles.css") => {
+                Either::B(self.get_file("public/css/admin/styles.css", ContentType(mime::TEXT_CSS)))
+            }
             (&Method::Post, "/facebook-ads/admin/ads") => {
                 Either::B(self.auth(req, |request| self.mark_ad(request)))
             }
 
-            (&Method::Get, "/facebook-ads/index.js") => Either::B(self.get_file(
-                "public/dist/index.js",
-                ContentType(mime::TEXT_JAVASCRIPT),
-            )),
-            (&Method::Get, "/facebook-ads/index.js.map") => Either::B(self.get_file(
-                "public/dist/index.js.map",
-                ContentType::json(),
-            )),
+            (&Method::Get, "/facebook-ads/index.js") => {
+                Either::B(self.get_file("public/dist/index.js", ContentType(mime::TEXT_JAVASCRIPT)))
+            }
+            (&Method::Get, "/facebook-ads/index.js.map") => {
+                Either::B(self.get_file("public/dist/index.js.map", ContentType::json()))
+            }
             (&Method::Get, "/facebook-ads/beacons.js") => Either::B(self.get_file(
                 "public/dist/beacons.js",
                 ContentType(mime::TEXT_JAVASCRIPT),
             )),
-            (&Method::Get, "/facebook-ads/beacons.js.map") => Either::B(self.get_file(
-                "public/dist/beacons.js.map",
-                ContentType::json(),
-            )),
-            (&Method::Get, "/facebook-ads/styles.css") => Either::B(self.get_file(
-                "public/dist/styles.css",
-                ContentType(mime::TEXT_CSS),
-            )),
-            (&Method::Get, "/facebook-ads/styles.css.map") => Either::B(self.get_file(
-                "public/dist/styles.css.map",
-                ContentType::json(),
-            )),
-            (&Method::Get, "/facebook-ads/locales/en/translation.json") => Either::B(
-                self.get_file("public/locales/en/translation.json", ContentType::json()),
-            ),
-            (&Method::Get, "/facebook-ads/locales/de/translation.json") => Either::B(
-                self.get_file("public/locales/de/translation.json", ContentType::json()),
-            ),
+            (&Method::Get, "/facebook-ads/beacons.js.map") => {
+                Either::B(self.get_file("public/dist/beacons.js.map", ContentType::json()))
+            }
+            (&Method::Get, "/facebook-ads/styles.css") => {
+                Either::B(self.get_file("public/dist/styles.css", ContentType(mime::TEXT_CSS)))
+            }
+            (&Method::Get, "/facebook-ads/styles.css.map") => {
+                Either::B(self.get_file("public/dist/styles.css.map", ContentType::json()))
+            }
+            (&Method::Get, "/facebook-ads/locales/en/translation.json") => {
+                Either::B(self.get_file("public/locales/en/translation.json", ContentType::json()))
+            }
+            (&Method::Get, "/facebook-ads/locales/de/translation.json") => {
+                Either::B(self.get_file("public/locales/de/translation.json", ContentType::json()))
+            }
             (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads()),
             (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
             (&Method::Get, "/facebook-ads/heartbeat") => {
@@ -143,33 +134,42 @@ impl Service for AdServer {
             }
 
 
-            // Restful-ish routing. 
+            // Restful-ish routing.
             (&Method::Get, _) => {
-                let restful = RegexSet::new(&[ // rudimentary routing. ORDER MATTERS. And we're using the index of these as the key for match below.
+                let restful = RegexSet::new(&[
+                    // rudimentary routing. ORDER MATTERS. And we're using the index of these as
+                    // the key for match below.
                     r"^/facebook-ads/ads/?(\d+)?$",
                     r"^/facebook-ads/admin/?(.*)?$",
                     r"^/facebook-ads(/?)$",
-                    r"^/facebook-ads/ad/?(\d+)?$"
+                    r"^/facebook-ads/ad/?(\d+)?$",
                 ]).unwrap();
-                let restful_collection_element_regex = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
-                // I'm sure I will understand why I needed to call to_owned() here better later,
-                // but for now, this is how to avoid borrowing-related issues.
+                let restful_collection_element_regex =
+                    Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
+                                                                              // I'm sure I will understand why I needed to call to_owned() here better later,
+                                                                              // but for now, this is how to avoid borrowing-related issues.
                 let my_path = req.path().to_owned();
                 let rest_matches: Vec<usize> = restful.matches(&my_path).into_iter().collect();
                 match rest_matches.get(0) {
-                    None => Either::A(future::ok(Response::new().with_status(StatusCode::NotFound))),
+                    None => Either::A(future::ok(
+                        Response::new().with_status(StatusCode::NotFound),
+                    )),
                     // these indices match to the indices of `restful` above.
                     Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // /facebook-ads/admin/ ->admin, route the rest in React
                     Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // /facebook-ads -> public site, route the rest in React
                     Some(&3) => Either::B(self.get_file("public/index.html", ContentType::html())), // /facebook-ads -> public site, route the rest in React
-                    Some(&_) => { // api
+                    Some(&_) => {
+                        // api
                         match restful_collection_element_regex.captures(&my_path) {
-                            Some(ads_api_id_match) => Either::B(self.get_ad(req, ads_api_id_match.get(1).unwrap().as_str().into())),
-                            None => Either::B(self.get_ads(req))
+                            Some(ads_api_id_match) => Either::B(self.get_ad(
+                                req,
+                                ads_api_id_match.get(1).unwrap().as_str().into(),
+                            )),
+                            None => Either::B(self.get_ads(req)),
                         }
-                    }, 
+                    }
                 }
-            },
+            }
             _ => Either::A(future::ok(
                 Response::new().with_status(StatusCode::NotFound),
             )),
@@ -220,12 +220,10 @@ impl AdServer {
             if let Ok(mut file) = File::open(path) {
                 let mut buf = String::new();
                 if let Ok(size) = file.read_to_string(&mut buf) {
-                    return Ok(
-                        Response::new()
-                            .with_header(ContentLength(size as u64))
-                            .with_header(content_type)
-                            .with_body(buf),
-                    );
+                    return Ok(Response::new()
+                        .with_header(ContentLength(size as u64))
+                        .with_header(content_type)
+                        .with_body(buf));
                 }
             }
             Ok(Response::new().with_status(StatusCode::NotFound))
@@ -239,9 +237,9 @@ impl AdServer {
                 return None;
             }
             let languages = langs.to_owned();
-            let lang = languages.iter().find(|quality| {
-                quality.item.language.is_some() && quality.item.region.is_some()
-            });
+            let lang = languages
+                .iter()
+                .find(|quality| quality.item.language.is_some() && quality.item.region.is_some());
             if let Some(l) = lang {
                 Some(
                     l.clone().item.language.unwrap_or_default() + "-"
@@ -265,22 +263,22 @@ impl AdServer {
             let ad = spawn_with_clone!(pool; lang, db_pool, options;
                             Ad::get_ad(&lang, &db_pool, &options)
                         );
-            let future = ad.map(|ad_option| {
-                match ad_option {
-                    None => Response::new().with_status(StatusCode::NotFound),
-                    Some(ad) => {
-                        let resp = serde_json::to_string(&ad);
-                        match resp {
-                            Ok(serialized) => Response::new()
-                                .with_header(ContentLength(serialized.len() as u64))
-                                .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
-                                .with_header(ContentType::json())
-                                .with_header(AccessControlAllowOrigin::Any)
-                                .with_body(serialized),
-                            Err(e) => {
-                                warn!("{:?}", e);
-                                Response::new().with_status(StatusCode::InternalServerError)
-                            }
+            let future = ad.map(|ad_option| match ad_option {
+                None => Response::new().with_status(StatusCode::NotFound),
+                Some(ad) => {
+                    let resp = serde_json::to_string(&ad);
+                    match resp {
+                        Ok(serialized) => Response::new()
+                            .with_header(ContentLength(serialized.len() as u64))
+                            .with_header(Vary::Items(vec![
+                                Ascii::new("Accept-Language".to_owned()),
+                            ]))
+                            .with_header(ContentType::json())
+                            .with_header(AccessControlAllowOrigin::Any)
+                            .with_body(serialized),
+                        Err(e) => {
+                            warn!("{:?}", e);
+                            Response::new().with_status(StatusCode::InternalServerError)
                         }
                     }
                 }
@@ -294,7 +292,6 @@ impl AdServer {
                 Response::new().with_status(StatusCode::BadRequest),
             ))
         }
-
     }
 
     fn get_advertisers(&self, req: Request) -> ResponseFuture {
@@ -404,9 +401,10 @@ impl AdServer {
                     form_urlencoded::parse(q.as_bytes())
                         .into_owned()
                         .filter(|pair| {
-                            pair.0 == "search" || pair.0 == "page" || pair.0 == "targets" ||
-                                pair.0 == "advertisers" ||
-                                pair.0 == "entities"    || pair.0 == "id"
+                            pair.0 == "search" || pair.0 == "page" || pair.0 == "targets"
+                                || pair.0 == "advertisers"
+                                || pair.0 == "entities"
+                                || pair.0 == "id"
                         })
                         .collect::<HashMap<_, _>>() // transforms the Vector of tuples into a HashMap.
                 })
@@ -436,9 +434,9 @@ impl AdServer {
                     }).map(|serialized| {
                         Response::new()
                             .with_header(ContentLength(serialized.len() as u64))
-                            .with_header(
-                                Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]),
-                            )
+                            .with_header(Vary::Items(vec![
+                                Ascii::new("Accept-Language".to_owned()),
+                            ]))
                             .with_header(ContentType::json())
                             .with_header(AccessControlAllowOrigin::Any)
                             .with_body(serialized)
@@ -478,9 +476,10 @@ impl AdServer {
                 let (sender, body) = Body::pair();
                 let resp = Response::new()
                     .with_header(ContentType("text/event-stream".parse().unwrap()))
-                    .with_header(CacheControl(
-                        vec![CacheDirective::Public, CacheDirective::MaxAge(29)],
-                    ))
+                    .with_header(CacheControl(vec![
+                        CacheDirective::Public,
+                        CacheDirective::MaxAge(29),
+                    ]))
                     .with_header(HttpConnection::keep_alive())
                     .with_body(body);
                 handle.spawn(sender.send_all(notifications).map(|_| ()).map_err(|_| ()));
@@ -521,11 +520,7 @@ impl AdServer {
             })
             .and_then(move |ads| {
                 for ad in ads {
-                    handle.spawn(ad.grab_and_store(
-                        client.clone(),
-                        &image_db,
-                        &image_pool.clone(),
-                    ))
+                    handle.spawn(ad.grab_and_store(client.clone(), &image_db, &image_pool.clone()))
                 }
 
                 Ok(Response::new())
@@ -610,21 +605,30 @@ impl AdServer {
             .build(&core.handle());
         // from: https://hyper.rs/guides/server/response_strategies/
         let server_handle = handle.clone();
-        let server = Http::new().serve_addr_handle(&addr, &server_handle, move || {
-            Ok(AdServer {
-                pool: pool.clone(),
-                db_pool: db_pool.clone(),
-                handle: handle.clone(),
-                client: client.clone(),
-                password: admin_password.clone(),
-                database_url: database_url.clone(),
+        let server = Http::new()
+            .serve_addr_handle(&addr, &server_handle, move || {
+                Ok(AdServer {
+                    pool: pool.clone(),
+                    db_pool: db_pool.clone(),
+                    handle: handle.clone(),
+                    client: client.clone(),
+                    password: admin_password.clone(),
+                    database_url: database_url.clone(),
+                })
             })
-        }).unwrap();
+            .unwrap();
         let h2 = server_handle.clone();
-        server_handle.spawn(server.for_each(move |conn| {
-            h2.spawn(conn.map(|_| ()).map_err(|err| warn!("server error: {:?}", err)));
-            Ok(())
-        }).map_err(|_| ()));
+        server_handle.spawn(
+            server
+                .for_each(move |conn| {
+                    h2.spawn(
+                        conn.map(|_| ())
+                            .map_err(|err| warn!("server error: {:?}", err)),
+                    );
+                    Ok(())
+                })
+                .map_err(|_| ()),
+        );
         println!("Listening on http://{} with 1 thread.", addr);
         core.run(future::empty::<(), ()>()).unwrap();
     }

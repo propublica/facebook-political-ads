@@ -8,21 +8,21 @@ use diesel::prelude::*;
 use diesel::sql_types::{BigInt, Text, Bool};
 use diesel_full_text_search::*;
 use errors::*;
-use futures::{Future, stream, Stream};
+use futures::{stream, Future, Stream};
 use futures_cpupool::CpuPool;
 use hyper::{Body, Client, Uri};
 use hyper::client::HttpConnector;
 use hyper_tls::HttpsConnector;
 use kuchiki;
-use kuchiki::iter::{Select, Elements, Descendants};
+use kuchiki::iter::{Descendants, Elements, Select};
 use kuchiki::traits::*;
 use url::Url;
-use targeting_parser::{collect_targeting, collect_advertiser, Targeting};
+use targeting_parser::{collect_advertiser, collect_targeting, Targeting};
 use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::{default_tls_client, Region};
 use rusoto_credential::DefaultCredentialsProvider;
-use rusoto_s3::{PutObjectRequest, S3Client, S3};
+use rusoto_s3::{PutObjectRequest, S3, S3Client};
 use schema::ads;
 use schema::ads::BoxedQuery;
 use serde_json;
@@ -36,9 +36,9 @@ pub fn document_select(
     document: &kuchiki::NodeRef,
     selector: &str,
 ) -> Result<Select<Elements<Descendants>>> {
-    document.select(selector).map_err(|_| {
-        ErrorKind::HTML(format!("Selector compile error {}", selector)).into()
-    })
+    document
+        .select(selector)
+        .map_err(|_| ErrorKind::HTML(format!("Selector compile error {}", selector)).into())
 }
 
 pub fn get_title(document: &kuchiki::NodeRef) -> Result<String> {
@@ -52,9 +52,10 @@ fn get_image(document: &kuchiki::NodeRef) -> Result<String> {
     document_select(document, "img")?
         .nth(0)
         .and_then(|a| {
-            a.attributes.borrow().get("src").and_then(
-                |src| Some(src.to_string()),
-            )
+            a.attributes
+                .borrow()
+                .get("src")
+                .and_then(|src| Some(src.to_string()))
         })
         .ok_or_else(|| "Couldn't find images.".into())
 }
@@ -67,9 +68,7 @@ pub fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
         .flat_map(|a| a);
 
     iters
-        .map(|i| {
-            i.fold(String::new(), |m, a| m + &a.as_node().to_string())
-        })
+        .map(|i| i.fold(String::new(), |m, a| m + &a.as_node().to_string()))
         .filter(|i| !i.is_empty())
         .nth(0)
         .ok_or_else(|| "Couldn't find message.".into())
@@ -79,27 +78,24 @@ pub fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
 pub fn get_author_link(
     document: &kuchiki::NodeRef,
 ) -> Result<kuchiki::NodeDataRef<kuchiki::ElementData>> {
-    document_select(document, ".fwb > a")?.nth(0).ok_or_else(
-        || {
-            "Couldn't find advertiser link".into()
-        },
-    )
+    document_select(document, ".fwb > a")?
+        .nth(0)
+        .ok_or_else(|| "Couldn't find advertiser link".into())
 }
 
 fn get_images(document: &kuchiki::NodeRef) -> Result<Vec<String>> {
     let select = document_select(document, "img")?;
-    Ok(
-        select
-            .skip(1)
-            .map(|a| {
-                a.attributes.borrow().get("src").and_then(
-                    |s| Some(s.to_string()),
-                )
-            })
-            .filter(|s| s.is_some())
-            .map(|s| s.unwrap())
-            .collect::<Vec<String>>(),
-    )
+    Ok(select
+        .skip(1)
+        .map(|a| {
+            a.attributes
+                .borrow()
+                .get("src")
+                .and_then(|s| Some(s.to_string()))
+        })
+        .filter(|s| s.is_some())
+        .map(|s| s.unwrap())
+        .collect::<Vec<String>>())
 }
 
 fn get_real_image_uri(uri: Uri) -> Uri {
@@ -140,9 +136,9 @@ impl Images {
         for a in document_select(&document, "img")? {
             if let Some(x) = a.attributes.borrow_mut().get_mut("src") {
                 if let Ok(u) = x.parse::<Uri>() {
-                    if let Some(i) = images.iter().find(|i| {
-                        i.path() == get_real_image_uri(u.clone()).path()
-                    })
+                    if let Some(i) = images
+                        .iter()
+                        .find(|i| i.path() == get_real_image_uri(u.clone()).path())
                     {
                         *x = ENDPOINT.to_string() + i.path().trim_left_matches('/');
                     } else {
@@ -167,7 +163,6 @@ impl Images {
         })
     }
 }
-
 
 pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
     fn field() -> &'static str {
@@ -252,8 +247,7 @@ where
 #[derive(Serialize, Deserialize)]
 pub struct EntityFilter {
     entity: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    entity_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")] entity_type: Option<String>,
 }
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
@@ -294,7 +288,6 @@ where
     }
 }
 
-
 #[derive(Serialize, Queryable, Debug, Clone)]
 pub struct Ad {
     pub id: String,
@@ -311,8 +304,7 @@ pub struct Ad {
     pub impressions: i32,
     pub political_probability: f64,
     pub targeting: Option<String>,
-    #[serde(skip_serializing)]
-    pub suppressed: bool,
+    #[serde(skip_serializing)] pub suppressed: bool,
     pub targets: Option<Value>,
     pub advertiser: Option<String>,
     pub entities: Option<Value>,
@@ -449,15 +441,10 @@ impl Ad {
         if let Some(search) = options.get("search") {
             query = match &language[..2] {
                 "de" => {
-                    query.filter(to_germantsvector(html).matches(
-                        to_germantsquery(search.clone()),
-                    ))
+                    query.filter(to_germantsvector(html).matches(to_germantsquery(search.clone())))
                 }
-                _ => {
-                    query.filter(to_englishtsvector(html).matches(
-                        to_englishtsquery(search.clone()),
-                    ))
-                }
+                _ => query
+                    .filter(to_englishtsvector(html).matches(to_englishtsquery(search.clone()))),
             }
         }
         // TODO: Make these into a function
@@ -503,13 +490,18 @@ impl Ad {
 
         if let Some(p) = options.get("page") {
             let raw_offset = p.parse::<usize>().unwrap_or_default() * 20;
-            let offset = if raw_offset > 10000 { 10000 } else { raw_offset };
+            let offset = if raw_offset > 10000 {
+                10000
+            } else {
+                raw_offset
+            };
             query = query.offset(offset as i64);
         }
 
-        Ok(query.limit(20).order(created_at.desc()).load::<Ad>(
-            &*connection,
-        )?)
+        Ok(query
+            .limit(20)
+            .order(created_at.desc())
+            .load::<Ad>(&*connection)?)
     }
 
     pub fn get_ad(
@@ -519,9 +511,8 @@ impl Ad {
     ) -> Result<Option<Ad>> {
         let connection = conn.get()?;
         let query = Ad::get_ads_query(language, &options);
-        Ok(query.limit(1).first::<Ad>(
-            &*connection,
-        ).optional()?) // returns a Result with value of Ok(Option(Ad)) OR a Result with value Err(somethin)
+        Ok(query.limit(1).first::<Ad>(&*connection).optional()?) // returns a Result with value of Ok(Option(Ad)) OR a Result with value
+                                                                 // Err(somethin)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
@@ -539,11 +530,9 @@ impl Ad {
 
 pub fn get_targets(targeting: Option<String>) -> Option<Value> {
     match targeting {
-        Some(ref targeting) => {
-            collect_targeting(&targeting)
-                .map(|t| serde_json::to_value(t).unwrap())
-                .ok()
-        }
+        Some(ref targeting) => collect_targeting(&targeting)
+            .map(|t| serde_json::to_value(t).unwrap())
+            .ok(),
         None => None,
     }
 }
@@ -645,7 +634,6 @@ impl<'a> NewAd<'a> {
         Ok(ad)
     }
 }
-
 
 #[cfg(test)]
 mod tests {
