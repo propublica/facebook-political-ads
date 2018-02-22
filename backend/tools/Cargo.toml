@@ -8,7 +8,7 @@ chrono = { version = "^0.4.0", features = ["serde"] }
 csv = "^1.0.0-beta.5"
 diesel = { version = "^1.1.1", features = ["postgres", "r2d2"] }
 docopt = "^0.8.1"
-dotenv = "^0.10.1"
+dotenv = "^0.11.0"
 futures = "^0.1.15"
 futures-cpupool = "^0.1.5"
 hyper = "^0.11.8"
