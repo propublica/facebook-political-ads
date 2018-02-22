@@ -69,7 +69,6 @@ fn test_individual_ad_url() {
     langtag.region = Some("US".to_owned());
     req.headers_mut().set(AcceptLanguage(vec![qitem(langtag)]));
 
-
     let work = client.request(req).and_then(|res| {
         res.body().concat2().and_then(move |body| {
             let v: Value = serde_json::from_slice(&body).unwrap();

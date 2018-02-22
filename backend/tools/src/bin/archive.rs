@@ -1,7 +1,7 @@
 extern crate chrono;
 extern crate csv;
-extern crate dotenv;
 extern crate diesel;
+extern crate dotenv;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
@@ -60,11 +60,10 @@ impl From<Ad> for Record {
             political_probability: ad.political_probability,
             targeting: ad.targeting,
             advertiser: ad.advertiser,
-            page: ad.page
+            page: ad.page,
         }
     }
 }
-
 
 fn main() {
     dotenv().ok();

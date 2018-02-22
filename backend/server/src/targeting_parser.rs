@@ -4,8 +4,7 @@ use nom::IResult;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Targeting {
     target: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub segment: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")] pub segment: Option<String>,
 }
 
 impl Targeting {
@@ -336,19 +335,17 @@ pub fn collect_targeting(thing: &str) -> Result<Vec<Targeting>> {
 
 pub fn collect_advertiser(thing: &str) -> Option<String> {
     match parse_targeting(thing) {
-        Ok(result) => {
-            result
-                .into_iter()
-                .filter(|t| match t {
-                    &TargetingParsed::Advertiser(_) => true,
-                    _ => false,
-                })
-                .nth(0)
-                .map(|t| match t {
-                    TargetingParsed::Advertiser(a) => a.to_string(),
-                    _ => panic!("Somehow got something other than an Advertiser"),
-                })
-        }
+        Ok(result) => result
+            .into_iter()
+            .filter(|t| match t {
+                &TargetingParsed::Advertiser(_) => true,
+                _ => false,
+            })
+            .nth(0)
+            .map(|t| match t {
+                TargetingParsed::Advertiser(a) => a.to_string(),
+                _ => panic!("Somehow got something other than an Advertiser"),
+            }),
         _ => None,
     }
 }

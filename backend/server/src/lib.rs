@@ -32,7 +32,6 @@ extern crate tokio_timer;
 extern crate unicase;
 extern crate url;
 
-
 pub mod errors;
 pub mod models;
 pub mod schema;

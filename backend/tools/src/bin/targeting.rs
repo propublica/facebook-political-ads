@@ -6,7 +6,7 @@ use dotenv::dotenv;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use kuchiki::traits::*;
-use server::models::{Ad, get_targets, get_advertiser};
+use server::models::{get_advertiser, get_targets, Ad};
 use server::start_logging;
 use server::schema::ads::dsl::*;
 use std::env;
@@ -27,9 +27,7 @@ fn main() {
         diesel::update(ads.find(ad.id))
             .set((
                 targets.eq(get_targets(ad.targeting.clone())),
-                advertiser.eq(
-                    get_advertiser(ad.targeting.clone(), &document),
-                ),
+                advertiser.eq(get_advertiser(ad.targeting.clone(), &document)),
             ))
             .execute(&conn)
             .unwrap();
