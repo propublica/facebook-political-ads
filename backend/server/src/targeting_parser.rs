@@ -324,11 +324,11 @@ pub fn collect_targeting(thing: &str) -> Result<Vec<Targeting>> {
     parse_targeting(thing).map(|result| {
         result
             .into_iter()
-            .filter(|t| match t {
-                &TargetingParsed::Advertiser(_) => false,
+            .filter(|t| match *t {
+                TargetingParsed::Advertiser(_) => false,
                 _ => true,
             })
-            .map(|t| Targeting::from(t))
+            .map(Targeting::from)
             .collect()
     })
 }
@@ -337,8 +337,8 @@ pub fn collect_advertiser(thing: &str) -> Option<String> {
     match parse_targeting(thing) {
         Ok(result) => result
             .into_iter()
-            .filter(|t| match t {
-                &TargetingParsed::Advertiser(_) => true,
+            .filter(|t| match *t {
+                TargetingParsed::Advertiser(_) => true,
                 _ => false,
             })
             .nth(0)

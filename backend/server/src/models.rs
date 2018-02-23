@@ -463,8 +463,8 @@ impl Ad {
 
         if let Some(p) = options.get("page") {
             let raw_offset = p.parse::<usize>().unwrap_or_default() * 20;
-            let offset = if raw_offset > 10000 {
-                10000
+            let offset = if raw_offset > 10_000 {
+                10_000
             } else {
                 raw_offset
             };
@@ -483,9 +483,10 @@ impl Ad {
         options: &HashMap<String, String>,
     ) -> Result<Option<Ad>> {
         let connection = conn.get()?;
-        let query = Ad::get_ads_query(language, &options);
-        Ok(query.limit(1).first::<Ad>(&*connection).optional()?) // returns a Result with value of Ok(Option(Ad)) OR a Result with value
-                                                                 // Err(somethin)
+        let query = Ad::get_ads_query(language, options);
+        // returns a Result with value of Ok(Option(Ad)) OR a Result with value
+        // Err(somethin)
+        Ok(query.limit(1).first::<Ad>(&*connection).optional()?)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
@@ -501,20 +502,22 @@ impl Ad {
     }
 }
 
-pub fn get_targets(targeting: Option<String>) -> Option<Value> {
-    match targeting {
-        Some(ref targeting) => collect_targeting(&targeting)
+pub fn get_targets(targeting: &Option<String>) -> Option<Value> {
+    match *targeting {
+        Some(ref targeting) => collect_targeting(targeting)
             .map(|t| serde_json::to_value(t).unwrap())
             .ok(),
         None => None,
     }
 }
 
-pub fn get_advertiser(targeting: Option<String>, document: &kuchiki::NodeRef) -> Option<String> {
-    match targeting {
-        Some(ref targeting) => collect_advertiser(&targeting).or(get_advertiser_link(document)
-            .map(|a| a.text_contents())
-            .ok()),
+pub fn get_advertiser(targeting: &Option<String>, document: &kuchiki::NodeRef) -> Option<String> {
+    match *targeting {
+        Some(ref targeting) => collect_advertiser(targeting).or_else(|| {
+            get_advertiser_link(document)
+                .map(|a| a.text_contents())
+                .ok()
+        }),
         None => None,
     }
 }
@@ -565,8 +568,8 @@ impl<'a> NewAd<'a> {
             images: images,
             impressions: if !ad.political.is_some() { 1 } else { 0 },
             targeting: ad.targeting.clone(),
-            targets: get_targets(ad.targeting.clone()),
-            advertiser: get_advertiser(ad.targeting.clone(), &document),
+            targets: get_targets(&ad.targeting),
+            advertiser: get_advertiser(&ad.targeting, &document),
             page: get_advertiser_link(&document)
                 .ok()
                 .and_then(|l| l.attributes.borrow().get("href").map(|i| i.to_string())),
@@ -595,7 +598,7 @@ impl<'a> NewAd<'a> {
             diesel::update(ads.find(self.id))
                 .set((
                     targeting.eq(&self.targeting),
-                    targets.eq(get_targets(ad.targeting.clone())),
+                    targets.eq(get_targets(&ad.targeting)),
                 ))
                 .execute(&*connection)?;
         };
