@@ -1,7 +1,7 @@
 import React from "react";
 import Enzyme, { mount } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
-import { FiltersUnconnected, Filter } from "../../src/components/filters.jsx";
+import { FiltersUnconnected } from "../../src/components/filters.jsx";
 import { go } from "i18n.js";
 
 Enzyme.configure({ adapter: new Adapter() });

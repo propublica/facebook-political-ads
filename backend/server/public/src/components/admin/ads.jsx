@@ -4,22 +4,12 @@ import { withRouter } from "react-router-dom";
 import Pagination from "components/pagination.jsx";
 import Ad from "components/admin/ad.jsx";
 import { debounce } from "lodash";
-import { newSearch, getAds } from "actions.js";
+import { fetchSearch, getAds } from "actions.js";
 import { deserialize } from "utils.js";
-import PropTypes from "prop-types";
 
 export class AdsUnconnected extends React.Component {
   componentDidMount() {
     this.props.deserialize(); // gets params from the URL, dispatches actions.
-  }
-
-  componentDidUpdate({ search, pagination }) {
-    if (
-      search !== this.props.search ||
-      this.props.pagination.page !== pagination.page
-    ) {
-      this.props.getAds();
-    }
   }
 
   render() {
@@ -44,18 +34,11 @@ export class AdsUnconnected extends React.Component {
       </div>
     );
   }
-
-  componentWillUnmount() {
-    if (this.unsubscribe) this.unsubscribe();
-  }
 }
 
 const throttledDispatch = debounce((dispatch, input) => {
-  dispatch(newSearch(input));
+  dispatch(fetchSearch(input));
 }, 750);
-
-// this AdsUnconnected.contextTypes stuff is bad and should be factored out once refresh is refactored.
-AdsUnconnected.contextTypes = { store: PropTypes.object }; // temporary, hopefully
 
 export const AdsUnrouted = connect(
   ({ ads, search, page, pagination }) => ({
@@ -65,15 +48,17 @@ export const AdsUnrouted = connect(
     page
   }),
   dispatch => ({
-    deserialize: () => deserialize(dispatch),
+    deserialize: () => {
+      deserialize(dispatch);
+      dispatch(getAds());
+    },
     onKeyUp: e => {
       e.preventDefault();
       throttledDispatch(
         dispatch,
         e.target.value.length ? e.target.value : null
       );
-    },
-    getAds: () => dispatch(getAds())
+    }
   })
 )(AdsUnconnected);
 const Ads = withRouter(AdsUnrouted);

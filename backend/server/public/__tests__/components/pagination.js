@@ -5,6 +5,8 @@ import Pagination, {
   PaginationUnconnected
 } from "../../src/components/pagination.jsx";
 import configureMockStore from "redux-mock-store";
+import thunk from "redux-thunk";
+import fetchMock from "fetch-mock";
 import { NEXT_PAGE, PREV_PAGE, SET_PAGE } from "../../src/actions.js";
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -114,7 +116,9 @@ describe("components", () => {
   });
 
   describe("Pagination", () => {
-    const mockStore = configureMockStore();
+    const mockStore = configureMockStore([thunk]);
+    fetchMock.get("/facebook-ads/ads?page=2", '{ "total": 4 }');
+
     let store, wrapper;
     beforeEach(() => {
       const initialState = {

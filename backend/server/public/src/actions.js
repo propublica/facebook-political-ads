@@ -30,6 +30,14 @@ export const newSearch = query => ({
   value: query
 });
 
+const async = action => {
+  return (dispatch, getState) => {
+    dispatch(action);
+    return getAds()(dispatch, getState);
+  };
+};
+export const fetchSearch = query => async(newSearch(query));
+
 export const BATCH = "batch";
 export const batch = (...actions) => ({
   type: BATCH,
@@ -50,6 +58,9 @@ export const FILTER_TARGET = "filter_target";
 export const filterEntity = a(FILTER_ENTITY);
 export const filterAdvertiser = a(FILTER_ADVERTISER);
 export const filterTarget = a(FILTER_TARGET);
+export const fetchEntity = e => async(filterEntity(e));
+export const fetchAdvertiser = a => async(filterAdvertiser(a));
+export const fetchTarget = t => async(filterTarget(t));
 
 export const TOGGLE_TARGET = "toggle_target";
 export const TOGGLE_ADVERTISER = "toggle_advertiser";
@@ -65,8 +76,11 @@ export const PREV_PAGE = "prev_page";
 export const SET_PAGE = "set_page";
 export const SET_TOTAL = "set_total";
 export const nextPage = () => ({ type: NEXT_PAGE });
+export const fetchNextPage = () => async(nextPage());
 export const prevPage = () => ({ type: PREV_PAGE });
+export const fetchPrevPage = () => async(prevPage());
 export const setPage = page => ({ type: SET_PAGE, value: page });
+export const fetchPage = page => async(setPage(page));
 export const setTotal = total => ({ type: SET_TOTAL, value: total });
 
 export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
