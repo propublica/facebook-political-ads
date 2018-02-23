@@ -11,7 +11,7 @@ use chrono::offset::Utc;
 
 use rand::{thread_rng, Rng};
 
-use r2d2_diesel::ConnectionManager;
+use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
 
 use server::models::*;
@@ -53,7 +53,7 @@ pub fn seed(connection: &PgConnection) {
         .values(&new_ad)
         .on_conflict(id)
         .do_update()
-        .set((updated_at.eq(Utc::now()),))
+        .set(updated_at.eq(Utc::now()))
         .execute(connection)
         .unwrap();
 }
@@ -62,7 +62,7 @@ pub fn seed_political(connection: &PgConnection) {
     seed(connection);
 
     let _ = diesel::update(ads.find("1".to_string()))
-        .set((political_probability.eq(1.0)))
+        .set(political_probability.eq(1.0))
         .execute(connection)
         .unwrap();
 }
@@ -81,5 +81,5 @@ fn make_targeting() -> String {
         .map(|s| String::from_str(s).expect("Error reading string"))
         .collect::<Vec<_>>();
 
-    return rng.choose(&targetings).unwrap().clone();
+    rng.choose(&targetings).unwrap().clone()
 }

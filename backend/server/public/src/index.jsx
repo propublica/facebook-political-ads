@@ -17,7 +17,6 @@ import {
   pagination,
   lang
 } from "reducers.js";
-import { refresh, deserialize } from "utils.js";
 import { go } from "i18n.js";
 import { enableBatching } from "reducers.js";
 
@@ -47,7 +46,4 @@ go(() => {
     </BrowserRouter>,
     document.querySelector("#graphic")
   );
-
-  deserialize(store.dispatch);
-  refresh(store).then(() => store.subscribe(() => refresh(store)));
 });

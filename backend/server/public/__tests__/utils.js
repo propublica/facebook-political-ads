@@ -47,7 +47,7 @@ describe("utils", () => {
     const query =
       "search=Trump&advertisers=%5B%22NRDC%2B%28Natural%2BResources%2BDefense%2BCouncil%29%22%5D&targets=%5B%7B%22target%22%3A%22Age%22%7D%5D&entities=%5B%7B%22entity%22%3A%22Donald+Trump%22%7D%5D&page=1&lang=de-DE";
 
-    expect(utils.serialize(store).toString()).toEqual(query);
+    expect(utils.serialize(store.getState()).toString()).toEqual(query);
     history.pushState({}, "", "/facebook-ads/ads?" + query);
     utils.deserialize(store.dispatch);
     const state = store.getState();
@@ -72,33 +72,22 @@ describe("utils", () => {
     );
   });
 
-  test("refresh gets ads on load", async () => {
+  test("deserialize creates a blank search on blank load", async () => {
     history.pushState({}, "", "/facebook-ads/ads");
     fetchMock.getOnce("/facebook-ads/ads", ads);
-    await utils.refresh(store);
-    const res = JSON.parse(ads);
+    await utils.deserialize(store.dispatch);
     expect(store.getActions()).toEqual([
-      actions.batch(
-        actions.newAds(ads.ads),
-        actions.newEntities(ads.entities),
-        actions.newAdvertisers(ads.advertisers),
-        actions.newTargets(ads.targets),
-        actions.setTotal(ads.total),
-        actions.setPage(1)
-      )
+      actions.batch(actions.newSearch(""), actions.setLang("en-US"))
     ]);
 
-    fetchMock.getOnce("/facebook-ads/ads?search=Trump&page=2", ads);
     const newStore = mockStore({
       ...JSON.parse(ads),
       search: "Trump",
       pagination: { page: 2 }
     });
-    await utils.refresh(newStore);
-    expect(location.search).toEqual("?search=Trump&page=2");
 
     fetchMock.reset().restore();
-    await utils.refresh(newStore);
+    await utils.deserialize(newStore.dispatch);
     expect(fetchMock.called()).toEqual(false);
   });
 });

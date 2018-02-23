@@ -166,6 +166,22 @@ describe("async actions", () => {
     expect(store.getActions()).toEqual(expected);
   });
 
+  test("getAds updates the URL", async () => {
+    const store = mockStore({ search: "Trump", pagination: { page: 2 } });
+    fetchMock.getOnce("/facebook-ads/ads?search=Trump&page=2", ads);
+    await store.dispatch(actions.getAds());
+    expect(location.search).toEqual("?search=Trump&page=2");
+  });
+
+  test("getAds dispatches some actions that eventually get us a new_ads action", async () => {
+    const store = mockStore({});
+    fetchMock.getOnce("/facebook-ads/ads?", ads);
+    await store.dispatch(actions.getAds());
+    expect(store.getActions()[0].actions.map(({ type }) => type)).toContain(
+      actions.NEW_ADS
+    );
+  });
+
   it("should suppress an ad", async () => {
     const ad = ads.ads[0];
     const url = "/facebook-ads/admin/ads";
