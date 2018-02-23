@@ -2,11 +2,11 @@ import React from "react";
 import { connect } from "react-redux";
 import { t } from "i18n.js";
 import {
-  filterEntity,
+  fetchEntity,
   toggleEntity,
-  filterAdvertiser,
+  fetchAdvertiser,
   toggleAdvertiser,
-  filterTarget,
+  fetchTarget,
   toggleTarget
 } from "actions.js";
 
@@ -41,32 +41,32 @@ const FiltersUnconnected = ({
   advertisers,
   targets,
   filters,
-  filterEntity,
+  fetchEntity,
   toggleEntity,
-  filterAdvertiser,
+  fetchAdvertiser,
   toggleAdvertiser,
-  filterTarget,
+  fetchTarget,
   toggleTarget
 }) => (
   <div className="filters">
     <Filter
       data={entities}
       title={t("related_terms")}
-      activate={it => filterEntity(it)}
+      activate={it => fetchEntity(it)}
       toggle={() => toggleEntity()}
       active={filters.entity}
     />
     <Filter
       data={advertisers}
       title={t("advertiser")}
-      activate={it => filterAdvertiser(it)}
+      activate={it => fetchAdvertiser(it)}
       toggle={() => toggleAdvertiser()}
       active={filters.advertiser}
     />
     <Filter
       data={targets}
       title={t("target_audience")}
-      activate={it => filterTarget(it)}
+      activate={it => fetchTarget(it)}
       toggle={() => toggleTarget()}
       active={filters.target}
     />
@@ -80,11 +80,11 @@ const Filters = connect(
     filters
   }),
   dispatch => ({
-    filterEntity: item => dispatch(filterEntity(item)),
+    fetchEntity: item => dispatch(fetchEntity(item)),
     toggleEntity: () => dispatch(toggleEntity()),
-    filterAdvertiser: item => dispatch(filterAdvertiser(item)),
+    fetchAdvertiser: item => dispatch(fetchAdvertiser(item)),
     toggleAdvertiser: () => dispatch(toggleAdvertiser()),
-    filterTarget: item => dispatch(filterTarget(item)),
+    fetchTarget: item => dispatch(fetchTarget(item)),
     toggleTarget: () => dispatch(toggleTarget())
   })
 )(FiltersUnconnected);

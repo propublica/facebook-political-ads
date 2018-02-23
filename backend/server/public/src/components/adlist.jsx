@@ -5,7 +5,7 @@ import Term from "components/term.jsx";
 import Ad from "components/ad.jsx";
 import { t } from "i18n.js";
 import { connect } from "react-redux";
-import { newSearch, getAds } from "actions.js";
+import { fetchSearch, getAds } from "actions.js";
 import { debounce } from "lodash";
 import { withRouter } from "react-router-dom";
 import { deserialize } from "utils.js";
@@ -15,12 +15,6 @@ class AdListUnconnected extends React.Component {
     this.props.deserialize(); // gets params from the URL and dispatches the relevant actions, which'll cause a DidUpdate, and then a getAds
   }
 
-  // if page or search changes, then we'll update the ads from the server.
-  componentDidUpdate({ ads }) {
-    if (ads === this.props.ads) {
-      this.props.getAds();
-    }
-  }
   render() {
     return (
       <div>
@@ -60,7 +54,7 @@ class AdListUnconnected extends React.Component {
 }
 
 const throttledDispatch = debounce((dispatch, input) => {
-  dispatch(newSearch(input));
+  dispatch(fetchSearch(input));
 }, 750);
 
 const AdList = withRouter(
@@ -82,8 +76,10 @@ const AdList = withRouter(
           e.target.value.length ? e.target.value : null
         );
       },
-      deserialize: () => deserialize(dispatch),
-      getAds: () => dispatch(getAds())
+      deserialize: () => {
+        deserialize(dispatch);
+        dispatch(getAds());
+      }
     })
   )(AdListUnconnected)
 );

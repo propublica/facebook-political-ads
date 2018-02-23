@@ -173,6 +173,52 @@ describe("async actions", () => {
     expect(location.search).toEqual("?search=Trump&page=2");
   });
 
+  test("async filters, pages and search", async () => {
+    const store = mockStore({});
+    fetchMock.get("/facebook-ads/ads?", ads);
+    const entity = { entity: ads.entities[0].entity };
+    await store.dispatch(actions.fetchEntity(entity));
+    expect(store.getActions()[0]).toEqual(actions.filterEntity(entity));
+    expect(fetchMock.called()).toEqual(true);
+    expect(store.getActions()).toHaveLength(2);
+    fetchMock.reset();
+    store.clearActions();
+    const target = { targets: ads.targets[0].target };
+    await store.dispatch(actions.fetchTarget(target));
+    expect(store.getActions()[0]).toEqual(actions.filterTarget(target));
+    expect(fetchMock.called()).toEqual(true);
+    fetchMock.reset();
+    store.clearActions();
+    const advertiser = { advertiser: ads.advertisers[0].advertiser };
+    await store.dispatch(actions.fetchAdvertiser(advertiser));
+    expect(store.getActions()[0]).toEqual(actions.filterAdvertiser(advertiser));
+    expect(fetchMock.called()).toEqual(true);
+
+    fetchMock.reset();
+    store.clearActions();
+    await store.dispatch(actions.fetchSearch("Trump"));
+    expect(store.getActions()[0]).toEqual(actions.newSearch("Trump"));
+    expect(fetchMock.called()).toEqual(true);
+
+    fetchMock.reset();
+    store.clearActions();
+    await store.dispatch(actions.fetchNextPage());
+    expect(store.getActions()[0]).toEqual(actions.nextPage());
+    expect(fetchMock.called()).toEqual(true);
+
+    fetchMock.reset();
+    store.clearActions();
+    await store.dispatch(actions.fetchPrevPage());
+    expect(store.getActions()[0]).toEqual(actions.prevPage());
+    expect(fetchMock.called()).toEqual(true);
+
+    fetchMock.reset();
+    store.clearActions();
+    await store.dispatch(actions.fetchPage(1));
+    expect(store.getActions()[0]).toEqual(actions.setPage(1));
+    expect(fetchMock.called()).toEqual(true);
+  });
+
   test("getAds dispatches some actions that eventually get us a new_ads action", async () => {
     const store = mockStore({});
     fetchMock.getOnce("/facebook-ads/ads?", ads);

@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { newSearch } from "actions.js";
+import { fetchSearch } from "actions.js";
 
 export const TermUnconnected = ({ search, term, newSearch }) => (
   <li>
@@ -17,7 +17,7 @@ export const TermUnconnected = ({ search, term, newSearch }) => (
 const Term = connect(
   () => ({}),
   dispatch => ({
-    newSearch: term => dispatch(newSearch(term))
+    newSearch: term => dispatch(fetchSearch(term))
   })
 )(TermUnconnected);
 export default Term;
