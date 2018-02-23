@@ -42,6 +42,11 @@ export const AdminUnconnected = ({ credentials }) => {
               Recent ads grouped by advertiser
             </Link>
           </li>
+          <li>
+            <Link to="/facebook-ads/admin/ads?search=Donald+J.+Trump&advertisers=%5B%22Donald+J.+Trump%22%5D">
+              Trump ads
+            </Link>
+          </li>
         </ul>
       </nav>
       {credentials && credentials.token ? <LoggedInApp /> : <Login />}
