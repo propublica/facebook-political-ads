@@ -77,16 +77,7 @@ describe("utils", () => {
     fetchMock.getOnce("/facebook-ads/ads", ads);
     await utils.deserialize(store.dispatch);
     expect(store.getActions()).toEqual([
-      actions.batch(
-        // actions.newAds(ads.ads),
-        // actions.newEntities(ads.entities),
-        // actions.newAdvertisers(ads.advertisers),
-        // actions.newTargets(ads.targets),
-        // actions.setTotal(ads.total),
-        // actions.setPage(1),
-        actions.newSearch(""),
-        actions.setLang("en-US")
-      )
+      actions.batch(actions.newSearch(""), actions.setLang("en-US"))
     ]);
 
     const newStore = mockStore({
