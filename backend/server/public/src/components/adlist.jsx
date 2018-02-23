@@ -5,40 +5,59 @@ import Term from "components/term.jsx";
 import Ad from "components/ad.jsx";
 import { t } from "i18n.js";
 import { connect } from "react-redux";
-import { newSearch } from "actions.js";
+import { newSearch, getAds } from "actions.js";
 import { debounce } from "lodash";
 import { withRouter } from "react-router-dom";
+import { deserialize } from "utils.js";
 
-const AdListUnconnected = ({ ads, onKeyUp, search }) => (
-  <div>
-    <form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
-      <fieldset className="prefabs">
-        <legend>{t("search_terms")}</legend>
-        <ul>
-          {["Trump", "Obama", "Hillary", "Mueller", "Health", "Taxes"].map(
-            term => <Term key={term} search={search} term={term} />
+class AdListUnconnected extends React.Component {
+  componentDidMount() {
+    this.props.deserialize(); // gets params from the URL and dispatches the relevant actions, which'll cause a DidUpdate, and then a getAds
+  }
+
+  // if page or search changes, then we'll update the ads from the server.
+  componentDidUpdate({ ads }) {
+    if (ads === this.props.ads) {
+      this.props.getAds();
+    }
+  }
+  render() {
+    return (
+      <div>
+        <form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
+          <fieldset className="prefabs">
+            <legend>{t("search_terms")}</legend>
+            <ul>
+              {["Trump", "Obama", "Hillary", "Mueller", "Health", "Taxes"].map(
+                term => (
+                  <Term key={term} search={this.props.search} term={term} />
+                )
+              )}
+            </ul>
+          </fieldset>
+          <input
+            type="search"
+            id="search"
+            placeholder={t("search")}
+            onChange={this.props.onKeyUp}
+          />
+          <Filters />
+        </form>
+        <div className="facebook-pac-ads">
+          {this.props.ads.length > 0 ? (
+            <Pagination />
+          ) : (
+            <p className="no_ads">No ads found for {this.props.search}.</p>
           )}
-        </ul>
-      </fieldset>
-      <input
-        type="search"
-        id="search"
-        placeholder={t("search")}
-        onChange={onKeyUp}
-      />
-      <Filters />
-    </form>
-    <div className="facebook-pac-ads">
-      {ads.length > 0 ? (
-        <Pagination />
-      ) : (
-        <p className="no_ads">No ads found for {search}.</p>
-      )}
-      <div id="ads">{ads.map(ad => <Ad ad={ad} key={ad.id} />)}</div>
-      {ads.length > 0 ? <Pagination /> : ""}
-    </div>
-  </div>
-);
+          <div id="ads">
+            {this.props.ads.map(ad => <Ad ad={ad} key={ad.id} />)}
+          </div>
+          {this.props.ads.length > 0 ? <Pagination /> : ""}
+        </div>
+      </div>
+    );
+  }
+}
 
 const throttledDispatch = debounce((dispatch, input) => {
   dispatch(newSearch(input));
@@ -46,7 +65,15 @@ const throttledDispatch = debounce((dispatch, input) => {
 
 const AdList = withRouter(
   connect(
-    ({ ads, search }) => ({ ads, search }),
+    ({ ads, search, pagination, filters, entities, advertisers, targets }) => ({
+      ads,
+      search,
+      pagination,
+      filters,
+      entities,
+      advertisers,
+      targets
+    }),
     dispatch => ({
       onKeyUp: e => {
         e.preventDefault();
@@ -54,7 +81,9 @@ const AdList = withRouter(
           dispatch,
           e.target.value.length ? e.target.value : null
         );
-      }
+      },
+      deserialize: () => deserialize(dispatch),
+      getAds: () => dispatch(getAds())
     })
   )(AdListUnconnected)
 );

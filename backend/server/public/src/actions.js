@@ -1,4 +1,4 @@
-import { headers } from "utils.js";
+import { headers, serialize } from "utils.js";
 
 export const NEW_ADS = "new_ads";
 export const newAds = ads => ({
@@ -83,6 +83,35 @@ export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
       .then(res => res.json())
       .then(ad => {
         dispatch(receiveOneAd(ad));
+      });
+  };
+};
+
+export const getAds = (url = "/facebook-ads/ads") => {
+  return (dispatch, getState) => {
+    let state = getState();
+    const params = serialize(state);
+    let path = `${url}?${params.toString()}`;
+
+    let query = params.toString().length > 0 ? `?${params.toString()}` : "";
+    history.pushState({ search: query }, "", `${location.pathname}${query}`);
+
+    return fetch(path, {
+      method: "GET",
+      headers: headers(state.credentials, state.lang)
+    })
+      .then(res => res.json())
+      .then(ads => {
+        dispatch(
+          batch(
+            newAds(ads.ads),
+            newEntities(ads.entities),
+            newAdvertisers(ads.advertisers),
+            newTargets(ads.targets),
+            setTotal(ads.total),
+            setPage(parseInt(params.get("page"), 0) || 0)
+          )
+        );
       });
   };
 };
