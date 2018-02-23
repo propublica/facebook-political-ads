@@ -4,7 +4,6 @@ import {
   setLang,
   setTotal,
   setPage,
-  newAds,
   newAdvertisers,
   newEntities,
   newSearch,
@@ -39,9 +38,9 @@ const serializeEntities = s("entities", "entity", entity => ({ entity }));
 const serializeAdvertisers = s("advertisers", "advertiser");
 const serializeTargets = s("targets", "target", target => ({ target }));
 
-const serialize = store => {
+const serialize = state => {
+  // N.B. this used to take store, now it takes state; so just give it store.getState()
   let params = new URLSearchParams();
-  const state = store.getState();
 
   if (state.search) {
     params.set("search", state.search);
@@ -52,7 +51,7 @@ const serialize = store => {
     params
   );
 
-  if (state.pagination.page) {
+  if (state.pagination && state.pagination.page) {
     params.set("page", state.pagination.page);
   }
 
@@ -101,49 +100,14 @@ const deserialize = dispatch => {
     actions.push(setPage(parseInt(params.get("page"), 10)));
   }
 
-  actions.push(setLang(params.get("lang") || "en-US"));
+  if (actions.length === 0) {
+    actions.push(newSearch(""));
+  }
 
+  actions.push(setLang(params.get("lang") || "en-US"));
   return dispatch(batch(...actions));
 };
 
 // this is horrid, todo cleanup
-let loaded = false;
-const refresh = (store, url = "/facebook-ads/ads") => {
-  const dispatch = store.dispatch;
-  const params = serialize(store, dispatch);
-  let path = `${url}?${params.toString()}`;
-  const cleanSearch = new URLSearchParams(location.search);
-  if (!loaded || cleanSearch.toString() !== params.toString()) {
-    if (!loaded) {
-      path = url + window.location.search;
-    } else {
-      if (cleanSearch.get("page") === params.get("page")) {
-        params.delete("page");
-      }
-      let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-      history.pushState({ search: query }, "", `${location.pathname}${query}`);
-    }
-    return fetch(path, {
-      method: "GET",
-      headers: headers(store.getState().credentials, store.getState().lang)
-    })
-      .then(res => res.json())
-      .then(ads => {
-        dispatch(
-          batch(
-            newAds(ads.ads),
-            newEntities(ads.entities),
-            newAdvertisers(ads.advertisers),
-            newTargets(ads.targets),
-            setTotal(ads.total),
-            setPage(parseInt(params.get("page"), 0) || 0)
-          )
-        );
-        loaded = true;
-      });
-  } else {
-    return Promise.resolve();
-  }
-};
 
-export { auth, language, headers, refresh, serialize, deserialize };
+export { auth, language, headers, serialize, deserialize };
