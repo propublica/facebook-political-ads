@@ -25,9 +25,25 @@ export const LoggedInApp = () => {
 export const AdminUnconnected = ({ credentials }) => {
   return (
     <div id="app">
-      <h1>
-        <Link to="/facebook-ads/admin">FBPAC Admin</Link>
-      </h1>
+      <nav>
+        <ul>
+          <li>
+            <Link to="/facebook-ads/admin">
+              <h1>FBPAC Admin</h1>
+            </Link>
+          </li>
+          <li>
+            <Link to="/facebook-ads/admin/grouped/advertisers">
+              Ads grouped by advertiser
+            </Link>
+          </li>
+          <li>
+            <Link to="/facebook-ads/admin/grouped/recentadvertisers">
+              Recent ads grouped by advertiser
+            </Link>
+          </li>
+        </ul>
+      </nav>
       {credentials && credentials.token ? <LoggedInApp /> : <Login />}
     </div>
   );
