@@ -49,7 +49,7 @@ fn getting_targets() {
     let options: HashMap<String, String> = HashMap::new();
 
     let t: Vec<Targets> = Targets::get("en-US", &db_pool, &options).unwrap();
-    assert!(t.iter().nth(0).is_some());
+    assert!(t.get(0).is_some());
 
     common::unseed(&connection);
 }

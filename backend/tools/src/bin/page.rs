@@ -30,7 +30,7 @@ fn main() {
             .and_then(|l| l.attributes.borrow().get("href").map(|i| i.to_string()));
         if html_page.is_some() {
             diesel::update(ads.find(ad.id))
-                .set((page.eq(html_page.unwrap())))
+                .set(page.eq(html_page.unwrap()))
                 .execute(&conn)
                 .unwrap();
         }

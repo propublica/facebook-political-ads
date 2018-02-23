@@ -158,14 +158,17 @@ impl Service for AdServer {
                     Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // /facebook-ads/admin/ ->admin, route the rest in React
                     Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // /facebook-ads -> public site, route the rest in React
                     Some(&3) => Either::B(self.get_file("public/index.html", ContentType::html())), // /facebook-ads -> public site, route the rest in React
+                    Some(&2) | Some(&3) => {
+                        Either::B(self.get_file("public/index.html", ContentType::html()))
+                    } /* public site, route the rest in React */
                     Some(&_) => {
                         // api
                         match restful_collection_element_regex.captures(&my_path) {
                             Some(ads_api_id_match) => Either::B(self.get_ad(
-                                req,
+                                &req,
                                 ads_api_id_match.get(1).unwrap().as_str().into(),
                             )),
-                            None => Either::B(self.get_ads(req)),
+                            None => Either::B(self.get_ads(&req)),
                         }
                     }
                 }
@@ -253,7 +256,7 @@ impl AdServer {
         }
     }
 
-    fn get_ad(&self, req: Request, adid: String) -> ResponseFuture {
+    fn get_ad(&self, req: &Request, adid: String) -> ResponseFuture {
         if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
             let db_pool = self.db_pool.clone();
             let pool = self.pool.clone();
@@ -394,7 +397,7 @@ impl AdServer {
         }
     }
 
-    fn get_ads(&self, req: Request) -> ResponseFuture {
+    fn get_ads(&self, req: &Request) -> ResponseFuture {
         if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
             let options = req.query()
                 .map(|q| {
@@ -441,7 +444,9 @@ impl AdServer {
                             .with_header(AccessControlAllowOrigin::Any)
                             .with_body(serialized)
                     })
-                        .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
+                        .unwrap_or_else(|_| {
+                            Response::new().with_status(StatusCode::InternalServerError)
+                        })
                 })
                 .map_err(|e| {
                     warn!("{:?}", e);

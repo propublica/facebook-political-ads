@@ -33,20 +33,13 @@ export class GroupedAttrsUnconnected extends React.Component {
           {this.props.groupedAttribute.map(advertiser => (
             <tr key={advertiser.advertiser}>
               <td>
-                {/* <Link
+                <Link
                   to={`/facebook-ads/admin/ads?search=${
                     advertiser.advertiser
                   }&advertisers=%5B"${advertiser.advertiser}"%5D`}
                 >
                   {advertiser.advertiser}
-                </Link> */}
-                <a
-                  href={`/facebook-ads/admin/ads?search=${
-                    advertiser.advertiser
-                  }&advertisers=%5B"${advertiser.advertiser}"%5D`}
-                >
-                  {advertiser.advertiser}
-                </a>
+                </Link>
               </td>
               <td>{advertiser.count}</td>
             </tr>

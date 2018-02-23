@@ -4,24 +4,22 @@ import { withRouter } from "react-router-dom";
 import Pagination from "components/pagination.jsx";
 import Ad from "components/admin/ad.jsx";
 import { debounce } from "lodash";
-import { newSearch } from "actions.js";
-import { deserialize, refresh } from "utils.js";
+import { newSearch, getAds } from "actions.js";
+import { deserialize } from "utils.js";
 import PropTypes from "prop-types";
 
 export class AdsUnconnected extends React.Component {
-  constructor(props, context) {
-    // this context stuff is bad and should be factored out once refresh is refactored.
-    super(props, context);
+  componentDidMount() {
+    this.props.deserialize(); // gets params from the URL, dispatches actions.
   }
 
-  componentDidMount() {
-    this.props.deserialize();
-    refresh(this.context.store).then(
-      () =>
-        (this.unsubscribe = this.context.store.subscribe(() =>
-          refresh(this.context.store)
-        ))
-    ); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
+  componentDidUpdate({ search, pagination }) {
+    if (
+      search !== this.props.search ||
+      this.props.pagination.page !== pagination.page
+    ) {
+      this.props.getAds();
+    }
   }
 
   render() {
@@ -74,7 +72,8 @@ export const AdsUnrouted = connect(
         dispatch,
         e.target.value.length ? e.target.value : null
       );
-    }
+    },
+    getAds: () => dispatch(getAds())
   })
 )(AdsUnconnected);
 const Ads = withRouter(AdsUnrouted);
