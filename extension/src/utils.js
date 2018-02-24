@@ -47,7 +47,7 @@ const mergeAds = (ads, newAds) => {
     Array.from(ids.values()),
     a => -1 * Date.parse(a.created_at)
   );
-  return sortBy(idSort, a => a.rating === "political").slice(0, 100);
+  return sortBy(idSort, a => a.rating === "political").slice(0, 50);
 };
 
 const updateBadge = ratings => {
@@ -60,7 +60,10 @@ const updateBadge = ratings => {
 };
 
 const getBrowserLocale = () => {
-  const lang = navigator.languages && navigator.languages.length ? navigator.languages[0] : navigator.language;
+  const lang =
+    navigator.languages && navigator.languages.length
+      ? navigator.languages[0]
+      : navigator.language;
   return {
     language: lang.split("-")[0],
     country: lang.split("-")[1]
