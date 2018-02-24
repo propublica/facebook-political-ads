@@ -112,10 +112,10 @@ let targetingCache = new Map();
 const getTargeting = ad => {
   if (ad.targeting) {
     if (targetingCache.has(ad.targeting))
-      return {
+      return Promise.resolve({
         ...ad,
         targeting: targetingCache.get(ad.targeting)
-      };
+      });
     const url = ad.targeting;
     delete ad.targeting;
     if (targetingBlocked) return ad;
@@ -140,6 +140,7 @@ const getTargeting = ad => {
           } catch (e) {
             targetingBlocked = true;
             setTimeout(() => (targetingBlocked = false), 15 * 60 * 100);
+            ad.targeting = null;
             resolve(ad);
           }
         }
@@ -170,7 +171,8 @@ const getTargeting = ad => {
       req.send();
     });
   } else {
-    return ad;
+    ad.targeting = null;
+    return Promise.resolve(ad);
   }
 };
 
