@@ -218,7 +218,7 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     }
   };
 
-  new MutationObserver(debounce(cb, 100)).observe(
+  new MutationObserver(debounce(cb, 250)).observe(
     document.querySelector("#globalContainer"),
     {
       childList: true,
@@ -293,7 +293,7 @@ const getSidebarId = (parent, ad) => {
 const timeline = node => {
   const sponsor = checkSponsor(node);
   // First we check if it is actually a sponsored post
-  if (!checkSponsor(node)) return Promise.resolve(false);
+  if (!sponsor) return Promise.resolve(false);
 
   // And then we try to grab the parent container that has a hyperfeed id
   let parent = node;
