@@ -84,11 +84,7 @@ const checkSponsor = node => {
         "Sponsorizzata",
         "Chartered"
       ].some(sponsor => {
-        if (text === sponsor || style === `"${sponsor}"`) {
-			console.log(`Node is sponsored because node text ${text} matched expected string ${sponsor}. Dumping node...`);
-			console.log(node)
-			return true;
-		}
+        if (text === sponsor || style === `"${sponsor}"`) return true;
         return false;
       });
     }
