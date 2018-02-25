@@ -73,7 +73,7 @@ const checkSponsor = node => {
         .getComputedStyle(a, ":after")
         .getPropertyValue("content");
       return [
-		"Gesponsord",
+        "Gesponsord",
         "Sponsored",
         "Gesponsert",
         "Sponsrad",
