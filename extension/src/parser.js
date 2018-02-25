@@ -73,6 +73,7 @@ const checkSponsor = node => {
         .getComputedStyle(a, ":after")
         .getPropertyValue("content");
       return [
+		"Gesponsord",
         "Sponsored",
         "Gesponsert",
         "Sponsrad",
@@ -83,7 +84,11 @@ const checkSponsor = node => {
         "Sponsorizzata",
         "Chartered"
       ].some(sponsor => {
-        if (text === sponsor || style === `"${sponsor}"`) return true;
+        if (text === sponsor || style === `"${sponsor}"`) {
+			console.log(`Node is sponsored because node text ${text} matched expected string ${sponsor}. Dumping node...`);
+			console.log(node)
+			return true;
+		}
         return false;
       });
     }
