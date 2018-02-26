@@ -202,6 +202,17 @@ describe("async actions", () => {
 
     fetchMock.reset();
     store.clearActions();
+    await actions.throttledDispatch(store.dispatch, "Trump");
+    expect(store.getActions()[0]).toEqual(undefined); // expect the function not to have been called yet, because it should've been throttled.
+    setTimeout(() => {
+      // what a mess. lodash.debounce and jest's fake timers don't play nicely together, hence the real 1s wait time.
+      console.log(store.getActions());
+      expect(store.getActions()[0]).toEqual(actions.newSearch("Trump"));
+      expect(fetchMock.called()).toEqual(true);
+    }, 1000);
+
+    fetchMock.reset();
+    store.clearActions();
     await store.dispatch(actions.fetchNextPage());
     expect(store.getActions()[0]).toEqual(actions.nextPage());
     expect(fetchMock.called()).toEqual(true);

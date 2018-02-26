@@ -3,8 +3,7 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import Pagination from "components/pagination.jsx";
 import Ad from "components/admin/ad.jsx";
-import { debounce } from "lodash";
-import { fetchSearch, getAds } from "actions.js";
+import { throttledDispatch, getAds } from "actions.js";
 import { deserialize } from "utils.js";
 
 export class AdsUnconnected extends React.Component {
@@ -35,10 +34,6 @@ export class AdsUnconnected extends React.Component {
     );
   }
 }
-
-const throttledDispatch = debounce((dispatch, input) => {
-  dispatch(fetchSearch(input));
-}, 750);
 
 export const AdsUnrouted = connect(
   ({ ads, search, page, pagination }) => ({

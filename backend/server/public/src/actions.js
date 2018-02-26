@@ -1,4 +1,5 @@
 import { headers, serialize } from "utils.js";
+import { debounce } from "lodash";
 
 export const NEW_ADS = "new_ads";
 export const newAds = ads => ({
@@ -37,6 +38,10 @@ const async = action => {
   };
 };
 export const fetchSearch = query => async(newSearch(query));
+
+export const throttledDispatch = debounce((dispatch, input) => {
+  dispatch(fetchSearch(input));
+}, 750);
 
 export const BATCH = "batch";
 export const batch = (...actions) => ({

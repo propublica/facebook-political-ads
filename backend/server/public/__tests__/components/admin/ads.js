@@ -6,7 +6,10 @@ import {
   AdsUnrouted
 } from "../../../src/components/admin/ads.jsx";
 import configureMockStore from "redux-mock-store";
-import { NEW_SEARCH } from "../../../src/actions.js";
+import thunkMiddleware from "redux-thunk";
+
+import * as actions from "../../../src/actions.js";
+
 Enzyme.configure({ adapter: new Adapter() });
 
 function setup({ ads, pagination }) {
@@ -67,29 +70,49 @@ describe("components", () => {
         1
       );
     });
+    it("should call deserialize on mount", () => {
+      const props = { deserialize: jest.fn(), ads: [] };
+      shallow(<AdsUnconnected {...props} />);
+      expect(props.deserialize.mock.calls).toHaveLength(1);
+    });
   });
 
   describe("AdminAds", () => {
-    const mockStore = configureMockStore();
+    const mockStore = configureMockStore([thunkMiddleware]);
     let store, wrapper;
+    actions.throttledDispatch = jest.fn(fn => fn);
 
-    it("should create a new search again when keyUp occurs", () => {
+    it("should preventDefault and call throttledDispatch again when keyUp occurs", () => {
       const initialState = { ads: [{ id: "1234567890" }], pagination: null };
       store = mockStore(initialState);
+      const preventDefault = jest.fn();
+
       wrapper = shallow(<AdsUnrouted store={store} />, {
         disableLifecycleMethods: true
       }).dive();
-      wrapper
-        .find("input")
-        .simulate("keyUp", { target: { value: "asdfa" }, preventDefault() {} });
+      const input_value = "asdfasfd";
+      wrapper.find("input").simulate("keyUp", {
+        target: { value: input_value },
+        preventDefault: preventDefault
+      });
+      expect(preventDefault).toHaveBeenCalledTimes(1);
+      expect(actions.throttledDispatch).toHaveBeenCalledTimes(1);
+      expect(actions.throttledDispatch.mock.calls[0][1]).toBe(input_value);
+    });
 
-      const actions = store.getActions();
-      setTimeout(
-        () =>
-          expect(actions).toEqual([
-            expect.objectContaining({ type: NEW_SEARCH })
-          ]),
-        1000 // we wait because this is debounced.
+    it("should deserialize on mount", () => {
+      const initialState = { ads: [{ id: "1234567890" }], pagination: null };
+      store = mockStore(initialState);
+      global.fetch = require("jest-fetch-mock");
+
+      fetch.mockResponse(JSON.stringify([]));
+      wrapper = shallow(<AdsUnrouted store={store} />, {
+        disableLifecycleMethods: false
+      }).dive();
+
+      const calledActions = store.getActions();
+      expect(calledActions).toContainEqual(
+        expect.objectContaining({ type: actions.BATCH })
       );
     });
   });
