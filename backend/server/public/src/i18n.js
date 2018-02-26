@@ -24,7 +24,10 @@ const go = cb =>
   );
 
 const t = (...args) => {
-  if (!_) throw "i18n is not initialized!";
+  if (!_) {
+    console.log("i18n is not initialized!");
+    return args;
+  }
   return _.apply(_, args);
 };
 

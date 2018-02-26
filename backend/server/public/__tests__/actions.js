@@ -166,6 +166,79 @@ describe("async actions", () => {
     expect(store.getActions()).toEqual(expected);
   });
 
+  test("getAds updates the URL", async () => {
+    const store = mockStore({ search: "Trump", pagination: { page: 2 } });
+    fetchMock.getOnce("/facebook-ads/ads?search=Trump&page=2", ads);
+    await store.dispatch(actions.getAds());
+    expect(location.search).toEqual("?search=Trump&page=2");
+  });
+
+  test("async filters, pages and search", async () => {
+    const store = mockStore({});
+    fetchMock.get("/facebook-ads/ads?", ads);
+    const entity = { entity: ads.entities[0].entity };
+    await store.dispatch(actions.fetchEntity(entity));
+    expect(store.getActions()[0]).toEqual(actions.filterEntity(entity));
+    expect(fetchMock.called()).toEqual(true);
+    expect(store.getActions()).toHaveLength(2);
+    fetchMock.reset();
+    store.clearActions();
+    const target = { targets: ads.targets[0].target };
+    await store.dispatch(actions.fetchTarget(target));
+    expect(store.getActions()[0]).toEqual(actions.filterTarget(target));
+    expect(fetchMock.called()).toEqual(true);
+    fetchMock.reset();
+    store.clearActions();
+    const advertiser = { advertiser: ads.advertisers[0].advertiser };
+    await store.dispatch(actions.fetchAdvertiser(advertiser));
+    expect(store.getActions()[0]).toEqual(actions.filterAdvertiser(advertiser));
+    expect(fetchMock.called()).toEqual(true);
+
+    fetchMock.reset();
+    store.clearActions();
+    await store.dispatch(actions.fetchSearch("Trump"));
+    expect(store.getActions()[0]).toEqual(actions.newSearch("Trump"));
+    expect(fetchMock.called()).toEqual(true);
+
+    fetchMock.reset();
+    store.clearActions();
+    await actions.throttledDispatch(store.dispatch, "Trump");
+    expect(store.getActions()[0]).toEqual(undefined); // expect the function not to have been called yet, because it should've been throttled.
+    setTimeout(() => {
+      // what a mess. lodash.debounce and jest's fake timers don't play nicely together, hence the real 1s wait time.
+      console.log(store.getActions());
+      expect(store.getActions()[0]).toEqual(actions.newSearch("Trump"));
+      expect(fetchMock.called()).toEqual(true);
+    }, 1000);
+
+    fetchMock.reset();
+    store.clearActions();
+    await store.dispatch(actions.fetchNextPage());
+    expect(store.getActions()[0]).toEqual(actions.nextPage());
+    expect(fetchMock.called()).toEqual(true);
+
+    fetchMock.reset();
+    store.clearActions();
+    await store.dispatch(actions.fetchPrevPage());
+    expect(store.getActions()[0]).toEqual(actions.prevPage());
+    expect(fetchMock.called()).toEqual(true);
+
+    fetchMock.reset();
+    store.clearActions();
+    await store.dispatch(actions.fetchPage(1));
+    expect(store.getActions()[0]).toEqual(actions.setPage(1));
+    expect(fetchMock.called()).toEqual(true);
+  });
+
+  test("getAds dispatches some actions that eventually get us a new_ads action", async () => {
+    const store = mockStore({});
+    fetchMock.getOnce("/facebook-ads/ads?", ads);
+    await store.dispatch(actions.getAds());
+    expect(store.getActions()[0].actions.map(({ type }) => type)).toContain(
+      actions.NEW_ADS
+    );
+  });
+
   it("should suppress an ad", async () => {
     const ad = ads.ads[0];
     const url = "/facebook-ads/admin/ads";

@@ -3,6 +3,8 @@ import Enzyme, { mount, shallow } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import Term, { TermUnconnected } from "../../src/components/term.jsx";
 import configureMockStore from "redux-mock-store";
+import thunk from "redux-thunk";
+import fetchMock from "fetch-mock";
 import { NEW_SEARCH } from "../../src/actions.js";
 
 Enzyme.configure({ adapter: new Adapter() });
@@ -51,7 +53,8 @@ describe("components", () => {
   });
 
   describe("Term", () => {
-    const mockStore = configureMockStore();
+    const mockStore = configureMockStore([thunk]);
+    fetchMock.get("/facebook-ads/ads?", '{ "total": 4 }');
     let store, wrapper;
     beforeEach(() => {
       const initialState = {};
