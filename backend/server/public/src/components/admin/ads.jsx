@@ -3,25 +3,12 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import Pagination from "components/pagination.jsx";
 import Ad from "components/admin/ad.jsx";
-import { debounce } from "lodash";
-import { newSearch } from "actions.js";
-import { deserialize, refresh } from "utils.js";
-import PropTypes from "prop-types";
+import { throttledDispatch, getAds } from "actions.js";
+import { deserialize } from "utils.js";
 
 export class AdsUnconnected extends React.Component {
-  constructor(props, context) {
-    // this context stuff is bad and should be factored out once refresh is refactored.
-    super(props, context);
-  }
-
   componentDidMount() {
-    this.props.deserialize();
-    refresh(this.context.store).then(
-      () =>
-        (this.unsubscribe = this.context.store.subscribe(() =>
-          refresh(this.context.store)
-        ))
-    ); // anytime anything changes, then make the ajax request whenever the user changes the facets they want.
+    this.props.deserialize(); // gets params from the URL, dispatches actions.
   }
 
   render() {
@@ -46,18 +33,7 @@ export class AdsUnconnected extends React.Component {
       </div>
     );
   }
-
-  componentWillUnmount() {
-    if (this.unsubscribe) this.unsubscribe();
-  }
 }
-
-const throttledDispatch = debounce((dispatch, input) => {
-  dispatch(newSearch(input));
-}, 750);
-
-// this AdsUnconnected.contextTypes stuff is bad and should be factored out once refresh is refactored.
-AdsUnconnected.contextTypes = { store: PropTypes.object }; // temporary, hopefully
 
 export const AdsUnrouted = connect(
   ({ ads, search, page, pagination }) => ({
@@ -67,7 +43,10 @@ export const AdsUnrouted = connect(
     page
   }),
   dispatch => ({
-    deserialize: () => deserialize(dispatch),
+    deserialize: () => {
+      deserialize(dispatch);
+      dispatch(getAds());
+    },
     onKeyUp: e => {
       e.preventDefault();
       throttledDispatch(
