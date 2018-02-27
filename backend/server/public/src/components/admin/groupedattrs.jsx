@@ -4,18 +4,13 @@ import { withRouter, Link } from "react-router-dom";
 import { getGroupedAttrs, newSearch } from "actions.js";
 
 export class GroupedAttrsUnconnected extends React.Component {
-  constructor(props, context) {
-    // this context stuff is bad and should be factored out once refresh is refactored.
-    super(props, context);
-    console.log(props);
-  }
-
   componentDidMount() {
     // TODO: follow this pattern to get various kinds of grouped attrs (advertisers, recent advertisers, etc.)
-    let groupingType = "advertisers";
+    let groupingType = "advertisers"; // default
     if (this.props.match) {
       // `match` is from React Router -- it's the bit of the URL that matches.
       groupingType = this.props.match.params.groupingType;
+      // the varieties of allowed groupingTypes are defined in Rust, in server.rs
     }
     this.props.getGroupedAttrs(groupingType);
   }
