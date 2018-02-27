@@ -5,6 +5,7 @@ import Ads from "components/admin/ads.jsx";
 import AdDetail from "components/admin/addetail.jsx";
 import Login from "components/admin/login.jsx";
 import GroupedAttrs from "components/admin/groupedattrs.jsx";
+import AdminTools from "components/admin/tools.jsx";
 
 export const LoggedInApp = () => {
   return (
@@ -18,6 +19,7 @@ export const LoggedInApp = () => {
         component={GroupedAttrs}
       />
       <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
+      <Route path="/facebook-ads/admin/tools" component={AdminTools} />
     </div>
   );
 };
@@ -33,19 +35,7 @@ export const AdminUnconnected = ({ credentials }) => {
             </Link>
           </li>
           <li>
-            <Link to="/facebook-ads/admin/grouped/advertisers">
-              Ads grouped by advertiser
-            </Link>
-          </li>
-          <li>
-            <Link to="/facebook-ads/admin/grouped/recentadvertisers">
-              Recent ads grouped by advertiser
-            </Link>
-          </li>
-          <li>
-            <Link to="/facebook-ads/admin/ads?search=Donald+J.+Trump&advertisers=%5B%22Donald+J.+Trump%22%5D">
-              Trump ads
-            </Link>
+            <Link to="/facebook-ads/admin/tools">Tools</Link>
           </li>
         </ul>
       </nav>
