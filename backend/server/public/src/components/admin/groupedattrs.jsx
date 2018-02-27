@@ -4,18 +4,17 @@ import { withRouter, Link } from "react-router-dom";
 import { getGroupedAttrs, newSearch } from "actions.js";
 
 export class GroupedAttrsUnconnected extends React.Component {
-  componentDidMount() {
+  componentWillMount() {
     // TODO: follow this pattern to get various kinds of grouped attrs (advertisers, recent advertisers, etc.)
-    let groupingType = "advertisers"; // default
+    let groupingType = "advertiser"; // default
     if (this.props.match) {
       // `match` is from React Router -- it's the bit of the URL that matches.
       groupingType = this.props.match.params.groupingType
         .replace("recent_", "")
-        .replace("recent", "");
+        .replace("by_", "");
       // the varieties of allowed groupingTypes are defined in Rust, in server.rs
       this.setState({ groupingType: groupingType });
     }
-    console.log(this.state);
     this.props.getGroupedAttrs(groupingType);
   }
 
@@ -35,20 +34,20 @@ export class GroupedAttrsUnconnected extends React.Component {
         </thead>
         <tbody>
           {this.props.groupedAttribute ? (
-            this.props.groupedAttribute.map(advertiser => (
-              <tr key={advertiser[this.state.groupingType]}>
+            this.props.groupedAttribute.map(groupedItem => (
+              <tr key={groupedItem[this.state.groupingType]}>
                 <td>
                   <Link
                     to={`/facebook-ads/admin/ads?search=${
-                      advertiser[this.state.groupingType]
+                      groupedItem[this.state.groupingType]
                     }&${this.state.groupingType}s=%5B"${
-                      advertiser[this.state.groupingType]
+                      groupedItem[this.state.groupingType]
                     }"%5D`}
                   >
-                    {advertiser[this.state.groupingType]}
+                    {groupedItem[this.state.groupingType]}
                   </Link>
                 </td>
-                <td>{advertiser.count}</td>
+                <td>{groupedItem.count}</td>
               </tr>
             ))
           ) : (

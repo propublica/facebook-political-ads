@@ -5,7 +5,7 @@ use diesel::dsl::sql;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use diesel::sql_types::{BigInt, Text, Bool};
+use diesel::sql_types::{BigInt, Bool, Text};
 use diesel_full_text_search::*;
 use errors::*;
 use futures::{stream, Future, Stream};
@@ -180,7 +180,7 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
         conn: &Pool<ConnectionManager<PgConnection>>,
         options: &HashMap<String, String>,
         limit: Option<i64>,
-        interval: Option<&str>
+        interval: Option<&str>,
     ) -> Result<Vec<T>> {
         let connection = conn.get()?;
         let mut interval_str = String::from("created_at > NOW() - interval '");
@@ -204,7 +204,7 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
         options: &HashMap<String, String>,
-        limit: Option<i64>
+        limit: Option<i64>,
     ) -> Result<Vec<T>> {
         let connection = conn.get()?;
         let query = Ad::get_ads_query(language, options)
@@ -229,7 +229,8 @@ pub struct Targets {
 
 impl<T> Aggregate<T> for Targets
 where
-    T: Queryable<(BigInt, Text), Pg>{
+    T: Queryable<(BigInt, Text), Pg>,
+{
     fn field() -> &'static str {
         "target"
     }
@@ -241,29 +242,28 @@ where
     fn null_check() -> &'static str {
         "targets"
     }
-
 }
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
 pub struct TargetingSegments {
     pub count: i64,
-    pub segments: String,
+    pub segment: String,
 }
 
 impl<T> Aggregate<T> for TargetingSegments
 where
-    T: Queryable<(BigInt, Text), Pg>{
+    T: Queryable<(BigInt, Text), Pg>,
+{
     fn field() -> &'static str {
-        "segments"
+        "segment"
     }
 
     fn column() -> &'static str {
-        "(jsonb_array_elements(targets)->>'target') || ' -> ' || greatest(jsonb_array_elements(targets)->>'segment', '(none)') as segments"
+        "(jsonb_array_elements(targets)->>'target') || ' -> ' || greatest(jsonb_array_elements(targets)->>'segment', '(none)') as segment"
     } // the `greatest` here avoids a `Unexpected null for non-null column` diesel error if there is no segment.
 
     fn null_check() -> &'static str {
         "targets"
     }
-
 }
 
 #[derive(Serialize, Deserialize)]
@@ -280,7 +280,7 @@ pub struct Entities {
 
 impl<T> Aggregate<T> for Entities
 where
-    T: Queryable<(BigInt, Text), Pg>
+    T: Queryable<(BigInt, Text), Pg>,
 {
     fn field() -> &'static str {
         "entity"
@@ -303,7 +303,7 @@ pub struct Advertisers {
 
 impl<T> Aggregate<T> for Advertisers
 where
-    T: Queryable<(BigInt, Text), Pg>
+    T: Queryable<(BigInt, Text), Pg>,
 {
     fn column() -> &'static str {
         "advertiser"
@@ -562,11 +562,8 @@ pub fn get_targets(targeting: &Option<String>) -> Option<Value> {
 
 pub fn get_advertiser(targeting: &Option<String>, document: &kuchiki::NodeRef) -> Option<String> {
     match *targeting {
-        Some(ref targeting) => collect_advertiser(targeting).or_else(|| {
-            get_author_link(document)
-                .map(|a| a.text_contents())
-                .ok()
-        }),
+        Some(ref targeting) => collect_advertiser(targeting)
+            .or_else(|| get_author_link(document).map(|a| a.text_contents()).ok()),
         None => None,
     }
 }
