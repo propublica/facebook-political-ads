@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { range } from "lodash";
-import { prevPage, nextPage, setPage } from "actions.js";
+import { fetchPrevPage, fetchNextPage, fetchPage } from "actions.js";
 
 export const PaginationUnconnected = ({ page, prev, next, set, total }) => (
   <nav className="pagination">
@@ -45,15 +45,15 @@ const Pagination = connect(
   dispatch => ({
     prev: e => {
       e.preventDefault();
-      dispatch(prevPage());
+      dispatch(fetchPrevPage());
     },
     next: e => {
       e.preventDefault();
-      dispatch(nextPage());
+      dispatch(fetchNextPage());
     },
     set: (e, i) => {
       e.preventDefault();
-      dispatch(setPage(i));
+      dispatch(fetchPage(i));
     }
   })
 )(PaginationUnconnected);

@@ -14,7 +14,8 @@ export const activeCountries = [
   "NL",
   "FI",
   "CA",
-  "SE"
+  "SE",
+  "BE"
 ];
 // ISO 639-1 (2 characters, lower case)
 export const activeLanguages = ["da", "de", "en", "it", "nl", "fi", "fr", "sv"];
