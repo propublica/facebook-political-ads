@@ -126,13 +126,14 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/heartbeat") => {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
-            (&Method::Get, "/facebook-ads/ads/advertisers") => { // TODO: route these in the restful routing area.
+            (&Method::Get, "/facebook-ads/ads/advertisers") => {
+                // TODO: route these in the restful routing area.
                 Either::B(self.get_advertisers(req))
             }
-            (&Method::Get, "/facebook-ads/ads/recentadvertisers") => { // TODO: route these in the restful routing area.
+            (&Method::Get, "/facebook-ads/ads/recentadvertisers") => {
+                // TODO: route these in the restful routing area.
                 Either::B(self.get_recent_advertisers(req))
             }
-
 
             // Restful-ish routing.
             (&Method::Get, _) => {
@@ -156,11 +157,9 @@ impl Service for AdServer {
                     )),
                     // these indices match to the indices of `restful` above.
                     Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // /facebook-ads/admin/ ->admin, route the rest in React
-                    Some(&2) => Either::B(self.get_file("public/index.html", ContentType::html())), // /facebook-ads -> public site, route the rest in React
-                    Some(&3) => Either::B(self.get_file("public/index.html", ContentType::html())), // /facebook-ads -> public site, route the rest in React
                     Some(&2) | Some(&3) => {
                         Either::B(self.get_file("public/index.html", ContentType::html()))
-                    } /* public site, route the rest in React */
+                    } /*  /facebook-ads | /facebook-ads/ad -> public site public site, route the rest in React */
                     Some(&_) => {
                         // api
                         match restful_collection_element_regex.captures(&my_path) {
@@ -303,19 +302,17 @@ impl AdServer {
             let db_pool = self.db_pool.clone();
             let pool = self.pool.clone();
 
-            fn advertiser_count_getter(a: &Advertisers) -> i64 {
-                a.count
-            }
             let top_advertisers = spawn_with_clone!(pool; lang, db_pool, options; 
                                                         Advertisers::get(&lang, &db_pool, &options, Some(1000)));
-            let future = top_advertisers.map(|advertisers| 
-                advertisers
-                .into_iter()
-                .filter(|advertiser| advertiser_count_getter(&advertiser) > 10 )
-                // Oddly, `.filter(|&advertiser| advertiser.count > 10)` didn't work. I kept getting `the type of this value must be known in this context` 
-                // So I had to define my own function. Don't really know why.
-                .collect::<Vec<Advertisers>>()
-            ).map(|advertisers|{
+            // let top_advertisers = db_pool.spawn_fn(Advertisers::get(&lang, &db_pool, &options, Some(1000)));
+            let future = top_advertisers
+                .map(|advertisers| {
+                    advertisers
+                        .into_iter()
+                        .filter(|advertiser: &Advertisers| advertiser.count as i64 > 10)
+                        .collect::<Vec<Advertisers>>()
+                })
+                .map(|advertisers| {
                     serde_json::to_string(&ApiResponse {
                         ads: Vec::new(),
                         targets: Vec::new(),
@@ -325,9 +322,9 @@ impl AdServer {
                     }).map(|serialized| {
                         Response::new()
                             .with_header(ContentLength(serialized.len() as u64))
-                            .with_header(
-                                Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]),
-                            )
+                            .with_header(Vary::Items(vec![
+                                Ascii::new("Accept-Language".to_owned()),
+                            ]))
                             .with_header(ContentType::json())
                             .with_header(AccessControlAllowOrigin::Any)
                             .with_body(serialized)
@@ -339,7 +336,7 @@ impl AdServer {
                     hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
                 });
             Box::new(future)
-        }else {
+        } else {
             Box::new(future::ok(
                 Response::new().with_status(StatusCode::BadRequest),
             ))
@@ -354,19 +351,16 @@ impl AdServer {
             let db_pool = self.db_pool.clone();
             let pool = self.pool.clone();
 
-            fn advertiser_count_getter(a: &Advertisers) -> i64 {
-                a.count
-            }
             let top_advertisers = spawn_with_clone!(pool; lang, db_pool, options; 
                                                         Advertisers::recent_get(&lang, &db_pool, &options, Some(1000), Some("1 month")));
-            let future = top_advertisers.map(|advertisers| 
-                advertisers
-                .into_iter()
-                .filter(|advertiser| advertiser_count_getter(&advertiser) >= 3 )
-                // Oddly, `.filter(|&advertiser| advertiser.count > 10)` didn't work. I kept getting `the type of this value must be known in this context` 
-                // So I had to define my own function. Don't really know why.
-                .collect::<Vec<Advertisers>>()
-            ).map(|advertisers|{
+            let future = top_advertisers
+                .map(|advertisers| {
+                    advertisers
+                        .into_iter()
+                        .filter(|advertiser: &Advertisers| advertiser.count as i64 >= 3)
+                        .collect::<Vec<Advertisers>>()
+                })
+                .map(|advertisers| {
                     serde_json::to_string(&ApiResponse {
                         ads: Vec::new(),
                         targets: Vec::new(),
@@ -376,9 +370,9 @@ impl AdServer {
                     }).map(|serialized| {
                         Response::new()
                             .with_header(ContentLength(serialized.len() as u64))
-                            .with_header(
-                                Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]),
-                            )
+                            .with_header(Vary::Items(vec![
+                                Ascii::new("Accept-Language".to_owned()),
+                            ]))
                             .with_header(ContentType::json())
                             .with_header(AccessControlAllowOrigin::Any)
                             .with_body(serialized)
@@ -390,7 +384,7 @@ impl AdServer {
                     hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
                 });
             Box::new(future)
-        }else {
+        } else {
             Box::new(future::ok(
                 Response::new().with_status(StatusCode::BadRequest),
             ))
