@@ -73,6 +73,7 @@ const checkSponsor = node => {
         .getComputedStyle(a, ":after")
         .getPropertyValue("content");
       return [
+        "Gesponsord",
         "Sponsored",
         "Gesponsert",
         "Sponsrad",
@@ -112,10 +113,10 @@ let targetingCache = new Map();
 const getTargeting = ad => {
   if (ad.targeting) {
     if (targetingCache.has(ad.targeting))
-      return {
+      return Promise.resolve({
         ...ad,
         targeting: targetingCache.get(ad.targeting)
-      };
+      });
     const url = ad.targeting;
     delete ad.targeting;
     if (targetingBlocked) return ad;
@@ -140,6 +141,7 @@ const getTargeting = ad => {
           } catch (e) {
             targetingBlocked = true;
             setTimeout(() => (targetingBlocked = false), 15 * 60 * 100);
+            ad.targeting = null;
             resolve(ad);
           }
         }
@@ -170,7 +172,8 @@ const getTargeting = ad => {
       req.send();
     });
   } else {
-    return ad;
+    ad.targeting = null;
+    return Promise.resolve(ad);
   }
 };
 
@@ -218,7 +221,7 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     }
   };
 
-  new MutationObserver(debounce(cb, 100)).observe(
+  new MutationObserver(debounce(cb, 250)).observe(
     document.querySelector("#globalContainer"),
     {
       childList: true,
@@ -293,7 +296,7 @@ const getSidebarId = (parent, ad) => {
 const timeline = node => {
   const sponsor = checkSponsor(node);
   // First we check if it is actually a sponsored post
-  if (!checkSponsor(node)) return Promise.resolve(false);
+  if (!sponsor) return Promise.resolve(false);
 
   // And then we try to grab the parent container that has a hyperfeed id
   let parent = node;

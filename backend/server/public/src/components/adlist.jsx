@@ -5,22 +5,15 @@ import Term from "components/term.jsx";
 import Ad from "components/ad.jsx";
 import { t } from "i18n.js";
 import { connect } from "react-redux";
-import { newSearch, getAds } from "actions.js";
-import { debounce } from "lodash";
+import { throttledDispatch, getAds } from "actions.js";
 import { withRouter } from "react-router-dom";
 import { deserialize } from "utils.js";
 
-class AdListUnconnected extends React.Component {
+export class AdListUnconnected extends React.Component {
   componentDidMount() {
     this.props.deserialize(); // gets params from the URL and dispatches the relevant actions, which'll cause a DidUpdate, and then a getAds
   }
 
-  // if page or search changes, then we'll update the ads from the server.
-  componentDidUpdate({ ads }) {
-    if (ads === this.props.ads) {
-      this.props.getAds();
-    }
-  }
   render() {
     return (
       <div>
@@ -39,7 +32,7 @@ class AdListUnconnected extends React.Component {
             type="search"
             id="search"
             placeholder={t("search")}
-            onChange={this.props.onKeyUp}
+            onChange={this.props.onChange}
           />
           <Filters />
         </form>
@@ -59,32 +52,29 @@ class AdListUnconnected extends React.Component {
   }
 }
 
-const throttledDispatch = debounce((dispatch, input) => {
-  dispatch(newSearch(input));
-}, 750);
-
-const AdList = withRouter(
-  connect(
-    ({ ads, search, pagination, filters, entities, advertisers, targets }) => ({
-      ads,
-      search,
-      pagination,
-      filters,
-      entities,
-      advertisers,
-      targets
-    }),
-    dispatch => ({
-      onKeyUp: e => {
-        e.preventDefault();
-        throttledDispatch(
-          dispatch,
-          e.target.value.length ? e.target.value : null
-        );
-      },
-      deserialize: () => deserialize(dispatch),
-      getAds: () => dispatch(getAds())
-    })
-  )(AdListUnconnected)
-);
+export const AdListUnrouted = connect(
+  ({ ads, search, pagination, filters, entities, advertisers, targets }) => ({
+    ads,
+    search,
+    pagination,
+    filters,
+    entities,
+    advertisers,
+    targets
+  }),
+  dispatch => ({
+    onChange: e => {
+      e.preventDefault();
+      throttledDispatch(
+        dispatch,
+        e.target.value.length ? e.target.value : null
+      );
+    },
+    deserialize: () => {
+      deserialize(dispatch);
+      dispatch(getAds());
+    }
+  })
+)(AdListUnconnected);
+const AdList = withRouter(AdListUnrouted);
 export default AdList;
