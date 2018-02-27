@@ -243,6 +243,28 @@ where
     }
 
 }
+#[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
+pub struct TargetingSegments {
+    pub count: i64,
+    pub segments: String,
+}
+
+impl<T> Aggregate<T> for TargetingSegments
+where
+    T: Queryable<(BigInt, Text), Pg>{
+    fn field() -> &'static str {
+        "segments"
+    }
+
+    fn column() -> &'static str {
+        "(jsonb_array_elements(targets)->>'target') || ' -> ' || greatest(jsonb_array_elements(targets)->>'segment', '(none)') as segments"
+    } // the `greatest` here avoids a `Unexpected null for non-null column` diesel error if there is no segment.
+
+    fn null_check() -> &'static str {
+        "targets"
+    }
+
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct EntityFilter {

@@ -9,9 +9,13 @@ export class GroupedAttrsUnconnected extends React.Component {
     let groupingType = "advertisers"; // default
     if (this.props.match) {
       // `match` is from React Router -- it's the bit of the URL that matches.
-      groupingType = this.props.match.params.groupingType;
+      groupingType = this.props.match.params.groupingType
+        .replace("recent_", "")
+        .replace("recent", "");
       // the varieties of allowed groupingTypes are defined in Rust, in server.rs
+      this.setState({ groupingType: groupingType });
     }
+    console.log(this.state);
     this.props.getGroupedAttrs(groupingType);
   }
 
@@ -20,20 +24,27 @@ export class GroupedAttrsUnconnected extends React.Component {
       <table id="advertisers" className="breakdown">
         <thead>
           <tr>
-            <th>Advertiser</th>
+            <th>
+              {this.state
+                ? this.state.groupingType[0].toUpperCase() +
+                  this.state.groupingType.substr(1)
+                : ""}
+            </th>
             <th>Count</th>
           </tr>
         </thead>
         <tbody>
           {this.props.groupedAttribute.map(advertiser => (
-            <tr key={advertiser.advertiser}>
+            <tr key={advertiser[this.state.groupingType]}>
               <td>
                 <Link
                   to={`/facebook-ads/admin/ads?search=${
-                    advertiser.advertiser
-                  }&advertisers=%5B"${advertiser.advertiser}"%5D`}
+                    advertiser[this.state.groupingType]
+                  }&${this.state.groupingType}s=%5B"${
+                    advertiser[this.state.groupingType]
+                  }"%5D`}
                 >
-                  {advertiser.advertiser}
+                  {advertiser[this.state.groupingType]}
                 </Link>
               </td>
               <td>{advertiser.count}</td>

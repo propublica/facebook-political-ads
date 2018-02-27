@@ -131,7 +131,7 @@ export const getGroupedAttrs = (
     })
       .then(res => res.json())
       .then(resp => {
-        dispatch(receiveRecentGroupedAttr(resp["advertisers"]));
+        dispatch(receiveRecentGroupedAttr(resp[groupingKind]));
       });
   };
 };
