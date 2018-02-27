@@ -82,7 +82,7 @@ export const groupedAttribute = (state = [], action) => {
     case GOT_RECENT_GROUPED_ATTR:
       return action.groupedAttrs;
     case REQUESTING_RECENT_GROUPED_ATTR:
-      return state;
+      return null;
     default:
       return state;
   }
