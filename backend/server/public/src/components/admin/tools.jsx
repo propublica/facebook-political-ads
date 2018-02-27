@@ -10,7 +10,7 @@ const AdminTools = () => (
     <ul className="tools">
       <li>
         <Link to="/facebook-ads/admin/grouped/advertisers">
-          Ads grouped by advertiser
+          All ads grouped by advertiser
         </Link>
       </li>
       <li>
@@ -18,6 +18,20 @@ const AdminTools = () => (
           Recent ads grouped by advertiser
         </Link>
       </li>
+      {/* <li>
+        <Link to="/facebook-ads/admin/grouped/recent_segments">
+          All ads grouped by targeting segment
+        </Link>{" "}
+        (i.e. all ads targeted at people over 18, or all ads targeted by gender
+        only to men)
+      </li>
+      <li>
+        <Link to="/facebook-ads/admin/grouped/segments">
+          Recent ads grouped by targeting segment
+        </Link>{" "}
+        (i.e. all ads targeted at people over 18, or all ads targeted by gender
+        only to men)
+      </li> */}
       <li>
         <Link to="/facebook-ads/admin/ads?search=Donald+J.+Trump&advertisers=%5B%22Donald+J.+Trump%22%5D">
           Trump ads
