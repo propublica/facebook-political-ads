@@ -49,7 +49,7 @@ describe("components", () => {
     it("should render the Ads dashboard for route /", () => {
       expect(pathMap["/facebook-ads/admin/"]).toBe(Ads);
     });
-    it("should render the GroupedAttrs page for route /grouped/advertisers", () => {
+    it("should render the GroupedAttrs page for route /grouped/by_advertiser", () => {
       expect(pathMap["/facebook-ads/admin/grouped/:groupingType"]).toBe(
         GroupedAttrs
       );

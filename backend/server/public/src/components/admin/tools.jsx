@@ -9,12 +9,12 @@ const AdminTools = () => (
     </p>
     <ul className="tools">
       <li>
-        <Link to="/facebook-ads/admin/grouped/advertisers">
+        <Link to="/facebook-ads/admin/grouped/by_advertiser">
           All ads grouped by advertiser
         </Link>
       </li>
       <li>
-        <Link to="/facebook-ads/admin/grouped/recentadvertisers">
+        <Link to="/facebook-ads/admin/grouped/recent_by_advertiser">
           Recent ads grouped by advertiser
         </Link>
       </li>
