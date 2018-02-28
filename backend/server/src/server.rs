@@ -305,15 +305,61 @@ impl AdServer {
         }
     }
 
+    // fn get_aggregate(&self, req: Request, aggregate_getter: F) -> ResponseFuture {
+
+    // }
+
+    // fn get_advertisers2(&self, req: Request) -> ResponseFuture {
+
+    // }
+
+    fn get_advertisers2(
+        &self,
+        req: Request,
+        advertisers_aggregate_getter: &Fn() -> Result<Vec<Advertisers>>,
+    ) -> ResponseFuture {
+        let pool = self.pool.clone();
+        let top_advertisers = pool.spawn_fn(advertisers_aggregate_getter);
+        let future = top_advertisers
+            .map(|advertisers| {
+                advertisers
+                    .into_iter()
+                    .filter(|advertiser: &Advertisers| advertiser.count as i64 > 10)
+                    .collect::<Vec<Advertisers>>()
+            })
+            .map(|advertisers| {
+                serde_json::to_string(&ApiResponse {
+                    ads: Vec::new(),
+                    targets: Vec::new(),
+                    entities: Vec::new(),
+                    segments: Vec::new(),
+                    advertisers: advertisers,
+                    total: 0,
+                }).map(|serialized| {
+                    Response::new()
+                        .with_header(ContentLength(serialized.len() as u64))
+                        .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
+                        .with_header(ContentType::json())
+                        .with_header(AccessControlAllowOrigin::Any)
+                        .with_body(serialized)
+                })
+                    .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
+            })
+            .map_err(|e| {
+                warn!("{:?}", e);
+                hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+            });
+        Box::new(future)
+    }
+
     fn get_advertisers(&self, req: Request) -> ResponseFuture {
         if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
             let options = HashMap::new();
             let db_pool = self.db_pool.clone();
             let pool = self.pool.clone();
 
-            let top_advertisers = spawn_with_clone!(pool; lang, db_pool, options; 
-                                                        Advertisers::get(&lang, &db_pool, &options, Some(1000)));
-            // let top_advertisers = db_pool.spawn_fn(Advertisers::get(&lang, &db_pool, &options, Some(1000)));
+            let top_advertisers =
+                pool.spawn_fn(move || Advertisers::get(&lang, &db_pool, &options, Some(1000)));
             let future = top_advertisers
                 .map(|advertisers| {
                     advertisers
@@ -359,47 +405,58 @@ impl AdServer {
         if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
             let options = HashMap::new();
             let db_pool = self.db_pool.clone();
-            let pool = self.pool.clone();
 
-            let top_advertisers = spawn_with_clone!(pool; lang, db_pool, options; 
-                                                        Advertisers::recent_get(&lang, &db_pool, &options, Some(1000), Some("1 month")));
-            let future = top_advertisers
-                .map(|advertisers| {
-                    advertisers
-                        .into_iter()
-                        .filter(|advertiser: &Advertisers| advertiser.count as i64 >= 3)
-                        .collect::<Vec<Advertisers>>()
-                })
-                .map(|advertisers| {
-                    serde_json::to_string(&ApiResponse {
-                        ads: Vec::new(),
-                        targets: Vec::new(),
-                        entities: Vec::new(),
-                        segments: Vec::new(),
-                        advertisers: advertisers,
-                        total: 0,
-                    }).map(|serialized| {
-                        Response::new()
-                            .with_header(ContentLength(serialized.len() as u64))
-                            .with_header(Vary::Items(vec![
-                                Ascii::new("Accept-Language".to_owned()),
-                            ]))
-                            .with_header(ContentType::json())
-                            .with_header(AccessControlAllowOrigin::Any)
-                            .with_body(serialized)
-                    })
-                        .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
-                })
-                .map_err(|e| {
-                    warn!("{:?}", e);
-                    hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-                });
-            Box::new(future)
+            let my_getter = move || {
+                Advertisers::recent_get(&lang, &db_pool, &options, Some(1000), Some("1 month"))
+            };
+
+            return self.get_advertisers2(req, &my_getter);
         } else {
             Box::new(future::ok(
                 Response::new().with_status(StatusCode::BadRequest),
             ))
         }
+
+        //     let top_advertisers = pool.spawn_fn(move || {
+        //         Advertisers::recent_get(&lang, &db_pool, &options, Some(1000), Some("1 month"))
+        //     });
+        //     let future = top_advertisers
+        //         .map(|advertisers| {
+        //             advertisers
+        //                 .into_iter()
+        //                 .filter(|advertiser: &Advertisers| advertiser.count as i64 >= 3)
+        //                 .collect::<Vec<Advertisers>>()
+        //         })
+        //         .map(|advertisers| {
+        //             serde_json::to_string(&ApiResponse {
+        //                 ads: Vec::new(),
+        //                 targets: Vec::new(),
+        //                 entities: Vec::new(),
+        //                 segments: Vec::new(),
+        //                 advertisers: advertisers,
+        //                 total: 0,
+        //             }).map(|serialized| {
+        //                 Response::new()
+        //                     .with_header(ContentLength(serialized.len() as u64))
+        //                     .with_header(Vary::Items(vec![
+        //                         Ascii::new("Accept-Language".to_owned()),
+        //                     ]))
+        //                     .with_header(ContentType::json())
+        //                     .with_header(AccessControlAllowOrigin::Any)
+        //                     .with_body(serialized)
+        //             })
+        //                 .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
+        //         })
+        //         .map_err(|e| {
+        //             warn!("{:?}", e);
+        //             hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
+        //         });
+        //     Box::new(future)
+        // } else {
+        //     Box::new(future::ok(
+        //         Response::new().with_status(StatusCode::BadRequest),
+        //     ))
+        // }
     }
     fn get_segments(&self, req: Request) -> ResponseFuture {
         if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
@@ -407,17 +464,16 @@ impl AdServer {
             let db_pool = self.db_pool.clone();
             let pool = self.pool.clone();
 
-            fn targeting_segment_count_getter(a: &TargetingSegments) -> i64 {
-                a.count
-            }
-            let top_segments = spawn_with_clone!(pool; lang, db_pool, options; 
-                                                        TargetingSegments::get(&lang, &db_pool, &options, Some(1000)));
+            let top_segments = pool.spawn_fn(move || {
+                TargetingSegments::get(&lang, &db_pool, &options, Some(1000))
+            });
+
             let future = top_segments
                 .map(|segments| {
                     segments
                         .into_iter()
-                        .filter(|targeting_segment| {
-                            targeting_segment_count_getter(&targeting_segment) > 10
+                        .filter(|targeting_segment: &TargetingSegments| {
+                            targeting_segment.count as i64 > 10
                         })
                         .collect::<Vec<TargetingSegments>>()
                 })
@@ -462,17 +518,21 @@ impl AdServer {
             let db_pool = self.db_pool.clone();
             let pool = self.pool.clone();
 
-            fn targeting_segment_count_getter(a: &TargetingSegments) -> i64 {
-                a.count
-            }
-            let top_segments = spawn_with_clone!(pool; lang, db_pool, options; 
-                                                        TargetingSegments::recent_get(&lang, &db_pool, &options, Some(1000), Some("1 month")));
+            let top_segments = pool.spawn_fn(move || {
+                TargetingSegments::recent_get(
+                    &lang,
+                    &db_pool,
+                    &options,
+                    Some(1000),
+                    Some("1 month"),
+                )
+            });
             let future = top_segments
                 .map(|segments| {
                     segments
                         .into_iter()
-                        .filter(|targeting_segment| {
-                            targeting_segment_count_getter(&targeting_segment) >= 3
+                        .filter(|targeting_segment: &TargetingSegments| {
+                            targeting_segment.count as i64 > 10
                         })
                         .collect::<Vec<TargetingSegments>>()
                 })
