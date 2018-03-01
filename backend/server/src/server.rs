@@ -129,11 +129,11 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/heartbeat") => {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
-            (&Method::Get, "/facebook-ads/ads/advertisers") => {
+            (&Method::Get, "/facebook-ads/advertisers") => {
                 // TODO: route these in the restful routing area.
                 Either::B(self.lang(req, |req, lang| self.advertisers(req, lang)))
             }
-            (&Method::Get, "/facebook-ads/ads/segments") => {
+            (&Method::Get, "/facebook-ads/segments") => {
                 // TODO: route these in the restful routing area.
                 Either::B(self.lang(req, |req, lang| self.segments(req, lang)))
             }
@@ -301,11 +301,24 @@ impl AdServer {
     }
 
     fn advertisers(&self, req: Request, lang: String) -> ResponseFuture {
-        unimplemented!();
+        let pool = self.pool.clone();
+        let lang = lang.clone();
+        let db_pool = self.db_pool.clone();
+        let future = pool.spawn_fn(move || {
+            Advertisers::get(&lang, &db_pool)
+                .map(|advertisers: Vec<Advertisers>| json(&advertisers))
+        }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
+        Box::new(future)
     }
 
     fn segments(&self, req: Request, lang: String) -> ResponseFuture {
-        unimplemented!();
+        let pool = self.pool.clone();
+        let lang = lang.clone();
+        let db_pool = self.db_pool.clone();
+        let future = pool.spawn_fn(move || {
+            Segments::get(&lang, &db_pool).map(|segments: Vec<Segments>| json(&segments))
+        }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
+        Box::new(future)
     }
 
     fn search(&self, req: Request, lang: String) -> ResponseFuture {
