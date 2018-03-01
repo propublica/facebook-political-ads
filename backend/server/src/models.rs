@@ -189,6 +189,37 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
         Self::field()
     }
 
+    fn recent_get(
+        language: &str,
+        conn: &Pool<ConnectionManager<PgConnection>>,
+        options: &HashMap<String, String>,
+        limit: Option<i64>,
+        interval: Option<&str>,
+    ) -> Result<Vec<T>> {
+        // uncomment to use PgInterval
+        // use diesel::dsl::now;
+        // use diesel::pg::expression::extensions::IntervalDsl;
+        // use schema::ads::columns::created_at;
+
+        let connection = conn.get()?;
+        let mut interval_str = String::from("created_at > NOW() - interval '");
+        interval_str.push_str(&interval.unwrap_or("1 month"));
+        interval_str.push_str("'");
+
+        let query = Ad::get_ads_query(language, options)
+            .select((
+                sql::<BigInt>("count(*) as count"),
+                sql::<Text>(Self::column()),
+            ))
+            .group_by(sql::<Text>(Self::field()))
+            .filter(sql::<Bool>(&interval_str))
+            // .filter(created_at.gt( now - interval.unwrap_or(1.months()) )) // uncomment to use PgInterval
+            .order(sql::<BigInt>("count desc"))
+            .filter(sql::<Text>(Self::null_check()).is_not_null())
+            .limit(limit.unwrap_or(20));
+        Ok(query.load::<T>(&*connection)?)
+    }
+
     fn get(language: &str, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<Vec<T>> {
         let connection = conn.get()?;
         let query = agg!(Ad::scoped(language));
