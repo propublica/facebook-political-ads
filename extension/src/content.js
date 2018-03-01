@@ -4,6 +4,7 @@ import debounce from "lodash/debounce";
 let running = false;
 const sendAds = function() {
   if (running) return;
+  console.log("sending Ads");
   running = true;
   let posts = Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)).concat(
     Array.from(document.querySelectorAll(TIMELINE_SELECTOR))
@@ -26,6 +27,8 @@ const sendAds = function() {
 
   scraper.then(() => {
     chrome.runtime.sendMessage(results.filter(i => i));
+    console.log("done sending Ads");
+
     running = false;
   });
 };
