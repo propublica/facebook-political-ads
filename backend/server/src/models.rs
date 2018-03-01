@@ -189,9 +189,29 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
         Self::field()
     }
 
-    fn get(language: &str, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<Vec<T>> {
+    fn get(
+        language: &str,
+        limit: &Option<i64>,
+        interval: &Option<&str>,
+        conn: &Pool<ConnectionManager<PgConnection>>,
+    ) -> Result<Vec<T>> {
+        // uncomment to use PgInterval
+        // use diesel::dsl::now;
+        // use diesel::pg::expression::extensions::IntervalDsl;
+        // use schema::ads::columns::created_at;
         let connection = conn.get()?;
-        let query = agg!(Ad::scoped(language));
+
+        let query = agg!(
+            match interval {
+                &Some(interv) => {
+                    let mut interval_str = String::from("created_at > NOW() - interval '");
+                    interval_str.push_str(interv);
+                    interval_str.push_str("'");
+                    Ad::scoped(language).filter(sql::<Bool>(&interval_str)) // .filter(created_at.gt( now - interval.unwrap_or(1.months()) )) // uncomment to use PgInterval
+                }
+                &None => Ad::scoped(language)
+            }
+        ).limit(limit.unwrap_or(20));
         println!("{}", debug_query::<Pg, _>(&query));
         Ok(query.load::<T>(&*connection)?)
     }

@@ -10,7 +10,6 @@ use hyper;
 use hyper::{Body, Chunk, Client, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
-use hyper::Headers;
 use hyper::header::{AcceptLanguage, AccessControlAllowOrigin, Authorization, Bearer, CacheControl,
                     CacheDirective, Connection as HttpConnection, ContentLength, ContentType, Vary};
 use hyper::mime;
@@ -135,6 +134,15 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/segments") => {
                 // TODO: route these in the restful routing area.
                 Either::B(self.lang(req, |req, lang| self.segments(req, lang)))
+            }
+
+            (&Method::Get, "/facebook-ads/recent_advertisers") => {
+                // TODO: route these in the restful routing area.
+                Either::B(self.lang(req, |req, lang| self.recent_advertisers(req, lang)))
+            }
+            (&Method::Get, "/facebook-ads/recent_segments") => {
+                // TODO: route these in the restful routing area.
+                Either::B(self.lang(req, |req, lang| self.recent_segments(req, lang)))
             }
             // Restful-ish routing.
             (&Method::Get, _) => {
@@ -288,7 +296,7 @@ impl AdServer {
         Box::new(future)
     }
 
-    fn ad(&self, req: Request, lang: String, adid: String) -> ResponseFuture {
+    fn ad(&self, _req: Request, lang: String, adid: String) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
         let ad = spawn_clone!(pool; lang, db_pool; Ad::find(&lang, &db_pool, adid));
@@ -299,23 +307,46 @@ impl AdServer {
         Box::new(future)
     }
 
-    fn advertisers(&self, req: Request, lang: String) -> ResponseFuture {
+    fn advertisers(&self, _req: Request, lang: String) -> ResponseFuture {
         let pool = self.pool.clone();
         let lang = lang.clone();
         let db_pool = self.db_pool.clone();
         let future = pool.spawn_fn(move || {
-            Advertisers::get(&lang, &db_pool)
+            Advertisers::get(&lang, &Some(1000), &None, &db_pool)
                 .map(|advertisers: Vec<Advertisers>| json(&advertisers))
         }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
         Box::new(future)
     }
 
-    fn segments(&self, req: Request, lang: String) -> ResponseFuture {
+    fn recent_advertisers(&self, _req: Request, lang: String) -> ResponseFuture {
         let pool = self.pool.clone();
         let lang = lang.clone();
         let db_pool = self.db_pool.clone();
         let future = pool.spawn_fn(move || {
-            Segments::get(&lang, &db_pool).map(|segments: Vec<Segments>| json(&segments))
+            Advertisers::get(&lang, &Some(1000), &Some("1 month"), &db_pool)
+                .map(|advertisers: Vec<Advertisers>| json(&advertisers))
+        }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
+        Box::new(future)
+    }
+
+    fn segments(&self, _req: Request, lang: String) -> ResponseFuture {
+        let pool = self.pool.clone();
+        let lang = lang.clone();
+        let db_pool = self.db_pool.clone();
+        let future = pool.spawn_fn(move || {
+            Segments::get(&lang, &Some(1000), &None, &db_pool)
+                .map(|segments: Vec<Segments>| json(&segments))
+        }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
+        Box::new(future)
+    }
+
+    fn recent_segments(&self, _req: Request, lang: String) -> ResponseFuture {
+        let pool = self.pool.clone();
+        let lang = lang.clone();
+        let db_pool = self.db_pool.clone();
+        let future = pool.spawn_fn(move || {
+            Segments::get(&lang, &Some(1000), &Some("1 month"), &db_pool)
+                .map(|segments: Vec<Segments>| json(&segments))
         }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
         Box::new(future)
     }
