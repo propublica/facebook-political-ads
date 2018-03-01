@@ -48,7 +48,8 @@ export class AdDetailUnconnected extends React.Component {
 const AdDetail = withRouter(
   connect(
     ({ ad }) => ({
-      // this is a mapStateToProps function. { ad } is destructuring the `store` hash and getting the `ads` element.
+      // this is a mapStateToProps function. { ad } is destructuring the `store` hash and getting
+      // the `ads` element.
       ad
     }),
     dispatch => ({

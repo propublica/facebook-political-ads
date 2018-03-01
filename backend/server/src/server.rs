@@ -97,7 +97,6 @@ impl Service for AdServer {
             (&Method::Post, "/facebook-ads/admin/ads") => {
                 Either::B(self.auth(req, |request| self.mark(request)))
             }
-
             (&Method::Get, "/facebook-ads/index.js") => {
                 Either::B(self.file("public/dist/index.js", ContentType(mime::TEXT_JAVASCRIPT)))
             }
@@ -142,37 +141,37 @@ impl Service for AdServer {
                 let restful = RegexSet::new(&[
                     // rudimentary routing. ORDER MATTERS. And we're using the index of these as
                     // the key for match below.
+                    r"^/facebook-ads/?$",
+                    r"^/facebook-ads/admin/?$",
                     r"^/facebook-ads/ads/?(\d+)?$",
-                    r"^/facebook-ads/admin/?(.*)?$",
-                    r"^/facebook-ads(/?)$",
-                    r"^/facebook-ads/ad/?(\d+)?$",
                 ]).unwrap();
                 // generic restful routing regex for distinguishing subroutes at the collection
                 // and those at a specific element.  I'm sure I will understand
                 // why I needed to call to_owned() here better later, but for
                 // now, this is how to avoid borrowing-related issues.
                 let collection = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap();
-
+                let not_found = Either::A(future::ok(
+                    Response::new().with_status(StatusCode::NotFound),
+                ));
                 let my_path = req.path().to_owned();
                 let rest_matches: Vec<usize> = restful.matches(&my_path).into_iter().collect();
                 match rest_matches.get(0) {
-                    None => Either::A(future::ok(
-                        Response::new().with_status(StatusCode::NotFound),
-                    )),
+                    None => not_found,
                     // these indices match to the indices of `restful` above.
+                    Some(&0) => Either::B(self.file("public/index.html", ContentType::html())),
                     Some(&1) => Either::B(self.file("public/admin.html", ContentType::html())),
-                    Some(&2) | Some(&3) => {
-                        Either::B(self.file("public/index.html", ContentType::html()))
-                    }
-                    Some(&_) => {
+                    Some(&2) => {
                         // api
                         match collection.captures(&my_path) {
                             Some(id) => Either::B(self.lang(req, |req, lang| {
-                                self.ad(req, String::from(id.get(1).unwrap().as_str()), lang)
+                                let id = String::from(id.get(1).unwrap().as_str());
+                                info!("Getting {}", id);
+                                self.ad(req, lang, id)
                             })),
                             None => Either::B(self.lang(req, |req, lang| self.search(req, lang))),
                         }
                     }
+                    Some(&_) => not_found,
                 }
             }
             _ => Either::A(future::ok(
