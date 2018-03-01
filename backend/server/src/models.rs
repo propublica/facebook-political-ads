@@ -1,6 +1,7 @@
 use chrono::DateTime;
 use chrono::offset::Utc;
 use diesel;
+use diesel::debug_query;
 use diesel::dsl::sql;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
@@ -191,6 +192,7 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
     fn get(language: &str, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<Vec<T>> {
         let connection = conn.get()?;
         let query = agg!(Ad::scoped(language));
+        println!("{}", debug_query::<Pg, _>(&query));
         Ok(query.load::<T>(&*connection)?)
     }
 
@@ -245,8 +247,7 @@ where
     fn column() -> &'static str {
         // the `greatest` here avoids a `Unexpected null for non-null column` diesel
         // error if there is no segment.
-        "(jsonb_array_elements(targets)->>'target') || ' -> ' ||
-         greatest(jsonb_array_elements(targets)->>'segment', '(none)') as segment"
+        "(jsonb_array_elements(targets)->>'target') || ' -> ' || greatest(jsonb_array_elements(targets)->>'segment', '(none)') as segment"
     }
 
     fn null_check() -> &'static str {
