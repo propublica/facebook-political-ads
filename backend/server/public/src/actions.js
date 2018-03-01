@@ -119,7 +119,7 @@ export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
 
 export const getGroupedAttrs = (
   groupingKind = "advertiser",
-  root_url = "/facebook-ads/ads"
+  root_url = "/facebook-ads"
 ) => {
   let path = `${root_url}/${groupingKind + "s"}`;
   return (dispatch, getState) => {
@@ -131,7 +131,7 @@ export const getGroupedAttrs = (
     })
       .then(res => res.json())
       .then(resp => {
-        dispatch(receiveRecentGroupedAttr(resp[groupingKind + "s"]));
+        dispatch(receiveRecentGroupedAttr(resp));
       });
   };
 };
