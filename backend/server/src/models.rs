@@ -182,6 +182,11 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
         limit: Option<i64>,
         interval: Option<&str>,
     ) -> Result<Vec<T>> {
+        // uncomment to use PgInterval
+        // use diesel::dsl::now;
+        // use diesel::pg::expression::extensions::IntervalDsl;
+        // use schema::ads::columns::created_at;
+
         let connection = conn.get()?;
         let mut interval_str = String::from("created_at > NOW() - interval '");
         interval_str.push_str(&interval.unwrap_or("1 month"));
@@ -194,6 +199,7 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
             ))
             .group_by(sql::<Text>(Self::field()))
             .filter(sql::<Bool>(&interval_str))
+            // .filter(created_at.gt( now - interval.unwrap_or(1.months()) )) // uncomment to use PgInterval
             .order(sql::<BigInt>("count desc"))
             .filter(sql::<Text>(Self::null_check()).is_not_null())
             .limit(limit.unwrap_or(20));
