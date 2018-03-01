@@ -16,14 +16,16 @@ use hyper::header::{AcceptLanguage, AccessControlAllowOrigin, Authorization, Bea
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
-use models::{Ad, Advertisers, Aggregate, Entities, NewAd, TargetingSegments, Targets};
+use models::{Ad, Advertisers, Aggregate, Entities, NewAd, Segments, Targets};
 use r2d2::Pool;
 use regex::Regex;
 use regex::RegexSet;
 use start_logging;
 use serde_json;
+use serde::ser::Serialize;
 use std::collections::HashMap;
 use std::env;
+use std::fmt::Debug;
 use std::error::Error as StdError;
 use std::io::ErrorKind as StdIoErrorKind;
 use std::io::Error as StdIoError;
@@ -58,13 +60,12 @@ pub struct Admin {
     pub username: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct ApiResponse {
     ads: Vec<Ad>,
     targets: Vec<Targets>,
     entities: Vec<Entities>,
     advertisers: Vec<Advertisers>,
-    segments: Vec<TargetingSegments>,
     total: i64,
 }
 
@@ -85,65 +86,57 @@ impl Service for AdServer {
             })),
             // Admin
             (&Method::Get, "/facebook-ads/admin.js") => {
-                Either::B(self.get_file("public/dist/admin.js", ContentType(mime::TEXT_JAVASCRIPT)))
+                Either::B(self.file("public/dist/admin.js", ContentType(mime::TEXT_JAVASCRIPT)))
             }
             (&Method::Get, "/facebook-ads/admin.js.map") => {
-                Either::B(self.get_file("public/dist/admin.js.map", ContentType::json()))
+                Either::B(self.file("public/dist/admin.js.map", ContentType::json()))
             }
             (&Method::Get, "/facebook-ads/admin/styles.css") => {
-                Either::B(self.get_file("public/css/admin/styles.css", ContentType(mime::TEXT_CSS)))
+                Either::B(self.file("public/css/admin/styles.css", ContentType(mime::TEXT_CSS)))
             }
             (&Method::Post, "/facebook-ads/admin/ads") => {
-                Either::B(self.auth(req, |request| self.mark_ad(request)))
+                Either::B(self.auth(req, |request| self.mark(request)))
             }
 
             (&Method::Get, "/facebook-ads/index.js") => {
-                Either::B(self.get_file("public/dist/index.js", ContentType(mime::TEXT_JAVASCRIPT)))
+                Either::B(self.file("public/dist/index.js", ContentType(mime::TEXT_JAVASCRIPT)))
             }
             (&Method::Get, "/facebook-ads/index.js.map") => {
-                Either::B(self.get_file("public/dist/index.js.map", ContentType::json()))
+                Either::B(self.file("public/dist/index.js.map", ContentType::json()))
             }
-            (&Method::Get, "/facebook-ads/beacons.js") => Either::B(self.get_file(
-                "public/dist/beacons.js",
-                ContentType(mime::TEXT_JAVASCRIPT),
-            )),
+            (&Method::Get, "/facebook-ads/beacons.js") => {
+                Either::B(self.file("public/dist/beacons.js", ContentType(mime::TEXT_JAVASCRIPT)))
+            }
             (&Method::Get, "/facebook-ads/beacons.js.map") => {
-                Either::B(self.get_file("public/dist/beacons.js.map", ContentType::json()))
+                Either::B(self.file("public/dist/beacons.js.map", ContentType::json()))
             }
             (&Method::Get, "/facebook-ads/styles.css") => {
-                Either::B(self.get_file("public/dist/styles.css", ContentType(mime::TEXT_CSS)))
+                Either::B(self.file("public/dist/styles.css", ContentType(mime::TEXT_CSS)))
             }
             (&Method::Get, "/facebook-ads/styles.css.map") => {
-                Either::B(self.get_file("public/dist/styles.css.map", ContentType::json()))
+                Either::B(self.file("public/dist/styles.css.map", ContentType::json()))
             }
             (&Method::Get, "/facebook-ads/locales/en/translation.json") => {
-                Either::B(self.get_file("public/locales/en/translation.json", ContentType::json()))
+                Either::B(self.file("public/locales/en/translation.json", ContentType::json()))
             }
             (&Method::Get, "/facebook-ads/locales/de/translation.json") => {
-                Either::B(self.get_file("public/locales/de/translation.json", ContentType::json()))
+                Either::B(self.file("public/locales/de/translation.json", ContentType::json()))
             }
-            (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream_ads()),
-            (&Method::Post, "/facebook-ads/ads") => Either::B(self.process_ads(req)),
+            (&Method::Get, "/facebook-ads/stream") => Either::B(self.stream()),
+            (&Method::Post, "/facebook-ads/ads") => {
+                Either::B(self.lang(req, |req, lang| self.process(req, lang)))
+            }
             (&Method::Get, "/facebook-ads/heartbeat") => {
                 Either::A(future::ok(Response::new().with_status(StatusCode::Ok)))
             }
             (&Method::Get, "/facebook-ads/ads/advertisers") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.get_advertisers(req))
-            }
-            (&Method::Get, "/facebook-ads/ads/recentadvertisers") => {
-                // TODO: route these in the restful routing area.
-                Either::B(self.get_recent_advertisers(req))
+                Either::B(self.lang(req, |req, lang| self.advertisers(req, lang)))
             }
             (&Method::Get, "/facebook-ads/ads/segments") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.get_segments(req))
+                Either::B(self.lang(req, |req, lang| self.segments(req, lang)))
             }
-            (&Method::Get, "/facebook-ads/ads/recentsegments") => {
-                // TODO: route these in the restful routing area.
-                Either::B(self.get_recent_segments(req))
-            }
-
             // Restful-ish routing.
             (&Method::Get, _) => {
                 let restful = RegexSet::new(&[
@@ -154,10 +147,12 @@ impl Service for AdServer {
                     r"^/facebook-ads(/?)$",
                     r"^/facebook-ads/ad/?(\d+)?$",
                 ]).unwrap();
-                let restful_collection_element_regex =
-                    Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap(); // generic restful routing regex for distinguishing subroutes at the collection and those at a specific element.
-                                                                              // I'm sure I will understand why I needed to call to_owned() here better later,
-                                                                              // but for now, this is how to avoid borrowing-related issues.
+                // generic restful routing regex for distinguishing subroutes at the collection
+                // and those at a specific element.  I'm sure I will understand
+                // why I needed to call to_owned() here better later, but for
+                // now, this is how to avoid borrowing-related issues.
+                let collection = Regex::new(r"^/facebook-ads/(?:[^/]+)/?(\d+)$").unwrap();
+
                 let my_path = req.path().to_owned();
                 let rest_matches: Vec<usize> = restful.matches(&my_path).into_iter().collect();
                 match rest_matches.get(0) {
@@ -165,18 +160,17 @@ impl Service for AdServer {
                         Response::new().with_status(StatusCode::NotFound),
                     )),
                     // these indices match to the indices of `restful` above.
-                    Some(&1) => Either::B(self.get_file("public/admin.html", ContentType::html())), // /facebook-ads/admin/ ->admin, route the rest in React
+                    Some(&1) => Either::B(self.file("public/admin.html", ContentType::html())),
                     Some(&2) | Some(&3) => {
-                        Either::B(self.get_file("public/index.html", ContentType::html()))
-                    } /*  /facebook-ads | /facebook-ads/ad -> public site public site, route the rest in React */
+                        Either::B(self.file("public/index.html", ContentType::html()))
+                    }
                     Some(&_) => {
                         // api
-                        match restful_collection_element_regex.captures(&my_path) {
-                            Some(ads_api_id_match) => Either::B(self.get_ad(
-                                &req,
-                                ads_api_id_match.get(1).unwrap().as_str().into(),
-                            )),
-                            None => Either::B(self.get_ads(&req)),
+                        match collection.captures(&my_path) {
+                            Some(id) => Either::B(self.lang(req, |req, lang| {
+                                self.ad(req, String::from(id.get(1).unwrap().as_str()), lang)
+                            })),
+                            None => Either::B(self.lang(req, |req, lang| self.search(req, lang))),
                         }
                     }
                 }
@@ -189,7 +183,7 @@ impl Service for AdServer {
 }
 
 // this lets us use variables many times by cloning them
-macro_rules! spawn_with_clone {
+macro_rules! spawn_clone {
     ($pool:ident; $($n:ident),+; $body:expr) => ({
         {
             $(let $n = $n.clone();)+
@@ -198,10 +192,24 @@ macro_rules! spawn_with_clone {
     });
 }
 
-// I'm not happy with the OK OK OKs here, but I can't quite find a Result
-// method that works. I should ask on stack overflow or something.
+// build out a json response
+fn json<T: Serialize + Debug>(thing: &T) -> Response {
+    serde_json::to_string(thing)
+        .map(|serialized| {
+            Response::new()
+                .with_header(ContentLength(serialized.len() as u64))
+                .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
+                .with_header(ContentType::json())
+                .with_header(AccessControlAllowOrigin::Any)
+                .with_body(serialized)
+        })
+        .map_err(|e| warn!("Couldn't serialize {:?} {:?}", thing, e))
+        .unwrap_or_else(|_| Response::new().with_status(StatusCode::InternalServerError))
+}
+
 type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
 impl AdServer {
+    // Middleware
     fn auth<F>(&self, req: Request, callback: F) -> ResponseFuture
     where
         F: Fn(Request) -> ResponseFuture,
@@ -223,7 +231,46 @@ impl AdServer {
         }
     }
 
-    fn get_file(&self, path: &str, content_type: ContentType) -> ResponseFuture {
+    fn lang<F>(&self, req: Request, callback: F) -> ResponseFuture
+    where
+        F: Fn(Request, String) -> ResponseFuture,
+    {
+        let bad = Box::new(future::ok(
+            Response::new().with_status(StatusCode::BadRequest),
+        ));
+
+        // this is annoying but hyper consumes a request when you read from it
+        // apparently in 0.12 this will be easier.
+        let (headers, new_req) = {
+            let (method, uri, version, headers, body) = req.deconstruct();
+            let mut new_request = Request::new(method, uri);
+            new_request.headers_mut().clone_from(&headers);
+            new_request.set_body(body);
+            new_request.set_version(version);
+            (headers, new_request)
+        };
+
+        if let Some(langs) = headers.get::<AcceptLanguage>() {
+            if langs.len() == 0 {
+                return bad;
+            }
+            let languages = langs.to_owned();
+            let lang = languages
+                .iter()
+                .find(|quality| quality.item.language.is_some() && quality.item.region.is_some())
+                .map(|l| {
+                    l.clone().item.language.unwrap_or_default() + "-"
+                        + &l.clone().item.region.unwrap_or_default().to_uppercase()
+                })
+                .unwrap_or_else(|| String::from("en-US"));
+            callback(new_req, lang)
+        } else {
+            bad
+        }
+    }
+
+    // Responders
+    fn file(&self, path: &str, content_type: ContentType) -> ResponseFuture {
         info!("Getting file {:?}", path);
         let pool = self.pool.clone();
         let path = path.to_string();
@@ -242,336 +289,29 @@ impl AdServer {
         Box::new(future)
     }
 
-    fn get_lang_from_headers(headers: &Headers) -> Option<String> {
-        if let Some(langs) = headers.get::<AcceptLanguage>() {
-            if langs.len() == 0 {
-                return None;
-            }
-            let languages = langs.to_owned();
-            let lang = languages
-                .iter()
-                .find(|quality| quality.item.language.is_some() && quality.item.region.is_some());
-            if let Some(l) = lang {
-                Some(
-                    l.clone().item.language.unwrap_or_default() + "-"
-                        + &l.clone().item.region.unwrap_or_default().to_uppercase(),
-                )
-            } else {
-                Some(String::from("en-US"))
-            }
-        } else {
-            None
-        }
-    }
-
-    fn get_ad(&self, req: &Request, adid: String) -> ResponseFuture {
-        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-            let db_pool = self.db_pool.clone();
-            let pool = self.pool.clone();
-            let mut options = HashMap::new();
-            options.insert(String::from("id"), adid);
-
-            let ad = spawn_with_clone!(pool; lang, db_pool, options;
-                            Ad::get_ad(&lang, &db_pool, &options)
-                        );
-            let future = ad.map(|ad_option| match ad_option {
-                None => Response::new().with_status(StatusCode::NotFound),
-                Some(ad) => {
-                    let resp = serde_json::to_string(&ad);
-                    match resp {
-                        Ok(serialized) => Response::new()
-                            .with_header(ContentLength(serialized.len() as u64))
-                            .with_header(Vary::Items(vec![
-                                Ascii::new("Accept-Language".to_owned()),
-                            ]))
-                            .with_header(ContentType::json())
-                            .with_header(AccessControlAllowOrigin::Any)
-                            .with_body(serialized),
-                        Err(e) => {
-                            warn!("{:?}", e);
-                            Response::new().with_status(StatusCode::InternalServerError)
-                        }
-                    }
-                }
-            }).map_err(|e| {
-                hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-            });
-
-            Box::new(future)
-        } else {
-            Box::new(future::ok(
-                Response::new().with_status(StatusCode::BadRequest),
-            ))
-        }
-    }
-
-    // fn get_aggregate(&self, req: Request, aggregate_getter: F) -> ResponseFuture {
-
-    // }
-
-    // fn get_advertisers2(&self, req: Request) -> ResponseFuture {
-
-    // }
-
-    fn get_advertisers2(
-        &self,
-        req: Request,
-        advertisers_aggregate_getter: &Fn() -> Result<Vec<Advertisers>>,
-    ) -> ResponseFuture {
+    fn ad(&self, req: Request, lang: String, adid: String) -> ResponseFuture {
+        let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
-        let top_advertisers = pool.spawn_fn(advertisers_aggregate_getter);
-        let future = top_advertisers
-            .map(|advertisers| {
-                advertisers
-                    .into_iter()
-                    .filter(|advertiser: &Advertisers| advertiser.count as i64 > 10)
-                    .collect::<Vec<Advertisers>>()
-            })
-            .map(|advertisers| {
-                serde_json::to_string(&ApiResponse {
-                    ads: Vec::new(),
-                    targets: Vec::new(),
-                    entities: Vec::new(),
-                    segments: Vec::new(),
-                    advertisers: advertisers,
-                    total: 0,
-                }).map(|serialized| {
-                    Response::new()
-                        .with_header(ContentLength(serialized.len() as u64))
-                        .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
-                        .with_header(ContentType::json())
-                        .with_header(AccessControlAllowOrigin::Any)
-                        .with_body(serialized)
-                })
-                    .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
-            })
-            .map_err(|e| {
-                warn!("{:?}", e);
-                hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-            });
+        let ad = spawn_clone!(pool; lang, db_pool; Ad::find(&lang, &db_pool, adid));
+        let future = ad.map(|ad_option| match ad_option {
+            None => Response::new().with_status(StatusCode::NotFound),
+            Some(ad) => json(&ad),
+        }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
         Box::new(future)
     }
 
-    fn get_advertisers(&self, req: Request) -> ResponseFuture {
-        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-            let options = HashMap::new();
-            let db_pool = self.db_pool.clone();
-            let pool = self.pool.clone();
-
-            let top_advertisers =
-                pool.spawn_fn(move || Advertisers::get(&lang, &db_pool, &options, Some(1000)));
-            let future = top_advertisers
-                .map(|advertisers| {
-                    advertisers
-                        .into_iter()
-                        .filter(|advertiser: &Advertisers| advertiser.count as i64 > 10)
-                        .collect::<Vec<Advertisers>>()
-                })
-                .map(|advertisers| {
-                    serde_json::to_string(&ApiResponse {
-                        ads: Vec::new(),
-                        targets: Vec::new(),
-                        entities: Vec::new(),
-                        segments: Vec::new(),
-                        advertisers: advertisers,
-                        total: 0,
-                    }).map(|serialized| {
-                        Response::new()
-                            .with_header(ContentLength(serialized.len() as u64))
-                            .with_header(Vary::Items(vec![
-                                Ascii::new("Accept-Language".to_owned()),
-                            ]))
-                            .with_header(ContentType::json())
-                            .with_header(AccessControlAllowOrigin::Any)
-                            .with_body(serialized)
-                    })
-                        .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
-                })
-                .map_err(|e| {
-                    warn!("{:?}", e);
-                    hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-                });
-            Box::new(future)
-        } else {
-            Box::new(future::ok(
-                Response::new().with_status(StatusCode::BadRequest),
-            ))
-        }
+    fn advertisers(&self, req: Request, lang: String) -> ResponseFuture {
+        unimplemented!();
     }
 
-    // I deeply dislike that get_recent_advertisers and get_advertisers are *exactly* the same
-    // but for Advertisers::get vs Advertisers::recent_get
-    fn get_recent_advertisers(&self, req: Request) -> ResponseFuture {
-        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-            let options = HashMap::new();
-            let db_pool = self.db_pool.clone();
-
-            let my_getter = move || {
-                Advertisers::recent_get(&lang, &db_pool, &options, Some(1000), Some("1 month"))
-            };
-
-            return self.get_advertisers2(req, &my_getter);
-        } else {
-            Box::new(future::ok(
-                Response::new().with_status(StatusCode::BadRequest),
-            ))
-        }
-
-        //     let top_advertisers = pool.spawn_fn(move || {
-        //         Advertisers::recent_get(&lang, &db_pool, &options, Some(1000), Some("1 month"))
-        //     });
-        //     let future = top_advertisers
-        //         .map(|advertisers| {
-        //             advertisers
-        //                 .into_iter()
-        //                 .filter(|advertiser: &Advertisers| advertiser.count as i64 >= 3)
-        //                 .collect::<Vec<Advertisers>>()
-        //         })
-        //         .map(|advertisers| {
-        //             serde_json::to_string(&ApiResponse {
-        //                 ads: Vec::new(),
-        //                 targets: Vec::new(),
-        //                 entities: Vec::new(),
-        //                 segments: Vec::new(),
-        //                 advertisers: advertisers,
-        //                 total: 0,
-        //             }).map(|serialized| {
-        //                 Response::new()
-        //                     .with_header(ContentLength(serialized.len() as u64))
-        //                     .with_header(Vary::Items(vec![
-        //                         Ascii::new("Accept-Language".to_owned()),
-        //                     ]))
-        //                     .with_header(ContentType::json())
-        //                     .with_header(AccessControlAllowOrigin::Any)
-        //                     .with_body(serialized)
-        //             })
-        //                 .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
-        //         })
-        //         .map_err(|e| {
-        //             warn!("{:?}", e);
-        //             hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-        //         });
-        //     Box::new(future)
-        // } else {
-        //     Box::new(future::ok(
-        //         Response::new().with_status(StatusCode::BadRequest),
-        //     ))
-        // }
-    }
-    fn get_segments(&self, req: Request) -> ResponseFuture {
-        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-            let options = HashMap::new();
-            let db_pool = self.db_pool.clone();
-            let pool = self.pool.clone();
-
-            let top_segments = pool.spawn_fn(move || {
-                TargetingSegments::get(&lang, &db_pool, &options, Some(1000))
-            });
-
-            let future = top_segments
-                .map(|segments| {
-                    segments
-                        .into_iter()
-                        .filter(|targeting_segment: &TargetingSegments| {
-                            targeting_segment.count as i64 > 10
-                        })
-                        .collect::<Vec<TargetingSegments>>()
-                })
-                .map(|segments| {
-                    serde_json::to_string(&ApiResponse {
-                        ads: Vec::new(),
-                        targets: Vec::new(),
-                        entities: Vec::new(),
-                        segments: segments,
-                        advertisers: Vec::new(),
-                        total: 0,
-                    }).map(|serialized| {
-                        Response::new()
-                            .with_header(ContentLength(serialized.len() as u64))
-                            .with_header(Vary::Items(vec![
-                                Ascii::new("Accept-Language".to_owned()),
-                            ]))
-                            .with_header(ContentType::json())
-                            .with_header(AccessControlAllowOrigin::Any)
-                            .with_body(serialized)
-                    })
-                        .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
-                })
-                .map_err(|e| {
-                    warn!("{:?}", e);
-                    hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-                });
-            Box::new(future)
-        } else {
-            Box::new(future::ok(
-                Response::new().with_status(StatusCode::BadRequest),
-            ))
-        }
+    fn segments(&self, req: Request, lang: String) -> ResponseFuture {
+        unimplemented!();
     }
 
-    // I deeply dislike that get_recent_advertisers and get_advertisers are *exactly* the same
-    // but for Advertisers::get vs Advertisers::recent_get
-    // and likewise for get_recent_segments and get_segments
-    fn get_recent_segments(&self, req: Request) -> ResponseFuture {
-        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-            let options = HashMap::new();
-            let db_pool = self.db_pool.clone();
-            let pool = self.pool.clone();
-
-            let top_segments = pool.spawn_fn(move || {
-                TargetingSegments::recent_get(
-                    &lang,
-                    &db_pool,
-                    &options,
-                    Some(1000),
-                    Some("1 month"),
-                )
-            });
-            let future = top_segments
-                .map(|segments| {
-                    segments
-                        .into_iter()
-                        .filter(|targeting_segment: &TargetingSegments| {
-                            targeting_segment.count as i64 > 10
-                        })
-                        .collect::<Vec<TargetingSegments>>()
-                })
-                .map(|segments| {
-                    serde_json::to_string(&ApiResponse {
-                        ads: Vec::new(),
-                        targets: Vec::new(),
-                        entities: Vec::new(),
-                        segments: segments,
-                        advertisers: Vec::new(),
-                        total: 0,
-                    }).map(|serialized| {
-                        Response::new()
-                            .with_header(ContentLength(serialized.len() as u64))
-                            .with_header(Vary::Items(vec![
-                                Ascii::new("Accept-Language".to_owned()),
-                            ]))
-                            .with_header(ContentType::json())
-                            .with_header(AccessControlAllowOrigin::Any)
-                            .with_body(serialized)
-                    })
-                        .unwrap_or(Response::new().with_status(StatusCode::InternalServerError))
-                })
-                .map_err(|e| {
-                    warn!("{:?}", e);
-                    hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-                });
-            Box::new(future)
-        } else {
-            Box::new(future::ok(
-                Response::new().with_status(StatusCode::BadRequest),
-            ))
-        }
-    }
-    fn get_ads(&self, req: &Request) -> ResponseFuture {
-        if let Some(lang) = AdServer::get_lang_from_headers(req.headers()) {
-            let options = req.query()
-                .map(|q| {
-                    form_urlencoded::parse(q.as_bytes())
+    fn search(&self, req: Request, lang: String) -> ResponseFuture {
+        let options = req.query()
+            .map(|q| {
+                form_urlencoded::parse(q.as_bytes())
                         .into_owned()
                         .filter(|pair| {
                             pair.0 == "search" || pair.0 == "page" || pair.0 == "targets"
@@ -579,61 +319,41 @@ impl AdServer {
                                 || pair.0 == "entities"
                                 || pair.0 == "id"
                         })
-                        .collect::<HashMap<_, _>>() // transforms the Vector of tuples into a HashMap.
-                })
-                .unwrap_or_default();
+                        // transforms the Vector of tuples into a HashMap.
+                        .collect::<HashMap<_, _>>()
+            })
+            .unwrap_or_default();
 
-            let db_pool = self.db_pool.clone();
-            let pool = self.pool.clone();
-            let ads = spawn_with_clone!(pool; lang, db_pool, options;
-                                        Ad::get_ads(&lang, &db_pool, &options));
-            let targets = spawn_with_clone!(pool; lang, db_pool, options;
-                                            Targets::get(&lang, &db_pool, &options, None));
-            let entities = spawn_with_clone!(pool; lang, db_pool, options;
-                                  Entities::get(&lang, &db_pool, &options, None));
-            let advertisers = spawn_with_clone!(pool; lang, db_pool, options;
-                                  Advertisers::get(&lang, &db_pool, &options, None));
-            let total = spawn_with_clone!(pool; lang, db_pool, options;
-                                          Ad::get_total(&lang, &db_pool, &options));
+        let db_pool = self.db_pool.clone();
+        let pool = self.pool.clone();
+        let ads = spawn_clone!(pool; lang, db_pool, options;
+                                        Ad::search(&lang, &db_pool, &options));
+        let targets = spawn_clone!(pool; lang, db_pool, options;
+                                            Targets::search(&lang, &db_pool, &options));
+        let entities = spawn_clone!(pool; lang, db_pool, options;
+                                  Entities::search(&lang, &db_pool, &options));
+        let advertisers = spawn_clone!(pool; lang, db_pool, options;
+                                  Advertisers::search(&lang, &db_pool, &options));
+        let total = spawn_clone!(pool; lang, db_pool, options;
+                                          Ad::search_total(&lang, &db_pool, &options));
 
-            let future = ads.join5(targets, entities, advertisers, total)
-                .map(|(ads, targeting, entities, advertisers, total)| {
-                    serde_json::to_string(&ApiResponse {
-                        ads: ads,
-                        targets: targeting,
-                        entities: entities,
-                        advertisers: advertisers,
-                        segments: Vec::new(),
-                        total: total,
-                    }).map(|serialized| {
-                        Response::new()
-                            .with_header(ContentLength(serialized.len() as u64))
-                            .with_header(Vary::Items(vec![
-                                Ascii::new("Accept-Language".to_owned()),
-                            ]))
-                            .with_header(ContentType::json())
-                            .with_header(AccessControlAllowOrigin::Any)
-                            .with_body(serialized)
-                    })
-                        .unwrap_or_else(|_| {
-                            Response::new().with_status(StatusCode::InternalServerError)
-                        })
+        let future = ads.join5(targets, entities, advertisers, total)
+            .map(|(ads, targeting, entities, advertisers, total)| {
+                json(&ApiResponse {
+                    ads: ads,
+                    targets: targeting,
+                    entities: entities,
+                    advertisers: advertisers,
+                    total: total,
                 })
-                .map_err(|e| {
-                    warn!("{:?}", e);
-                    hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description()))
-                });
-            Box::new(future)
-        } else {
-            Box::new(future::ok(
-                Response::new().with_status(StatusCode::BadRequest),
-            ))
-        }
+            })
+            .map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
+        Box::new(future)
     }
 
     // Beware! This function assumes that we have a caching proxy in front of our
     // web server, otherwise we're making a new connection on every request.
-    fn stream_ads(&self) -> ResponseFuture {
+    fn stream(&self) -> ResponseFuture {
         let handle = self.handle.clone();
         let url = Url::parse(&self.database_url.clone()).unwrap();
         let database_url = url.as_str();
@@ -668,26 +388,21 @@ impl AdServer {
         Box::new(notifications)
     }
 
-    fn process_ads(&self, req: Request) -> ResponseFuture {
+    fn process(&self, req: Request, lang: String) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
         let image_pool = self.pool.clone();
         let image_db = self.db_pool.clone();
         let handle = self.handle.clone();
         let client = self.client.clone();
-        let maybe_lang = AdServer::get_lang_from_headers(req.headers());
-        if !maybe_lang.is_some() {
-            return Box::new(future::ok(
-                Response::new().with_status(StatusCode::BadRequest),
-            ));
+        let body = {
+            let (_, _, _, _, body) = req.deconstruct();
+            body
         };
-        let lang = maybe_lang.unwrap();
-
-        let future = req.body()
-            .concat2()
+        let future = body.concat2()
             .then(move |msg| {
                 pool.spawn_fn(move || {
-                    AdServer::save_ads(
+                    AdServer::save(
                         msg.map_err(|e| Error::with_chain(e, "Can't get body")),
                         &db_pool,
                         lang,
@@ -711,7 +426,7 @@ impl AdServer {
         Box::new(future)
     }
 
-    fn save_ads(
+    fn save(
         msg: Result<Chunk>,
         db_pool: &Pool<ConnectionManager<PgConnection>>,
         lang: String,
@@ -727,7 +442,7 @@ impl AdServer {
     }
 
     // for suppressin' ads.
-    fn mark_ad(&self, req: Request) -> ResponseFuture {
+    fn mark(&self, req: Request) -> ResponseFuture {
         let db_pool = self.db_pool.clone();
         let pool = self.pool.clone();
         let future = req.body()

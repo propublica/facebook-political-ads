@@ -164,6 +164,19 @@ impl Images {
     }
 }
 
+macro_rules! agg {
+    ($query:expr) => ({
+        $query.select((
+                sql::<BigInt>("count(*) as count"),
+                sql::<Text>(Self::column()),
+            ))
+            .group_by(sql::<Text>(Self::field()))
+            /* Ideally we'd have a .having() here, but it's not implemented yet in Diesel. */
+            .order(sql::<BigInt>("count desc"))
+            .filter(sql::<Text>(Self::null_check()).is_not_null())
+    })
+}
+
 pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
     fn field() -> &'static str {
         Self::column()
@@ -206,23 +219,19 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
         Ok(query.load::<T>(&*connection)?)
     }
 
-    fn get(
+    fn get(language: &str, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<Vec<T>> {
+        let connection = conn.get()?;
+        let query = agg!(Ad::scoped(language));
+        Ok(query.load::<T>(&*connection)?)
+    }
+
+    fn search(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
         options: &HashMap<String, String>,
-        limit: Option<i64>,
     ) -> Result<Vec<T>> {
         let connection = conn.get()?;
-        let query = Ad::get_ads_query(language, options)
-            .select((
-                sql::<BigInt>("count(*) as count"),
-                sql::<Text>(Self::column()),
-            ))
-            .group_by(sql::<Text>(Self::field()))
-            /* Ideally we'd have a .having() here, but it's not implemented yet in Diesel. */
-            .order(sql::<BigInt>("count desc"))
-            .filter(sql::<Text>(Self::null_check()).is_not_null())
-            .limit(limit.unwrap_or(20));
+        let query = agg!(Ad::search_query(language, options)).limit(20);
         Ok(query.load::<T>(&*connection)?)
     }
 }
@@ -249,13 +258,14 @@ where
         "targets"
     }
 }
+
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
-pub struct TargetingSegments {
+pub struct Segments {
     pub count: i64,
     pub segment: String,
 }
 
-impl<T> Aggregate<T> for TargetingSegments
+impl<T> Aggregate<T> for Segments
 where
     T: Queryable<(BigInt, Text), Pg>,
 {
@@ -264,8 +274,11 @@ where
     }
 
     fn column() -> &'static str {
-        "(jsonb_array_elements(targets)->>'target') || ' -> ' || greatest(jsonb_array_elements(targets)->>'segment', '(none)') as segment"
-    } // the `greatest` here avoids a `Unexpected null for non-null column` diesel error if there is no segment.
+        // the `greatest` here avoids a `Unexpected null for non-null column` diesel
+        // error if there is no segment.
+        "(jsonb_array_elements(targets)->>'target') || ' -> ' ||
+         greatest(jsonb_array_elements(targets)->>'segment', '(none)') as segment"
+    }
 
     fn null_check() -> &'static str {
         "targets"
@@ -441,31 +454,33 @@ impl Ad {
             .collect()
     }
 
-    pub fn get_total(
+    pub fn scoped<'a>(language: &'a str) -> BoxedQuery<'a, Pg> {
+        use schema::ads::dsl::*;
+        ads.filter(lang.eq(language))
+            .filter(political_probability.gt(0.70))
+            .filter(suppressed.eq(false))
+            .into_boxed()
+    }
+
+    pub fn search_total(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
         options: &HashMap<String, String>,
     ) -> Result<i64> {
         let connection = conn.get()?;
-        let count = Ad::get_ads_query(language, options)
+        let count = Ad::search_query(language, options)
             .count()
             .get_result::<i64>(&*connection)?;
         Ok(count)
     }
 
-    pub fn get_ads_query<'a>(
+    pub fn search_query<'a>(
         language: &'a str,
         options: &'a HashMap<String, String>,
     ) -> BoxedQuery<'a, Pg> {
         use schema::ads::dsl::*;
-        let mut query = ads.filter(lang.eq(language))
-            .filter(political_probability.gt(0.70))
-            .filter(suppressed.eq(false))
-            .into_boxed();
+        let mut query = Ad::scoped(language);
 
-        if let Some(ad_id) = options.get("id") {
-            query = query.filter(id.eq(ad_id));
-        }
         if let Some(search) = options.get("search") {
             query = match &language[..2] {
                 "de" => {
@@ -480,7 +495,6 @@ impl Ad {
             let targts: Result<Vec<Targeting>> = serde_json::from_str(target).map_err(|e| e.into());
             if targts.is_ok() {
                 let json = serde_json::to_string(&targts.unwrap()).unwrap();
-                // WARNING! Possible injection, always rely on serde serialization above.
                 query = query.filter(sql(&format!("targets @> '{}'", json)));
             }
         }
@@ -505,16 +519,14 @@ impl Ad {
         query
     }
 
-    pub fn get_ads(
+    pub fn search(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
         options: &HashMap<String, String>,
     ) -> Result<Vec<Ad>> {
         use schema::ads::dsl::*;
-
         let connection = conn.get()?;
-
-        let mut query = Ad::get_ads_query(language, options);
+        let mut query = Ad::search_query(language, options);
 
         if let Some(p) = options.get("page") {
             let raw_offset = p.parse::<usize>().unwrap_or_default() * 20;
@@ -532,16 +544,21 @@ impl Ad {
             .load::<Ad>(&*connection)?)
     }
 
-    pub fn get_ad(
+    pub fn find(
         language: &str,
         conn: &Pool<ConnectionManager<PgConnection>>,
-        options: &HashMap<String, String>,
+        id: String,
     ) -> Result<Option<Ad>> {
+        use schema::ads::dsl::id as db_id;
         let connection = conn.get()?;
-        let query = Ad::get_ads_query(language, options);
+        let query = Ad::scoped(language);
         // returns a Result with value of Ok(Option(Ad)) OR a Result with value
         // Err(somethin)
-        Ok(query.limit(1).first::<Ad>(&*connection).optional()?)
+        Ok(query
+            .filter(db_id.eq(id))
+            .limit(1)
+            .first::<Ad>(&*connection)
+            .optional()?)
     }
 
     pub fn suppress(adid: String, conn: &Pool<ConnectionManager<PgConnection>>) -> Result<()> {
