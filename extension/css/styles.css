@@ -158,6 +158,25 @@ body {
   height: 100%;
 }
 
+#thankscontainer {
+  width: 100%;
+  height: 100%;
+}
+
+#thanksbar {
+  position: fixed;
+  bottom: 0;
+  z-index: 2;
+  background-color: #f9f9f9;
+  width: 100%;
+  text-align: center;
+  border-top: 2px solid #ccc;
+}
+
+#thanksbar:not(:empty) + #toggler {
+  margin-bottom: 1rem;
+}
+
 #tabs {
   background-color: #fff;
   position: sticky;
