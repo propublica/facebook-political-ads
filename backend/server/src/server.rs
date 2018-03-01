@@ -407,11 +407,8 @@ impl AdServer {
         let image_db = self.db_pool.clone();
         let handle = self.handle.clone();
         let client = self.client.clone();
-        let body = {
-            let (_, _, _, _, body) = req.deconstruct();
-            body
-        };
-        let future = body.concat2()
+        let future = req.body()
+            .concat2()
             .then(move |msg| {
                 pool.spawn_fn(move || {
                     AdServer::save(
