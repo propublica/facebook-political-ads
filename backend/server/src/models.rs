@@ -494,9 +494,7 @@ impl Ad {
         options: &HashMap<String, String>,
     ) -> Result<Vec<Ad>> {
         use schema::ads::dsl::*;
-
         let connection = conn.get()?;
-
         let mut query = Ad::search_query(language, options);
 
         if let Some(p) = options.get("page") {
