@@ -522,6 +522,7 @@ impl Ad {
         use schema::ads::dsl::id as db_id;
         let connection = conn.get()?;
         let query = Ad::scoped(language);
+        info!("Getting from db {}", id);
         // returns a Result with value of Ok(Option(Ad)) OR a Result with value
         // Err(somethin)
         Ok(query
