@@ -1,12 +1,13 @@
 import React from "react";
 import { connect } from "react-redux";
 import { withRouter, Link } from "react-router-dom";
-import { getGroupedAttrs, newSearch } from "actions.js";
+import { getGroupedAttrs, newSearch, RECENT } from "actions.js";
 
 export class GroupedAttrsUnconnected extends React.Component {
   componentWillMount() {
     // TODO: follow this pattern to get various kinds of grouped attrs (advertisers, recent advertisers, etc.)
     let groupingType = "advertiser"; // default
+    let recent = false;
     if (this.props.match) {
       // `match` is from React Router -- it's the bit of the URL that matches.
       groupingType = this.props.match.params.groupingType
@@ -14,8 +15,12 @@ export class GroupedAttrsUnconnected extends React.Component {
         .replace("by_", "");
       // the varieties of allowed groupingTypes are defined in Rust, in server.rs
       this.setState({ groupingType: groupingType });
+      recent =
+        this.props.match.params.groupingType.indexOf("recent") >= 0
+          ? RECENT
+          : null;
     }
-    this.props.getGroupedAttrs(groupingType);
+    this.props.getGroupedAttrs(groupingType, recent);
   }
 
   render() {
@@ -68,7 +73,7 @@ const GroupedAttrs = withRouter(
     }),
     dispatch => ({
       onClick: term => dispatch(newSearch(term)),
-      getGroupedAttrs: kind => dispatch(getGroupedAttrs(kind))
+      getGroupedAttrs: (kind, recent) => dispatch(getGroupedAttrs(kind, recent))
     })
   )(GroupedAttrsUnconnected)
 );
