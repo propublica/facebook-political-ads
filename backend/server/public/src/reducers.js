@@ -15,7 +15,9 @@ import {
   LOGIN,
   LOGOUT,
   GOT_THAT_AD,
-  REQUESTING_ONE_AD
+  REQUESTING_ONE_AD,
+  GOT_RECENT_GROUPED_ATTR,
+  REQUESTING_RECENT_GROUPED_ATTR
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -69,6 +71,17 @@ export const ad = (state = {}, action) => {
     case GOT_THAT_AD:
       return action.ad;
     case REQUESTING_ONE_AD:
+      return null;
+    default:
+      return state;
+  }
+};
+
+export const groupedAttribute = (state = [], action) => {
+  switch (action.type) {
+    case GOT_RECENT_GROUPED_ATTR:
+      return action.groupedAttrs;
+    case REQUESTING_RECENT_GROUPED_ATTR:
       return null;
     default:
       return state;
