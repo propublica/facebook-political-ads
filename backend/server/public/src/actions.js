@@ -19,6 +19,17 @@ export const requestingOneAd = ad_id => ({
   ad_id: ad_id
 });
 
+export const GOT_RECENT_GROUPED_ATTR = "GOT_RECENT_GROUPED_ATTR";
+export const receiveRecentGroupedAttr = groupedAttrs => ({
+  type: GOT_RECENT_GROUPED_ATTR,
+  groupedAttrs
+});
+
+export const REQUESTING_RECENT_GROUPED_ATTR = "REQUESTING_RECENT_GROUPED_ATTR";
+export const requestingRecentGroupedAttr = () => ({
+  type: REQUESTING_RECENT_GROUPED_ATTR
+});
+
 export const SET_LANG = "set_lang";
 export const setLang = lang => ({
   type: SET_LANG,
@@ -102,6 +113,28 @@ export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
       .then(res => res.json())
       .then(ad => {
         dispatch(receiveOneAd(ad));
+      });
+  };
+};
+
+export const RECENT = "recent";
+export const getGroupedAttrs = (
+  groupingKind = "advertiser",
+  recent = null,
+  root_url = "/facebook-ads"
+) => {
+  let path = `${root_url}/${recent === RECENT ? "recent_" : ""}${groupingKind +
+    "s"}`;
+  return (dispatch, getState) => {
+    let state = getState();
+    dispatch(requestingRecentGroupedAttr());
+    return fetch(path, {
+      method: "GET",
+      headers: headers(state.credentials, state.lang)
+    })
+      .then(res => res.json())
+      .then(resp => {
+        dispatch(receiveRecentGroupedAttr(resp));
       });
   };
 };
