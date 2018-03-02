@@ -43,11 +43,9 @@ export class GroupedAttrsUnconnected extends React.Component {
               <tr key={groupedItem[this.state.groupingType]}>
                 <td>
                   <Link
-                    to={`/facebook-ads/admin/ads?search=${
-                      groupedItem[this.state.groupingType]
-                    }&${this.state.groupingType}s=%5B"${
-                      groupedItem[this.state.groupingType]
-                    }"%5D`}
+                    to={`/facebook-ads/admin/ads?${
+                      this.state.groupingType
+                    }s=%5B"${groupedItem[this.state.groupingType]}"%5D`}
                   >
                     {groupedItem[this.state.groupingType]}
                   </Link>
