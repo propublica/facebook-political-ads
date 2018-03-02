@@ -150,7 +150,7 @@ impl Service for AdServer {
                     // rudimentary routing. ORDER MATTERS. And we're using the index of these as
                     // the key for match below.
                     r"^/facebook-ads/?$",
-                    r"^/facebook-ads/admin/?$",
+                    r"^/facebook-ads/admin/?(.*)?$$",
                     r"^/facebook-ads/ads/?(\d+)?$",
                 ]).unwrap();
                 // generic restful routing regex for distinguishing subroutes at the collection

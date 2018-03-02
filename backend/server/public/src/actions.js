@@ -117,11 +117,14 @@ export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
   };
 };
 
+export const RECENT = "recent";
 export const getGroupedAttrs = (
   groupingKind = "advertiser",
+  recent = null,
   root_url = "/facebook-ads"
 ) => {
-  let path = `${root_url}/${groupingKind + "s"}`;
+  let path = `${root_url}/${recent === RECENT ? "recent_" : ""}${groupingKind +
+    "s"}`;
   return (dispatch, getState) => {
     let state = getState();
     dispatch(requestingRecentGroupedAttr());
