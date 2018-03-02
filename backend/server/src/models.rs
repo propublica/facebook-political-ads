@@ -201,17 +201,15 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
         // use schema::ads::columns::created_at;
         let connection = conn.get()?;
 
-        let query = agg!(
-            match interval {
-                &Some(interv) => {
-                    let mut interval_str = String::from("created_at > NOW() - interval '");
-                    interval_str.push_str(interv);
-                    interval_str.push_str("'");
-                    Ad::scoped(language).filter(sql::<Bool>(&interval_str)) // .filter(created_at.gt( now - interval.unwrap_or(1.months()) )) // uncomment to use PgInterval
-                }
-                &None => Ad::scoped(language)
+        let query = agg!(match interval {
+            &Some(interv) => {
+                let mut interval_str = String::from("created_at > NOW() - interval '");
+                interval_str.push_str(interv);
+                interval_str.push_str("'");
+                Ad::scoped(language).filter(sql::<Bool>(&interval_str)) // .filter(created_at.gt( now - interval.unwrap_or(1.months()) )) // uncomment to use PgInterval
             }
-        ).limit(limit.unwrap_or(20));
+            &None => Ad::scoped(language),
+        }).limit(limit.unwrap_or(20));
         println!("{}", debug_query::<Pg, _>(&query));
         Ok(query.load::<T>(&*connection)?)
     }
@@ -265,9 +263,7 @@ where
     }
 
     fn column() -> &'static str {
-        // the `greatest` here avoids a `Unexpected null for non-null column` diesel
-        // error if there is no segment.
-        "(jsonb_array_elements(targets)->>'target') || ' -> ' || greatest(jsonb_array_elements(targets)->>'segment', '(none)') as segment"
+        "('{\"segment\": \"(n/a)\"}' || jsonb_array_elements(targets)->>'segment') as segment"
     }
 
     fn null_check() -> &'static str {
