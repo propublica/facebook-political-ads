@@ -141,8 +141,7 @@ html {
 
 body {
   width: 400px;
-  min-height: 300;
-  max-height: 600;
+  height: 600px;
   font-family: -apple-system, BlinkMacSystemFont, "avenir next", avenir,
     helvetica, "helvetica neue", ubuntu, roboto, noto, "segoe ui", arial,
     sans-serif;
