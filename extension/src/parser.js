@@ -193,14 +193,14 @@ const refocus = cb => {
   cb();
   if (focus) focus.focus();
   if (ranges.length > 0) {
-    var newSelection = window.getSelection();
+    const newSelection = window.getSelection();
     newSelection.removeAllRanges();
-    for (var i = 0; i < ranges.length; i++) {
-      var range = document.createRange();
-      range.setStart(ranges[i][0], ranges[i][1]);
-      range.setEnd(ranges[i][2], ranges[i][3]);
+    ranges.forEach(range_attrs => {
+      const range = document.createRange();
+      range.setStart(range_attrs[0], range_attrs[1]);
+      range.setEnd(range_attrs[2], range_attrs[3]);
       newSelection.addRange(range);
-    }
+    });
   }
 };
 
