@@ -181,8 +181,27 @@ const getTargeting = ad => {
 // restore the state of the page when the extension clicks around.
 const refocus = cb => {
   const focus = document.activeElement;
+  const ranges = [];
+  for (var i = 0; i < window.getSelection().rangeCount; i++) {
+    ranges.push([
+      window.getSelection().getRangeAt(i).startContainer,
+      window.getSelection().getRangeAt(i).startOffset,
+      window.getSelection().getRangeAt(i).endContainer,
+      window.getSelection().getRangeAt(i).endOffset
+    ]);
+  }
   cb();
   if (focus) focus.focus();
+  if (ranges.length > 0) {
+    const newSelection = window.getSelection();
+    newSelection.removeAllRanges();
+    ranges.forEach(range_attrs => {
+      const range = document.createRange();
+      range.setStart(range_attrs[0], range_attrs[1]);
+      range.setEnd(range_attrs[2], range_attrs[3]);
+      newSelection.addRange(range);
+    });
+  }
 };
 
 // All of the menus on Facebook are asynchronously opened so we have to use a observer here to make
