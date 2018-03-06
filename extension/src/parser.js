@@ -183,11 +183,12 @@ const refocus = cb => {
   const focus = document.activeElement;
   const ranges = [];
   for (var i = 0; i < window.getSelection().rangeCount; i++) {
+    let range = window.getSelection().getRangeAt(i);
     ranges.push([
-      window.getSelection().getRangeAt(i).startContainer,
-      window.getSelection().getRangeAt(i).startOffset,
-      window.getSelection().getRangeAt(i).endContainer,
-      window.getSelection().getRangeAt(i).endOffset
+      range.startContainer,
+      range.startOffset,
+      range.endContainer,
+      range.endOffset
     ]);
   }
   cb();
