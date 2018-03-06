@@ -193,7 +193,13 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
   resolve,
   reject
 ) => {
+  let time = Date.now();
   let cb = (record, self) => {
+    // give up if we haven't got anything after a second
+    if (Date.now() - time > 1000) {
+      self.disconnect();
+      return reject("no menu");
+    }
     const menu = menuFilter();
     if (!menu) return null;
     const li = Array.from(menu.querySelectorAll("li")).filter(filter)[0];
@@ -225,8 +231,7 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     document.querySelector("#globalContainer"),
     {
       childList: true,
-      subtree: true,
-      attributes: false
+      subtree: true
     }
   );
   refocus(() => toggle.click());
