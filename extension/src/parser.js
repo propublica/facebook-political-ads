@@ -2,6 +2,7 @@ import debounce from "lodash/debounce";
 
 const TIMELINE_SELECTOR = ".userContentWrapper";
 const SIDEBAR_SELECTOR = ".ego_unit";
+const debug = true;
 
 // This function cleans all the elements that could leak user data
 // before sending to the server. It also removes any attributes that
@@ -218,6 +219,7 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     // give up if we haven't got anything after a second
     if (Date.now() - time > 1000) {
       self.disconnect();
+      if (debug) toggle.style.backgroundColor = "green";
       return reject("no menu");
     }
     const menu = menuFilter();
@@ -228,6 +230,7 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     if (!endpoint) return null;
     const url = endpoint.getAttribute("ajaxify");
     refocus(() => toggle.click());
+    if (debug) toggle.style.backgroundColor = "unset";
     self.disconnect();
     try {
       const resolved = {
@@ -341,6 +344,8 @@ const timeline = node => {
   // and shares.
   if (node.querySelector(TIMELINE_SELECTOR))
     node = node.querySelector(TIMELINE_SELECTOR);
+
+  if (debug) parent.style.color = "red";
 
   // Finally we have something to save.
   return getTimelineId(parent, {
