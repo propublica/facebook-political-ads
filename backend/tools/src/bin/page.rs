@@ -7,7 +7,7 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
 use kuchiki::traits::*;
-use server::models::{get_advertiser_link, Ad};
+use server::models::{get_author_link, Ad};
 use server::schema::ads::*;
 use server::schema::ads::dsl::*;
 use server::start_logging;
@@ -25,7 +25,7 @@ fn main() {
     for ad in dbads {
         let document = kuchiki::parse_html().one(ad.html.clone());
 
-        let html_page = get_advertiser_link(&document)
+        let html_page = get_author_link(&document)
             .ok()
             .and_then(|l| l.attributes.borrow().get("href").map(|i| i.to_string()));
         if html_page.is_some() {
