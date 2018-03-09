@@ -181,8 +181,28 @@ const getTargeting = ad => {
 // restore the state of the page when the extension clicks around.
 const refocus = cb => {
   const focus = document.activeElement;
+  const ranges = [];
+  for (var i = 0; i < window.getSelection().rangeCount; i++) {
+    let range = window.getSelection().getRangeAt(i);
+    ranges.push([
+      range.startContainer,
+      range.startOffset,
+      range.endContainer,
+      range.endOffset
+    ]);
+  }
   cb();
   if (focus) focus.focus();
+  if (ranges.length > 0) {
+    const newSelection = window.getSelection();
+    newSelection.removeAllRanges();
+    ranges.forEach(range_attrs => {
+      const range = document.createRange();
+      range.setStart(range_attrs[0], range_attrs[1]);
+      range.setEnd(range_attrs[2], range_attrs[3]);
+      newSelection.addRange(range);
+    });
+  }
 };
 
 // All of the menus on Facebook are asynchronously opened so we have to use a observer here to make
@@ -193,7 +213,13 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
   resolve,
   reject
 ) => {
+  let time = Date.now();
   let cb = (record, self) => {
+    // give up if we haven't got anything after a second
+    if (Date.now() - time > 1000) {
+      self.disconnect();
+      return reject("no menu");
+    }
     const menu = menuFilter();
     if (!menu) return null;
     const li = Array.from(menu.querySelectorAll("li")).filter(filter)[0];
@@ -225,8 +251,7 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     document.querySelector("#globalContainer"),
     {
       childList: true,
-      subtree: true,
-      attributes: false
+      subtree: true
     }
   );
   refocus(() => toggle.click());

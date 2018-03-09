@@ -141,8 +141,7 @@ html {
 
 body {
   width: 400px;
-  min-height: 300;
-  max-height: 600;
+  height: 600px;
   font-family: -apple-system, BlinkMacSystemFont, "avenir next", avenir,
     helvetica, "helvetica neue", ubuntu, roboto, noto, "segoe ui", arial,
     sans-serif;
@@ -503,6 +502,11 @@ b.political {
   color: rgb(144, 148, 156);
 }
 
+._2lgs {
+  /* intrusive S in Sponsored (i.e. SpSonSsOSredS or whatever) */
+  display: none !important;
+}
+
 ._5pcp._5lel._232_ div,
 ._5paw div {
   display: inline;
@@ -599,7 +603,7 @@ b.political {
   margin-bottom: 5px;
 }
 
-.5s6c a {
+._5s6c a {
   color: inherit;
 }
 
