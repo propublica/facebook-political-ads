@@ -108,6 +108,4 @@ const deserialize = dispatch => {
   return dispatch(batch(...actions));
 };
 
-// this is horrid, todo cleanup
-
 export { auth, language, headers, serialize, deserialize };
