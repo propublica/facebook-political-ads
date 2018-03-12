@@ -2,7 +2,10 @@ import debounce from "lodash/debounce";
 
 const TIMELINE_SELECTOR = ".userContentWrapper";
 const SIDEBAR_SELECTOR = ".ego_unit";
-const debug = true;
+const DEBUG =
+  (process.env.NODE_ENV === "dev" || process.env.NODE_ENV) === "development"
+    ? "development"
+    : "production";
 
 // This function cleans all the elements that could leak user data
 // before sending to the server. It also removes any attributes that
@@ -219,7 +222,7 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     // give up if we haven't got anything after a second
     if (Date.now() - time > 1000) {
       self.disconnect();
-      if (debug) toggle.style.backgroundColor = "green";
+      if (DEBUG) toggle.style.backgroundColor = "#630000"; // in debug, mark the button green if we failed to get the menu for this ad.
       return reject("no menu");
     }
     const menu = menuFilter();
@@ -230,7 +233,7 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     if (!endpoint) return null;
     const url = endpoint.getAttribute("ajaxify");
     refocus(() => toggle.click());
-    if (debug) toggle.style.backgroundColor = "unset";
+    if (DEBUG) toggle.style.backgroundColor = "unset";
     self.disconnect();
     try {
       const resolved = {
@@ -345,7 +348,7 @@ const timeline = node => {
   if (node.querySelector(TIMELINE_SELECTOR))
     node = node.querySelector(TIMELINE_SELECTOR);
 
-  if (debug) parent.style.color = "red";
+  if (DEBUG) parent.style.color = "#006304"; // in debug, mark an ad green once we've selected it to be submitted (to help find ads that we don't recognize or posts we mistakenly believe are ads)
 
   // Finally we have something to save.
   return getTimelineId(parent, {
