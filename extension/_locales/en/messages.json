@@ -8,7 +8,7 @@
     "description": "Extension short name"
   },
   "description": {
-    "message":"This extension collects political ads on facebook.",
+    "message": "This extension collects political ads on facebook.",
     "description": "Description of the extension"
   },
   "rate_ads": {
@@ -17,7 +17,8 @@
   },
   "see_ads": {
     "message": "Ads Others are Seeing",
-    "description": "Text for the 'Ads Others are Seeing' button in the extension."
+    "description":
+      "Text for the 'Ads Others are Seeing' button in the extension."
   },
   "political": {
     "message": "Political Ad",
@@ -40,7 +41,8 @@
     "description": "Your Language Settings"
   },
   "you_speak": {
-    "message": "Your browser thinks you speak <b>$language$</b> and live in <b>$country$</b>.",
+    "message":
+      "Your browser thinks you speak <b>$language$</b> and live in <b>$country$</b>.",
     "description": "Your language and country",
     "placeholders": {
       "language": {
@@ -52,7 +54,8 @@
     }
   },
   "language_instructions": {
-    "message": "If these settings are not correct, please change them via the pulldowns.",
+    "message":
+      "If these settings are not correct, please change them via the pulldowns.",
     "description": "Instructions to adapt if needed."
   },
   "language": {
@@ -64,11 +67,38 @@
     "description": "Country: "
   },
   "terms_of_service": {
-    "message": "<h2>May we have your consent?</h2> <p> ProPublica believes in providing transparency about what we do. So before you this extension will do anything, please take a minute to understand what the extension will do. </p> <h2>What the Extension Does</h2> <p> The extension places content script on every Facebook page you visit. That script scans for ads, which it then stores on your computer. </p> <h2>How You Can Help</h2> <p> Whenever you feel like supporting our mission, you can click on the ProPublica icon on your browser bar and a pop-up window will appear. It will contain all the ads saved on your computer. You can “teach” the Extension by classifying the ads as either Political or Not Political. </p> <h2>Information We Will Receive</h2> <p> Our server will receive clean, identifier-free html of the ads, the ads’ Facebook identifiers and demographic targeting parameters (e.g., people ages 18 and over residing in the US), their classification (Political or Non Political), and your browser’s language setting. We have otherwise made every effort to ensure the extension will not collect data that could be used to identify you individually. </p> <h2>What We Will Do With the Information</h2> <p> We will feed the information to our algorithm to help it learn to identify political ads. We will also send you political ads that you have not already seen, but that others have reported to us. When you want to know what ads others are seeing, you can click on the “Ads I’m not Seeing” icon on your browser and we will send a batch of about 100 ads. The extension will then compare those to the ads stored locally on your computer and show you only new ads. We will never receive information about what ads you have or have not seen.</p><h2>What if I Want to Withdraw my Consent?</h2><p>By installing the plug-in, I confirm that the data mentioned above, as well as my categorization of advertisements as political, may be used in the context of this project.</p><p>You can stop participating in this project at any time by uninstalling the extension (Here are instructions for disabling extensions in <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=en\">Chrome</a> and <a href=\"https://support.mozilla.org/en-US/kb/disable-or-remove-add-ons\">Firefox.</a>) On deactivation or uninstallation of the plug-in, no further data will be sent.</p><p><b>Questions, Concerns or Suggestions? Please contact us at: <a href=\"adcollector@propublica.org\">adcollector@propublica.org</a>",
+    "message":
+      "<h2>May we have your consent?</h2> <p> ProPublica believes in providing transparency about what we do. So before you this extension will do anything, please take a minute to understand what the extension will do. </p> <h2>What the Extension Does</h2> <p> The extension places content script on every Facebook page you visit. That script scans for ads, which it then stores on your computer. </p> <h2>How You Can Help</h2> <p> Whenever you feel like supporting our mission, you can click on the ProPublica icon on your browser bar and a pop-up window will appear. It will contain all the ads saved on your computer. You can “teach” the Extension by classifying the ads as either Political or Not Political. </p> <h2>Information We Will Receive</h2> <p> Our server will receive clean, identifier-free html of the ads, the ads’ Facebook identifiers and demographic targeting parameters (e.g., people ages 18 and over residing in the US), their classification (Political or Non Political), and your browser’s language setting. We have otherwise made every effort to ensure the extension will not collect data that could be used to identify you individually. </p> <h2>What We Will Do With the Information</h2> <p> We will feed the information to our algorithm to help it learn to identify political ads. We will also send you political ads that you have not already seen, but that others have reported to us. When you want to know what ads others are seeing, you can click on the “Ads I’m not Seeing” icon on your browser and we will send a batch of about 100 ads. The extension will then compare those to the ads stored locally on your computer and show you only new ads. We will never receive information about what ads you have or have not seen.</p><h2>What if I Want to Withdraw my Consent?</h2><p>By installing the plug-in, I confirm that the data mentioned above, as well as my categorization of advertisements as political, may be used in the context of this project.</p><p>You can stop participating in this project at any time by uninstalling the extension (Here are instructions for disabling extensions in <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=en\">Chrome</a> and <a href=\"https://support.mozilla.org/en-US/kb/disable-or-remove-add-ons\">Firefox.</a>) On deactivation or uninstallation of the plug-in, no further data will be sent.</p><p><b>Questions, Concerns or Suggestions? Please contact us at: <a href=\"adcollector@propublica.org\">adcollector@propublica.org</a>",
     "description": "The terms of service"
   },
   "terms_of_service_accept": {
     "message": "Accept",
     "description": "The terms of service accept button"
+  },
+
+  "thanks1": {
+    "message": "Thanks! 🙂",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks2": {
+    "message": "Keep it up!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks3": {
+    "message": "We couldn't do it without you!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks4": {
+    "message": "Thanks for helping out!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks5": {
+    "message": "Way to go! You've categorized $count$ ads so far.",
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

@@ -8,7 +8,7 @@
     "description": "Extension short name"
   },
   "description": {
-    "message":"Sucht nach politischer Werbung auf Facebook",
+    "message": "Sucht nach politischer Werbung auf Facebook",
     "description": "Description of the extension"
   },
   "rate_ads": {
@@ -44,7 +44,8 @@
     "description": "Your Language Settings"
   },
   "you_speak": {
-    "message": "Ihr Browser denkt, dass Sie „<b>$language$</b>“ sprechen und in „<b>$country$</b>“ leben.",
+    "message":
+      "Ihr Browser denkt, dass Sie „<b>$language$</b>“ sprechen und in „<b>$country$</b>“ leben.",
     "description": "Your language and country",
     "placeholders": {
       "language": {
@@ -56,7 +57,8 @@
     }
   },
   "language_instructions": {
-    "message": "Wenn diese Angaben nicht korrekt sind, ändern Sie diese über das Menü.",
+    "message":
+      "Wenn diese Angaben nicht korrekt sind, ändern Sie diese über das Menü.",
     "description": "Instructions to adapt if needed."
   },
   "language": {
@@ -68,11 +70,38 @@
     "description": "Country: "
   },
   "terms_of_service": {
-    "message": "<h2>Geben Sie uns Ihre Einwilligung?</h2> <p>ProPublica möchte über die Erweiterung „Political Ad Collector“ an dieser Stelle Transparenz herstellen. Bevor Sie also beginnen, nehmen Sie sich bitte eine Minute Zeit, um zu verstehen, wie das Plugin funktioniert.</p> <h2>Wie die Erweiterung funktioniert</h2> <p>Die Erweiterung platziert ein Inhaltsskript auf jeder Facebook-Seite, die Sie besuchen. Dieses Skript sucht nach Anzeigen, die es dann auf Ihrem Computer speichert. Es soll Ihnen zeigen, welche politischen Anzeigen in Ihrem Facebook-Newsfeed erscheinen (bei Wahlen und Abstimmungen) und welche politischen Anzeigen in den Newsfeeds anderer Leute erscheinen.</p> <h2>Wie Sie helfen können</h2> <p>Wenn Sie dieses Projekt unterstützen möchten, können Sie auf das Pro-Publica-Symbol in Ihrer Browserleiste klicken. Dann öffnet sich ein Fenster. Es zeigt Werbeanzeigen aus Ihrem Newsfeed, die politische Anzeigen sein können, und wird Sie bitten, bei deren Kategorisierung als „politische Werbung“ oder „keine politische Werbung“ zu helfen.</p> <h2>Welche Informationen wir erhalten</h2> <p>Der von uns genutzte Server, der sich außerhalb von Deutschland befinden kann, erhält sauberes, kennzeichnungsfreies HTML der Anzeigen, der Facebook-Identifikatoren dieser Anzeigen und der demografischen Zielparameter (z.B. Personen ab 18 Jahren, die in der Schweiz leben), Ihrer Klassifizierung (politisch oder unpolitisch) und der Spracheinstellung Ihres Browsers. Nicht gespeichert werden hingegen Ihr Name, Ihre Facebook-ID und andere Daten wie etwa die IP-Adresse oder Cookies in Ihrem Browser. Wir werden zu keinem Zeitpunkt Informationen darüber erhalten, welche Anzeigen Sie gesehen oder nicht gesehen haben. Grundsätzlich haben wir die Erweiterung so gestaltet, dass sie keine Daten sammelt, die dazu dienen könnten, Sie persönlich zu identifizieren.</p> <h2>Was wir mit den Informationen tun werden</h2> <p>Wir planen, eine öffentliche Datenbank zu erstellen und dort alle politischen Werbeanzeigen zu veröffentlichen, die wir mit dieser Erweiterung sammeln. Dies ist ein Versuch, die Werbepraxis der politischen Parteien und Abstimmungskomitees in der Schweiz transparent zu machen. Wir werden auch die uns bekannten politischen Anzeigen in unseren Algorithmus einspeisen, damit das System lernen kann, politische Anzeigen zu erkennen.</p> <h2>Was ist, wenn ich meine Zustimmung widerrufen möchte?</h2> <p>Mit der Installation des Plugins bestätige ich, dass die oben genannten Daten sowie meine Kategorisierung der Werbung als politische Werbung im Rahmen dieses Projektes verwendet werden dürfen.</p> <p>Sie können die Teilnahme an diesem Projekt jederzeit beenden, indem Sie die Erweiterung deinstallieren (Hier finden Sie Anleitungen zum Deaktivieren von Erweiterungen in <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=de\">Chrome</a> und <a href=\"https://support.mozilla.org/de/kb/addons-deaktivieren-oder-deinstallieren\">Firefox</a>). Bei Deaktivierung oder Deinstallation des Plugins werden keine weiteren Daten mehr gesendet. </p> <p>Fragen, Bedenken oder Anregungen? Bitte kontaktieren Sie uns unter: <a href=\"mailto:adcollector@propublica.org\">adcollector@propublica.org</a></p>",
+    "message":
+      "<h2>Geben Sie uns Ihre Einwilligung?</h2> <p>ProPublica möchte über die Erweiterung „Political Ad Collector“ an dieser Stelle Transparenz herstellen. Bevor Sie also beginnen, nehmen Sie sich bitte eine Minute Zeit, um zu verstehen, wie das Plugin funktioniert.</p> <h2>Wie die Erweiterung funktioniert</h2> <p>Die Erweiterung platziert ein Inhaltsskript auf jeder Facebook-Seite, die Sie besuchen. Dieses Skript sucht nach Anzeigen, die es dann auf Ihrem Computer speichert. Es soll Ihnen zeigen, welche politischen Anzeigen in Ihrem Facebook-Newsfeed erscheinen (bei Wahlen und Abstimmungen) und welche politischen Anzeigen in den Newsfeeds anderer Leute erscheinen.</p> <h2>Wie Sie helfen können</h2> <p>Wenn Sie dieses Projekt unterstützen möchten, können Sie auf das Pro-Publica-Symbol in Ihrer Browserleiste klicken. Dann öffnet sich ein Fenster. Es zeigt Werbeanzeigen aus Ihrem Newsfeed, die politische Anzeigen sein können, und wird Sie bitten, bei deren Kategorisierung als „politische Werbung“ oder „keine politische Werbung“ zu helfen.</p> <h2>Welche Informationen wir erhalten</h2> <p>Der von uns genutzte Server, der sich außerhalb von Deutschland befinden kann, erhält sauberes, kennzeichnungsfreies HTML der Anzeigen, der Facebook-Identifikatoren dieser Anzeigen und der demografischen Zielparameter (z.B. Personen ab 18 Jahren, die in der Schweiz leben), Ihrer Klassifizierung (politisch oder unpolitisch) und der Spracheinstellung Ihres Browsers. Nicht gespeichert werden hingegen Ihr Name, Ihre Facebook-ID und andere Daten wie etwa die IP-Adresse oder Cookies in Ihrem Browser. Wir werden zu keinem Zeitpunkt Informationen darüber erhalten, welche Anzeigen Sie gesehen oder nicht gesehen haben. Grundsätzlich haben wir die Erweiterung so gestaltet, dass sie keine Daten sammelt, die dazu dienen könnten, Sie persönlich zu identifizieren.</p> <h2>Was wir mit den Informationen tun werden</h2> <p>Wir planen, eine öffentliche Datenbank zu erstellen und dort alle politischen Werbeanzeigen zu veröffentlichen, die wir mit dieser Erweiterung sammeln. Dies ist ein Versuch, die Werbepraxis der politischen Parteien und Abstimmungskomitees in der Schweiz transparent zu machen. Wir werden auch die uns bekannten politischen Anzeigen in unseren Algorithmus einspeisen, damit das System lernen kann, politische Anzeigen zu erkennen.</p> <h2>Was ist, wenn ich meine Zustimmung widerrufen möchte?</h2> <p>Mit der Installation des Plugins bestätige ich, dass die oben genannten Daten sowie meine Kategorisierung der Werbung als politische Werbung im Rahmen dieses Projektes verwendet werden dürfen.</p> <p>Sie können die Teilnahme an diesem Projekt jederzeit beenden, indem Sie die Erweiterung deinstallieren (Hier finden Sie Anleitungen zum Deaktivieren von Erweiterungen in <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=de\">Chrome</a> und <a href=\"https://support.mozilla.org/de/kb/addons-deaktivieren-oder-deinstallieren\">Firefox</a>). Bei Deaktivierung oder Deinstallation des Plugins werden keine weiteren Daten mehr gesendet. </p> <p>Fragen, Bedenken oder Anregungen? Bitte kontaktieren Sie uns unter: <a href=\"mailto:adcollector@propublica.org\">adcollector@propublica.org</a></p>",
     "description": "The terms of service"
   },
   "terms_of_service_accept": {
     "message": "Akzeptieren",
     "description": "The terms of service accept button"
+  },
+
+  "thanks1": {
+    "message": "Danke! 🙂",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks2": {
+    "message": "Danke!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks3": {
+    "message": "Danke!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks4": {
+    "message": "Danke!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks5": {
+    "message": "Danke!",
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

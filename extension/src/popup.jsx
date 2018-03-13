@@ -40,6 +40,7 @@ const UPDATE_AD = "update_ad";
 const UPDATE_RATING = "update_rating";
 const SET_LANGUAGE = "set_language";
 const SET_COUNTRY = "set_country";
+const SAY_THANKS = "say_thanks";
 
 // Actions
 const setLanguage = language => ({ type: SET_LANGUAGE, language });
@@ -64,6 +65,10 @@ const updateRating = (id, rating) => ({
   id: id,
   value: rating
 });
+const sayThanks = ratings_count => ({
+  type: SAY_THANKS,
+  ratings_count
+});
 const rateAd = (ad, rating, update) => {
   return dispatch => {
     let body = {
@@ -71,6 +76,7 @@ const rateAd = (ad, rating, update) => {
       political: rating === RatingType.POLITICAL
     };
     dispatch(update(ad.id, rating));
+    dispatch(sayThanks(store.getState().ratings_count || 0));
     let cb = () => ({});
     return sendAds([body], store.getState().language).then(cb, cb);
   };
@@ -114,6 +120,37 @@ const terms = (state = false, action) => {
   }
 };
 
+const thanks_messages = [
+  "thanks1", // "Thanks! 🙂",
+  "thanks2", // "Keep it up!",
+  "thanks3", // "We couldn't do it without you!",
+  "thanks4", // "Thanks for helping out!",
+  "thanks5" //  "Way to go! You've categorized $count$ ads so far."
+];
+const thanks = (state = null, action) => {
+  switch (action.type) {
+    case SAY_THANKS:
+      // we thank you frequently at first and exponentially less often later
+      // for instance, your first ad, we have a 50% chance of thanking you
+      // and your 4th ad a 25% chance and so on.
+      let message =
+        Math.random() < 1 / (2 * Math.sqrt(action.ratings_count || 1))
+          ? thanks_messages[parseInt(Math.random() * thanks_messages.length)]
+          : null;
+      return message;
+    default:
+      return state;
+  }
+};
+const ratings_count = (state = 0, action) => {
+  switch (action.type) {
+    case UPDATE_RATING:
+      return state + 1;
+    default:
+      return state;
+  }
+};
+
 const browserLocale = getBrowserLocale();
 const language = (state = browserLocale, action) => {
   switch (action.type) {
@@ -132,7 +169,9 @@ const reducer = combineReducers({
   ads: buildUpdate("ad"),
   ratings: buildUpdate("rating"),
   terms,
-  language
+  thanks,
+  language,
+  ratings_count
 });
 
 let middleware = [thunkMiddleware];
@@ -330,6 +369,16 @@ const togglerDispatchToProps = dispatch => ({
 });
 Toggler = connect(state => state, togglerDispatchToProps)(Toggler);
 
+let ContainerWithThanks = withI18n(({ getMessage, thanks, ratings_count }) => (
+  <div id="thankscontainer">
+    <div id="thanksbar">
+      {thanks ? getMessage(thanks, { count: ratings_count || 0 }) : null}
+    </div>
+    <Toggler />
+  </div>
+));
+ContainerWithThanks = connect(state => state)(ContainerWithThanks);
+
 let SelectLanguage = ({ language, onChange }) => {
   const allLangs = langs.all();
 
@@ -444,7 +493,11 @@ let Dispatcher = ({ terms, language, onAcceptClick }) => {
       lang={language.language}
       data-locale={`${language.language}_${language.country}`}
     >
-      {terms ? <Toggler /> : <Onboarding onAcceptClick={onAcceptClick} />}
+      {terms ? (
+        <ContainerWithThanks />
+      ) : (
+        <Onboarding onAcceptClick={onAcceptClick} />
+      )}
     </div>
   );
 };
