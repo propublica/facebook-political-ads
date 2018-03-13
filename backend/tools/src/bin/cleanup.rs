@@ -11,8 +11,7 @@ use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
 use kuchiki::traits::*;
-use rusoto_core::{default_tls_client, Region};
-use rusoto_credential::DefaultCredentialsProvider;
+use rusoto_core::Region;
 use rusoto_s3::{DeleteObjectRequest, S3, S3Client};
 use server::models::*;
 use server::start_logging;
@@ -36,14 +35,14 @@ fn cleanup(ad: &mut Ad) -> bool {
 
             println!("deleting {}", src);
             if let Ok(url) = src.parse::<Url>() {
-                let credentials = DefaultCredentialsProvider::new().unwrap();
-                let tls = default_tls_client().unwrap();
-                let client = S3Client::new(tls, credentials, Region::UsEast1);
-                let res = client.delete_object(&DeleteObjectRequest {
-                    bucket: "pp-facebook-ads".to_string(),
-                    key: url.path().trim_left_matches('/').to_string(),
-                    ..DeleteObjectRequest::default()
-                });
+                let client = S3Client::simple(Region::UsEast1);
+                let res = client
+                    .delete_object(&DeleteObjectRequest {
+                        bucket: "pp-facebook-ads".to_string(),
+                        key: url.path().trim_left_matches('/').to_string(),
+                        ..DeleteObjectRequest::default()
+                    })
+                    .sync();
                 *src = "".to_string();
                 if res.is_err() {
                     println!("Couldn't delete {} {:?}", src, res);
