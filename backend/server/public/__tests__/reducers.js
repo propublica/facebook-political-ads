@@ -62,48 +62,38 @@ describe("ad", () => {
   it("should respond to REQUESTING_ONE_AD", () =>
     expect(reducers.ad(null, actions.requestingOneAd(ads[0]))).toEqual(null));
 
-  it(
-    "should only respond to GOT_THAT_AD and REQUESTING_ONE_AD",
-    expect(reducers.ad(ads[0], actions.newSearch("Trump"))).toEqual(ads[0])
-  );
+  it("should only respond to GOT_THAT_AD and REQUESTING_ONE_AD", () =>
+    expect(reducers.ad(ads[0], actions.newSearch("Trump"))).toEqual(ads[0]));
 });
 
 describe("filters", () => {
-  it(
-    "should respond to TOGGLE_TARGET",
+  it("should respond to TOGGLE_TARGET", () =>
     expect(reducers.filters({}, actions.toggleTarget())).toEqual({
       target: true
-    })
-  );
+    }));
 
-  it(
-    "should respond to TOGGLE_ENTITY",
+  it("should respond to TOGGLE_ENTITY", () =>
     expect(reducers.filters({}, actions.toggleEntity())).toEqual({
       entity: true
-    })
-  );
+    }));
 
-  it(
-    "should respond to TOGGLE_ADVERTISER",
+  it("should respond to TOGGLE_ADVERTISER", () =>
     expect(reducers.filters({}, actions.toggleAdvertiser())).toEqual({
       advertiser: true
-    })
-  );
+    }));
 
-  it(
-    "should reset dropdowns",
+  it("should reset dropdowns", () =>
     expect(
       reducers.filters(
         { target: true, advertiser: true, entity: true },
         actions.resetDropdowns()
       )
-    ).toEqual({})
-  );
+    ).toEqual({}));
 
-  it(
-    "should only respond to filter actions",
-    expect(reducers.filters(undefined, actions.newSearch("Trump"))).toEqual({})
-  );
+  it("should only respond to filter actions", () =>
+    expect(reducers.filters(undefined, actions.newSearch("Trump"))).toEqual(
+      {}
+    ));
 
   const testFilter = (
     label,
@@ -119,18 +109,16 @@ describe("filters", () => {
       key: it[key],
       active: false
     }));
-    it(`should set ${label}`, expect(set).toEqual(newColl));
+    it(`should set ${label}`, () => expect(set).toEqual(newColl));
     const filter = reducer(set, actionFilter(collection[0]));
     const filterOut = collection.map(it => ({
       ...it,
       key: it[key],
       active: it[key] === collection[0][key]
     }));
-    it(`should filter ${label}`, expect(filter).toEqual(filterOut));
-    it(
-      `should ignore non ${label} calls`,
-      expect(reducer([], actions.newSearch("Trump"))).toEqual([])
-    );
+    it(`should filter ${label}`, () => expect(filter).toEqual(filterOut));
+    it(`should ignore non ${label} calls`, () =>
+      expect(reducer([], actions.newSearch("Trump"))).toEqual([]));
   };
 
   testFilter(
@@ -162,22 +150,18 @@ describe("filters", () => {
 });
 
 describe("credentials", () => {
-  it(
-    "should login",
+  it("should login", () =>
     expect(reducers.credentials(null, actions.login({ login: "ok" }))).toEqual({
       login: "ok"
-    })
-  );
-  it(
-    "should logout",
-    expect(reducers.credentials({ login: "ok" }, actions.logout())).toEqual({})
-  );
-  it(
-    "should ignore other actions",
+    }));
+  it("should logout", () =>
+    expect(reducers.credentials({ login: "ok" }, actions.logout())).toEqual(
+      {}
+    ));
+  it("should ignore other actions", () =>
     expect(
       reducers.credentials({ login: "ok" }, actions.newSearch("trump"))
-    ).toEqual({ login: "ok" })
-  );
+    ).toEqual({ login: "ok" }));
 });
 
 describe("pagination", () => {
@@ -185,28 +169,25 @@ describe("pagination", () => {
     reducers.pagination(undefined, {}),
     actions.setTotal(20)
   );
-  it("should set the total", expect(initial).toEqual({ page: 0, total: 1 }));
+  it("should set the total", () =>
+    expect(initial).toEqual({ page: 0, total: 1 }));
 
   const inc = it => reducers.pagination(it, actions.nextPage());
   const dec = it => reducers.pagination(it, actions.prevPage());
 
-  it(
-    "should increment the page",
-    expect(inc(initial)).toEqual({ page: 1, total: 1 })
-  );
+  it("should increment the page", () =>
+    expect(inc(initial)).toEqual({ page: 1, total: 1 }));
 
-  it(
-    "should stop at the last page",
-    expect(inc(inc(initial))).toEqual({ page: 1, total: 1 })
-  );
+  it("should stop at the last page", () =>
+    expect(inc(inc(initial))).toEqual({ page: 1, total: 1 }));
 
-  it("should go back one page", expect(dec(inc(initial))).toEqual(initial));
-  it("should stop at the first page", expect(dec(initial)).toEqual(initial));
-  it(
-    "should set a page",
+  it("should go back one page", () =>
+    expect(dec(inc(initial))).toEqual(initial));
+  it("should stop at the first page", () =>
+    expect(dec(initial)).toEqual(initial));
+  it("should set a page", () =>
     expect(reducers.pagination(initial, actions.setPage(20))).toEqual({
       page: 1,
       total: 1
-    })
-  );
+    }));
 });
