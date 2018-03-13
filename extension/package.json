@@ -7,8 +7,11 @@
     "test": "node test/test.js",
     "build": "webpack --progress",
     "watch": "webpack -w --progress",
-    "dist": "NODE_ENV=production webpack --progress -p && web-ext build -s dist",
-    "ff": "web-ext run -s build"
+    "dist":
+      "NODE_ENV=production webpack --progress -p && web-ext build -s dist",
+    "ff": "web-ext run -s build",
+    "ffde":
+      "web-ext run -s build --pref intl.locale.requested=de-DE --pref intl.locale.matchOS=false --pref intl.accept_languages=de-DE,de"
   },
   "author": "Jeff Larson <jeff.larson@propublica.org>",
   "license": "ISC",
