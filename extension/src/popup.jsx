@@ -65,9 +65,9 @@ const updateRating = (id, rating) => ({
   id: id,
   value: rating
 });
-const sayThanks = ratings_length => ({
+const sayThanks = ratings_count => ({
   type: SAY_THANKS,
-  ratings_length
+  ratings_count
 });
 const rateAd = (ad, rating, update) => {
   return dispatch => {
@@ -134,7 +134,7 @@ const thanks = (state = null, action) => {
       // for instance, your first ad, we have a 50% chance of thanking you
       // and your 4th ad a 25% chance and so on.
       let message =
-        Math.random() < 1 / (2 * Math.sqrt(action.ratings_length || 1))
+        Math.random() < 1 / (2 * Math.sqrt(action.ratings_count || 1))
           ? thanks_messages[parseInt(Math.random() * thanks_messages.length)]
           : null;
       return message;
