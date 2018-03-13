@@ -129,20 +129,24 @@ impl Service for AdServer {
             }
             (&Method::Get, "/facebook-ads/advertisers") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.lang(req, |req, lang| self.advertisers(req, lang)))
+                Either::B(self.lang(req, |req, lang| self.advertisers(req, lang, None)))
             }
             (&Method::Get, "/facebook-ads/segments") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.lang(req, |req, lang| self.segments(req, lang)))
+                Either::B(self.lang(req, |req, lang| self.segments(req, lang, None)))
             }
 
             (&Method::Get, "/facebook-ads/recent_advertisers") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.lang(req, |req, lang| self.recent_advertisers(req, lang)))
+                Either::B(self.lang(req, |req, lang| {
+                    self.advertisers(req, lang, Some(String::from("1 Month")))
+                }))
             }
             (&Method::Get, "/facebook-ads/recent_segments") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.lang(req, |req, lang| self.recent_segments(req, lang)))
+                Either::B(self.lang(req, |req, lang| {
+                    self.segments(req, lang, Some(String::from("1 Month")))
+                }))
             }
             // Restful-ish routing.
             (&Method::Get, _) => {
@@ -180,7 +184,7 @@ impl Service for AdServer {
                             None => Either::B(self.lang(req, |req, lang| self.search(req, lang))),
                         }
                     }
-                    Some(&3) => Either::B(self.file("public/index.html", ContentType::html())), // this is the permalinks!
+                    Some(&3) => Either::B(self.file("public/index.html", ContentType::html())), /* this is the permalinks! */
                     Some(&_) => not_found,
                 }
             }
@@ -207,7 +211,10 @@ fn json<T: Serialize + Debug>(thing: &T) -> Response {
         .map(|serialized| {
             Response::new()
                 .with_header(ContentLength(serialized.len() as u64))
-                .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
+                .with_header(Vary::Items(vec![
+                    Ascii::new("Accept-Language".to_owned()),
+                    Ascii::new("Content-Type".to_owned()),
+                ]))
                 .with_header(ContentType::json())
                 .with_header(AccessControlAllowOrigin::Any)
                 .with_body(serialized)
@@ -248,18 +255,11 @@ impl AdServer {
             Response::new().with_status(StatusCode::BadRequest),
         ));
 
-        // this is annoying but hyper consumes a request when you read from it
-        // apparently in 0.12 this will be easier.
-        let (headers, new_req) = {
-            let (method, uri, version, headers, body) = req.deconstruct();
-            let mut new_request = Request::new(method, uri);
-            new_request.headers_mut().clone_from(&headers);
-            new_request.set_body(body);
-            new_request.set_version(version);
-            (headers, new_request)
-        };
+        let langs = req.headers()
+            .get::<AcceptLanguage>()
+            .and_then(|langs| Some(langs.clone()));
 
-        if let Some(langs) = headers.get::<AcceptLanguage>() {
+        if let Some(langs) = langs {
             if langs.len() == 0 {
                 return bad;
             }
@@ -272,7 +272,7 @@ impl AdServer {
                         + &l.clone().item.region.unwrap_or_default().to_uppercase()
                 })
                 .unwrap_or_else(|| String::from("en-US"));
-            callback(new_req, lang)
+            callback(req, lang)
         } else {
             bad
         }
@@ -309,45 +309,23 @@ impl AdServer {
         Box::new(future)
     }
 
-    fn advertisers(&self, _req: Request, lang: String) -> ResponseFuture {
+    fn advertisers(&self, _req: Request, lang: String, time: Option<String>) -> ResponseFuture {
         let pool = self.pool.clone();
         let lang = lang.clone();
         let db_pool = self.db_pool.clone();
         let future = pool.spawn_fn(move || {
-            Advertisers::get(&lang, &Some(1000), &None, &db_pool)
+            Advertisers::get(&lang, &Some(1000), time, &db_pool)
                 .map(|advertisers: Vec<Advertisers>| json(&advertisers))
         }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
         Box::new(future)
     }
 
-    fn recent_advertisers(&self, _req: Request, lang: String) -> ResponseFuture {
+    fn segments(&self, _req: Request, lang: String, time: Option<String>) -> ResponseFuture {
         let pool = self.pool.clone();
         let lang = lang.clone();
         let db_pool = self.db_pool.clone();
         let future = pool.spawn_fn(move || {
-            Advertisers::get(&lang, &Some(1000), &Some("1 month"), &db_pool)
-                .map(|advertisers: Vec<Advertisers>| json(&advertisers))
-        }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
-        Box::new(future)
-    }
-
-    fn segments(&self, _req: Request, lang: String) -> ResponseFuture {
-        let pool = self.pool.clone();
-        let lang = lang.clone();
-        let db_pool = self.db_pool.clone();
-        let future = pool.spawn_fn(move || {
-            Segments::get(&lang, &Some(1000), &None, &db_pool)
-                .map(|segments: Vec<Segments>| json(&segments))
-        }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
-        Box::new(future)
-    }
-
-    fn recent_segments(&self, _req: Request, lang: String) -> ResponseFuture {
-        let pool = self.pool.clone();
-        let lang = lang.clone();
-        let db_pool = self.db_pool.clone();
-        let future = pool.spawn_fn(move || {
-            Segments::get(&lang, &Some(1000), &Some("1 month"), &db_pool)
+            Segments::get(&lang, &Some(1000), time, &db_pool)
                 .map(|segments: Vec<Segments>| json(&segments))
         }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
         Box::new(future)

@@ -8,31 +8,37 @@ extern crate server;
 extern crate tokio_core;
 
 use futures::{Future, Stream};
-use hyper::{Client, Method, Request};
+use hyper::{Chunk, Client, Error, Method, Request};
 use tokio_core::reactor::Core;
 use serde_json::Value;
 use hyper::header::{qitem, AcceptLanguage, LanguageTag};
 use std::str;
 
-#[test]
-fn test_index_url() {
+fn run_test(url: &str, test: Box<FnOnce(Chunk) -> Result<(), Error>>) {
     let mut core = Core::new().unwrap();
     let client = Client::new(&core.handle());
-    let uri = "http://localhost:8080/facebook-ads/ads".parse().unwrap();
+    let uri = url.parse().unwrap();
     let mut req = Request::new(Method::Get, uri);
     let mut langtag: LanguageTag = Default::default();
     langtag.language = Some("en".to_owned());
     langtag.region = Some("US".to_owned());
     req.headers_mut().set(AcceptLanguage(vec![qitem(langtag)]));
+    let work = client
+        .request(req)
+        .and_then(|res| res.body().concat2().and_then(&test));
+    core.run(work).unwrap();
+}
 
-    let work = client.request(req).and_then(|res| {
-        res.body().concat2().and_then(move |body| {
+#[test]
+fn test_index_url() {
+    run_test(
+        "http://localhost:8080/facebook-ads/ads",
+        Box::new(move |body| {
             let v: Value = serde_json::from_slice(&body).unwrap();
             assert!(v["ads"].as_array().unwrap().len() >= 1);
             Ok(())
-        })
-    });
-    core.run(work).unwrap();
+        }),
+    )
 }
 
 #[test]

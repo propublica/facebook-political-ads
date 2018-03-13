@@ -38,14 +38,13 @@ fn test_parse_targeting() {
 
 #[test]
 fn getting_targets() {
-    use std::collections::HashMap;
     use server::models::Targets;
     use server::models::Aggregate;
 
     let connection = common::connect();
     common::seed_political(&connection);
     let db_pool = common::connect_pool();
-    let t: Vec<Targets> = Targets::get("en-US", &Some(1), &None, &db_pool).unwrap();
+    let t: Vec<Targets> = Targets::get("en-US", &Some(1), None, &db_pool).unwrap();
     assert!(t.get(0).is_some());
 
     common::unseed(&connection);
