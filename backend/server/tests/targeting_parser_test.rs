@@ -44,11 +44,8 @@ fn getting_targets() {
 
     let connection = common::connect();
     common::seed_political(&connection);
-
     let db_pool = common::connect_pool();
-    let options: HashMap<String, String> = HashMap::new();
-
-    let t: Vec<Targets> = Targets::get("en-US", &db_pool, &options).unwrap();
+    let t: Vec<Targets> = Targets::get("en-US", &Some(1), &None, &db_pool).unwrap();
     assert!(t.get(0).is_some());
 
     common::unseed(&connection);
