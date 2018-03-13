@@ -75,10 +75,8 @@ const rateAd = (ad, rating, update) => {
       ...adForRequest(ad),
       political: rating === RatingType.POLITICAL
     };
-    // if (rating === RatingType.POLITICAL) {
-    dispatch(sayThanks((store.getState().ratings || []).length));
-    // }
     dispatch(update(ad.id, rating));
+    dispatch(sayThanks(store.getState().ratings_count || 0));
     let cb = () => ({});
     return sendAds([body], store.getState().language).then(cb, cb);
   };
@@ -123,30 +121,31 @@ const terms = (state = false, action) => {
 };
 
 const thanks_messages = [
-  "Thanks! 🙂",
-  "Keep it up!",
-  "We couldn't do it without you!",
-  "Thanks for helping out!",
-  "Way to go! You've categorized COUNT ads so far."
+  "thanks1", // "Thanks! 🙂",
+  "thanks2", // "Keep it up!",
+  "thanks3", // "We couldn't do it without you!",
+  "thanks4", // "Thanks for helping out!",
+  "thanks5" //  "Way to go! You've categorized $count$ ads so far."
 ];
 const thanks = (state = null, action) => {
   switch (action.type) {
     case SAY_THANKS:
-      // TODO: make this much less often, and decaying as you answer more
-      // so we thank you frequently at first and less often later
-      // for instance, your first ad, we have a 25% chance of thanking you
-      // and your tenth ad a 5% chance
-      console.log(
-        "ratings_length",
-        action.ratings_length,
-        "thanks coef",
-        1 / (2 * Math.sqrt(action.ratings_length || 1))
-      );
-      return Math.random() < 1 / (2 * Math.sqrt(action.ratings_length || 1))
-        ? thanks_messages[
-            parseInt(Math.random() * thanks_messages.length)
-          ].replace("COUNT", action.ratings_length)
-        : null;
+      // we thank you frequently at first and exponentially less often later
+      // for instance, your first ad, we have a 50% chance of thanking you
+      // and your 4th ad a 25% chance and so on.
+      let message =
+        Math.random() < 1 / (2 * Math.sqrt(action.ratings_length || 1))
+          ? thanks_messages[parseInt(Math.random() * thanks_messages.length)]
+          : null;
+      return message;
+    default:
+      return state;
+  }
+};
+const ratings_count = (state = 0, action) => {
+  switch (action.type) {
+    case UPDATE_RATING:
+      return state + 1;
     default:
       return state;
   }
@@ -171,7 +170,8 @@ const reducer = combineReducers({
   ratings: buildUpdate("rating"),
   terms,
   thanks,
-  language
+  language,
+  ratings_count
 });
 
 let middleware = [thunkMiddleware];
@@ -369,12 +369,14 @@ const togglerDispatchToProps = dispatch => ({
 });
 Toggler = connect(state => state, togglerDispatchToProps)(Toggler);
 
-let ContainerWithThanks = ({ thanks }) => (
+let ContainerWithThanks = withI18n(({ getMessage, thanks, ratings_count }) => (
   <div id="thankscontainer">
-    <div id="thanksbar">{thanks}</div>
+    <div id="thanksbar">
+      {thanks ? getMessage(thanks, { count: ratings_count || 0 }) : null}
+    </div>
     <Toggler />
   </div>
-);
+));
 ContainerWithThanks = connect(state => state)(ContainerWithThanks);
 
 let SelectLanguage = ({ language, onChange }) => {
