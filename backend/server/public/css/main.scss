@@ -549,11 +549,15 @@ article {
   }
 }
 
-.permalink {
+.ad-metadata {
   max-width: 500px;
-  margin: 0 auto 20px;
+  margin: 0 auto 1em;
+  padding: 0 12px;
   display: block;
-  text-align: right;
+
+  .permalink {
+    float: right;
+  }
 }
 
 ._1dwg._1w_m {
