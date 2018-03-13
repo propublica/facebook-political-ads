@@ -152,6 +152,7 @@ impl Service for AdServer {
                     r"^/facebook-ads/?$",
                     r"^/facebook-ads/admin/?(.*)?$",
                     r"^/facebook-ads/ads/?(\d+)?$",
+                    r"^/facebook-ads/ad/?(\d+)?$",
                 ]).unwrap();
                 // generic restful routing regex for distinguishing subroutes at the collection
                 // and those at a specific element.  I'm sure I will understand
@@ -179,6 +180,7 @@ impl Service for AdServer {
                             None => Either::B(self.lang(req, |req, lang| self.search(req, lang))),
                         }
                     }
+                    Some(&3) => Either::B(self.file("public/index.html", ContentType::html())), // this is the permalinks!
                     Some(&_) => not_found,
                 }
             }
