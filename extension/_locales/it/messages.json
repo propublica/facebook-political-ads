@@ -68,24 +68,29 @@
     "description": "The terms of service"
   },
 
-  "Thanks! 🙂": {
+  "thanks1": {
     "message": "Grazie! 🙂",
     "description": "a randomly-chosen Thanks! message"
   },
-  "Keep it up!": {
+  "thanks2": {
     "message": "Grazie!",
     "description": "a randomly-chosen Thanks! message"
   },
-  "We couldn't do it without you!": {
+  "thanks3": {
     "message": "Grazie!",
     "description": "a randomly-chosen Thanks! message"
   },
-  "Thanks for helping out!": {
+  "thanks4": {
     "message": "Grazie!",
     "description": "a randomly-chosen Thanks! message"
   },
-  "Way to go! You've categorized COUNT ads so far.": {
+  "thanks5": {
     "message": "Grazie!",
-    "description": "a randomly-chosen Thanks! message"
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }
