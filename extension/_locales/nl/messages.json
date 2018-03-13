@@ -8,16 +8,18 @@
     "description": "Extensie short naam"
   },
   "description": {
-    "message":"Deze extensie verzamelt politieke advertenties op Facebook.",
+    "message": "Deze extensie verzamelt politieke advertenties op Facebook.",
     "description": "Beschrijving van de Extensie"
   },
   "rate_ads": {
     "message": "Mijn bekeken advertenties",
-    "description": "Tekst voor de 'advertenties die ik zie'-knop in the Extensie."
+    "description":
+      "Tekst voor de 'advertenties die ik zie'-knop in the Extensie."
   },
   "see_ads": {
     "message": "Advertenties van anderen",
-    "description": "Tekst voor de 'Advertenties die anderen zien' knop in the Extensie."
+    "description":
+      "Tekst voor de 'Advertenties die anderen zien' knop in the Extensie."
   },
   "political": {
     "message": "Politieke advertentie",
@@ -40,7 +42,8 @@
     "description": "Uw taalinstellingen"
   },
   "you_speak": {
-    "message": "Uw browser denkt dat u <b>$language$</b> spreekt en in <b>$country$</b> woont.",
+    "message":
+      "Uw browser denkt dat u <b>$language$</b> spreekt en in <b>$country$</b> woont.",
     "description": "Uw taal en land",
     "placeholders": {
       "language": {
@@ -52,7 +55,8 @@
     }
   },
   "language_instructions": {
-    "message": "Als deze instellingen onjuist zijn, verander ze dan via het drop down-menu.",
+    "message":
+      "Als deze instellingen onjuist zijn, verander ze dan via het drop down-menu.",
     "description": "Instructies om aan te passen indien nodig."
   },
   "language": {
@@ -64,11 +68,38 @@
     "description": "Land: "
   },
   "terms_of_service": {
-    "message": "<h2>Mogen we u vragen om mee te werken?</h2><p>ProPublica gelooft in transparantie. Dus neem even de tijd om te begrijpen wat de extensie gaat doen.</p><br><h2> Wat de extensie doet</h2><p>De extensie plaatst een script op elke Facebook-pagina die u bezoekt. Dat script zoekt naar advertenties en slaat die vervolgens op uw computer op.</ p> <h2> Hoe u kunt helpen</h2> <p> Als u onze missie wilt steunen, klik dan op het ProPublica-pictogram in de browserbalk. Er verschijnt dan een pop-upvenster. Het bevat alle advertenties die op uw computer zijn opgeslagen. U kunt die gebruiken om de extensie te laten 'leren' welke advertenties een politieke lading hebben, door ze te classificeren als 'politiek' of 'niet politiek.</p><br><h2>Informatie die we ontvangen</h2> <p>Onze server ontvangt de html-broncode van advertenties, die is gestript van informatie waarmee u geïdentificeerd kan worden. Ook krijgen we de Facebook-ID's van advertenties en demografische targetingparameters (bijvoorbeeld: 'mensen van 18 jaar en ouder die in de Verenigde Staten wonen'), hun classificatie ('politiek' of 'niet politiek') en de taalinstelling van uw browser. We hebben er alles aan gedaan om te voorkomen dat de extensie identificerende gegevens verzamelt.</ p> <h2> Wat we doen met de informatie</h2> <p> We zullen de informatie aan ons algoritme toevoegen om het te helpen bij het identificeren van politieke advertenties. We sturen u ook politieke advertenties die u nog niet eerder heeft bekeken, maar die anderen aan ons hebben gerapporteerd. Als u wilt weten welke advertenties anderen te zien krijgen, klikt dan op het pictogram 'advertenties die ik niet heb gezien' in u browser, en we sturen  een batch van ongeveer 100 advertenties. De extensie vergelijkt deze vervolgens met de advertenties die op uw computer zijn opgeslagen en toont u alleen advertenties die u nog niet heeft gezien. Wij weten niet welke advertenties u wel en niet hebt gezien.</ p> <h2> Wat als ik mijn toestemming wil intrekken? <h2> <p> Door de plug-in te installeren, bevestigt u dat de bovengenoemde gegevens, evenals  categorisering van advertentie-uitgaven als politiek, mogelijk worden gebruikt in de context van dit project.</ p> <p> U kunt op elk moment stoppen door deel te nemen aan dit project door de extensie te verwijderen (hier vindt u instructies voor het uitschakelen van extensies in ondersteuning <a href=\"https://.google.nl/chrome_webstore/answer/2664769?hl=nl\">Chrome</a> en <a href=\"https://ondersteuning.mozilla.org/nl/VS/kb/deactiveren-van-verwijderen-advertentie-ons\"> Firefox.</a>) Er worden geen verdere gegevens verzonden wanneer de plug-in is gedeactiveerd of verwijderd.</ p> <p> <b> Vragen, opmerkingen of suggesties? Neem contact met ons op: <a href=\"mailto:jeff.Larson@ProPublica.org\"> jeff.Larson@ProPublica.org</a>",
-  "description": "De gebruiksvoorwaarden"
+    "message":
+      "<h2>Mogen we u vragen om mee te werken?</h2><p>ProPublica gelooft in transparantie. Dus neem even de tijd om te begrijpen wat de extensie gaat doen.</p><br><h2> Wat de extensie doet</h2><p>De extensie plaatst een script op elke Facebook-pagina die u bezoekt. Dat script zoekt naar advertenties en slaat die vervolgens op uw computer op.</ p> <h2> Hoe u kunt helpen</h2> <p> Als u onze missie wilt steunen, klik dan op het ProPublica-pictogram in de browserbalk. Er verschijnt dan een pop-upvenster. Het bevat alle advertenties die op uw computer zijn opgeslagen. U kunt die gebruiken om de extensie te laten 'leren' welke advertenties een politieke lading hebben, door ze te classificeren als 'politiek' of 'niet politiek.</p><br><h2>Informatie die we ontvangen</h2> <p>Onze server ontvangt de html-broncode van advertenties, die is gestript van informatie waarmee u geïdentificeerd kan worden. Ook krijgen we de Facebook-ID's van advertenties en demografische targetingparameters (bijvoorbeeld: 'mensen van 18 jaar en ouder die in de Verenigde Staten wonen'), hun classificatie ('politiek' of 'niet politiek') en de taalinstelling van uw browser. We hebben er alles aan gedaan om te voorkomen dat de extensie identificerende gegevens verzamelt.</ p> <h2> Wat we doen met de informatie</h2> <p> We zullen de informatie aan ons algoritme toevoegen om het te helpen bij het identificeren van politieke advertenties. We sturen u ook politieke advertenties die u nog niet eerder heeft bekeken, maar die anderen aan ons hebben gerapporteerd. Als u wilt weten welke advertenties anderen te zien krijgen, klikt dan op het pictogram 'advertenties die ik niet heb gezien' in u browser, en we sturen  een batch van ongeveer 100 advertenties. De extensie vergelijkt deze vervolgens met de advertenties die op uw computer zijn opgeslagen en toont u alleen advertenties die u nog niet heeft gezien. Wij weten niet welke advertenties u wel en niet hebt gezien.</ p> <h2> Wat als ik mijn toestemming wil intrekken? <h2> <p> Door de plug-in te installeren, bevestigt u dat de bovengenoemde gegevens, evenals  categorisering van advertentie-uitgaven als politiek, mogelijk worden gebruikt in de context van dit project.</ p> <p> U kunt op elk moment stoppen door deel te nemen aan dit project door de extensie te verwijderen (hier vindt u instructies voor het uitschakelen van extensies in ondersteuning <a href=\"https://.google.nl/chrome_webstore/answer/2664769?hl=nl\">Chrome</a> en <a href=\"https://ondersteuning.mozilla.org/nl/VS/kb/deactiveren-van-verwijderen-advertentie-ons\"> Firefox.</a>) Er worden geen verdere gegevens verzonden wanneer de plug-in is gedeactiveerd of verwijderd.</ p> <p> <b> Vragen, opmerkingen of suggesties? Neem contact met ons op: <a href=\"mailto:jeff.Larson@ProPublica.org\"> jeff.Larson@ProPublica.org</a>",
+    "description": "De gebruiksvoorwaarden"
   },
   "terms_of_service_accept": {
     "message": "Accepteren",
     "description": "De knop voor het accepteren van de gebruiksvoorwaarden"
+  },
+
+  "thanks1": {
+    "message": "Dank u! 🙂",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks2": {
+    "message": "Dank u!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks3": {
+    "message": "Dank u!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks4": {
+    "message": "Dank u!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks5": {
+    "message": "Dank u!",
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

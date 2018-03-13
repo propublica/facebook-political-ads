@@ -8,7 +8,7 @@
     "description": "Extension short name"
   },
   "description": {
-    "message":"Denne udvidelse indsamler politiske reklamer på Facebook.",
+    "message": "Denne udvidelse indsamler politiske reklamer på Facebook.",
     "description": "Description of the extension"
   },
   "rate_ads": {
@@ -17,7 +17,8 @@
   },
   "see_ads": {
     "message": "Reklamer andre ser",
-    "description": "Text for the 'Ads Others are Seeing' button in the extension."
+    "description":
+      "Text for the 'Ads Others are Seeing' button in the extension."
   },
   "political": {
     "message": "Politisk reklame",
@@ -40,7 +41,8 @@
     "description": "Your Language Settings"
   },
   "you_speak": {
-    "message": "Din browser mener du taler <b>$language$</b> og bor i <b>$country$</b>.",
+    "message":
+      "Din browser mener du taler <b>$language$</b> og bor i <b>$country$</b>.",
     "description": "Your language and country",
     "placeholders": {
       "language": {
@@ -60,7 +62,34 @@
     "description": "Country: "
   },
   "terms_of_service": {
-    "message": "<h2>Må vi få dit samtykke?</h2> <p> ProPublica ønsker at være gennemsigtige omkring hvad vi gør. Så brug lige et minut inden du downloader på at forstå, hvad udvidelsen gør </p> <h2>Hvad gør udvidelsen</h2> <p> Udvidelsen lægger et script på hver eneste Facebook-side du besøger. Scriptet scanner for reklamer, som det så gemmer på din computer. </p> <h2>Sådan kan du hjælpe</h2> <p> Når du har lyst til at støtte projektet, kan du klikke på ProPublica ikonet i din bogmærkelinje. Der vil komme et pop-up vindue, som vil indeholde alle de reklamer, der er blevet gemt på din computer. Du kan hjælpe indsamlingen ved at klassificere de reklamer, du har set, som enten Politiske eller Ikke politiske </p> <h2>Information vi modtager</h2> <p> Vores server modtager ren identifikationsfri html af reklamerne, annoncernes Facebook identifikatorer og de demografiske parametre de er målrettet efter (f.eks. folk over 18 og bosat i Danmark), deres klassificering (Politisk eller Ikke politisk), og din browsers sprogindstilling. Udover det har vi gjort alt, hvad vi kan for at sikre os, at udvidelsen ikke indsamler data som kan bruges til at identificere dig individuelt. </p> <h2>Hvad bruger vi informationen til</h2> <p> Vi fodrer informationen til vores algoritme for at hjælpe den med at lære at identificere politiske reklamer. Så snart den har fået nok træning, vil vi blive i stand til at sende dig reklamer, som du ikke har set før. Når du vil vide, hvilke reklamer andre ser, kan du klikke på 'Reklamer jeg ikke ser' ikonet i din browser, og så sender vi dig en sending med omkring 100 reklamer. Udvidelsen sammenligner dem så med de reklamer, som er gemt lokalt på din computer og viser dig kun nye reklamer. Vi kommer aldrig til at få informationer om, hvilke reklamer du har set eller ikke set.</p><h2>Hvad hvis jeg vil trække mit samtykke tilbage?</h2><p>Ved at installere udvidelsen, bekræfter jeg, at dataene nævnt ovenfor samt min kategorisering af reklamer som politiske, må bruges i dette projekts kontekst.</p><p>Du kan stoppe din deltagelse i projektet på et hvilket som helst tidspunkt ved at afintallere udvidelsen (Her er instruktioner til at slå udvidelser fra i <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=en\">Chrome</a> og <a href=\"https://support.mozilla.org/en-US/kb/disable-or-remove-add-ons\">Firefox.</a>) Når du har deaktiveret eller afinstalleret udvidelsen, vil der ikke blive sendt yderligere data.</p><p><b>Spørgsmål, bekymringer eller forslag? Kontakt os på: <a href=\"mailto:adcollector@propublica.org\">adcollector@propublica.org</a>",
+    "message":
+      "<h2>Må vi få dit samtykke?</h2> <p> ProPublica ønsker at være gennemsigtige omkring hvad vi gør. Så brug lige et minut inden du downloader på at forstå, hvad udvidelsen gør </p> <h2>Hvad gør udvidelsen</h2> <p> Udvidelsen lægger et script på hver eneste Facebook-side du besøger. Scriptet scanner for reklamer, som det så gemmer på din computer. </p> <h2>Sådan kan du hjælpe</h2> <p> Når du har lyst til at støtte projektet, kan du klikke på ProPublica ikonet i din bogmærkelinje. Der vil komme et pop-up vindue, som vil indeholde alle de reklamer, der er blevet gemt på din computer. Du kan hjælpe indsamlingen ved at klassificere de reklamer, du har set, som enten Politiske eller Ikke politiske </p> <h2>Information vi modtager</h2> <p> Vores server modtager ren identifikationsfri html af reklamerne, annoncernes Facebook identifikatorer og de demografiske parametre de er målrettet efter (f.eks. folk over 18 og bosat i Danmark), deres klassificering (Politisk eller Ikke politisk), og din browsers sprogindstilling. Udover det har vi gjort alt, hvad vi kan for at sikre os, at udvidelsen ikke indsamler data som kan bruges til at identificere dig individuelt. </p> <h2>Hvad bruger vi informationen til</h2> <p> Vi fodrer informationen til vores algoritme for at hjælpe den med at lære at identificere politiske reklamer. Så snart den har fået nok træning, vil vi blive i stand til at sende dig reklamer, som du ikke har set før. Når du vil vide, hvilke reklamer andre ser, kan du klikke på 'Reklamer jeg ikke ser' ikonet i din browser, og så sender vi dig en sending med omkring 100 reklamer. Udvidelsen sammenligner dem så med de reklamer, som er gemt lokalt på din computer og viser dig kun nye reklamer. Vi kommer aldrig til at få informationer om, hvilke reklamer du har set eller ikke set.</p><h2>Hvad hvis jeg vil trække mit samtykke tilbage?</h2><p>Ved at installere udvidelsen, bekræfter jeg, at dataene nævnt ovenfor samt min kategorisering af reklamer som politiske, må bruges i dette projekts kontekst.</p><p>Du kan stoppe din deltagelse i projektet på et hvilket som helst tidspunkt ved at afintallere udvidelsen (Her er instruktioner til at slå udvidelser fra i <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=en\">Chrome</a> og <a href=\"https://support.mozilla.org/en-US/kb/disable-or-remove-add-ons\">Firefox.</a>) Når du har deaktiveret eller afinstalleret udvidelsen, vil der ikke blive sendt yderligere data.</p><p><b>Spørgsmål, bekymringer eller forslag? Kontakt os på: <a href=\"mailto:adcollector@propublica.org\">adcollector@propublica.org</a>",
     "description": "The terms of service"
+  },
+
+  "thanks1": {
+    "message": "Tak! 🙂",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks2": {
+    "message": "Tak!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks3": {
+    "message": "Tak!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks4": {
+    "message": "Tak!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks5": {
+    "message": "Tak!",
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }

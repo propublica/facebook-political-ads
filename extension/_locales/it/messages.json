@@ -8,7 +8,8 @@
     "description": "Extension short name"
   },
   "description": {
-    "message":"Questa estensione raccoglie le pubblicità politiche su facebook.",
+    "message":
+      "Questa estensione raccoglie le pubblicità politiche su facebook.",
     "description": "Description of the extension"
   },
   "rate_ads": {
@@ -17,7 +18,8 @@
   },
   "see_ads": {
     "message": "Pubblicità che vedono altri",
-    "description": "Text for the 'Ads Others are Seeing' button in the extension."
+    "description":
+      "Text for the 'Ads Others are Seeing' button in the extension."
   },
   "political": {
     "message": "Pubblicità politica",
@@ -40,7 +42,8 @@
     "description": "Your Language Settings"
   },
   "you_speak": {
-    "message": "Il tuo browser pensa che parli <b>$language$</b> e che vivi in <b>$country$</b>.",
+    "message":
+      "Il tuo browser pensa che parli <b>$language$</b> e che vivi in <b>$country$</b>.",
     "description": "Your language and country",
     "placeholders": {
       "language": {
@@ -60,7 +63,34 @@
     "description": "Country: "
   },
   "terms_of_service": {
-    "message": "<h2> Possiamo avere il tuo consenso?</h2> <p> ProPublica crede nella trasparenza. Allora prima di scarica l’estensione, prendi qualche minuto per capire cosa fa. </p> <h2>Cosa fa l’estensione</h2> <p> L’estensione monitora con uno script ogni pagina che visiti su Facebook. Lo script scansiona le pubblicità, e poi le archivia sul tuo computer. </p> <h2>Come puoi aiutare</h2> <p> Quando vuoi aiutare il nostro progetto, puoi cliccare sull’icona di ProPublica sulla barra delle icone del tuo browser e un pop-up comparirà. Conterrà tutte le pubblicità che hai salvato sul tuo computer. Puoi “allenare” l’estensione classificando le pubblicità come politiche o non politiche.</p> <h2>Le informazioni che riceveremo</h2> <p> Il nostro server riceverà un html pulito e anonimo delle pubblicità, i parametri demografici e identificativi delle pubblicità di Facebook (per esempio: persone con più di 18 anni residenti in Italia), la loro classificazione (politiche e non politiche), e la lingua del tuo browser. Ci siamo impegnati a fare il possibile per assicurare che l’estensione non raccolga informazioni che potrebbero essere utilizzate per individuarti. </p> <h2>Che cosa faremo con le informazioni</h2> <p> Tutte le informazioni alleneranno il nostro algoritmo a riconoscere le pubblicità politiche. Una volta allenato, saremo capaci di mandarti pubblicità che ancora non hai visto. Quando vuoi vedere le pubblicità che vedono altri, puoi cliccare sull'icona “Pubblicità che vedono altri” sul tuo browser e ti manderemo una raccolta di circa 100 pubblicità. L’estensione poi confronterà queste pubblicità con quelle già presenti sul tuo computer, per mostrati solo quelle nuove. Non riceveremo mai informazioni su quali pubblicità hai visto o non hai visto.</p><h2>Cosa succede se non voglio più dare il mio consenso?</h2><p>Installando questo plug-in, confermo che i dati qui sopra menzionati, come anche la mia categorizzazione delle pubblicità politiche, potranno essere utilizzati per questo progetto.</p><p>Puoi smettere di partecipare a questo progetto disinstallando l’estensione (Qui le istruzioni per disinstallare l’estensione in <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=en\">Chrome</a> e <a href=\"https://support.mozilla.org/en-US/kb/disable-or-remove-add-ons\">Firefox.</a>) Una volta disattivato o disinstallato il plug-in, nessun altro dato sarà inviato.</p><p><b>Domande, perplessità o suggerimenti? Ci potete contattare a: <a href=\"mailto:adcollector@propublica.org\">adcollector@propublica.org</a>",
+    "message":
+      "<h2> Possiamo avere il tuo consenso?</h2> <p> ProPublica crede nella trasparenza. Allora prima di scarica l’estensione, prendi qualche minuto per capire cosa fa. </p> <h2>Cosa fa l’estensione</h2> <p> L’estensione monitora con uno script ogni pagina che visiti su Facebook. Lo script scansiona le pubblicità, e poi le archivia sul tuo computer. </p> <h2>Come puoi aiutare</h2> <p> Quando vuoi aiutare il nostro progetto, puoi cliccare sull’icona di ProPublica sulla barra delle icone del tuo browser e un pop-up comparirà. Conterrà tutte le pubblicità che hai salvato sul tuo computer. Puoi “allenare” l’estensione classificando le pubblicità come politiche o non politiche.</p> <h2>Le informazioni che riceveremo</h2> <p> Il nostro server riceverà un html pulito e anonimo delle pubblicità, i parametri demografici e identificativi delle pubblicità di Facebook (per esempio: persone con più di 18 anni residenti in Italia), la loro classificazione (politiche e non politiche), e la lingua del tuo browser. Ci siamo impegnati a fare il possibile per assicurare che l’estensione non raccolga informazioni che potrebbero essere utilizzate per individuarti. </p> <h2>Che cosa faremo con le informazioni</h2> <p> Tutte le informazioni alleneranno il nostro algoritmo a riconoscere le pubblicità politiche. Una volta allenato, saremo capaci di mandarti pubblicità che ancora non hai visto. Quando vuoi vedere le pubblicità che vedono altri, puoi cliccare sull'icona “Pubblicità che vedono altri” sul tuo browser e ti manderemo una raccolta di circa 100 pubblicità. L’estensione poi confronterà queste pubblicità con quelle già presenti sul tuo computer, per mostrati solo quelle nuove. Non riceveremo mai informazioni su quali pubblicità hai visto o non hai visto.</p><h2>Cosa succede se non voglio più dare il mio consenso?</h2><p>Installando questo plug-in, confermo che i dati qui sopra menzionati, come anche la mia categorizzazione delle pubblicità politiche, potranno essere utilizzati per questo progetto.</p><p>Puoi smettere di partecipare a questo progetto disinstallando l’estensione (Qui le istruzioni per disinstallare l’estensione in <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=en\">Chrome</a> e <a href=\"https://support.mozilla.org/en-US/kb/disable-or-remove-add-ons\">Firefox.</a>) Una volta disattivato o disinstallato il plug-in, nessun altro dato sarà inviato.</p><p><b>Domande, perplessità o suggerimenti? Ci potete contattare a: <a href=\"mailto:adcollector@propublica.org\">adcollector@propublica.org</a>",
     "description": "The terms of service"
+  },
+
+  "thanks1": {
+    "message": "Grazie! 🙂",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks2": {
+    "message": "Grazie!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks3": {
+    "message": "Grazie!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks4": {
+    "message": "Grazie!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks5": {
+    "message": "Grazie!",
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
   }
 }
