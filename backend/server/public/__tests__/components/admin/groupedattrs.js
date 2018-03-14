@@ -8,7 +8,7 @@ Enzyme.configure({ adapter: new Adapter() });
 function setup(newProps = {}) {
   const props = {
     ...{
-      match: { params: { groupingType: "advertisers" } },
+      match: { params: { groupingType: "advertiser" } },
       groupedAttribute: [{ advertiser: "Fake", count: "1134" }],
       getGroupedAttrs: jest.fn()
     },
