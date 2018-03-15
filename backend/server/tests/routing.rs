@@ -41,7 +41,6 @@ where
     common::seed_political(&conn);
     let (tx, rx) = oneshot();
     let (start_tx, start_rx) = channel();
-    // Start server
     thread::spawn(move || {
         let mut core = Core::new().unwrap();
         let handle = core.handle();
@@ -53,7 +52,6 @@ where
                 Ok(AdServer::new(handle.clone(), url.clone()))
             })
             .unwrap();
-
         let h2 = handle.clone();
         let server_addr = server.incoming_ref().local_addr();
         let srv = server
@@ -63,10 +61,8 @@ where
             })
             .map_err(|_| ());
         start_tx.send(server_addr).unwrap();
-        // signaled when the test is over, and the other pair is dropped
         let _ = core.run(rx.then(|_| Ok(())).select(srv));
     });
-    // wait until it starts
     let local = start_rx.recv().unwrap();
     let body = Client::new()
         .get(&format!("http://{}{}", local, url))
@@ -108,7 +104,6 @@ fn admin(mut response: Response) {
     assert!(text.contains("<title>Admin: Facebook Political Ad Collector</title>"));
 }
 
-// ensuring we return the right HTML page for React to do its thing.
 #[test]
 fn test_admin_url() {
     http_test("/facebook-ads/admin", admin);
