@@ -37,6 +37,7 @@ use tokio_timer::Timer;
 use unicase::Ascii;
 use url::{form_urlencoded, Url};
 
+#[derive(Clone)]
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
     pool: CpuPool,
@@ -486,6 +487,28 @@ impl AdServer {
         Box::new(future)
     }
 
+    pub fn new(handle: Handle, database_url: String) -> AdServer {
+        dotenv().ok();
+        let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
+        let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
+        let db_pool = Pool::builder()
+            .build(manager)
+            .expect("Failed to create pool.");
+        let pool = CpuPool::new_num_cpus();
+        let connector = HttpsConnector::new(4, &handle).expect("Couldn't build HttpsConnector");
+        let client = Client::configure()
+            .connector(connector)
+            .build(&handle.clone());
+        AdServer {
+            pool: pool,
+            db_pool: db_pool,
+            handle: handle,
+            client: client,
+            password: admin_password,
+            database_url: database_url,
+        }
+    }
+
     pub fn start() {
         dotenv().ok();
         start_logging();
@@ -493,42 +516,22 @@ impl AdServer {
         if let Ok(root) = env::var("ROOT") {
             env::set_current_dir(&root).expect(&format!("Couldn't change directory to {}", root));
         }
+        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
 
         let addr = env::var("HOST")
             .expect("HOST must be set")
             .parse()
             .expect("Error parsing HOST");
 
-        let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
-        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
-        let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
-        let db_pool = Pool::builder()
-            .build(manager)
-            .expect("Failed to create pool.");
-        let pool = CpuPool::new_num_cpus();
-
         let mut core = Core::new().unwrap();
         let handle = core.handle();
-        let connector =
-            HttpsConnector::new(4, &core.handle()).expect("Couldn't build HttpsConnector");
-        let client = Client::configure()
-            .connector(connector)
-            .build(&core.handle());
+        let ad_server = AdServer::new(handle.clone(), database_url);
         // from: https://hyper.rs/guides/server/response_strategies/
         let server_handle = handle.clone();
         let server = Http::new()
-            .serve_addr_handle(&addr, &server_handle, move || {
-                Ok(AdServer {
-                    pool: pool.clone(),
-                    db_pool: db_pool.clone(),
-                    handle: handle.clone(),
-                    client: client.clone(),
-                    password: admin_password.clone(),
-                    database_url: database_url.clone(),
-                })
-            })
+            .serve_addr_handle(&addr, &server_handle, move || Ok(ad_server.clone()))
             .unwrap();
-        let h2 = server_handle.clone();
+        let h2 = handle.clone();
         server_handle.spawn(
             server
                 .for_each(move |conn| {

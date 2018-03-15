@@ -36,3 +36,4 @@ url = "^1.6.0"
 
 [dev-dependencies]
 reqwest = "^0.8.5"
+lazy_static = "^1.0.0"
