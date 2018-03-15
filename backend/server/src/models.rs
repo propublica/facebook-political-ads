@@ -1,7 +1,6 @@
 use chrono::DateTime;
 use chrono::offset::Utc;
 use diesel;
-use diesel::debug_query;
 use diesel::dsl::sql;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
@@ -211,7 +210,6 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
             }
             None => Ad::scoped(language),
         }).limit(limit.unwrap_or(20));
-        println!("{}", debug_query::<Pg, _>(&query));
         Ok(query.load::<T>(&*connection)?)
     }
 
@@ -537,7 +535,7 @@ impl Ad {
         Ok(query
             .filter(db_id.eq(id))
             .limit(1)
-            .first::<Ad>(&*connection)
+            .first::<Ad>(&connection)
             .optional()?)
     }
 
@@ -549,7 +547,7 @@ impl Ad {
         }
         diesel::update(ads.filter(id.eq(adid)))
             .set(suppressed.eq(true))
-            .execute(&*connection)?;
+            .execute(&connection)?;
         Ok(())
     }
 }
@@ -571,7 +569,7 @@ pub fn get_advertiser(targeting: &Option<String>, document: &kuchiki::NodeRef) -
     }
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Debug)]
 #[table_name = "ads"]
 pub struct NewAd<'a> {
     pub id: &'a str,
