@@ -1,6 +1,7 @@
 import { sortBy } from "lodash";
+import { RatingType } from "constants.js";
 
-const adForRequest = ad => ({
+export const adForRequest = ad => ({
   id: ad.id,
   html: ad.html,
   targeting: ad.targeting
@@ -16,7 +17,7 @@ const headers = language =>
     "Accept-Language": language.language + "-" + language.country + ";q=1.0"
   });
 
-const sendAds = (body, language) =>
+export const sendAds = (body, language) =>
   fetch(endpoint, {
     method: "POST",
     mode: "no-cors",
@@ -24,7 +25,7 @@ const sendAds = (body, language) =>
     body: JSON.stringify(body)
   });
 
-const getAds = (language, cb) =>
+export const getAds = (language, cb) =>
   fetch(endpoint, {
     method: "GET",
     headers: headers(language)
@@ -32,7 +33,7 @@ const getAds = (language, cb) =>
     .then(res => res.json())
     .then(ads => cb(ads.ads || ads));
 
-const mergeAds = (ads, newAds) => {
+export const mergeAds = (ads, newAds) => {
   let ids = new Map(ads.map(ad => [ad.id, ad]));
   newAds.forEach(ad => {
     if (ids.has(ad.id)) {
@@ -50,7 +51,7 @@ const mergeAds = (ads, newAds) => {
   return sortBy(idSort, a => a.rating === "political").slice(0, 50);
 };
 
-const updateBadge = ratings => {
+export const updateBadge = ratings => {
   const num = ratings.filter(rating => !("rating" in rating)).length;
   if (num > 0) {
     chrome.browserAction.setBadgeText({ text: num > 100 ? "100+" : "" + num });
@@ -59,22 +60,11 @@ const updateBadge = ratings => {
   }
 };
 
-const getBrowserLocale = () => {
-  const lang =
-    navigator.languages && navigator.languages.length
-      ? navigator.languages[0]
-      : navigator.language;
-  return {
-    language: lang.split("-")[0],
-    country: lang.split("-")[1]
-  };
-};
+// Ad utilities
+export const getUnratedRatings = ratings =>
+  ratings.filter(
+    rating => rating.rating === RatingType.POLITICAL || !("rating" in rating)
+  );
 
-export {
-  sendAds,
-  getAds,
-  mergeAds,
-  updateBadge,
-  adForRequest,
-  getBrowserLocale
-};
+export const countUnratedRatings = ratings =>
+  ratings.filter(rating => !("rating" in rating)).length;
