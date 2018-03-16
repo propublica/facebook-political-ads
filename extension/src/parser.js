@@ -222,7 +222,8 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
     // give up if we haven't got anything after a second
     if (Date.now() - time > 1000) {
       self.disconnect();
-      if (DEBUG) toggle.style.backgroundColor = "#630000"; // in debug, mark the button green if we failed to get the menu for this ad.
+      // in debug, mark the button green if we failed to get the menu for this ad.
+      if (DEBUG) toggle.style.backgroundColor = "#630000";
       return reject("no menu");
     }
     const menu = menuFilter();
@@ -348,7 +349,9 @@ const timeline = node => {
   if (node.querySelector(TIMELINE_SELECTOR))
     node = node.querySelector(TIMELINE_SELECTOR);
 
-  if (DEBUG) parent.style.color = "#006304"; // in debug, mark an ad green once we've selected it to be submitted (to help find ads that we don't recognize or posts we mistakenly believe are ads)
+  // in debug, mark an ad green once we've selected it to be submitted (to help find ads that we
+  // don't recognize or posts we mistakenly believe are ads)
+  if (DEBUG) parent.style.color = "#006304";
 
   // Finally we have something to save.
   return getTimelineId(parent, {
