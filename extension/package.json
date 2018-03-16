@@ -5,19 +5,18 @@
   "main": "index.js",
   "scripts": {
     "test": "node test/test.js",
-    "build": "webpack --progress",
-    "watch": "webpack -w --progress",
-    "dist":
-      "NODE_ENV=production webpack --progress -p && web-ext build -s dist",
+    "build": "webpack --progress --mode development",
+    "watch": "webpack -w --progress --mode development",
+    "dist": "NODE_ENV=production webpack --progress -p && web-ext build -s dist",
     "ff": "web-ext run -s build",
-    "ffde":
-      "web-ext run -s build --pref intl.locale.requested=de-DE --pref intl.locale.matchOS=false --pref intl.accept_languages=de-DE,de"
+    "ffde": "web-ext run -s build --pref intl.locale.requested=de-DE --pref intl.locale.matchOS=false --pref intl.accept_languages=de-DE,de"
   },
   "author": "Jeff Larson <jeff.larson@propublica.org>",
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-eslint": "^8.2.2",
+    "babel-jest": "^23.0.0-alpha.0",
     "babel-loader": "^7.1.4",
     "babel-plugin-external-helpers": "^6.22.0",
     "babel-plugin-jsx-pragmatic": "^1.0.2",
@@ -25,18 +24,20 @@
     "babel-plugin-transform-react-constant-elements": "^6.23.0",
     "babel-plugin-transform-react-jsx": "^6.24.1",
     "babel-preset-env": "^1.6.1",
-    "copy-webpack-plugin": "^4.5.0",
+    "copy-webpack-plugin": "^4.5.1",
     "css-loader": "^0.28.10",
     "eslint": "^4.18.2",
     "eslint-plugin-react": "^7.7.0",
-    "extract-text-webpack-plugin": "^3.0.2",
     "html-webpack-plugin": "^3.0.5",
+    "jest": "^23.0.0-alpha.0",
     "jsdom": "^11.6.2",
+    "mini-css-extract-plugin": "^0.2.0",
     "source-map-loader": "^0.2.3",
-    "style-loader": "^0.20.2",
-    "uglifyjs-webpack-plugin": "^1.2.2",
-    "web-ext": "^2.4.0",
-    "webpack": "^4.1.0"
+    "style-loader": "^0.20.3",
+    "uglifyjs-webpack-plugin": "^1.2.3",
+    "web-ext": "^2.5.0",
+    "webpack": "^4.1.0",
+    "webpack-cli": "^2.0.12"
   },
   "dependencies": {
     "base64url": "^2.0.0",

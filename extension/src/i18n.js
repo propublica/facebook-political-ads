@@ -66,3 +66,14 @@ export const withI18n = connect(({ language }) => ({
   getMessage: getFormatter(language),
   language
 }));
+
+export const getBrowserLocale = () => {
+  const lang =
+    navigator.languages && navigator.languages.length
+      ? navigator.languages[0]
+      : navigator.language;
+  return {
+    language: lang.split("-")[0],
+    country: lang.split("-")[1]
+  };
+};
