@@ -7,6 +7,166 @@ const DEBUG =
     ? "development"
     : "production";
 
+// create an ad for sending
+const ad = node => ({
+  html: cleanAd(node.outerHTML),
+  created_at: new Date().toString()
+});
+
+// This is a simple state machine that aims to get rid of the promise mess of before in favor of a
+// tick based approach. It should help us reason about the flow and transition states. And allow for
+// easier testing
+const states = {
+  INITIAL: "INITIAL",
+  TIMELINE: "TIMELINE",
+  TIMELINE_ID: "TIMELINE_ID",
+  SIDEBAR: "SIDEBAR",
+  SIDEBAR_ID: "SIDEBAR_ID",
+  DONE: "DONE",
+  ERROR: "ERROR"
+};
+const errors = {
+  NOT_AN_AD: "Not an ad",
+  TIMEOUT: "Timeout transitioning states"
+};
+const TIMEOUT = 100000;
+const POLL = 100;
+export class Scraper {
+  constructor(node, resolve, reject) {
+    this.state = states.INITIAL;
+    this.node = node;
+    this.resolve = resolve;
+    this.reject = reject;
+  }
+
+  start() {
+    this.timer = setInterval(() => this.tick(), POLL);
+    // cleanup after ourselves if we have been stuck for TIMEOUT millis
+    this.timeout = setTimeout(() => {
+      if (this.state !== states.DONE) {
+        this.state = states.ERROR;
+        this.message = errors.TIMEOUT;
+      }
+    }, TIMEOUT);
+  }
+
+  stop() {
+    clearTimeout(this.timeout);
+    clearInterval(this.timer);
+  }
+
+  tick() {
+    switch (this.state) {
+      case states.INITIAL:
+        this.parse();
+        break;
+      case states.TIMELINE:
+        this.timeline();
+        break;
+      case states.TIMELINE_ID:
+        this.timelineId();
+        break;
+      case states.SIDEBAR:
+        this.sidebar();
+        break;
+      case states.SIDEBAR_ID:
+        this.sidebarId();
+        break;
+      case states.ERROR:
+        this.error();
+        break;
+      case states.DONE:
+        this.done();
+        break;
+    }
+  }
+
+  parse() {
+    const list = this.node.classList;
+    if (list.contains("userContentWrapper") || list.contains("_5pcr")) {
+      this.state = states.TIMELINE;
+    } else if (list.contains("ego_unit")) {
+      this.state = states.SIDEBAR;
+    } else {
+      this.state = states.ERROR;
+      this.message = errors.NOT_AN_AD;
+    }
+  }
+
+  timeline() {
+    const sponsor = checkSponsor(this.node);
+    // First we check if it is actually a sponsored post
+    if (!sponsor) return Promise.resolve(false);
+
+    // And then we try to grab the parent container that has a hyperfeed id
+    let parent = this.node;
+    while (parent) {
+      let id = parent.getAttribute("id");
+      if (id && id.startsWith("hyperfeed")) break;
+      parent = parent.parentElement;
+    }
+
+    // If we've walked off the top of the parent heirarchy that's an error
+    if (!parent) return this.notAnAd();
+
+    // Also if there's nothing to save that's an error
+    if (this.node.children.length === 0) return this.notAnAd();
+
+    // Check to see that we have the innermost fbUserContent, this cuts out like's
+    // and shares.
+    if (this.node.querySelector(TIMELINE_SELECTOR))
+      this.node = this.node.querySelector(TIMELINE_SELECTOR);
+
+    if (DEBUG) parent.style.color = "#006304";
+    this.ad = ad(this.node.outerHTML);
+    this.state = states.TIMELINE_ID;
+  }
+
+  timelineId() {}
+
+  sidebar() {
+    // First we still need to make sure we are in a sponsored box;
+    let parent = this.node;
+    while (parent) {
+      if (checkSponsor(parent)) break;
+      parent = parent.parentElement;
+    }
+
+    // As before it is an error if we haven't found a sponsor node.
+    if (
+      !(parent && parent.classList && parent.classList.contains("ego_section"))
+    ) {
+      return this.notAnAd();
+    }
+    // Sanity check to make sure we have a salvageable id
+    if (!this.node.hasAttribute("data-ego-fbid")) {
+      return this.notAnAd();
+    }
+    // and we have childnodes
+    if (!this.node.children.length === 0) return this.notAnAd();
+    this.ad = ad(this.node.outerHTML);
+    // Move onto the next step
+    this.state = states.SIDEBAR_ID;
+  }
+
+  sidebarId() {}
+
+  notAnAd() {
+    this.state = states.ERROR;
+    this.message = errors.NOT_AN_AD;
+  }
+
+  done() {
+    this.stop();
+    this.resolve(this.ad, this);
+  }
+
+  error() {
+    this.stop();
+    this.reject(this.message, this);
+  }
+}
+
 // This function cleans all the elements that could leak user data
 // before sending to the server. It also removes any attributes that
 // could have personal data so we end up with a clean dom tree.
@@ -376,10 +536,7 @@ const sidebar = node => {
   // and we have childnodes
   if (!node.children.length === 0) return Promise.resolve(false);
   // Then we just need to send the cleaned ad
-  return getSidebarId(parent, {
-    html: cleanAd(node.outerHTML),
-    created_at: new Date().toString()
-  });
+  return getSidebarId(parent, {});
 };
 
 // We are careful here to only accept a valid timeline ad or sidebar ad
