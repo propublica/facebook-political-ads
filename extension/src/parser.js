@@ -9,8 +9,7 @@ const DEBUG =
 
 // create an ad for sending
 const ad = node => ({
-  html: cleanAd(node.outerHTML),
-  created_at: new Date().toString()
+  html: cleanAd(node.outerHTML)
 });
 
 // This is a simple state machine that aims to get rid of the promise mess of before in favor of a
@@ -22,12 +21,18 @@ const states = {
   TIMELINE_ID: "TIMELINE_ID",
   SIDEBAR: "SIDEBAR",
   SIDEBAR_ID: "SIDEBAR_ID",
+  CACHED: "CACHED",
+  OPEN: "OPEN",
+  MENU: "MENU",
   DONE: "DONE",
   ERROR: "ERROR"
 };
 const errors = {
   NOT_AN_AD: "Not an ad",
-  TIMEOUT: "Timeout transitioning states"
+  TIMEOUT: "Timeout transitioning states",
+  NO_TOGGLE: "Couldn't find a toggle",
+  INVARIANT: "Impossible state, BUG!",
+  NO_ID: "Couldn't find the ad's id"
 };
 const TIMEOUT = 100000;
 const POLL = 100;
@@ -37,6 +42,7 @@ export class Scraper {
     this.node = node;
     this.resolve = resolve;
     this.reject = reject;
+    this.states = [];
   }
 
   start() {
@@ -72,11 +78,26 @@ export class Scraper {
       case states.SIDEBAR_ID:
         this.sidebarId();
         break;
+      case states.CACHED:
+        this.cached();
+        break;
+      case states.OPEN:
+        this.open();
+        break;
+      case states.MENU:
+        this.menu();
+        break;
+      case states.TARGETING:
+        this.targeting();
+        break;
       case states.ERROR:
         this.error();
         break;
       case states.DONE:
         this.done();
+        break;
+      default:
+        this.promote(states.ERROR, errors.INVARIANT);
         break;
     }
   }
@@ -84,13 +105,18 @@ export class Scraper {
   parse() {
     const list = this.node.classList;
     if (list.contains("userContentWrapper") || list.contains("_5pcr")) {
-      this.state = states.TIMELINE;
+      this.promote(states.TIMELINE);
     } else if (list.contains("ego_unit")) {
-      this.state = states.SIDEBAR;
+      this.promote(states.SIDEBAR);
     } else {
-      this.state = states.ERROR;
-      this.message = errors.NOT_AN_AD;
+      this.promote(this.ERROR, errors.NOT_AN_AD);
     }
+  }
+
+  promote(state, message = "") {
+    this.states.push(state);
+    this.state = state;
+    this.message = message;
   }
 
   timeline() {
@@ -119,10 +145,28 @@ export class Scraper {
 
     if (DEBUG) parent.style.color = "#006304";
     this.ad = ad(this.node.outerHTML);
-    this.state = states.TIMELINE_ID;
+    this.parent = parent;
+    this.promote(states.TIMELINE_ID);
   }
 
-  timelineId() {}
+  timelineId() {
+    const control = this.parent.querySelector(".uiPopover");
+    if (!control && control.id === "") return Promise.resolve(ad);
+    const toggle = control.querySelector("a");
+    if (!toggle) return this.promote(states.ERROR, "Couldn't find a toggle");
+    if (adCache.has(toggle.id)) return this.promote(states.CACHED);
+    // build out our state for the next step.
+    this.id = toggle.id;
+    this.toggle = toggle;
+    this.selector = ".uiLayer";
+    this.menuFilter = () =>
+      Array.from(document.querySelectorAll(".uiLayer")).filter(
+        a => a.getAttribute("data-ownerid") === this.id
+      )[0];
+    this.filter = it =>
+      it.getAttribute("data-feed-option-name") === "FeedAdSeenReasonOption";
+    this.promote(states.OPEN);
+  }
 
   sidebar() {
     // First we still need to make sure we are in a sponsored box;
@@ -146,17 +190,55 @@ export class Scraper {
     if (!this.node.children.length === 0) return this.notAnAd();
     this.ad = ad(this.node.outerHTML);
     // Move onto the next step
-    this.state = states.SIDEBAR_ID;
+    this.promote(states.SIDEBAR_ID);
   }
 
   sidebarId() {}
 
+  open() {
+    refocus(() => this.toggle.click());
+    this.promote(states.MENU);
+  }
+
+  targeting() {}
+
+  menu() {
+    const menu = this.menuFilter();
+    // No menu yet, try again.
+    if (!menu) return;
+    const li = Array.from(menu.querySelectorAll("li")).filter(this.filter)[0];
+    if (!li) return;
+    const endpoint = li.querySelector("a");
+    if (!endpoint) return;
+    const url = endpoint.getAttribute("ajaxify");
+    try {
+      this.ad.id = new URL("https://facebook.com" + url).searchParams.get("id");
+      if (this.ad.id) {
+        adCache.set(this.id, this.ad);
+        this.promote(states.TARGETING);
+      } else {
+        this.promote(states.ERROR, errors.NO_ID);
+      }
+    } catch (e) {
+      this.promote(states.ERROR, errors.NO_ID);
+    }
+  }
+
+  cached() {
+    if (adCache.has(this.id)) {
+      this.ad = adCache.get(this.id);
+      this.promote(states.DONE);
+    } else {
+      this.promote(states.ERROR, errors.INVARIANT);
+    }
+  }
+
   notAnAd() {
-    this.state = states.ERROR;
-    this.message = errors.NOT_AN_AD;
+    this.promote(states.ERROR, errors.NOT_AN_AD);
   }
 
   done() {
+    if (this.toggle) refocus(() => this.toggle.click());
     this.stop();
     this.resolve(this.ad, this);
   }
@@ -425,14 +507,6 @@ const parseMenu = (ad, selector, toggle, toggleId, menuFilter, filter) => (
 
 // Grab an id from a timeline ad which is hidden in a async popup.
 const getTimelineId = (parent, ad) => {
-  const control = parent.querySelector(".uiPopover");
-  if (!control && control.id === "") return Promise.resolve(ad);
-
-  const toggle = control.querySelector("a");
-  if (!toggle) return Promise.resolve(ad);
-
-  if (adCache.has(toggle.id)) return Promise.resolve(adCache.get(toggle.id));
-
   // this is async, we have to wait until our popup shows up.
   let promise = new Promise(
     parseMenu(
