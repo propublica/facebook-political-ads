@@ -1,5 +1,3 @@
-import debounce from "lodash/debounce";
-
 const TIMELINE_SELECTOR = ".userContentWrapper";
 const SIDEBAR_SELECTOR = ".ego_unit";
 const DEBUG =
@@ -13,7 +11,8 @@ let targetingBlocked = false;
 
 // create an ad for sending
 const ad = node => ({
-  html: cleanAd(node.outerHTML)
+  html: cleanAd(node.outerHTML),
+  created_at: new Date().toString()
 });
 
 class StateMachine {
@@ -209,6 +208,7 @@ export class Scraper extends StateMachine {
       return this.promote(states.ERROR, errors.NO_TOGGLE);
     const toggle = control.querySelector("a");
     if (!toggle) return this.promote(states.ERROR, errors.NO_TOGGLE);
+    this.toggleId = toggle.id;
     if (adCache.has(toggle.id)) return this.promote(states.CACHED);
     // build out our state for the next step.
     this.idFinder = new TimelineFinder(toggle.id, toggle);
@@ -230,9 +230,10 @@ export class Scraper extends StateMachine {
       return this.promote(states.ERROR, errors.NO_TOGGLE);
 
     const toggleId = toggleData["data_to_log"]["ad_id"];
+    this.toggleId = toggleId;
     if (!toggleId) return this.promote(states.ERROR, errors.NO_TOGGLE);
 
-    if (adCache.has(this.toggleId)) return this.promote(states.CACHED);
+    if (adCache.has(toggleId)) return this.promote(states.CACHED);
     this.idFinder = new SidebarFinder(toggleId, toggle, control);
     this.promote(states.MENU);
   }
