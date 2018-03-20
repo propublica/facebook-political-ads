@@ -78,8 +78,8 @@ export class Scraper extends StateMachine {
   }
 
   stop() {
-    clearTimeout(this.timeout);
-    clearInterval(this.timer);
+    if (this.timeout) clearTimeout(this.timeout);
+    if (this.timer) clearInterval(this.timer);
   }
 
   tick() {
@@ -320,6 +320,9 @@ export class Scraper extends StateMachine {
   }
 
   done() {
+    if (DEBUG) {
+      console.info(this.states);
+    }
     if (this.toggle) refocus(() => this.toggle.click());
     adCache.set(this.toggleId, this.ad);
     this.stop();
@@ -327,6 +330,10 @@ export class Scraper extends StateMachine {
   }
 
   error() {
+    if (DEBUG) {
+      console.warn(this.message);
+      console.warn(this.states);
+    }
     this.stop();
     this.reject(this.message, this);
   }
@@ -545,17 +552,8 @@ const refocus = cb => {
   }
 };
 
-// We are careful here to only accept a valid timeline ad or sidebar ad
-const parser = function(node) {
-  const list = node.classList;
-  if (list.contains("userContentWrapper") || list.contains("_5pcr")) {
-    return timeline(node);
-  } else if (list.contains("ego_unit")) {
-    return sidebar(node);
-  } else {
-    return Promise.resolve(false);
-  }
-};
+const parser = node =>
+  new Promise((resolve, reject) => new Scraper(node, resolve, reject).start());
 
 module.exports = {
   parser,
