@@ -15,6 +15,22 @@ const ad = node => ({
   html: cleanAd(node.outerHTML)
 });
 
+class StateMachine {
+  constructor() {
+    this.states = [];
+  }
+
+  tick() {
+    throw "Unimplemented!";
+  }
+
+  promote(state, message = "") {
+    this.states.push(state);
+    this.state = state;
+    this.message = message;
+  }
+}
+
 // This is a simple state machine that aims to get rid of the promise mess of before in favor of a
 // tick based approach. It should help us reason about the flow and transition states. And allow for
 // easier testing
@@ -41,13 +57,13 @@ const errors = {
 };
 const TIMEOUT = 100000;
 const POLL = 100;
-export class Scraper {
+export class Scraper extends StateMachine {
   constructor(node, resolve, reject) {
+    super();
     this.state = states.INITIAL;
     this.node = node;
     this.resolve = resolve;
     this.reject = reject;
-    this.states = [];
   }
 
   start() {
@@ -121,12 +137,6 @@ export class Scraper {
     }
   }
 
-  promote(state, message = "") {
-    this.states.push(state);
-    this.state = state;
-    this.message = message;
-  }
-
   timeline() {
     const sponsor = checkSponsor(this.node);
     // First we check if it is actually a sponsored post
@@ -178,13 +188,14 @@ export class Scraper {
     // and we have childnodes
     if (!this.node.children.length === 0) return this.notAnAd();
     this.ad = ad(this.node.outerHTML);
+    this.parent = parent;
     // Move onto the next step
     this.promote(states.SIDEBAR_ID);
   }
 
   cached() {
-    if (adCache.has(this.id)) {
-      this.ad = adCache.get(this.id);
+    if (adCache.has(this.toggleId)) {
+      this.ad = adCache.get(this.toggleId);
       this.promote(states.DONE);
     } else {
       this.promote(states.ERROR, errors.INVARIANT);
@@ -199,7 +210,7 @@ export class Scraper {
     const toggle = control.querySelector("a");
     if (!toggle) return this.promote(states.ERROR, errors.NO_TOGGLE);
 
-    const toggleId = toggle.id;
+    this.toggleId = toggle.id;
     if (adCache.has(toggle.id)) return this.promote(states.CACHED);
     // build out our state for the next step.
     this.idFinder = new TimelineFinder(toggleId, toggle);
@@ -209,7 +220,7 @@ export class Scraper {
   // Similar to the above -- while we could just use the data-ego-fbid from before, it makes sense
   // to use the one in the encoded url in case that the dom one goes away.
   sidebarId() {
-    const control = parent.querySelector(".uiSelector");
+    const control = this.parent.querySelector(".uiSelector");
     if (!control) return this.promote(states.ERROR, errors.NO_TOGGLE);
     // Since the sidebar DOM structure is slightly different we need to pull out
     // the toggle Id from the data-gt attribute.
@@ -220,10 +231,10 @@ export class Scraper {
     if (!toggleData["data_to_log"])
       return this.promote(states.ERROR, errors.NO_TOGGLE);
 
-    const toggleId = toggleData["data_to_log"]["ad_id"];
+    this.toggleId = toggleData["data_to_log"]["ad_id"];
     if (!toggleId) return this.promote(states.ERROR, errors.NO_TOGGLE);
 
-    if (adCache.has(toggleId)) return this.promote(states.CACHED);
+    if (adCache.has(this.toggleId)) return this.promote(states.CACHED);
 
     this.idFinder = new SidebarFinder(id, toggle, control);
     this.promote(states.OPEN);
@@ -310,7 +321,7 @@ export class Scraper {
 
   done() {
     if (this.toggle) refocus(() => this.toggle.click());
-    adCache.set(this.ad.id, this.ad);
+    adCache.set(this.toggleId, this.ad);
     this.stop();
     this.resolve(this.ad, this);
   }
@@ -322,10 +333,12 @@ export class Scraper {
 }
 
 // Sub state machine for menu parsing
-class IdFinder {
+class IdFinder extends StateMachine {
   constructor(id, toggle) {
+    super();
     this.id = id;
     this.toggle = toggle;
+    this.promote(states.MENU);
   }
 
   tick() {
