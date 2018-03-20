@@ -46,14 +46,14 @@ export const sayThanks = ratings_count => ({
 });
 
 export const rateAd = (ad, rating, update) => {
-  return (dispatch, store) => {
+  return (dispatch, getState) => {
     let body = {
       ...adForRequest(ad),
       political: rating === RatingType.POLITICAL
     };
     dispatch(update(ad.id, rating));
-    dispatch(sayThanks(store.getState().ratings_count || 0));
+    dispatch(sayThanks(getState().ratings_count || 0));
     let cb = () => ({});
-    return sendAds([body], store.getState().language).then(cb, cb);
+    return sendAds([body], getState().language).then(cb, cb);
   };
 };
