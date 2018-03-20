@@ -1,4 +1,4 @@
-import { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR } from "parser";
+import { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR, DEBUG } from "parser";
 import debounce from "lodash/debounce";
 
 let running = false;
@@ -13,25 +13,25 @@ const sendAds = function() {
   let results = [];
   let scraper = posts.reduce(
     (p, i) =>
-      p.then(() => {
-        let timeout = new Promise(resolve =>
-          setTimeout(() => resolve(false), 5000)
-        );
-        return Promise.race([
-          parser(i).then(it => results.push(it), e => console.log(e)),
-          timeout
-        ]);
-      }),
+      p.then(() =>
+        parser(i).then(
+          it => {
+            results.push(it);
+          },
+          e => {
+            if (DEBUG) console.log(e);
+          }
+        )
+      ),
     Promise.resolve(null)
   );
 
   scraper.then(() => {
-    chrome.runtime.sendMessage(results.filter(i => i));
+    console.log(results);
+    chrome.runtime.sendMessage(results);
     console.log("done sending Ads");
-
     running = false;
   });
 };
 
-let a = new MutationObserver(debounce(sendAds, 5000));
-a.observe(document.body, { childList: true, subtree: true });
+setInterval(sendAds, 10000);

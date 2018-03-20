@@ -9,6 +9,7 @@ const DEBUG =
 
 const adCache = new Map();
 const targetingCache = new Map();
+let targetingBlocked = false;
 
 // create an ad for sending
 const ad = node => ({
@@ -55,8 +56,8 @@ const errors = {
   INVARIANT: "Impossible state, BUG!",
   NO_ID: "Couldn't find the ad's id"
 };
-const TIMEOUT = 100000;
-const POLL = 100;
+const TIMEOUT = 10000;
+const POLL = 50;
 export class Scraper extends StateMachine {
   constructor(node, resolve, reject) {
     super();
@@ -71,8 +72,7 @@ export class Scraper extends StateMachine {
     // cleanup after ourselves if we have been stuck for TIMEOUT millis
     this.timeout = setTimeout(() => {
       if (this.state !== states.DONE) {
-        this.state = states.ERROR;
-        this.message = errors.TIMEOUT;
+        this.promote(states.ERROR, errors.TIMEOUT);
       }
     }, TIMEOUT);
   }
@@ -140,7 +140,7 @@ export class Scraper extends StateMachine {
   timeline() {
     const sponsor = checkSponsor(this.node);
     // First we check if it is actually a sponsored post
-    if (!sponsor) return Promise.resolve(false);
+    if (!sponsor) return this.notAnAd();
 
     // And then we try to grab the parent container that has a hyperfeed id
     let parent = this.node;
@@ -162,7 +162,7 @@ export class Scraper extends StateMachine {
       this.node = this.node.querySelector(TIMELINE_SELECTOR);
 
     if (DEBUG) parent.style.color = "#006304";
-    this.ad = ad(this.node.outerHTML);
+    this.ad = ad(this.node);
     this.parent = parent;
     this.promote(states.TIMELINE_ID);
   }
@@ -187,7 +187,7 @@ export class Scraper extends StateMachine {
     }
     // and we have childnodes
     if (!this.node.children.length === 0) return this.notAnAd();
-    this.ad = ad(this.node.outerHTML);
+    this.ad = ad(this.node);
     this.parent = parent;
     // Move onto the next step
     this.promote(states.SIDEBAR_ID);
@@ -209,12 +209,10 @@ export class Scraper extends StateMachine {
       return this.promote(states.ERROR, errors.NO_TOGGLE);
     const toggle = control.querySelector("a");
     if (!toggle) return this.promote(states.ERROR, errors.NO_TOGGLE);
-
-    this.toggleId = toggle.id;
     if (adCache.has(toggle.id)) return this.promote(states.CACHED);
     // build out our state for the next step.
-    this.idFinder = new TimelineFinder(toggleId, toggle);
-    this.promote(states.OPEN);
+    this.idFinder = new TimelineFinder(toggle.id, toggle);
+    this.promote(states.MENU);
   }
 
   // Similar to the above -- while we could just use the data-ego-fbid from before, it makes sense
@@ -231,31 +229,28 @@ export class Scraper extends StateMachine {
     if (!toggleData["data_to_log"])
       return this.promote(states.ERROR, errors.NO_TOGGLE);
 
-    this.toggleId = toggleData["data_to_log"]["ad_id"];
+    const toggleId = toggleData["data_to_log"]["ad_id"];
     if (!toggleId) return this.promote(states.ERROR, errors.NO_TOGGLE);
 
     if (adCache.has(this.toggleId)) return this.promote(states.CACHED);
-
-    this.idFinder = new SidebarFinder(id, toggle, control);
-    this.promote(states.OPEN);
-  }
-
-  open() {
-    refocus(() => this.toggle.click());
+    this.idFinder = new SidebarFinder(toggleId, toggle, control);
     this.promote(states.MENU);
   }
 
   menu() {
+    this.idFinder.tick();
     switch (this.idFinder.state) {
+      case states.INITIAL:
       case states.MENU:
-        this.idFinder.tick();
         break;
       case states.DONE:
-        this.ad.id == this.idFinder.id;
+        this.ad.id = this.idFinder.id;
         this.targetingUrl = this.idFinder.url;
+        this.states.push(this.idFinder.states);
         this.promote(states.TARGETING);
         break;
       default:
+        this.states.push(this.idFinder.states);
         this.promote(states.ERROR, errors.INVARIANT);
     }
   }
@@ -308,9 +303,9 @@ export class Scraper extends StateMachine {
         }
       }
     };
+    this.promote(states.WAIT_TARGETING);
     req.open("GET", "https://www.facebook.com" + built, true);
     req.send();
-    this.promote(states.WAIT_TARGETING);
   }
 
   waitTargeting() {}
@@ -321,9 +316,8 @@ export class Scraper extends StateMachine {
 
   done() {
     if (DEBUG) {
-      console.info(this.states);
+      console.log(this.states);
     }
-    if (this.toggle) refocus(() => this.toggle.click());
     adCache.set(this.toggleId, this.ad);
     this.stop();
     this.resolve(this.ad, this);
@@ -331,8 +325,8 @@ export class Scraper extends StateMachine {
 
   error() {
     if (DEBUG) {
-      console.warn(this.message);
-      console.warn(this.states);
+      console.error(this.message);
+      console.error(this.states);
     }
     this.stop();
     this.reject(this.message, this);
@@ -341,24 +335,43 @@ export class Scraper extends StateMachine {
 
 // Sub state machine for menu parsing
 class IdFinder extends StateMachine {
-  constructor(id, toggle) {
+  constructor(toggleId, toggle) {
     super();
-    this.id = id;
+    this.toggleId = toggleId;
     this.toggle = toggle;
-    this.promote(states.MENU);
+    this.promote(states.INITIAL);
   }
 
   tick() {
     switch (this.state) {
+      case states.INITIAL:
+        this.click();
+        break;
       case states.MENU:
         this.menu();
         break;
-      case states.DONE:
-        this.done();
+      case states.ERROR:
+        this.error();
         break;
       default:
+        this.error();
         this.promote(states.ERROR, errors.INVARIANT);
     }
+  }
+
+  click() {
+    refocus(() => this.toggle.click());
+    this.promote(states.MENU);
+  }
+
+  close() {
+    refocus(() => this.toggle.click());
+    this.promote(states.DONE);
+  }
+
+  error() {
+    refocus(() => this.toggle.click());
+    this.promote(states.ERROR, errors.NO_ID);
   }
 
   menu() {
@@ -374,12 +387,12 @@ class IdFinder extends StateMachine {
       this.id = new URL("https://facebook.com" + url).searchParams.get("id");
       if (this.id) {
         this.url = url;
-        this.promote(states.DONE);
+        this.close();
       } else {
-        this.promote(states.ERROR, errors.NO_ID);
+        this.error();
       }
     } catch (e) {
-      this.promote(states.ERROR, errors.NO_ID);
+      this.error();
     }
   }
 
@@ -395,7 +408,7 @@ class IdFinder extends StateMachine {
 export class TimelineFinder extends IdFinder {
   menuFilter() {
     return Array.from(document.querySelectorAll(".uiLayer")).filter(
-      a => a.getAttribute("data-ownerid") === this.id
+      a => a.getAttribute("data-ownerid") === this.toggleId
     )[0];
   }
 
@@ -558,5 +571,6 @@ const parser = node =>
 module.exports = {
   parser,
   TIMELINE_SELECTOR,
-  SIDEBAR_SELECTOR
+  SIDEBAR_SELECTOR,
+  DEBUG
 };
