@@ -38,13 +38,18 @@ if (process.env.NODE_ENV === "development") {
 const enhancer = compose(...[persistState(), applyMiddleware(...middleware)]);
 let store = createStore(reducer, enhancer);
 
-render(
-  <Provider store={store}>
-    <div id="popup">
-      <Dispatcher />
-    </div>
-  </Provider>,
-  document.body
+// this setTimeout is ugly but seems to be a workaround for https://bugs.chromium.org/p/chromium/issues/detail?id=649942
+// we're trying to outsmart Chrome into thinking that our popup is "loaded" and ready to go
+// otherwise it waits for all external assets to load before popping-up the popup.
+setTimeout(
+  () =>
+    render(
+      <Provider store={store}>
+        <Dispatcher />
+      </Provider>,
+      document.body
+    ),
+  1
 );
 
 // connect to the ratings channel
