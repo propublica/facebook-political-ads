@@ -2,7 +2,9 @@ import * as actions from "../src/actions.js";
 import { ToggleType, RatingType } from "../src/constants.js";
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
-import fetchMock from "fetch-mock";
+import fetch from "jest-fetch-mock";
+global.fetch = fetch;
+global.Headers = fetch.Headers;
 
 const ads = JSON.parse(require("fs").readFileSync(__dirname + "/ads.json"));
 
@@ -60,8 +62,29 @@ describe("actions", () => {
 const mockStore = configureMockStore([thunk]);
 
 describe("async actions", () => {
-  it("should post updates to our server on rateAd", () => {
+  it("should post updates to our server on rateAd", async () => {
     const { id, html, targeting } = ads.ads[0];
-    fetchMock.postOnce("/facebook-ads/ads", { id, html, targeting });
+    const ad = { id, html, targeting, political: true };
+    // find the chance that we get a success :)
+    let count = 1;
+    let cumP = 1;
+    while (1 - cumP < 0.99999) {
+      cumP *= 1 / (2 * Math.sqrt(count));
+      count++;
+    }
+
+    const store = mockStore({ language: "en", country: "US" });
+    for (let i = 0; i <= count; i++) {
+      await store.dispatch(
+        actions.rateAd(ad, RatingType.POLITICAL, actions.updateRating)
+      );
+    }
+    expect(
+      store.getActions().filter(it => it.type === actions.SAY_THANKS).length
+    ).toBeGreaterThan(0);
+
+    expect(store.getActions()[0]).toEqual(
+      actions.updateRating(ad.id, RatingType.POLITICAL)
+    );
   });
 });
