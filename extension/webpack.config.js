@@ -11,7 +11,8 @@ const outdir =
 
 module.exports = [
   {
-    entry: "./src/content.js",
+    entry: "content.js",
+    context: path.resolve(__dirname, "src"),
     output: {
       filename: "content.js",
       path: outdir
@@ -31,7 +32,8 @@ module.exports = [
     devtool: "source-map"
   },
   {
-    entry: "./src/background.js",
+    entry: "background.js",
+    context: path.resolve(__dirname, "src"),
     output: {
       filename: "background.js",
       path: outdir
@@ -52,7 +54,7 @@ module.exports = [
   },
   {
     context: path.resolve(__dirname, "src"),
-    entry: "./popup.jsx",
+    entry: "popup.jsx",
     output: {
       filename: "popup.js",
       path: outdir
@@ -71,7 +73,7 @@ module.exports = [
         {
           test: /\.jsx?$/,
           exclude: /node_modules/,
-          use: "babel-loader"
+          use: "babel-loader?cacheDirectory"
         },
         {
           test: /\.css$/,

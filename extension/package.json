@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "test:jest": "npm test -- --watch",
+    "test:watch": "npm test -- --watch",
     "coverage": "jest --coverage",
     "build": "webpack --progress --mode development",
     "watch": "webpack -w --progress --mode development",
@@ -35,6 +35,7 @@
     "eslint-plugin-react": "^7.7.0",
     "html-webpack-plugin": "^3.0.7",
     "jest": "^22.4.3",
+    "redux-mock-store": "^1.5.1",
     "source-map-loader": "^0.2.3",
     "style-loader": "^0.20.3",
     "uglifyjs-webpack-plugin": "^1.2.4",
@@ -56,5 +57,10 @@
     "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0"
+  },
+  "jest": {
+    "modulePaths": [
+      "<rootDir>/src/"
+    ]
   }
 }
