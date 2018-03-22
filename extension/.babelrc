@@ -1,10 +1,5 @@
 {
   "sourceMaps": true,
-  "presets": [
-    ["env", "react"]
-  ],
-  "plugins": [
-    ["transform-react-jsx"],
-    ["transform-object-rest-spread"]
-  ]
+  "presets": ["@babel/env", "@babel/react"],
+  "plugins": ["@babel/plugin-proposal-object-rest-spread", "@babel/transform-runtime"]
 }

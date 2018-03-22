@@ -2,7 +2,6 @@ const path = require("path");
 const webpack = require("webpack");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const ENV = process.env.NODE_ENV || "development";
 
 const outdir =
@@ -76,12 +75,17 @@ module.exports = [
         },
         {
           test: /\.css$/,
-          use: [MiniCssExtractPlugin.loader, "css-loader"]
+          use: [
+            "style-loader",
+            {
+              loader: "css-loader",
+              options: { importLoaders: 1 }
+            }
+          ]
         }
       ]
     },
     plugins: [
-      new MiniCssExtractPlugin({ filename: "styles.css" }),
       new webpack.optimize.ModuleConcatenationPlugin(),
       new webpack.NoEmitOnErrorsPlugin(),
       new HTMLWebpackPlugin({
