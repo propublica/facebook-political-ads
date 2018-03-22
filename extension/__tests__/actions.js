@@ -65,7 +65,7 @@ describe("async actions", () => {
   it("should post updates to our server on rateAd", async () => {
     const { id, html, targeting } = ads.ads[0];
     const ad = { id, html, targeting, political: true };
-    // find the chance that we get a success :)
+    // find a reasonable chance that we will get a thanks :)
     let count = 1;
     let cumP = 1;
     while (1 - cumP < 0.99999) {
