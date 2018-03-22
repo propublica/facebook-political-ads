@@ -161,7 +161,7 @@ describe("async actions", () => {
     const ad = ads.ads[0];
     fetchMock.getOnce("/facebook-ads/ads/" + ad.id, JSON.stringify(ad));
     const expected = [actions.requestingOneAd(ad.id), actions.receiveOneAd(ad)];
-    let store = mockStore({});
+    const store = mockStore({});
     await store.dispatch(actions.getOneAd(ad.id));
     expect(store.getActions()).toEqual(expected);
   });
