@@ -8,6 +8,8 @@ import {
 Enzyme.configure({ adapter: new Adapter() });
 import configureMockStore from "redux-mock-store";
 import thunkMiddleware from "redux-thunk";
+import fetchMock from "fetch-mock";
+
 import * as actions from "../../src/actions.js";
 
 function setup({ ads }) {
@@ -72,14 +74,13 @@ describe("components", () => {
 
   describe("AdListUnrouted", () => {
     const mockStore = configureMockStore([thunkMiddleware]);
-    let store;
     jest.mock("lodash/debounce", () => jest.fn(fn => fn));
     actions.throttledDispatch = jest.fn(fn => fn);
 
     it("should preventDefault and call throttledDispatch when change occurs", () => {
       const initialState = { ads: [{ id: "1234567890" }], pagination: null };
-      store = mockStore(initialState);
-      let wrapper = shallow(<AdListUnrouted store={store} />, {
+      const store = mockStore(initialState);
+      const wrapper = shallow(<AdListUnrouted store={store} />, {
         disableLifecycleMethods: true
       }).dive();
       const preventDefault = jest.fn();
@@ -89,16 +90,14 @@ describe("components", () => {
         preventDefault: preventDefault
       });
       expect(actions.throttledDispatch.mock.calls[0][1]).toBe(input_value);
-
       expect(preventDefault).toHaveBeenCalledTimes(1);
       expect(actions.throttledDispatch).toHaveBeenCalledTimes(1);
     });
 
     it("should deserialize on mount", () => {
       const initialState = { ads: [{ id: "1234567890" }], pagination: null };
-      store = mockStore(initialState);
-      global.fetch = require("jest-fetch-mock");
-      fetch.mockResponse(JSON.stringify([]));
+      const store = mockStore(initialState);
+      fetchMock.getOnce("/facebook-ads/ads?", JSON.stringify([]));
       shallow(<AdListUnrouted store={store} />, {
         disableLifecycleMethods: false
       }).dive();
