@@ -1,5 +1,4 @@
 import { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR, DEBUG } from "parser";
-import debounce from "lodash/debounce";
 
 let running = false;
 const sendAds = function() {
