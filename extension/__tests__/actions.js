@@ -65,24 +65,12 @@ describe("async actions", () => {
   it("should post updates to our server on rateAd", async () => {
     const { id, html, targeting } = ads.ads[0];
     const ad = { id, html, targeting, political: true };
-    // find a reasonable chance that we will get a thanks :)
-    let count = 1;
-    let cumP = 1;
-    while (1 - cumP < 0.99999) {
-      cumP *= 1 / (2 * Math.sqrt(count));
-      count++;
-    }
-
     const store = mockStore({ language: "en", country: "US" });
-    for (let i = 0; i <= count; i++) {
-      await store.dispatch(
-        actions.rateAd(ad, RatingType.POLITICAL, actions.updateRating)
-      );
-    }
-    expect(
-      store.getActions().filter(it => it.type === actions.SAY_THANKS).length
-    ).toBeGreaterThan(0);
 
+    await store.dispatch(
+      actions.rateAd(ad, RatingType.POLITICAL, actions.updateRating)
+    );
+    expect(store.getActions()[1]).toEqual(actions.sayThanks(0));
     expect(store.getActions()[0]).toEqual(
       actions.updateRating(ad.id, RatingType.POLITICAL)
     );

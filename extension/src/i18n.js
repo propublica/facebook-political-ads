@@ -1,6 +1,7 @@
 import { memoize } from "lodash";
 import { connect } from "react-redux";
 import countries from "i18n-iso-countries";
+import * as messages from "locales.js";
 
 // active ones get prioritised in the ui (pull downs)
 // ISO 3166-1 Alpha-2 (upper case)
@@ -26,14 +27,6 @@ activeLanguages
   .forEach(lang =>
     countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
   );
-
-// load all messages from ../_locales
-const requireLocales = require.context("../_locales", true, /messages\.json$/);
-const messages = requireLocales.keys().reduce((index, key) => {
-  const locale = key.split("/")[1]; // example key: './de_CH/messages.json'
-  index[locale] = requireLocales(key);
-  return index;
-}, {});
 
 const createFormatter = (...locales) => {
   const index = locales.reduceRight(Object.assign, {});
