@@ -74,5 +74,6 @@ describe("async actions", () => {
     expect(store.getActions()[0]).toEqual(
       actions.updateRating(ad.id, RatingType.POLITICAL)
     );
+    fetch.resetMocks();
   });
 });

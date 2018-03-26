@@ -85,6 +85,7 @@ describe("ads and ratings", () => {
       expect.arrayContaining([])
     );
   });
+
   it("should respond to new", () => {
     expect(reducers.ads(undefined, actions.newAds(ads.ads))).toEqual(
       expect.arrayContaining(ads.ads)
