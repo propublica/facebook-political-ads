@@ -40,7 +40,7 @@ export const buildUpdate = type => (state = [], action) => {
 };
 
 export const ads = buildUpdate("ad");
-export const ratings = buildUpdate("ratings");
+export const ratings = buildUpdate("rating");
 
 export const terms = (state = false, action) => {
   switch (action.type) {
@@ -74,6 +74,7 @@ export const thanks = (state = null, action) => {
       return state;
   }
 };
+
 export const ratings_count = (state = 0, action) => {
   switch (action.type) {
     case UPDATE_RATING:
