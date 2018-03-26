@@ -94,5 +94,19 @@ describe("ads and ratings", () => {
     );
   });
 
-  it("should respond to update", () => {});
+  it("should respond to update", () => {
+    const old = [Object.assign({}, ads.ads[0])];
+    const expected = [
+      Object.assign({}, { rating: RatingType.POLITICAL }, ads.ads[0])
+    ];
+    expect(
+      reducers.ads(old, actions.updateAd(ads.ads[0].id, RatingType.POLITICAL))
+    ).toEqual(expect.arrayContaining(expected));
+    expect(
+      reducers.ratings(
+        old,
+        actions.updateRating(ads.ads[0].id, RatingType.POLITICAL)
+      )
+    ).toEqual(expect.arrayContaining(expected));
+  });
 });
