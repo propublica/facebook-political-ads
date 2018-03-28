@@ -96,9 +96,10 @@ describe("ads and ratings", () => {
   });
 
   it("should respond to update", () => {
-    const old = [Object.assign({}, ads.ads[0])];
+    const old = [Object.assign({}, ads.ads[0]), ads.ads[1]];
     const expected = [
-      Object.assign({}, { rating: RatingType.POLITICAL }, ads.ads[0])
+      Object.assign({}, { rating: RatingType.POLITICAL }, ads.ads[0]),
+      ads.ads[1]
     ];
     expect(
       reducers.ads(old, actions.updateAd(ads.ads[0].id, RatingType.POLITICAL))

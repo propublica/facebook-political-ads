@@ -1,6 +1,8 @@
 import * as utils from "../src/utils.js";
 import fetch from "jest-fetch-mock";
 import { RatingType } from "../src/constants.js";
+import sortBy from "lodash/sortby";
+import cloneDeep from "lodash/clonedeep";
 global.fetch = fetch;
 global.Headers = fetch.Headers;
 
@@ -42,6 +44,7 @@ describe("server communication", () => {
     ]);
   });
 });
+
 const badge = jest.fn();
 global.chrome = {
   browserAction: {
@@ -63,6 +66,7 @@ describe("badges", () => {
     utils.updateBadge(bulk);
     expect(badge.mock.calls[0]).toEqual([{ text: "100+" }]);
   });
+
   it("should not show a badge when everything is rated", () => {
     const ratings = [
       Object.assign({}, ads.ads[0], { rating: RatingType.POLITICAL })
@@ -70,4 +74,24 @@ describe("badges", () => {
     utils.updateBadge(ratings);
     expect(badge.mock.calls[0]).toEqual([{ text: "" }]);
   });
+});
+
+describe("merge", () => {
+  const old = ads.ads.slice(0, 1);
+  const newAds = sortBy(
+    ads.ads.slice(0, 2),
+    a => -1 * Date.parse(a.created_at)
+  );
+  expect(utils.mergeAds(old, newAds)).toEqual(expect.arrayContaining(newAds));
+});
+
+describe("unrated ratings", () => {
+  const ratings = cloneDeep(ads.ads);
+  ratings[1].rating = RatingType.POLITICAL;
+  ratings[0].rating = RatingType.NORMAL;
+  expect(utils.getUnratedRatings(ratings)).toEqual(
+    expect.arrayContaining(ratings.slice(1, ratings.length))
+  );
+
+  expect(utils.countUnratedRatings(ratings)).toEqual(18);
 });
