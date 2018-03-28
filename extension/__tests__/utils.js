@@ -51,6 +51,7 @@ global.chrome = {
 
 describe("badges", () => {
   afterEach(() => badge.mockReset());
+
   it("should update the badge", () => {
     utils.updateBadge(ads.ads);
     expect(badge.mock.calls[0]).toEqual([{ text: "" + ads.ads.length }]);
