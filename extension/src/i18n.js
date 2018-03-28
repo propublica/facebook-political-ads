@@ -1,4 +1,4 @@
-import { memoize } from "lodash";
+import memoize from "lodash/memoize";
 import { connect } from "react-redux";
 import countries from "i18n-iso-countries";
 import * as messages from "locales.js";
@@ -16,19 +16,18 @@ export const activeCountries = [
   "FI",
   "CA",
   "SE",
-  "BE"
+  "BE",
+  "SV"
 ];
 // ISO 639-1 (2 characters, lower case)
 export const activeLanguages = ["da", "de", "en", "it", "nl", "fi", "fr", "sv"];
 
 // load country names in our languages
-activeLanguages
-  .concat(["sv"])
-  .forEach(lang =>
-    countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
-  );
+activeLanguages.forEach(lang =>
+  countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
+);
 
-const createFormatter = (...locales) => {
+export const createFormatter = (...locales) => {
   const index = locales.reduceRight(Object.assign, {});
 
   const formatter = (key, replacements) => {
@@ -47,7 +46,7 @@ const createFormatter = (...locales) => {
   return formatter;
 };
 
-const getFormatter = memoize(({ language, country }) =>
+export const getFormatter = memoize(({ language, country }) =>
   createFormatter(
     messages[`${language}_${country}`],
     messages[language],
