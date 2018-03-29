@@ -1,16 +1,25 @@
 import React from "react";
 import { Provider } from "react-redux";
 import renderer from "react-test-renderer";
-import { Ad, RatingForm } from "../../src/components/ads.jsx";
+import {
+  Ad,
+  Ads,
+  RatingForm,
+  UnratedRatings
+} from "../../src/components/ads.jsx";
 import { getMessage } from "../../src/i18n.js";
 import { RatingType } from "../../src/constants.js";
+import { updateRating, updateAd } from "../../src/actions.js";
 import Enzyme, { mount } from "enzyme";
 import Adapter from "enzyme-adapter-react-16";
 import configureMockStore from "redux-mock-store";
-
+import thunk from "redux-thunk";
+import fetch from "jest-fetch-mock";
+global.fetch = fetch;
+global.Headers = fetch.Headers;
 Enzyme.configure({ adapter: new Adapter() });
 
-const mockStore = configureMockStore();
+const mockStore = configureMockStore([thunk]);
 const ads = JSON.parse(require("fs").readFileSync(__dirname + "/../ads.json"));
 
 describe("ads", () => {
@@ -37,5 +46,40 @@ describe("ads", () => {
     );
     expect(form).toMatchSnapshot();
     form.find("button").forEach(node => node.simulate("click"));
+  });
+
+  it("should display ratings", () => {
+    const store = mockStore({ language: "en", ratings: ads.ads });
+    const ratings = mount(
+      <Provider store={store}>
+        <UnratedRatings ratings={ads.ads} />
+      </Provider>
+    );
+    expect(ratings).toMatchSnapshot();
+    ratings
+      .find("button")
+      .at(0)
+      .simulate("click");
+    expect(store.getActions()[0]).toEqual(
+      updateRating(ads.ads[0].id, RatingType.POLITICAL)
+    );
+  });
+
+  it("should display ads", () => {
+    ads.ads[1].rating = RatingType.POLITICAL;
+    const store = mockStore({ language: "en", ads: ads.ads });
+    const ratings = mount(
+      <Provider store={store}>
+        <Ads ratings={ads.ads} />
+      </Provider>
+    );
+    expect(ratings).toMatchSnapshot();
+    ratings
+      .find("button")
+      .at(0)
+      .simulate("click");
+    expect(store.getActions()[0]).toEqual(
+      updateAd(ads.ads[0].id, RatingType.POLITICAL)
+    );
   });
 });
