@@ -50,8 +50,9 @@ def classify(ctx, newest, lang):
     idx = 0
     for record in records:
         idx += 1
-        if record["lang"] in classifiers:
-            classifier = classifiers[record["lang"]]
+        record_lang = "en-US" if record["lang"] == "en-IE" else record["lang"]
+        if record_lang in classifiers:
+            classifier = classifiers[record_lang]
             text = classifier["vectorizer"].transform([get_text(record)])
             probability = classifier["classifier"].predict_proba(text)[0][1]
             update = {
