@@ -60,6 +60,11 @@ export const fetchSearch = query => asyncResetPage(newSearch(query));
 export const throttledDispatch = debounce((dispatch, input) => {
   dispatch(fetchSearch(input));
 }, 750);
+// throttledDispatchAny(dispatch, fetchSearch, input) // TODO
+
+export const throttledDispatchAny = debounce((dispatch, func, input) => {
+  dispatch(func(input));
+}, 750);
 
 export const BATCH = "batch";
 export const batch = (...actions) => ({
@@ -93,6 +98,11 @@ export const toggleTarget = () => ({ type: TOGGLE_TARGET });
 export const toggleAdvertiser = () => ({ type: TOGGLE_ADVERTISER });
 export const toggleEntity = () => ({ type: TOGGLE_ENTITY });
 export const resetDropdowns = () => ({ type: RESET_DROPDOWNS });
+
+export const CHANGE_POLITICAL_PROBABILITY = "change_poliprob";
+export const filterbyPoliticalProbability = a(CHANGE_POLITICAL_PROBABILITY);
+export const changePoliticalProbability = t =>
+  asyncResetPage(filterbyPoliticalProbability(t));
 
 export const NEXT_PAGE = "next_page";
 export const PREV_PAGE = "prev_page";

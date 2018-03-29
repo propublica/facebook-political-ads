@@ -3,8 +3,14 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import Pagination from "components/pagination.jsx";
 import Ad from "components/admin/ad.jsx";
-import { throttledDispatch, getAds } from "actions.js";
+import {
+  throttledDispatch,
+  getAds,
+  changePoliticalProbability,
+  throttledDispatchAny
+} from "actions.js";
 import { deserialize } from "utils.js";
+import Range from "rc-slider/lib/Range";
 
 export class AdsUnconnected extends React.Component {
   componentDidMount() {
@@ -20,6 +26,14 @@ export class AdsUnconnected extends React.Component {
           onKeyUp={this.props.onKeyUp}
           search={this.props.search}
         />
+        <div className="rangeslider">
+          <label htmlFor="range-1a">Political Probability:</label>
+          <Range
+            defaultValue={[70, 100]}
+            onChange={this.props.onSliderChange}
+          />
+        </div>
+
         {this.props.pagination ? <Pagination /> : ""}
         {this.props.ads
           .filter(ad => !ad.suppressed)
@@ -53,6 +67,10 @@ export const AdsUnrouted = connect(
         dispatch,
         e.target.value.length ? e.target.value : null
       );
+    },
+    onSliderChange: vals => {
+      console.log(vals);
+      throttledDispatchAny(dispatch, vals, changePoliticalProbability);
     }
   })
 )(AdsUnconnected);

@@ -206,9 +206,9 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
                 let mut interval_str = String::from("created_at > NOW() - interval '");
                 interval_str.push_str(interv);
                 interval_str.push_str("'");
-                Ad::scoped(language).filter(sql::<Bool>(&interval_str)) // .filter(created_at.gt( now - interval.unwrap_or(1.months()) )) // uncomment to use PgInterval
+                Ad::scoped(language, &None).filter(sql::<Bool>(&interval_str)) // .filter(created_at.gt( now - interval.unwrap_or(1.months()) )) // uncomment to use PgInterval
             }
-            &None => Ad::scoped(language),
+            &None => Ad::scoped(language, &None),
         }).limit(limit.unwrap_or(20));
         println!("{}", debug_query::<Pg, _>(&query));
         Ok(query.load::<T>(&*connection)?)
@@ -221,6 +221,7 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
     ) -> Result<Vec<T>> {
         let connection = conn.get()?;
         let query = agg!(Ad::search_query(language, options)).limit(20);
+        println!("{}", debug_query::<Pg, _>(&query));
         Ok(query.load::<T>(&*connection)?)
     }
 }
@@ -440,10 +441,16 @@ impl Ad {
             .collect()
     }
 
-    pub fn scoped<'a>(language: &'a str) -> BoxedQuery<'a, Pg> {
+    pub fn scoped<'a>(
+        language: &'a str,
+        minimum_probability: &Option<f64>, // why does f32 throw a zillion errors but f64 work? why do people call eggs a dairy product?
+    ) -> BoxedQuery<'a, Pg> {
         use schema::ads::dsl::*;
         ads.filter(lang.eq(language))
-            .filter(political_probability.gt(0.70))
+            .filter(political_probability.gt(match minimum_probability {
+                &Some(minprob) => minprob,
+                &None => 0.70,
+            }))
             .filter(suppressed.eq(false))
             .into_boxed()
     }
@@ -465,7 +472,10 @@ impl Ad {
         options: &'a HashMap<String, String>,
     ) -> BoxedQuery<'a, Pg> {
         use schema::ads::dsl::*;
-        let mut query = Ad::scoped(language);
+        use std::str::FromStr;
+        let poliprob =
+            f64::from_str(options.get("poliprob").unwrap_or(&String::from("error"))).ok();
+        let mut query = Ad::scoped(language, &poliprob);
 
         if let Some(search) = options.get("search") {
             query = match &language[..2] {
@@ -524,6 +534,7 @@ impl Ad {
             query = query.offset(offset as i64);
         }
 
+        println!("{}", debug_query::<Pg, _>(&query));
         Ok(query
             .limit(20)
             .order(created_at.desc())
@@ -537,7 +548,7 @@ impl Ad {
     ) -> Result<Option<Ad>> {
         use schema::ads::dsl::id as db_id;
         let connection = conn.get()?;
-        let query = Ad::scoped(language);
+        let query = Ad::scoped(language, &None);
         info!("Getting from db {}", id);
         // returns a Result with value of Ok(Option(Ad)) OR a Result with value
         // Err(somethin)
