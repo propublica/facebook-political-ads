@@ -28,6 +28,9 @@
     "babel-loader": "^8.0.0-beta.2",
     "copy-webpack-plugin": "^4.5.1",
     "css-loader": "^0.28.11",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "enzyme-to-json": "^3.3.3",
     "eslint": "^4.19",
     "eslint-config-prettier": "^2.9.0",
     "eslint-plugin-jest": "^21.14.0",
@@ -36,6 +39,7 @@
     "html-webpack-plugin": "^3.0.7",
     "jest": "^22.4.3",
     "jest-fetch-mock": "^1.5.0",
+    "react-test-renderer": "^16.2.0",
     "redux-mock-store": "^1.5.1",
     "source-map-loader": "^0.2.3",
     "style-loader": "^0.20.3",
@@ -61,6 +65,7 @@
   "jest": {
     "modulePaths": [
       "<rootDir>/src/"
-    ]
+    ],
+    "snapshotSerializers": ["enzyme-to-json/serializer"]
   }
 }

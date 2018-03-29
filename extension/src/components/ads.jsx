@@ -17,17 +17,13 @@ export const RatingForm = withI18n(
       {getMessage(question)}
       <button
         id={"political" + rating.id}
-        onClick={function() {
-          return action(rating, RatingType.POLITICAL);
-        }}
+        onClick={() => action(rating, RatingType.POLITICAL)}
       >
         {getMessage("political")}
       </button>
       <button
         id={"normal" + rating.id}
-        onClick={function() {
-          return action(rating, RatingType.NORMAL);
-        }}
+        onClick={() => action(rating, RatingType.NORMAL)}
       >
         {getMessage("normal")}
       </button>
