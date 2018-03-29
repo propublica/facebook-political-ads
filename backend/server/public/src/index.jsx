@@ -48,7 +48,9 @@ go(() => {
     document.querySelector("#graphic")
   );
   history.listen(location => {
-    window.ga("set", "page", location.pathname + location.search);
-    window.ga("send", "pageview", location.pathname + location.search);
+    if (window.ga) {
+      window.ga("set", "page", location.pathname + location.search);
+      window.ga("send", "pageview", location.pathname + location.search);
+    }
   });
 });
