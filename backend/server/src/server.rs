@@ -91,7 +91,7 @@ impl Service for AdServer {
                 Either::B(self.file("public/dist/admin.js.map", ContentType::json()))
             }
             (&Method::Get, "/facebook-ads/admin/styles.css") => {
-                Either::B(self.file("public/css/admin/styles.css", ContentType(mime::TEXT_CSS)))
+                Either::B(self.file("public/dist/admin/styles.css", ContentType(mime::TEXT_CSS)))
             }
             (&Method::Post, "/facebook-ads/admin/ads") => {
                 Either::B(self.auth(req, |request| self.mark(request)))
@@ -363,6 +363,7 @@ impl AdServer {
                                 || pair.0 == "advertisers"
                                 || pair.0 == "entities"
                                 || pair.0 == "id"
+                                || pair.0 == "poliprob"
                         })
                         // transforms the Vector of tuples into a HashMap.
                         .collect::<HashMap<_, _>>()

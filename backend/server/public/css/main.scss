@@ -10,6 +10,8 @@
 @import "grid-settings";
 @import "josef";
 
+@import "../node_modules/rc-slider/assets/index.css";
+
 $image-assets: "../images";
 $cachebuster: random(1000000);
 
