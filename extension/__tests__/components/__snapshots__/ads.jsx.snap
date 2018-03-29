@@ -1,0 +1,155 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ads should render an ad 1`] = `
+<div
+  className="ad"
+  id="1"
+>
+  <div
+    className="ad-display"
+    dangerouslySetInnerHTML={
+      Object {
+        "__html": "<b>Hello!</b>",
+      }
+    }
+  />
+</div>
+`;
+
+exports[`ads should show a rating form 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Connect(Component)
+    action={[Function]}
+    question="verify_question"
+    rating={
+      Object {
+        "advertiser": "International Rescue Committee",
+        "created_at": "2018-03-22T17:11:57.354805Z",
+        "entities": Array [
+          Object {
+            "entity": "Syrian",
+            "entity_type": "Group",
+          },
+        ],
+        "html": "<div class=\\"_1dwg _1w_m\\"><div><span class=\\"_47we\\"><span class=\\"uiLikePageButton\\" id=\\"u_ps_fetchstream_6_0_h\\"></span></span><div class=\\"_5x46 _1yz1 clearfix\\"><div class=\\"clearfix _5va3\\"><a class=\\"_5pb8 _1yz2 _8o _8s lfloat _ohe\\" href=\\"https://www.facebook.com/InternationalRescueCommittee/\\"><div class=\\"_38vo\\"><img class=\\"_s0 _4ooo _5xib _44ma _54ru img\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/v/t1.0-1/p32x32/2501_10153888779753024_4453263147283902647_n.jpg\\"></div></a><div class=\\"clearfix _42ef\\"><div class=\\"rfloat _ohf\\"></div><div class=\\"_5va4\\"><div><div class=\\"_6a _5u5j\\"><div class=\\"_6a _6b\\"></div><div class=\\"_6a _5u5j _6b\\"><h6 class=\\"_14f3 _14f5 _5pbw _5vra\\"><span class=\\"fwn fcg\\"><span class=\\"fwb fcg\\"><a href=\\"https://www.facebook.com/InternationalRescueCommittee/\\">International Rescue Committee</a></span></span></h6><div class=\\"_5pcp _5lel _2jyu _232_\\" id=\\"feed_subtitle_128;73970658023;0;10156261500423024;1521738054:-6493541085699270874:5:0:3884\\"><span class=\\"_5paw _4dcu _6187\\"><div class=\\"_14ba _14bf\\"><div class=\\"_14bd _14bf\\"><a class=\\"_3e_2 _m8c\\" href=\\"nullblank\\"><div><div class=\\"_14bf\\">Sp</div><div class=\\"_14bf _2lgs\\">S</div><div class=\\"_14bf\\">on</div><div class=\\"_14bf _2lgs\\">S</div><div class=\\"_14bf\\">so</div><div class=\\"_14bf _2lgs\\">S</div><div class=\\"_14bf\\">red</div><div class=\\"_14bf _2lgs\\">S</div></div></a></div></div></span><span> · </span><a class=\\"uiStreamPrivacy inlineBlock fbStreamPrivacy fbPrivacyAudienceIndicator _5pcq\\" href=\\"nullblank\\"><i class=\\"lock img sp_d0NYpM4xxw4 sx_226545\\"></i></a></div></div></div></div></div></div></div></div><div class=\\"_5pbx userContent _3576\\" id=\\"js_183\\"><p>Trapped Syrian families need urgent aid as bombs rain down. Their homes are gone, they have little aid and nowhere to hide. Please don’t turn away. Help us save lives now.</p></div><div class=\\"_3x-2\\"><div><div class=\\"mtm\\"><div class=\\"_6m2 _1zpr clearfix _dcs _4_w4 _41u- _6m8 _59ap\\" id=\\"u_ps_fetchstream_6_0_i\\"><div class=\\"clearfix _2r3x\\"><div class=\\"lfloat _ohe\\"><span class=\\"_3m6-\\"><div class=\\"_150c\\"><img class=\\"_3chq\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/v/t15.0-10/27600013_10213727726041277_3929550735426977792_n.jpg\\"><div class=\\"_5mly _40ja _45oh\\" id=\\"u_ps_fetchstream_6_0_p\\"><div class=\\"_5v-_ _zpr\\" id=\\"u_ps_fetchstream_6_0_q\\"><div class=\\"_1c_u _45oh\\" id=\\"u_ps_fetchstream_6_0_r\\"><div class=\\"_53j5\\" id=\\"u_ps_fetchstream_6_0_s\\"><div class=\\"_4lpe _3htz\\"><img class=\\"_4lpf\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/v/t15.0-10/27600013_10213727726041277_3929550735426977792_n.jpg\\"></div><div class=\\"_m54 _1jto _3htz\\" id=\\"u_ps_fetchstream_6_0_u\\"><img class=\\"_1445 _4ndd img\\" id=\\"u_ps_fetchstream_6_0_v\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y4/r/-PAXP-deijE.gif\\"></div><div class=\\"_4ubd _170l _27db _3htz\\" id=\\"u_ps_fetchstream_6_0_w\\"><div class=\\"_2w_u\\"><div class=\\"_w80 _2oy-\\"></div><div class=\\"_1otk _3t1r _4ubd\\"><div class=\\"_2w_w\\"><div class=\\"_1c7d\\"><div class=\\"_1c7f _1c7g _2oy-\\"></div><div class=\\"_1c7f _2pvx _2oy-\\"><div><div class=\\"_2yu5\\"><div class=\\"_2yu7\\"><div class=\\"_2yu8\\"></div><div class=\\"_2yu9\\"><div class=\\"_2yua _4sxb\\"></div></div><div></div></div></div></div></div><div class=\\"_1c7f _1c7h _2oy-\\"><div class=\\"_5qsr _66_y _66_z\\">-0:18</div><div class=\\"_2j04\\"><div></div></div><span></span></div><div class=\\"_1c7f _w7o _2oy-\\"><div class=\\"_2swo\\"><div class=\\"_3pao\\"><div class=\\"_4sxa\\"><div class=\\"_3paq\\"><div class=\\"_3par\\"><div class=\\"_3pas _4sxb\\"></div></div></div></div><div class=\\"_3pat\\"></div></div></div></div></div></div></div></div></div><div class=\\"_27vv _n2z _167h _3htz\\" id=\\"u_ps_fetchstream_6_0_x\\"><div class=\\"_31-p _3t-6\\"><div class=\\"_42o0\\"><div class=\\"_2za- _5tps uiContextualLayerParent _10sh _360f\\"><div class=\\"_1vx9\\"><a class=\\"_2za_ _5p5v\\" href=\\"https://www.facebook.com/InternationalRescueCommittee/videos\\"><span class=\\"_50f7\\">International Rescue Committee</span></a></div><span class=\\"_5-sh\\">Sponsored</span></div></div><div class=\\"_bvu\\"><div class=\\"_-pr\\"><a class=\\"_3xxp\\" href=\\"nullblank\\"><i class=\\"_5-q_ _360f img sp_nUZhQzOSrMZ sx_96e9b4\\"><u>triangle-down</u></i></a><a class=\\"_3xxo\\" href=\\"nullblank\\"><i class=\\"_5-r0 _360f img sp_nUZhQzOSrMZ sx_ef716e\\"><u>triangle-up</u></i></a><div class=\\"_n2_ _j-p _360f\\"></div></div></div></div><div class=\\"_62jj _qzf _2se8\\"></div><div class=\\"_31-o _3t-6 _2se8\\"><div class=\\"_5aj7\\"><div class=\\"_4bl9 _3w_z _360f\\"><div class=\\"_11jc\\"></div></div><div class=\\"_4bl7\\"><div class=\\"_5sv5 _360f\\"></div></div></div><div class=\\"clearfix\\"><div class=\\"lfloat _ohe\\"><div class=\\"_3bn1\\"><div class=\\"_n2- _n2y _360f\\"></div><div class=\\"_4per _4pep _360f\\"></div></div></div><div class=\\"rfloat _ohf\\"><div class=\\"_27w7\\"><span class=\\"_4qo2 _360f\\" id=\\"u_ps_fetchstream_6_0_y\\"><div class=\\"_khz _4sz1 _4rw5 _3wv2\\"><a class=\\"UFILikeLink _4x9- _4x9_ _48-k\\" href=\\"nullblank\\">Like</a></div></span><a class=\\"_27w8 _24mq _360f\\" href=\\"nullblank\\"><i class=\\"_27w9 img sp_d0NYpM4xxw4 sx_43e15a\\"><u>share</u></i><span class=\\"_3l-d\\">Share</span></a></div></div></div></div></div><div class=\\"_npo hidden_elem _3htz\\" id=\\"u_ps_fetchstream_6_0_z\\"><div class=\\"_3drf\\"></div><div class=\\"_3x62\\"><div class=\\"_63rn\\"><div class=\\"_63rm\\"><div class=\\"_iij\\">It looks like you may be having problems playing this video. If so, please try restarting your browser.</div><div class=\\"_iir\\">Close</div></div></div></div></div><div class=\\"_567v _3bw _4ubd _28dy _3htz\\" id=\\"u_ps_fetchstream_6_0_10\\"><div class=\\"_567_\\"><div class=\\"_2za- _2vd- uiContextualLayerParent _28dz\\" id=\\"u_ps_fetchstream_6_0_11\\"><div class=\\"_1vx9\\"><a class=\\"_2za_\\" href=\\"https://www.facebook.com/InternationalRescueCommittee/videos\\"><span class=\\"_50f7\\">URGENT: Save Families in Eastern Ghouta</span></a></div><div class=\\"_1vx9\\">Posted by <a class=\\"_2za_ _5p5v\\" href=\\"https://www.facebook.com/InternationalRescueCommittee/videos\\"><span class=\\"_50f7\\">International Rescue Committee</span></a></div><div class=\\"_1vx9\\"><span>1,791,071 Views</span></div></div></div><div class=\\"_5bke\\" id=\\"u_ps_fetchstream_6_0_12\\"></div></div><div class=\\"_35sk _tbz _3htz\\" id=\\"u_ps_fetchstream_6_0_13\\"><ul class=\\"_53bj\\"><li><a href=\\"https://help.rescue.org/donate/help-families-trapped-in-syria\\" id=\\"u_ps_fetchstream_6_0_14\\"><img class=\\"_53bk img\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y0/r/vi2mg40IS3R.png\\"><div class=\\"_53bl\\"><div class=\\"_35si\\">Donate Now</div><div class=\\"_35sj\\">help.rescue.org</div></div></a></li></ul><a class=\\"_2le_\\" href=\\"nullblank\\" id=\\"u_ps_fetchstream_6_0_15\\"><i class=\\"_53bk\\"></i><div class=\\"_53bl _35si\\">Watch Again</div></a></div><div class=\\"_35sk _3htz\\" id=\\"u_ps_fetchstream_6_0_16\\"><ul class=\\"_53bj\\"><li><a class=\\"_2le_\\" href=\\"nullblank\\" id=\\"u_ps_fetchstream_6_0_17\\"><i class=\\"_2ipv\\"></i><div class=\\"_53bl _35si\\">Resume Video</div></a></li><li><a href=\\"https://help.rescue.org/donate/help-families-trapped-in-syria\\" id=\\"u_ps_fetchstream_6_0_18\\"><img class=\\"_53bk img\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y0/r/vi2mg40IS3R.png\\"><div class=\\"_53bl\\"><div class=\\"_35si\\">Donate Now</div><div class=\\"_35sj\\">help.rescue.org</div></div></a></li></ul></div><i class=\\"_1jto _bsl _3htz\\" id=\\"u_ps_fetchstream_6_0_l\\"></i><span class=\\"img _55ym _55yq _55yo _167h _4ubd _1hiu hidden_elem _360f _167h _3htz\\" id=\\"u_ps_fetchstream_6_0_m\\"></span></div><div class=\\"_2i84\\"><div id=\\"u_ps_fetchstream_6_0_1a\\"></div></div></div></div></div></div><div class=\\"_3ekx _29_4\\"><div class=\\"_275x\\"><div class=\\"_275z _5s6c\\">URGENT: Save Families in Eastern Ghouta</div><div class=\\"_2dc9\\"><div class=\\"_5q4r\\">Aid Syrians and refugees worldwide.</div><div class=\\"_1s4d\\"><div class=\\"clearfix\\"><div class=\\"_275- _4s-8 rfloat _ohf\\"><a class=\\"_42ft _4jy0 _4jy3 _517h _51sy\\" href=\\"https://help.rescue.org/donate/help-families-trapped-in-syria\\">Donate Now</a></div><div class=\\"_42ef\\"><div class=\\"_275y\\">help.rescue.org</div><div class=\\"_1-m5\\">Not affiliated with Facebook</div></div></div></div></div><a class=\\"_275_\\" href=\\"https://help.rescue.org/donate/help-families-trapped-in-syria\\"></a></div></div></span></div><div class=\\"_42ef\\"><span class=\\"_3c21\\"></span></div></div></div></div></div></div><div></div></div></div>",
+        "id": "23842758479610544",
+        "images": Array [
+          "https://pp-facebook-ads.s3.amazonaws.com/v/t15.0-10/27600013_10213727726041277_3929550735426977792_n.jpg",
+          "https://pp-facebook-ads.s3.amazonaws.com/v/t15.0-10/27600013_10213727726041277_3929550735426977792_n.jpg",
+          "https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y4/r/-PAXP-deijE.gif",
+          "https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y0/r/vi2mg40IS3R.png",
+          "https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y0/r/vi2mg40IS3R.png",
+        ],
+        "impressions": 3,
+        "lang": "en-US",
+        "message": "<p>Trapped Syrian families need urgent aid as bombs rain down. Their homes are gone, they have little aid and nowhere to hide. Please don’t turn away. Help us save lives now.</p>",
+        "not_political": 2,
+        "page": "https://www.facebook.com/InternationalRescueCommittee/",
+        "political": 1,
+        "political_probability": 0.985015838890429,
+        "targeting": "<div><div class=\\"_4-i0 _26c5\\"><div class=\\"clearfix\\"><div class=\\"_51-u rfloat _ohf\\"><a class=\\"_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-\\" href=\\"nullblank\\">Close</a></div><div><h3 id=\\"u_6c_0\\" class=\\"_52c9\\">About This Facebook Ad</h3></div></div></div><div class=\\"_4-i2 _pig _4s3a _50f4\\"><div class=\\"_4uov\\"><div class=\\"_4uoz\\"><div id=\\"u_6c_1\\"></div><div class=\\"_3-8x\\"><span class=\\"_4v6n\\"><div id=\\"u_6c_2\\">One reason you're seeing this ad is that <b id=\\"ad_prefs_advertiser\\">International Rescue Committee</b> wants to reach <b>people who may be similar to their customers</b>. <a id=\\"ad_prefs_link\\">Learn more.</a></div></span><div class=\\"_4hcd\\"><span>There may be other reasons you're seeing this ad, including that International Rescue Committee wants to reach <b>people ages 18 and older who live in the United States</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div><div class=\\"_4uor _52jw\\"><div class=\\"_5aj7\\" id=\\"u_6c_3\\"><div class=\\"_4bl9\\"></div><div class=\\"_4bl7 _5r7v\\"><i class=\\"img sp_3zN9IEjlHNa sx_890484\\"><u>gear</u></i></div><div class=\\"_4bl7\\"><a href=\\"https://www.facebook.com/ads/preferences/\\">Manage Your Ad Preferences</a></div></div></div><div class=\\"mhs pluginBoxDivider pluginBoxDividerGray _4uos\\"></div><div class=\\"_4uou\\"><div class=\\"_26c6 _3es4 fsl fwb fcb\\">Tell Us What You Think</div><div><div class=\\"clearfix _ikh\\" id=\\"u_6c_4\\"><div class=\\"_4bl7 _3es3\\">Was this explanation useful?</div><div class=\\"_4bl7 _2pit\\"><a href=\\"nullblank\\" id=\\"u_6c_5\\">Yes</a></div><div class=\\"_4bl9 _2pit\\"><a href=\\"nullblank\\" id=\\"u_6c_6\\">No</a></div></div><span class=\\"hidden_elem _3es3\\" id=\\"u_6c_7\\">Thanks for your rating.</span></div></div></div></div><div class=\\"_5lnf uiOverlayFooter _5a8u _4866\\"><table class=\\"uiGrid _51mz uiOverlayFooterGrid\\"><tbody><tr class=\\"_51mx\\"><td class=\\"_51m- prs uiOverlayFooterMessage\\"><a><i class=\\"_4868 img sp_QnBZoPF5RpH sx_368214\\"><u>info</u></i><span class=\\"_4867\\">Learn more about Facebook Ads</span></a></td><td class=\\"_51m- uiOverlayFooterButtons _51mw\\"></td></tr></tbody></table></div></div>",
+        "targets": Array [
+          Object {
+            "segment": "people who may be similar to their customers",
+            "target": "Retargeting",
+          },
+          Object {
+            "segment": "18 and older",
+            "target": "Age",
+          },
+          Object {
+            "segment": "the United States",
+            "target": "Region",
+          },
+        ],
+        "thumbnail": "https://pp-facebook-ads.s3.amazonaws.com/v/t1.0-1/p32x32/2501_10153888779753024_4453263147283902647_n.jpg",
+        "title": "International Rescue Committee",
+        "updated_at": "2018-03-22T17:45:16.277947Z",
+      }
+    }
+  >
+    <Component
+      action={[Function]}
+      dispatch={[Function]}
+      getMessage={[Function]}
+      language="en"
+      question="verify_question"
+      rating={
+        Object {
+          "advertiser": "International Rescue Committee",
+          "created_at": "2018-03-22T17:11:57.354805Z",
+          "entities": Array [
+            Object {
+              "entity": "Syrian",
+              "entity_type": "Group",
+            },
+          ],
+          "html": "<div class=\\"_1dwg _1w_m\\"><div><span class=\\"_47we\\"><span class=\\"uiLikePageButton\\" id=\\"u_ps_fetchstream_6_0_h\\"></span></span><div class=\\"_5x46 _1yz1 clearfix\\"><div class=\\"clearfix _5va3\\"><a class=\\"_5pb8 _1yz2 _8o _8s lfloat _ohe\\" href=\\"https://www.facebook.com/InternationalRescueCommittee/\\"><div class=\\"_38vo\\"><img class=\\"_s0 _4ooo _5xib _44ma _54ru img\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/v/t1.0-1/p32x32/2501_10153888779753024_4453263147283902647_n.jpg\\"></div></a><div class=\\"clearfix _42ef\\"><div class=\\"rfloat _ohf\\"></div><div class=\\"_5va4\\"><div><div class=\\"_6a _5u5j\\"><div class=\\"_6a _6b\\"></div><div class=\\"_6a _5u5j _6b\\"><h6 class=\\"_14f3 _14f5 _5pbw _5vra\\"><span class=\\"fwn fcg\\"><span class=\\"fwb fcg\\"><a href=\\"https://www.facebook.com/InternationalRescueCommittee/\\">International Rescue Committee</a></span></span></h6><div class=\\"_5pcp _5lel _2jyu _232_\\" id=\\"feed_subtitle_128;73970658023;0;10156261500423024;1521738054:-6493541085699270874:5:0:3884\\"><span class=\\"_5paw _4dcu _6187\\"><div class=\\"_14ba _14bf\\"><div class=\\"_14bd _14bf\\"><a class=\\"_3e_2 _m8c\\" href=\\"nullblank\\"><div><div class=\\"_14bf\\">Sp</div><div class=\\"_14bf _2lgs\\">S</div><div class=\\"_14bf\\">on</div><div class=\\"_14bf _2lgs\\">S</div><div class=\\"_14bf\\">so</div><div class=\\"_14bf _2lgs\\">S</div><div class=\\"_14bf\\">red</div><div class=\\"_14bf _2lgs\\">S</div></div></a></div></div></span><span> · </span><a class=\\"uiStreamPrivacy inlineBlock fbStreamPrivacy fbPrivacyAudienceIndicator _5pcq\\" href=\\"nullblank\\"><i class=\\"lock img sp_d0NYpM4xxw4 sx_226545\\"></i></a></div></div></div></div></div></div></div></div><div class=\\"_5pbx userContent _3576\\" id=\\"js_183\\"><p>Trapped Syrian families need urgent aid as bombs rain down. Their homes are gone, they have little aid and nowhere to hide. Please don’t turn away. Help us save lives now.</p></div><div class=\\"_3x-2\\"><div><div class=\\"mtm\\"><div class=\\"_6m2 _1zpr clearfix _dcs _4_w4 _41u- _6m8 _59ap\\" id=\\"u_ps_fetchstream_6_0_i\\"><div class=\\"clearfix _2r3x\\"><div class=\\"lfloat _ohe\\"><span class=\\"_3m6-\\"><div class=\\"_150c\\"><img class=\\"_3chq\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/v/t15.0-10/27600013_10213727726041277_3929550735426977792_n.jpg\\"><div class=\\"_5mly _40ja _45oh\\" id=\\"u_ps_fetchstream_6_0_p\\"><div class=\\"_5v-_ _zpr\\" id=\\"u_ps_fetchstream_6_0_q\\"><div class=\\"_1c_u _45oh\\" id=\\"u_ps_fetchstream_6_0_r\\"><div class=\\"_53j5\\" id=\\"u_ps_fetchstream_6_0_s\\"><div class=\\"_4lpe _3htz\\"><img class=\\"_4lpf\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/v/t15.0-10/27600013_10213727726041277_3929550735426977792_n.jpg\\"></div><div class=\\"_m54 _1jto _3htz\\" id=\\"u_ps_fetchstream_6_0_u\\"><img class=\\"_1445 _4ndd img\\" id=\\"u_ps_fetchstream_6_0_v\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y4/r/-PAXP-deijE.gif\\"></div><div class=\\"_4ubd _170l _27db _3htz\\" id=\\"u_ps_fetchstream_6_0_w\\"><div class=\\"_2w_u\\"><div class=\\"_w80 _2oy-\\"></div><div class=\\"_1otk _3t1r _4ubd\\"><div class=\\"_2w_w\\"><div class=\\"_1c7d\\"><div class=\\"_1c7f _1c7g _2oy-\\"></div><div class=\\"_1c7f _2pvx _2oy-\\"><div><div class=\\"_2yu5\\"><div class=\\"_2yu7\\"><div class=\\"_2yu8\\"></div><div class=\\"_2yu9\\"><div class=\\"_2yua _4sxb\\"></div></div><div></div></div></div></div></div><div class=\\"_1c7f _1c7h _2oy-\\"><div class=\\"_5qsr _66_y _66_z\\">-0:18</div><div class=\\"_2j04\\"><div></div></div><span></span></div><div class=\\"_1c7f _w7o _2oy-\\"><div class=\\"_2swo\\"><div class=\\"_3pao\\"><div class=\\"_4sxa\\"><div class=\\"_3paq\\"><div class=\\"_3par\\"><div class=\\"_3pas _4sxb\\"></div></div></div></div><div class=\\"_3pat\\"></div></div></div></div></div></div></div></div></div><div class=\\"_27vv _n2z _167h _3htz\\" id=\\"u_ps_fetchstream_6_0_x\\"><div class=\\"_31-p _3t-6\\"><div class=\\"_42o0\\"><div class=\\"_2za- _5tps uiContextualLayerParent _10sh _360f\\"><div class=\\"_1vx9\\"><a class=\\"_2za_ _5p5v\\" href=\\"https://www.facebook.com/InternationalRescueCommittee/videos\\"><span class=\\"_50f7\\">International Rescue Committee</span></a></div><span class=\\"_5-sh\\">Sponsored</span></div></div><div class=\\"_bvu\\"><div class=\\"_-pr\\"><a class=\\"_3xxp\\" href=\\"nullblank\\"><i class=\\"_5-q_ _360f img sp_nUZhQzOSrMZ sx_96e9b4\\"><u>triangle-down</u></i></a><a class=\\"_3xxo\\" href=\\"nullblank\\"><i class=\\"_5-r0 _360f img sp_nUZhQzOSrMZ sx_ef716e\\"><u>triangle-up</u></i></a><div class=\\"_n2_ _j-p _360f\\"></div></div></div></div><div class=\\"_62jj _qzf _2se8\\"></div><div class=\\"_31-o _3t-6 _2se8\\"><div class=\\"_5aj7\\"><div class=\\"_4bl9 _3w_z _360f\\"><div class=\\"_11jc\\"></div></div><div class=\\"_4bl7\\"><div class=\\"_5sv5 _360f\\"></div></div></div><div class=\\"clearfix\\"><div class=\\"lfloat _ohe\\"><div class=\\"_3bn1\\"><div class=\\"_n2- _n2y _360f\\"></div><div class=\\"_4per _4pep _360f\\"></div></div></div><div class=\\"rfloat _ohf\\"><div class=\\"_27w7\\"><span class=\\"_4qo2 _360f\\" id=\\"u_ps_fetchstream_6_0_y\\"><div class=\\"_khz _4sz1 _4rw5 _3wv2\\"><a class=\\"UFILikeLink _4x9- _4x9_ _48-k\\" href=\\"nullblank\\">Like</a></div></span><a class=\\"_27w8 _24mq _360f\\" href=\\"nullblank\\"><i class=\\"_27w9 img sp_d0NYpM4xxw4 sx_43e15a\\"><u>share</u></i><span class=\\"_3l-d\\">Share</span></a></div></div></div></div></div><div class=\\"_npo hidden_elem _3htz\\" id=\\"u_ps_fetchstream_6_0_z\\"><div class=\\"_3drf\\"></div><div class=\\"_3x62\\"><div class=\\"_63rn\\"><div class=\\"_63rm\\"><div class=\\"_iij\\">It looks like you may be having problems playing this video. If so, please try restarting your browser.</div><div class=\\"_iir\\">Close</div></div></div></div></div><div class=\\"_567v _3bw _4ubd _28dy _3htz\\" id=\\"u_ps_fetchstream_6_0_10\\"><div class=\\"_567_\\"><div class=\\"_2za- _2vd- uiContextualLayerParent _28dz\\" id=\\"u_ps_fetchstream_6_0_11\\"><div class=\\"_1vx9\\"><a class=\\"_2za_\\" href=\\"https://www.facebook.com/InternationalRescueCommittee/videos\\"><span class=\\"_50f7\\">URGENT: Save Families in Eastern Ghouta</span></a></div><div class=\\"_1vx9\\">Posted by <a class=\\"_2za_ _5p5v\\" href=\\"https://www.facebook.com/InternationalRescueCommittee/videos\\"><span class=\\"_50f7\\">International Rescue Committee</span></a></div><div class=\\"_1vx9\\"><span>1,791,071 Views</span></div></div></div><div class=\\"_5bke\\" id=\\"u_ps_fetchstream_6_0_12\\"></div></div><div class=\\"_35sk _tbz _3htz\\" id=\\"u_ps_fetchstream_6_0_13\\"><ul class=\\"_53bj\\"><li><a href=\\"https://help.rescue.org/donate/help-families-trapped-in-syria\\" id=\\"u_ps_fetchstream_6_0_14\\"><img class=\\"_53bk img\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y0/r/vi2mg40IS3R.png\\"><div class=\\"_53bl\\"><div class=\\"_35si\\">Donate Now</div><div class=\\"_35sj\\">help.rescue.org</div></div></a></li></ul><a class=\\"_2le_\\" href=\\"nullblank\\" id=\\"u_ps_fetchstream_6_0_15\\"><i class=\\"_53bk\\"></i><div class=\\"_53bl _35si\\">Watch Again</div></a></div><div class=\\"_35sk _3htz\\" id=\\"u_ps_fetchstream_6_0_16\\"><ul class=\\"_53bj\\"><li><a class=\\"_2le_\\" href=\\"nullblank\\" id=\\"u_ps_fetchstream_6_0_17\\"><i class=\\"_2ipv\\"></i><div class=\\"_53bl _35si\\">Resume Video</div></a></li><li><a href=\\"https://help.rescue.org/donate/help-families-trapped-in-syria\\" id=\\"u_ps_fetchstream_6_0_18\\"><img class=\\"_53bk img\\" src=\\"https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y0/r/vi2mg40IS3R.png\\"><div class=\\"_53bl\\"><div class=\\"_35si\\">Donate Now</div><div class=\\"_35sj\\">help.rescue.org</div></div></a></li></ul></div><i class=\\"_1jto _bsl _3htz\\" id=\\"u_ps_fetchstream_6_0_l\\"></i><span class=\\"img _55ym _55yq _55yo _167h _4ubd _1hiu hidden_elem _360f _167h _3htz\\" id=\\"u_ps_fetchstream_6_0_m\\"></span></div><div class=\\"_2i84\\"><div id=\\"u_ps_fetchstream_6_0_1a\\"></div></div></div></div></div></div><div class=\\"_3ekx _29_4\\"><div class=\\"_275x\\"><div class=\\"_275z _5s6c\\">URGENT: Save Families in Eastern Ghouta</div><div class=\\"_2dc9\\"><div class=\\"_5q4r\\">Aid Syrians and refugees worldwide.</div><div class=\\"_1s4d\\"><div class=\\"clearfix\\"><div class=\\"_275- _4s-8 rfloat _ohf\\"><a class=\\"_42ft _4jy0 _4jy3 _517h _51sy\\" href=\\"https://help.rescue.org/donate/help-families-trapped-in-syria\\">Donate Now</a></div><div class=\\"_42ef\\"><div class=\\"_275y\\">help.rescue.org</div><div class=\\"_1-m5\\">Not affiliated with Facebook</div></div></div></div></div><a class=\\"_275_\\" href=\\"https://help.rescue.org/donate/help-families-trapped-in-syria\\"></a></div></div></span></div><div class=\\"_42ef\\"><span class=\\"_3c21\\"></span></div></div></div></div></div></div><div></div></div></div>",
+          "id": "23842758479610544",
+          "images": Array [
+            "https://pp-facebook-ads.s3.amazonaws.com/v/t15.0-10/27600013_10213727726041277_3929550735426977792_n.jpg",
+            "https://pp-facebook-ads.s3.amazonaws.com/v/t15.0-10/27600013_10213727726041277_3929550735426977792_n.jpg",
+            "https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y4/r/-PAXP-deijE.gif",
+            "https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y0/r/vi2mg40IS3R.png",
+            "https://pp-facebook-ads.s3.amazonaws.com/rsrc.php/v3/y0/r/vi2mg40IS3R.png",
+          ],
+          "impressions": 3,
+          "lang": "en-US",
+          "message": "<p>Trapped Syrian families need urgent aid as bombs rain down. Their homes are gone, they have little aid and nowhere to hide. Please don’t turn away. Help us save lives now.</p>",
+          "not_political": 2,
+          "page": "https://www.facebook.com/InternationalRescueCommittee/",
+          "political": 1,
+          "political_probability": 0.985015838890429,
+          "targeting": "<div><div class=\\"_4-i0 _26c5\\"><div class=\\"clearfix\\"><div class=\\"_51-u rfloat _ohf\\"><a class=\\"_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-\\" href=\\"nullblank\\">Close</a></div><div><h3 id=\\"u_6c_0\\" class=\\"_52c9\\">About This Facebook Ad</h3></div></div></div><div class=\\"_4-i2 _pig _4s3a _50f4\\"><div class=\\"_4uov\\"><div class=\\"_4uoz\\"><div id=\\"u_6c_1\\"></div><div class=\\"_3-8x\\"><span class=\\"_4v6n\\"><div id=\\"u_6c_2\\">One reason you're seeing this ad is that <b id=\\"ad_prefs_advertiser\\">International Rescue Committee</b> wants to reach <b>people who may be similar to their customers</b>. <a id=\\"ad_prefs_link\\">Learn more.</a></div></span><div class=\\"_4hcd\\"><span>There may be other reasons you're seeing this ad, including that International Rescue Committee wants to reach <b>people ages 18 and older who live in the United States</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div><div class=\\"_4uor _52jw\\"><div class=\\"_5aj7\\" id=\\"u_6c_3\\"><div class=\\"_4bl9\\"></div><div class=\\"_4bl7 _5r7v\\"><i class=\\"img sp_3zN9IEjlHNa sx_890484\\"><u>gear</u></i></div><div class=\\"_4bl7\\"><a href=\\"https://www.facebook.com/ads/preferences/\\">Manage Your Ad Preferences</a></div></div></div><div class=\\"mhs pluginBoxDivider pluginBoxDividerGray _4uos\\"></div><div class=\\"_4uou\\"><div class=\\"_26c6 _3es4 fsl fwb fcb\\">Tell Us What You Think</div><div><div class=\\"clearfix _ikh\\" id=\\"u_6c_4\\"><div class=\\"_4bl7 _3es3\\">Was this explanation useful?</div><div class=\\"_4bl7 _2pit\\"><a href=\\"nullblank\\" id=\\"u_6c_5\\">Yes</a></div><div class=\\"_4bl9 _2pit\\"><a href=\\"nullblank\\" id=\\"u_6c_6\\">No</a></div></div><span class=\\"hidden_elem _3es3\\" id=\\"u_6c_7\\">Thanks for your rating.</span></div></div></div></div><div class=\\"_5lnf uiOverlayFooter _5a8u _4866\\"><table class=\\"uiGrid _51mz uiOverlayFooterGrid\\"><tbody><tr class=\\"_51mx\\"><td class=\\"_51m- prs uiOverlayFooterMessage\\"><a><i class=\\"_4868 img sp_QnBZoPF5RpH sx_368214\\"><u>info</u></i><span class=\\"_4867\\">Learn more about Facebook Ads</span></a></td><td class=\\"_51m- uiOverlayFooterButtons _51mw\\"></td></tr></tbody></table></div></div>",
+          "targets": Array [
+            Object {
+              "segment": "people who may be similar to their customers",
+              "target": "Retargeting",
+            },
+            Object {
+              "segment": "18 and older",
+              "target": "Age",
+            },
+            Object {
+              "segment": "the United States",
+              "target": "Region",
+            },
+          ],
+          "thumbnail": "https://pp-facebook-ads.s3.amazonaws.com/v/t1.0-1/p32x32/2501_10153888779753024_4453263147283902647_n.jpg",
+          "title": "International Rescue Committee",
+          "updated_at": "2018-03-22T17:45:16.277947Z",
+        }
+      }
+    >
+      <div
+        className="rater"
+      >
+        Is this ad political?
+        <button
+          id="political23842758479610544"
+          onClick={[Function]}
+        >
+          Political Ad
+        </button>
+        <button
+          id="normal23842758479610544"
+          onClick={[Function]}
+        >
+          Normal Ad
+        </button>
+      </div>
+    </Component>
+  </Connect(Component)>
+</Provider>
+`;
