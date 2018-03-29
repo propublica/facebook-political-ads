@@ -1,5 +1,6 @@
 import { headers, serialize } from "utils.js";
 import { debounce } from "lodash";
+import history from "./history.js";
 
 export const NEW_ADS = "new_ads";
 export const newAds = ads => ({
@@ -153,8 +154,7 @@ export const getAds = (url = "/facebook-ads/ads") => {
     let path = `${url}?${params.toString()}`;
 
     let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-    history.pushState({ search: query }, "", `${location.pathname}${query}`);
-
+    history.push({ search: query }, "", `${location.pathname}${query}`);
     return fetch(path, {
       method: "GET",
       headers: headers(state.credentials, state.lang)
