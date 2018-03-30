@@ -1,0 +1,146 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`thanks should render 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Connect(Connect(Component))>
+    <Connect(Component)
+      ads={Array []}
+      dispatch={[Function]}
+      language={
+        Object {
+          "country": "US",
+          "language": "en",
+        }
+      }
+      ratings={Array []}
+      thanks="thanks1"
+    >
+      <Component
+        ads={Array []}
+        dispatch={[Function]}
+        getMessage={[Function]}
+        language={
+          Object {
+            "country": "US",
+            "language": "en",
+          }
+        }
+        ratings={Array []}
+        thanks="thanks1"
+      >
+        <div
+          id="thankscontainer"
+        >
+          <div
+            id="thanksbar"
+          >
+            Thanks! 🙂
+          </div>
+          <Connect(TogglerUnconnected)>
+            <TogglerUnconnected
+              ads={Array []}
+              dispatch={[Function]}
+              language={
+                Object {
+                  "country": "US",
+                  "language": "en",
+                }
+              }
+              ratings={Array []}
+              thanks="thanks1"
+            >
+              <div
+                id="toggler"
+              >
+                <div
+                  id="tabs"
+                >
+                  <Connect(Component)
+                    amount={0}
+                    message="rate_ads"
+                    type="rater"
+                  >
+                    <Component
+                      amount={0}
+                      dispatch={[Function]}
+                      getMessage={[Function]}
+                      language={
+                        Object {
+                          "country": "US",
+                          "language": "en",
+                        }
+                      }
+                      message="rate_ads"
+                      type="rater"
+                    >
+                      <div
+                        className="toggle"
+                        onClick={[Function]}
+                      >
+                        Ads I'm Seeing
+                      </div>
+                    </Component>
+                  </Connect(Component)>
+                  <Connect(Component)
+                    amount={0}
+                    message="see_ads"
+                    type="ads"
+                  >
+                    <Component
+                      amount={0}
+                      dispatch={[Function]}
+                      getMessage={[Function]}
+                      language={
+                        Object {
+                          "country": "US",
+                          "language": "en",
+                        }
+                      }
+                      message="see_ads"
+                      type="ads"
+                    >
+                      <div
+                        className="toggle"
+                        onClick={[Function]}
+                      >
+                        Ads Others are Seeing
+                      </div>
+                    </Component>
+                  </Connect(Component)>
+                </div>
+                <div
+                  id="container"
+                >
+                  <Connect(Ratings)
+                    ratings={Array []}
+                  >
+                    <Ratings
+                      onRatingClick={[Function]}
+                      ratings={Array []}
+                    >
+                      <div
+                        id="ratings"
+                      />
+                    </Ratings>
+                  </Connect(Ratings)>
+                </div>
+              </div>
+            </TogglerUnconnected>
+          </Connect(TogglerUnconnected)>
+        </div>
+      </Component>
+    </Connect(Component)>
+  </Connect(Connect(Component))>
+</Provider>
+`;

@@ -43,7 +43,7 @@ export const Rating = withI18n(({ getMessage, rating, action, question }) => (
   </div>
 ));
 
-export const Ratings = ({ onRatingClick, ratings }) => (
+const Ratings = ({ onRatingClick, ratings }) => (
   <div id="ratings">
     {ratings.map(rating => (
       <Rating
@@ -69,7 +69,7 @@ export const UnratedRatings = connect(
 )(Ratings);
 
 // Ads from the server to show
-export const AdsUnconnected = ({ ads, onAdClick }) => (
+const AdsUnconnected = ({ ads, onAdClick }) => (
   <div id="ads">
     {ads.map(ad => (
       <Rating
@@ -81,10 +81,10 @@ export const AdsUnconnected = ({ ads, onAdClick }) => (
     ))}
   </div>
 );
-export const adStateToProps = state => ({
+const adStateToProps = state => ({
   ads: getUnratedRatings(state.ads)
 });
-export const adDispatchToProps = dispatch => ({
+const adDispatchToProps = dispatch => ({
   onAdClick: (id, rating) => {
     dispatch(rateAd(id, rating, updateAd));
   }

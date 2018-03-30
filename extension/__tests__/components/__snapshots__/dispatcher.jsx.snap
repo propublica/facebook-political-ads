@@ -3155,8 +3155,8 @@ exports[`dispatcher should render thanks when the terms are accepted 1`] = `
                 <Connect(TogglerUnconnected)>
                   <TogglerUnconnected
                     ads={Array []}
+                    dispatch={[Function]}
                     language={Object {}}
-                    onToggleClick={[Function]}
                     ratings={Array []}
                     terms={true}
                   >
@@ -3169,7 +3169,6 @@ exports[`dispatcher should render thanks when the terms are accepted 1`] = `
                         <Connect(Component)
                           amount={0}
                           message="rate_ads"
-                          onToggleClick={[Function]}
                           type="rater"
                         >
                           <Component
@@ -3178,7 +3177,6 @@ exports[`dispatcher should render thanks when the terms are accepted 1`] = `
                             getMessage={[Function]}
                             language={Object {}}
                             message="rate_ads"
-                            onToggleClick={[Function]}
                             type="rater"
                           >
                             <div
@@ -3192,7 +3190,6 @@ exports[`dispatcher should render thanks when the terms are accepted 1`] = `
                         <Connect(Component)
                           amount={0}
                           message="see_ads"
-                          onToggleClick={[Function]}
                           type="ads"
                         >
                           <Component
@@ -3201,7 +3198,6 @@ exports[`dispatcher should render thanks when the terms are accepted 1`] = `
                             getMessage={[Function]}
                             language={Object {}}
                             message="see_ads"
-                            onToggleClick={[Function]}
                             type="ads"
                           >
                             <div
