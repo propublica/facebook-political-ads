@@ -66,6 +66,8 @@
     "modulePaths": [
       "<rootDir>/src/"
     ],
-    "snapshotSerializers": ["enzyme-to-json/serializer"]
+    "snapshotSerializers": ["enzyme-to-json/serializer"],
+    "setupFiles": ["./__tests__/setup.js"],
+    "testPathIgnorePatterns": ["./__tests__/setup.js"]
   }
 }
