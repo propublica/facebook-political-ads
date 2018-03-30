@@ -10,14 +10,9 @@ import {
 import { getMessage } from "../../src/i18n.js";
 import { RatingType } from "../../src/constants.js";
 import { updateRating, updateAd } from "../../src/actions.js";
-import Enzyme, { mount } from "enzyme";
-import Adapter from "enzyme-adapter-react-16";
+import { mount } from "enzyme";
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
-import fetch from "jest-fetch-mock";
-global.fetch = fetch;
-global.Headers = fetch.Headers;
-Enzyme.configure({ adapter: new Adapter() });
 
 const mockStore = configureMockStore([thunk]);
 const ads = JSON.parse(require("fs").readFileSync(__dirname + "/../ads.json"));
