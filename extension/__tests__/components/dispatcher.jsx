@@ -3,7 +3,6 @@ import { mount } from "enzyme";
 import configureMockStore from "redux-mock-store";
 import { Provider } from "react-redux";
 import { Dispatcher } from "../../src/components/dispatcher.jsx";
-import fetch from "jest-fetch-mock";
 import { acceptTerms } from "../../src/actions.js";
 
 const mockStore = configureMockStore();
