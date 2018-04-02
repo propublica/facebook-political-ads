@@ -2,6 +2,10 @@
    v2.0 | 20110126
    License: none (public domain)
 */
+@import "reset";
+@import "colors";
+@import "typography";
+@import "ads";
 
 html,
 body,
@@ -234,3 +238,36 @@ ul.tools {
 ul.tools li,
 ul.tools li h1 {
 } */
+
+.ad .message {
+  font-family: unset;
+  font-weight: 400;
+  font-size: 14px;
+  margin: colspan(g, 4) 0;
+
+  a {
+    color: rgb(54, 88, 153);
+    border: none;
+    &:hover,
+    &:focus {
+      border: none;
+    }
+    text-decoration: none;
+  }
+  p + p {
+    margin-top: 6px;
+  }
+  .no_ads {
+    text-align: center;
+    font-size: 16px;
+    padding: 16px;
+    font-weight: bold;
+  }
+
+  img {
+    display: block;
+    height: auto;
+    max-width: unset;
+    width: 100%;
+  }
+}
