@@ -1,0 +1,308 @@
+._4uoz {
+  // Targeting info
+  color: $text-color-low-contrast;
+  max-width: 500px;
+  padding: 0 12px;
+  margin: 12px auto 24px auto;
+  a {
+    display: none;
+  }
+  b {
+    color: $text-color;
+    font-weight: bold;
+  }
+  ._4hcd {
+    margin-top: 6px;
+  }
+}
+
+._2lgs {
+  /* intrusive S in Sponsored (i.e. SpSonSsOSredS or whatever) */
+  display: none !important;
+}
+
+._4-i0._26c5,
+._4uor._52jw,
+._4uou,
+._5lnf.uiOverlayFooter._5a8u._4866,
+._4ubd._3tsq,
+.hidden_elem,
+._567v._3bw,
+._35sk {
+  // Excess targeting info and video ads
+  display: none;
+}
+
+._1dwg._1w_m,
+.ego_unit {
+  // Sidebar ad wrapper div
+  background-color: white;
+  padding: 12px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 4px;
+
+  ._1dwg._1w_m {
+    display: block;
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+  }
+}
+
+.message {
+  margin: 12px auto 0;
+  border-radius: 4px;
+  min-width: 308px;
+  max-width: 500px;
+}
+
+.targeting_info {
+  max-width: 500px;
+  margin: 0 auto 12px;
+  h3 {
+    font-weight: bold;
+    padding-left: 12px;
+    margin-top: 6px;
+  }
+
+  .targeting {
+    b {
+      font-weight: bold;
+    }
+  }
+}
+
+.ad-metadata {
+  max-width: 500px;
+  margin: 0 auto 1em;
+  padding: 0 12px;
+  display: block;
+
+  .permalink {
+    float: right;
+  }
+}
+
+._1dwg._1w_m {
+  // Timeline ad wrapper div
+  max-width: 500px;
+  border: 1px solid #dddfe2;
+}
+
+.ego_unit {
+  // Sidebar ad wrapper div
+  max-width: 308px;
+  border: 1px solid #dddfe2;
+}
+
+/* NEWS FEED ADS */
+
+._5pb8._1yz2._8o._8s.lfloat._ohe,
+._38vo {
+  // Profile pic wrapper
+  display: block;
+  float: left;
+  width: 32px;
+  margin-right: 8px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+._5x46,
+._3dp._29k {
+  // Profile name wrapper
+  @include clearfix;
+  margin-bottom: 6px;
+  a:hover,
+  a:focus {
+    text-decoration: underline;
+  }
+}
+
+._5pbw {
+  // Profile name
+  font-weight: bold;
+}
+
+._5pcp._5lel._232_,
+._5paw {
+  // 'Sponsored'
+  font-size: 12px;
+  color: rgb(144, 148, 156);
+  div {
+    display: inline;
+  }
+  a {
+    color: inherit;
+  }
+}
+
+._5mfr .img {
+  display: none;
+}
+
+.lock.img {
+  // 'Public' globe
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background-image: url(../images/fb-globe.png);
+  background-repeat: no-repeat;
+  background-size: 100%;
+  vertical-align: -2px;
+}
+
+.userContent {
+  // Post text
+  clear: both;
+}
+// emojis
+.userContent img,
+.mbs._6m6 img,
+._6a img {
+  display: none;
+}
+
+.text_exposed_show {
+  // Truncated post text
+  display: none;
+}
+
+.mtm,
+._dcs {
+  // Article wrap
+  margin-top: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  .mtm,
+  ._dcs {
+    margin-top: 0;
+    border: none;
+  }
+}
+
+._150c {
+  // Video (and slideshow?) wrap
+  > * {
+    display: none;
+  }
+  > img:first-of-type {
+    display: block;
+  }
+}
+
+._2a2q ._5dec._xcx {
+  // Slideshow images
+  display: none;
+  &:first-child {
+    display: block;
+  }
+}
+
+._6ks > a {
+  // Article image wrap
+  display: block;
+}
+
+.fbStoryAttachmentImage {
+  // Article image
+}
+
+// ._6m3._--6,
+._3ekx._29_4 {
+  // Article description wrap
+  padding: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+._5qf- {
+  // Profile metadata
+  display: none;
+}
+
+._5s6c {
+  // Article hed
+  font-family: Georgia, "Times New Roman", Times, serif;
+  font-size: 18px;
+  line-height: 22px;
+  margin-bottom: 5px;
+  a {
+    color: inherit;
+  }
+}
+
+._6m7._3bt9,
+._5q4r {
+  // Article dek
+  font-size: 12px;
+  line-height: 16px;
+}
+
+._59tj._2iau,
+._1s4d {
+  // Article URL/CTA wrap
+  vertical-align: bottom;
+  padding-top: 5px;
+  @include clearfix;
+}
+
+._522u.rfloat._ohf,
+._275-._4s-8.rfloat._ohf {
+  // CTA button
+  display: inline-block;
+  float: right;
+  margin-left: 10px;
+  a {
+    display: block;
+    color: rgb(75, 79, 86);
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 22px;
+    padding: 0 8px;
+    background-color: rgb(246, 247, 249);
+    border: 1px solid rgb(206, 208, 212);
+    border-radius: 2px;
+  }
+  a:hover,
+  a:focus {
+    background-color: #e9ebee;
+  }
+}
+
+._6lz._6mb,
+._275y {
+  // Article URL
+  color: rgb(144, 148, 156);
+  font-size: 12px;
+  line-height: 11px;
+  text-transform: uppercase;
+  padding-top: 13px;
+}
+
+._5g-l,
+._5tc6,
+._1-m5 {
+  // 'Not affiliated with Facebook'
+  display: none;
+}
+
+/* SIDEBAR ADS */
+
+.ego_unit {
+  // Sidebar ad
+  font-size: 13px;
+  line-height: 16px;
+
+  // These all use different class names, hence the delightful muck below. Fun!
+
+  div > div > a > div > div:nth-child(2) {
+    // Sidebar ad hed/URL wrapper
+    padding-top: 10px;
+  }
+  div > div > a > div > div:nth-child(4) {
+    // Sidebar ad article dek
+    color: rgb(144, 148, 156);
+  }
+}
