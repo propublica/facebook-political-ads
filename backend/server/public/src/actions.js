@@ -107,7 +107,7 @@ export const setPage = page => ({ type: SET_PAGE, value: page });
 export const fetchPage = page => async(setPage(page));
 export const setTotal = total => ({ type: SET_TOTAL, value: total });
 
-export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
+export const getOneAd = (ad_id, url = "http://localhost:3000/ads") => {
   if (!ad_id) return () => null;
 
   let path = `${url}/${ad_id}`;
@@ -129,16 +129,18 @@ export const RECENT = "recent";
 export const getGroupedAttrs = (
   groupingKind = "advertiser",
   recent = null,
-  root_url = "/facebook-ads"
+  root_url = "http://localhost:3000/ads"
 ) => {
-  let path = `${root_url}/${recent === RECENT ? "recent_" : ""}${groupingKind +
-    "s"}`;
+  let path = `${root_url}/${
+    recent === RECENT ? "recent_" : "by_"
+  }${groupingKind + "s"}`;
   return (dispatch, getState) => {
     let state = getState();
     dispatch(requestingRecentGroupedAttr());
     return fetch(path, {
       method: "GET",
-      headers: headers(state.credentials, state.lang)
+      // headers: headers(state.credentials, state.lang),
+      credentials: "include"
     })
       .then(res => res.json())
       .then(resp => {
@@ -147,7 +149,7 @@ export const getGroupedAttrs = (
   };
 };
 
-export const getAds = (url = "/facebook-ads/ads") => {
+export const getAds = (url = "http://localhost:3000/ads") => {
   return (dispatch, getState) => {
     let state = getState();
     const params = serialize(state);
