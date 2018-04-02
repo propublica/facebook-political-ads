@@ -1,5 +1,6 @@
 import { headers, serialize } from "utils.js";
 import { debounce } from "lodash";
+import history from "./history.js";
 
 export const NEW_ADS = "new_ads";
 export const newAds = ads => ({
@@ -42,13 +43,20 @@ export const newSearch = query => ({
   value: query
 });
 
+const asyncResetPage = action => {
+  return (dispatch, getState) => {
+    dispatch(setPage(0));
+    return async(action)(dispatch, getState);
+  };
+};
+
 const async = action => {
   return (dispatch, getState) => {
     dispatch(action);
     return getAds()(dispatch, getState);
   };
 };
-export const fetchSearch = query => async(newSearch(query));
+export const fetchSearch = query => asyncResetPage(newSearch(query));
 
 export const throttledDispatch = debounce((dispatch, input) => {
   dispatch(fetchSearch(input));
@@ -74,9 +82,9 @@ export const FILTER_TARGET = "filter_target";
 export const filterEntity = a(FILTER_ENTITY);
 export const filterAdvertiser = a(FILTER_ADVERTISER);
 export const filterTarget = a(FILTER_TARGET);
-export const fetchEntity = e => async(filterEntity(e));
-export const fetchAdvertiser = a => async(filterAdvertiser(a));
-export const fetchTarget = t => async(filterTarget(t));
+export const fetchEntity = e => asyncResetPage(filterEntity(e));
+export const fetchAdvertiser = a => asyncResetPage(filterAdvertiser(a));
+export const fetchTarget = t => asyncResetPage(filterTarget(t));
 
 export const TOGGLE_TARGET = "toggle_target";
 export const TOGGLE_ADVERTISER = "toggle_advertiser";
@@ -146,8 +154,7 @@ export const getAds = (url = "/facebook-ads/ads") => {
     let path = `${url}?${params.toString()}`;
 
     let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-    history.pushState({ search: query }, "", `${location.pathname}${query}`);
-
+    history.push({ search: query }, "", `${location.pathname}${query}`);
     return fetch(path, {
       method: "GET",
       headers: headers(state.credentials, state.lang)

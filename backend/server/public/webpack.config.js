@@ -11,6 +11,11 @@ const extractSass = new ExtractTextPlugin({
   allChunks: true
 });
 
+const extractAdminSass = new ExtractTextPlugin({
+  filename: "admin.css",
+  allChunks: true
+});
+
 const plugins = () =>
   [
     new webpack.DefinePlugin({
@@ -108,6 +113,7 @@ module.exports = [
       rules: [
         {
           test: /\.scss$/,
+          exclude: ["admin.scss"],
           use: extractSass.extract({
             use: [
               {
@@ -134,6 +140,49 @@ module.exports = [
       ]
     },
     plugins: [extractSass].filter(Boolean),
+    devtool: "source-map"
+  },
+  {
+    entry: "admin.scss",
+    context: path.resolve(__dirname, "css"),
+    resolve: {
+      extensions: [".scss"],
+      modules: ["css"]
+    },
+    output: {
+      filename: "admin.css",
+      path: path.resolve(__dirname, "dist")
+    },
+    module: {
+      rules: [
+        {
+          test: /admin\.scss$/,
+          use: extractAdminSass.extract({
+            use: [
+              {
+                loader: "css-loader",
+                options: {
+                  sourceMap: true
+                }
+              },
+              {
+                loader: "sass-loader",
+                options: {
+                  sourceMap: true
+                }
+              }
+            ]
+          })
+        },
+        {
+          test: /\.(woff2|woff|svg|png)$/,
+          use: {
+            loader: "url-loader"
+          }
+        }
+      ]
+    },
+    plugins: [extractAdminSass].filter(Boolean),
     devtool: "source-map"
   }
 ];

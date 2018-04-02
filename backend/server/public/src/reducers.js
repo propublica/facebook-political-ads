@@ -152,7 +152,7 @@ export const pagination = (state = { page: 0, total: 0 }, action) => {
       };
     case SET_TOTAL: {
       const total = Math.ceil(action.value / PER_PAGE);
-      return { total, page: min({ total: total, page: state.page }) };
+      return { total, page: 0 };
     }
     default:
       return state;

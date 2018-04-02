@@ -5,7 +5,7 @@ import Term, { TermUnconnected } from "../../src/components/term.jsx";
 import configureMockStore from "redux-mock-store";
 import thunk from "redux-thunk";
 import fetchMock from "fetch-mock";
-import { NEW_SEARCH } from "../../src/actions.js";
+import { NEW_SEARCH, SET_PAGE } from "../../src/actions.js";
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -66,7 +66,10 @@ describe("components", () => {
       wrapper.find("button").simulate("click");
 
       const actions = store.getActions();
-      expect(actions).toEqual([expect.objectContaining({ type: NEW_SEARCH })]);
+      expect(actions).toEqual([
+        expect.objectContaining({ type: SET_PAGE }),
+        expect.objectContaining({ type: NEW_SEARCH })
+      ]);
     });
   });
 });
