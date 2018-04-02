@@ -12,6 +12,8 @@ target
 /backend/classifier/.python-version
 /backend/classifier/Dockerfile.cron
 /backend/classifier/deploy-ecs-cron.sh
+/backend/tools/Dockerfile.archive
+/backend/tools/deploy-ecs-cron-archiver.sh
 .vscode/
 deploy.sh
 /papers
@@ -24,3 +26,4 @@ __pycache__
 *.pyc
 passwords.txt
 coverage
+facebook_ads_*.sql

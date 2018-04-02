@@ -1,0 +1,273 @@
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+@import "reset";
+@import "colors";
+@import "typography";
+@import "ads";
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+
+body {
+  line-height: 1;
+}
+
+ol,
+ul {
+  list-style: none;
+}
+
+blockquote,
+q {
+  quotes: none;
+}
+
+blockquote::before,
+blockquote::after,
+q::before,
+q::after {
+  content: "";
+  content: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+body {
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "avenir next", avenir,
+    helvetica, "helvetica neue", ubuntu, roboto, noto, "segoe ui", arial,
+    sans-serif;
+  font-size: 100%;
+  line-height: 1.5;
+  font-weight: 200;
+  background-color: #eceff1;
+}
+
+table {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  border: 1px solid #efefef;
+  background-color: #fff;
+}
+
+table td {
+  padding: 0.5rem;
+}
+
+table td:first-child {
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+img {
+  max-width: 10rem;
+}
+
+#login {
+  width: 20%;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10rem;
+}
+
+#search {
+  display: block;
+  width: 80%;
+  padding: 0.5rem;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  border-radius: 0.3rem;
+  border: 0.1rem solid #ddd;
+}
+
+.pagination {
+  display: block;
+  text-align: center;
+}
+
+.pagination li {
+  display: inline-block;
+}
+
+.pagination li a,
+.pagination .current {
+  padding: 0.5rem;
+  text-decoration: none;
+}
+
+#app {
+  max-width: 1234px;
+  width: 98%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+nav ul li,
+nav ul li h1 {
+  display: inline;
+  padding: 0 5px;
+}
+
+nav ul li h1 {
+  font-size: 22px;
+}
+
+ul.tools {
+  list-style-type: disc;
+  list-style-position: inside;
+  margin: default;
+  padding: default;
+}
+/* 
+ul.tools li,
+ul.tools li h1 {
+} */
+
+.ad .message {
+  font-family: unset;
+  font-weight: 400;
+  font-size: 14px;
+  margin: colspan(g, 4) 0;
+
+  a {
+    color: rgb(54, 88, 153);
+    border: none;
+    &:hover,
+    &:focus {
+      border: none;
+    }
+    text-decoration: none;
+  }
+  p + p {
+    margin-top: 6px;
+  }
+  .no_ads {
+    text-align: center;
+    font-size: 16px;
+    padding: 16px;
+    font-weight: bold;
+  }
+
+  img {
+    display: block;
+    height: auto;
+    max-width: unset;
+    width: 100%;
+  }
+}

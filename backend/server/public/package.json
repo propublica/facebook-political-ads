@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.40",
+    "history": "^4.7.2",
     "i18next": "^10.5.0",
     "i18next-browser-languagedetector": "^2.1.0",
     "i18next-xhr-backend": "^1.5.1",
