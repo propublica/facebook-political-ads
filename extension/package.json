@@ -70,10 +70,11 @@
       "enzyme-to-json/serializer"
     ],
     "setupFiles": [
-      "./__tests__/setup.js"
+      "<rootDir>/__tests__/setup.js"
     ],
     "testPathIgnorePatterns": [
-      "./__tests__/setup.js"
+      "<rootDir>/__tests__/setup.js",
+      "<rootDir>/__testes_/vm.js"
     ]
   }
 }
