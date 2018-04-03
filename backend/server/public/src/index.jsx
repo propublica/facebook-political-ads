@@ -47,10 +47,9 @@ go(() => {
     </Router>,
     document.querySelector("#graphic")
   );
-  history.listen(location => {
+  history.listen(() => {
     if (window.ga) {
-      window.ga("set", "page", location.pathname + location.search);
-      window.ga("send", "pageview", location.pathname + location.search);
+      window.ga("send", "pageview");
     }
   });
 });
