@@ -48,8 +48,11 @@ go(() => {
     document.querySelector("#graphic")
   );
   history.listen(() => {
-    if (window.ga) {
-      window.ga("send", "pageview");
+    if (window.dataLayer) {
+      window.dataLayer.push({
+        event: "Pageview",
+        url: location.pathname + location.search
+      });
     }
   });
 });
