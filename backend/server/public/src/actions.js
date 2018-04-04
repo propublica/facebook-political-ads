@@ -2,6 +2,10 @@ import { headers, serialize } from "utils.js";
 import { debounce } from "lodash";
 import history from "./history.js";
 
+const URL_ROOT = location.href.indexOf("localhost")
+  ? "http://localhost:3000"
+  : "";
+
 export const NEW_ADS = "new_ads";
 export const newAds = ads => ({
   type: NEW_ADS,
@@ -107,17 +111,14 @@ export const setPage = page => ({ type: SET_PAGE, value: page });
 export const fetchPage = page => async(setPage(page));
 export const setTotal = total => ({ type: SET_TOTAL, value: total });
 
-export const getOneAd = (ad_id, url = "http://localhost:3000/ads") => {
+export const getOneAd = (ad_id, url = `${URL_ROOT}/fbpac-api/ads`) => {
   if (!ad_id) return () => null;
 
   let path = `${url}/${ad_id}`;
   return (dispatch, getState) => {
     let state = getState();
     dispatch(requestingOneAd(ad_id));
-    return fetch(path, {
-      method: "GET",
-      headers: headers(state.credentials, state.lang)
-    })
+    return fetch(path, { method: "GET", credentials: "include" })
       .then(res => res.json())
       .then(ad => {
         dispatch(receiveOneAd(ad));
@@ -129,7 +130,7 @@ export const RECENT = "recent";
 export const getGroupedAttrs = (
   groupingKind = "advertiser",
   recent = null,
-  root_url = "http://localhost:3000/ads"
+  root_url = `${URL_ROOT}/fbpac-api/ads`
 ) => {
   let path = `${root_url}/${
     recent === RECENT ? "recent_" : "by_"
@@ -137,19 +138,29 @@ export const getGroupedAttrs = (
   return (dispatch, getState) => {
     let state = getState();
     dispatch(requestingRecentGroupedAttr());
-    return fetch(path, {
-      method: "GET",
-      // headers: headers(state.credentials, state.lang),
-      credentials: "include"
-    })
-      .then(res => res.json())
-      .then(resp => {
-        dispatch(receiveRecentGroupedAttr(resp));
-      });
+    return (
+      fetch(path, {
+        method: "GET",
+        // headers: headers(state.credentials, state.lang),
+        credentials: "include",
+        redirect: "follow" // in case we get redirected to the login page.
+      })
+        .then(resp => {
+          if (resp.redirected === true) {
+            window.location.href = `${URL_ROOT}/fbpac-api/partners/sign_in`;
+            return null;
+          }
+          return resp.json();
+        })
+        // .then(res => res.json())
+        .then(resp => {
+          dispatch(receiveRecentGroupedAttr(resp));
+        })
+    );
   };
 };
 
-export const getAds = (url = "http://localhost:3000/ads") => {
+export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
   return (dispatch, getState) => {
     let state = getState();
     const params = serialize(state);
@@ -157,10 +168,7 @@ export const getAds = (url = "http://localhost:3000/ads") => {
 
     let query = params.toString().length > 0 ? `?${params.toString()}` : "";
     history.push({ search: query }, "", `${location.pathname}${query}`);
-    return fetch(path, {
-      method: "GET",
-      headers: headers(state.credentials, state.lang)
-    })
+    return fetch(path, { method: "GET", credentials: "include" })
       .then(res => res.json())
       .then(ads => {
         dispatch(
@@ -187,13 +195,13 @@ export const hideAd = ad => ({
 export const suppressAd = ad => {
   return (dispatch, getState) => {
     dispatch(hideAd(ad));
-    return fetch("/facebook-ads/admin/ads", {
-      method: "POST",
+    return fetch(`${URL_ROOT}/fbpac-api/ads/${ad.id}/suppress`, {
+      method: "PUT",
       body: ad.id,
-      headers: headers(getState().credentials)
+      credentials: "include"
     }).then(resp => {
       if (!resp.ok) {
-        dispatch(logout());
+        window.location = `${URL_ROOT}/fbpac-api/partners/sign_in`;
       }
     });
   };
