@@ -1,6 +1,6 @@
-const TIMELINE_SELECTOR = ".userContentWrapper";
-const SIDEBAR_SELECTOR = ".ego_unit";
-const DEBUG =
+export const TIMELINE_SELECTOR = ".userContentWrapper";
+export const SIDEBAR_SELECTOR = ".ego_unit";
+export const DEBUG =
   (process.env.NODE_ENV === "dev" || process.env.NODE_ENV) === "development"
     ? "development"
     : "production";
@@ -34,7 +34,7 @@ class StateMachine {
 // This is a simple state machine that aims to get rid of the promise mess of before in favor of a
 // tick based approach. It should help us reason about the flow and transition states. And allow for
 // easier testing
-const states = {
+export const states = {
   INITIAL: "INITIAL",
   TIMELINE: "TIMELINE",
   TIMELINE_ID: "TIMELINE_ID",
@@ -48,7 +48,7 @@ const states = {
   DONE: "DONE",
   ERROR: "ERROR"
 };
-const errors = {
+export const errors = {
   NOT_AN_AD: "Not an ad",
   TIMEOUT: "Timeout transitioning states",
   NO_TOGGLE: "Couldn't find a toggle",
@@ -57,7 +57,7 @@ const errors = {
 };
 const TIMEOUT = 10000;
 const POLL = 50;
-export class Scraper extends StateMachine {
+export class Parser extends StateMachine {
   constructor(node, resolve, reject) {
     super();
     this.state = states.INITIAL;
@@ -132,7 +132,7 @@ export class Scraper extends StateMachine {
     } else if (list.contains("ego_unit")) {
       this.promote(states.SIDEBAR);
     } else {
-      this.promote(this.ERROR, errors.NOT_AN_AD);
+      this.promote(states.ERROR, errors.NOT_AN_AD);
     }
   }
 
@@ -298,6 +298,7 @@ export class Scraper extends StateMachine {
           this.ad.targeting = targeting;
           this.promote(states.DONE);
         } catch (e) {
+          if (DEBUG) console.log(e);
           targetingBlocked = true;
           setTimeout(() => (targetingBlocked = false), 15 * 16 * 1000);
           this.promote(states.DONE);
@@ -321,7 +322,7 @@ export class Scraper extends StateMachine {
     }
     adCache.set(this.toggleId, this.ad);
     this.stop();
-    this.resolve(this.ad, this);
+    this.resolve(this.ad);
   }
 
   error() {
@@ -330,7 +331,7 @@ export class Scraper extends StateMachine {
       console.error(this.states);
     }
     this.stop();
-    this.reject(this.message, this);
+    this.reject(this.message);
   }
 }
 
@@ -543,8 +544,9 @@ const grabVariable = (fn, args) => {
 const refocus = cb => {
   const focus = document.activeElement;
   const ranges = [];
-  for (var i = 0; i < window.getSelection().rangeCount; i++) {
-    let range = window.getSelection().getRangeAt(i);
+  const selection = window.getSelection();
+  for (let i = 0; i < selection.rangeCount; i++) {
+    let range = selection.getRangeAt(i);
     ranges.push([
       range.startContainer,
       range.startOffset,
@@ -566,12 +568,5 @@ const refocus = cb => {
   }
 };
 
-const parser = node =>
-  new Promise((resolve, reject) => new Scraper(node, resolve, reject).start());
-
-module.exports = {
-  parser,
-  TIMELINE_SELECTOR,
-  SIDEBAR_SELECTOR,
-  DEBUG
-};
+export const parser = node =>
+  new Promise((resolve, reject) => new Parser(node, resolve, reject).start());
