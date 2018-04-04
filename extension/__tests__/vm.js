@@ -4,16 +4,13 @@ class AsyncRequest {
   constructor() {
     this.data = {};
     this.uri = { addQueryData: () => "" };
-    this.calls = [];
   }
 
   setURI() {
-    this.calls.push("setURI");
     return this;
   }
 
   setData() {
-    this.calls.push;
     return this;
   }
 
@@ -37,18 +34,23 @@ class AsyncRequest {
 
   setNewSerial() {}
 }
-
-globals.AsyncRequest = AsyncRequest;
-Object.assign(globals.window, { require: () => () => {} });
+global.AsyncRequest = AsyncRequest;
+Object.assign(global.window, { require: () => () => {} });
 
 class XMLHttpRequest {
+  constructor() {
+    this.response =
+      'for (;;);{"jsmods":{"markup":[["",{"__html":"targeting"}]]}}';
+  }
   open() {}
   send() {
     this.readyState = 4;
     this.onreadystatechange();
   }
 }
-globals.XMLHttpRequest = XMLHttpRequest;
+global.XMLHttpRequest = XMLHttpRequest;
+global.getSelection = () => ({ rangeCount: 0 });
+global.localStorage = { setItem: a => a, getItem: () => "targeting" };
 
 export class FacebookVM {
   constructor() {
@@ -63,19 +65,20 @@ export class FacebookVM {
 
     this.click = () => this._click();
     this.timelineAd = document.querySelector(
-      "#hyperfeed_story_id_5ac2bbb055fd90225091584 .toggle"
+      "#hyperfeed_story_id_5ac2bbb055fd90225091584 .uiPopover"
     );
 
     this.timelineAd.addEventListener("click", this.click);
   }
 
   _click() {
-    const node = document.createElement("div");
-    div.innerHTML = readFileSync(__dirname + "/fixtures/toggle.html");
+    const node = (this.popup = document.createElement("div"));
+    node.innerHTML = readFileSync(__dirname + "/fixtures/timeline-popup.html");
     document.body.appendChild(node);
   }
 
   detach() {
+    if (this.popup) this.popup.remove();
     this.timelineAd.removeEventListener("click", this.click);
   }
 }
