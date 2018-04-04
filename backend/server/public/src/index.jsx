@@ -47,10 +47,12 @@ go(() => {
     </Router>,
     document.querySelector("#graphic")
   );
-  history.listen(location => {
-    if (window.ga) {
-      window.ga("set", "page", location.pathname + location.search);
-      window.ga("send", "pageview", location.pathname + location.search);
+  history.listen(() => {
+    if (window.dataLayer) {
+      window.dataLayer.push({
+        event: "Pageview",
+        url: location.pathname + location.search
+      });
     }
   });
 });
