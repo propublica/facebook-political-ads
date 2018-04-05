@@ -37,6 +37,7 @@ use tokio_timer::Timer;
 use unicase::Ascii;
 use url::{form_urlencoded, Url};
 
+#[derive(Clone)]
 pub struct AdServer {
     db_pool: Pool<ConnectionManager<PgConnection>>,
     pool: CpuPool,
@@ -129,20 +130,24 @@ impl Service for AdServer {
             }
             (&Method::Get, "/facebook-ads/advertisers") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.lang(req, |req, lang| self.advertisers(req, lang)))
+                Either::B(self.lang(req, |req, lang| self.advertisers(req, lang, None)))
             }
             (&Method::Get, "/facebook-ads/segments") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.lang(req, |req, lang| self.segments(req, lang)))
+                Either::B(self.lang(req, |req, lang| self.segments(req, lang, None)))
             }
 
             (&Method::Get, "/facebook-ads/recent_advertisers") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.lang(req, |req, lang| self.recent_advertisers(req, lang)))
+                Either::B(self.lang(req, |req, lang| {
+                    self.advertisers(req, lang, Some(String::from("1 Month")))
+                }))
             }
             (&Method::Get, "/facebook-ads/recent_segments") => {
                 // TODO: route these in the restful routing area.
-                Either::B(self.lang(req, |req, lang| self.recent_segments(req, lang)))
+                Either::B(self.lang(req, |req, lang| {
+                    self.segments(req, lang, Some(String::from("1 Month")))
+                }))
             }
             // Restful-ish routing.
             (&Method::Get, _) => {
@@ -180,7 +185,7 @@ impl Service for AdServer {
                             None => Either::B(self.lang(req, |req, lang| self.search(req, lang))),
                         }
                     }
-                    Some(&3) => Either::B(self.file("public/index.html", ContentType::html())), // this is the permalinks!
+                    Some(&3) => Either::B(self.file("public/index.html", ContentType::html())), /* this is the permalinks! */
                     Some(&_) => not_found,
                 }
             }
@@ -207,7 +212,10 @@ fn json<T: Serialize + Debug>(thing: &T) -> Response {
         .map(|serialized| {
             Response::new()
                 .with_header(ContentLength(serialized.len() as u64))
-                .with_header(Vary::Items(vec![Ascii::new("Accept-Language".to_owned())]))
+                .with_header(Vary::Items(vec![
+                    Ascii::new("Accept-Language".to_owned()),
+                    Ascii::new("Content-Type".to_owned()),
+                ]))
                 .with_header(ContentType::json())
                 .with_header(AccessControlAllowOrigin::Any)
                 .with_body(serialized)
@@ -248,18 +256,11 @@ impl AdServer {
             Response::new().with_status(StatusCode::BadRequest),
         ));
 
-        // this is annoying but hyper consumes a request when you read from it
-        // apparently in 0.12 this will be easier.
-        let (headers, new_req) = {
-            let (method, uri, version, headers, body) = req.deconstruct();
-            let mut new_request = Request::new(method, uri);
-            new_request.headers_mut().clone_from(&headers);
-            new_request.set_body(body);
-            new_request.set_version(version);
-            (headers, new_request)
-        };
+        let langs = req.headers()
+            .get::<AcceptLanguage>()
+            .and_then(|langs| Some(langs.clone()));
 
-        if let Some(langs) = headers.get::<AcceptLanguage>() {
+        if let Some(langs) = langs {
             if langs.len() == 0 {
                 return bad;
             }
@@ -272,7 +273,7 @@ impl AdServer {
                         + &l.clone().item.region.unwrap_or_default().to_uppercase()
                 })
                 .unwrap_or_else(|| String::from("en-US"));
-            callback(new_req, lang)
+            callback(req, lang)
         } else {
             bad
         }
@@ -309,45 +310,23 @@ impl AdServer {
         Box::new(future)
     }
 
-    fn advertisers(&self, _req: Request, lang: String) -> ResponseFuture {
+    fn advertisers(&self, _req: Request, lang: String, time: Option<String>) -> ResponseFuture {
         let pool = self.pool.clone();
         let lang = lang.clone();
         let db_pool = self.db_pool.clone();
         let future = pool.spawn_fn(move || {
-            Advertisers::get(&lang, &Some(1000), &None, &db_pool)
+            Advertisers::get(&lang, &Some(1000), time, &db_pool)
                 .map(|advertisers: Vec<Advertisers>| json(&advertisers))
         }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
         Box::new(future)
     }
 
-    fn recent_advertisers(&self, _req: Request, lang: String) -> ResponseFuture {
+    fn segments(&self, _req: Request, lang: String, time: Option<String>) -> ResponseFuture {
         let pool = self.pool.clone();
         let lang = lang.clone();
         let db_pool = self.db_pool.clone();
         let future = pool.spawn_fn(move || {
-            Advertisers::get(&lang, &Some(1000), &Some("1 month"), &db_pool)
-                .map(|advertisers: Vec<Advertisers>| json(&advertisers))
-        }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
-        Box::new(future)
-    }
-
-    fn segments(&self, _req: Request, lang: String) -> ResponseFuture {
-        let pool = self.pool.clone();
-        let lang = lang.clone();
-        let db_pool = self.db_pool.clone();
-        let future = pool.spawn_fn(move || {
-            Segments::get(&lang, &Some(1000), &None, &db_pool)
-                .map(|segments: Vec<Segments>| json(&segments))
-        }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
-        Box::new(future)
-    }
-
-    fn recent_segments(&self, _req: Request, lang: String) -> ResponseFuture {
-        let pool = self.pool.clone();
-        let lang = lang.clone();
-        let db_pool = self.db_pool.clone();
-        let future = pool.spawn_fn(move || {
-            Segments::get(&lang, &Some(1000), &Some("1 month"), &db_pool)
+            Segments::get(&lang, &Some(1000), time, &db_pool)
                 .map(|segments: Vec<Segments>| json(&segments))
         }).map_err(|e| hyper::Error::Io(StdIoError::new(StdIoErrorKind::Other, e.description())));
         Box::new(future)
@@ -508,6 +487,28 @@ impl AdServer {
         Box::new(future)
     }
 
+    pub fn new(handle: Handle, database_url: String) -> AdServer {
+        dotenv().ok();
+        let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
+        let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
+        let db_pool = Pool::builder()
+            .build(manager)
+            .expect("Failed to create pool.");
+        let pool = CpuPool::new_num_cpus();
+        let connector = HttpsConnector::new(4, &handle).expect("Couldn't build HttpsConnector");
+        let client = Client::configure()
+            .connector(connector)
+            .build(&handle.clone());
+        AdServer {
+            pool: pool,
+            db_pool: db_pool,
+            handle: handle,
+            client: client,
+            password: admin_password,
+            database_url: database_url,
+        }
+    }
+
     pub fn start() {
         dotenv().ok();
         start_logging();
@@ -515,42 +516,22 @@ impl AdServer {
         if let Ok(root) = env::var("ROOT") {
             env::set_current_dir(&root).expect(&format!("Couldn't change directory to {}", root));
         }
+        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
 
         let addr = env::var("HOST")
             .expect("HOST must be set")
             .parse()
             .expect("Error parsing HOST");
 
-        let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
-        let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set.");
-        let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
-        let db_pool = Pool::builder()
-            .build(manager)
-            .expect("Failed to create pool.");
-        let pool = CpuPool::new_num_cpus();
-
         let mut core = Core::new().unwrap();
         let handle = core.handle();
-        let connector =
-            HttpsConnector::new(4, &core.handle()).expect("Couldn't build HttpsConnector");
-        let client = Client::configure()
-            .connector(connector)
-            .build(&core.handle());
+        let ad_server = AdServer::new(handle.clone(), database_url);
         // from: https://hyper.rs/guides/server/response_strategies/
         let server_handle = handle.clone();
         let server = Http::new()
-            .serve_addr_handle(&addr, &server_handle, move || {
-                Ok(AdServer {
-                    pool: pool.clone(),
-                    db_pool: db_pool.clone(),
-                    handle: handle.clone(),
-                    client: client.clone(),
-                    password: admin_password.clone(),
-                    database_url: database_url.clone(),
-                })
-            })
+            .serve_addr_handle(&addr, &server_handle, move || Ok(ad_server.clone()))
             .unwrap();
-        let h2 = server_handle.clone();
+        let h2 = handle.clone();
         server_handle.spawn(
             server
                 .for_each(move |conn| {

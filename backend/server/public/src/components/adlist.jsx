@@ -11,7 +11,9 @@ import { deserialize } from "utils.js";
 
 export class AdListUnconnected extends React.Component {
   componentDidMount() {
-    this.props.deserialize(); // gets params from the URL and dispatches the relevant actions, which'll cause a DidUpdate, and then a getAds
+    // gets params from the URL and dispatches the relevant actions, which'll cause a DidUpdate, and
+    // then a getAds
+    this.props.deserialize();
   }
 
   render() {
