@@ -1,7 +1,6 @@
 use chrono::DateTime;
 use chrono::offset::Utc;
 use diesel;
-use diesel::debug_query;
 use diesel::dsl::sql;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
@@ -9,6 +8,8 @@ use diesel::prelude::*;
 use diesel::sql_types::{BigInt, Bool, Text};
 use diesel_full_text_search::*;
 use errors::*;
+use futures::future::Either;
+use futures::future;
 use futures::{stream, Future, Stream};
 use futures_cpupool::CpuPool;
 use hyper::{Body, Client, Uri};
@@ -21,8 +22,7 @@ use url::Url;
 use targeting_parser::{collect_advertiser, collect_targeting, Targeting};
 use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
-use rusoto_core::{default_tls_client, Region};
-use rusoto_credential::DefaultCredentialsProvider;
+use rusoto_core::Region;
 use rusoto_s3::{PutObjectRequest, S3, S3Client};
 use schema::ads;
 use schema::ads::BoxedQuery;
@@ -192,7 +192,7 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
     fn get(
         language: &str,
         limit: &Option<i64>,
-        interval: &Option<&str>,
+        interval: Option<String>,
         conn: &Pool<ConnectionManager<PgConnection>>,
     ) -> Result<Vec<T>> {
         // uncomment to use PgInterval
@@ -202,15 +202,14 @@ pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
         let connection = conn.get()?;
 
         let query = agg!(match interval {
-            &Some(interv) => {
+            Some(interv) => {
                 let mut interval_str = String::from("created_at > NOW() - interval '");
-                interval_str.push_str(interv);
+                interval_str.push_str(&interv);
                 interval_str.push_str("'");
-                Ad::scoped(language).filter(sql::<Bool>(&interval_str)) // .filter(created_at.gt( now - interval.unwrap_or(1.months()) )) // uncomment to use PgInterval
+                Ad::scoped(language).filter(sql::<Bool>(&interval_str))
             }
-            &None => Ad::scoped(language),
+            None => Ad::scoped(language),
         }).limit(limit.unwrap_or(20));
-        println!("{}", debug_query::<Pg, _>(&query));
         Ok(query.load::<T>(&*connection)?)
     }
 
@@ -357,7 +356,6 @@ impl Ad {
         pool: &CpuPool,
     ) -> Box<Future<Item = (), Error = ()>> {
         let ad = self.clone();
-        let pool_s3 = pool.clone();
         let pool_db = pool.clone();
         let db = db.clone();
         let future = stream::iter_ok(self.image_urls())
@@ -384,15 +382,8 @@ impl Ad {
             })
             // upload them to s3
             .and_then(move |tuple| {
-                let pool = pool_s3.clone();
-                // we do this in a worker thread because rusoto isn't on
-                // Hyper async yet.
-                pool.spawn_fn(move || {
                     if tuple.1.host().unwrap_or_default() != "pp-facebook-ads.s3.amazonaws.com" {
-                        let credentials = DefaultCredentialsProvider::new()
-                            .map_err(|e| { warn!("could not access credentials {:?}", e); e })?;
-                        let tls = default_tls_client()?;
-                        let client = S3Client::new(tls, credentials, Region::UsEast1);
+                        let client = S3Client::simple(Region::UsEast1);
                         let req = PutObjectRequest {
                             bucket: "pp-facebook-ads".to_string(),
                             key: tuple.1.path().trim_left_matches('/').to_string(),
@@ -400,12 +391,12 @@ impl Ad {
                             body: Some(tuple.0.to_vec()),
                             ..PutObjectRequest::default()
                         };
-                        client.put_object(&req)
-                            .map_err(|e| { warn!("could not store image {:?}", e); e })?;
-                        info!("stored {:?}", tuple.1.path());
+                        Either::A(client.put_object(&req)
+                            .map_err(|e| { warn!("could not store image {:?}", e); e.into() })
+                            .and_then(|_| Ok(tuple.1)))
+                    } else {
+                        Either::B(future::ok(tuple.1).and_then(|i| Ok(i)))
                     }
-                    Ok(tuple.1)
-                })
             })
             .collect()
             // save the new urls to the database. the images variable will
@@ -544,7 +535,7 @@ impl Ad {
         Ok(query
             .filter(db_id.eq(id))
             .limit(1)
-            .first::<Ad>(&*connection)
+            .first::<Ad>(&connection)
             .optional()?)
     }
 
@@ -556,7 +547,7 @@ impl Ad {
         }
         diesel::update(ads.filter(id.eq(adid)))
             .set(suppressed.eq(true))
-            .execute(&*connection)?;
+            .execute(&connection)?;
         Ok(())
     }
 }
@@ -578,7 +569,7 @@ pub fn get_advertiser(targeting: &Option<String>, document: &kuchiki::NodeRef) -
     }
 }
 
-#[derive(Insertable)]
+#[derive(Insertable, Debug)]
 #[table_name = "ads"]
 pub struct NewAd<'a> {
     pub id: &'a str,
