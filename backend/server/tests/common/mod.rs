@@ -3,17 +3,13 @@ extern crate server;
 use dotenv::dotenv;
 use std::env;
 use std::str::FromStr;
-use diesel::prelude::*;
 use diesel;
+use diesel::prelude::*;
 use diesel::pg::PgConnection;
-
 use chrono::offset::Utc;
-
 use rand::{thread_rng, Rng};
-
 use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
-
 use server::models::*;
 use server::schema::ads;
 use server::schema::ads::dsl::*;
@@ -48,7 +44,6 @@ pub fn seed(connection: &PgConnection) {
     };
 
     let new_ad: NewAd = NewAd::new(&post, &en).unwrap();
-
     let _ = diesel::insert_into(ads::table)
         .values(&new_ad)
         .on_conflict(id)
@@ -69,7 +64,7 @@ pub fn seed_political(connection: &PgConnection) {
 
 pub fn unseed(connection: &PgConnection) {
     diesel::delete(ads)
-        .execute(&*connection)
+        .execute(connection)
         .expect("Error unseeding");
 }
 

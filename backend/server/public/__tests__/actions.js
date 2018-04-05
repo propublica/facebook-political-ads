@@ -164,7 +164,7 @@ describe("async actions", () => {
       JSON.stringify(ad)
     );
     const expected = [actions.requestingOneAd(ad.id), actions.receiveOneAd(ad)];
-    let store = mockStore({});
+    const store = mockStore({});
     await store.dispatch(actions.getOneAd(ad.id));
     expect(store.getActions()).toEqual(expected);
   });

@@ -10,6 +10,7 @@ const extractSass = new ExtractTextPlugin({
   filename: "styles.css",
   allChunks: true
 });
+
 const extractAdminSass = new ExtractTextPlugin({
   filename: "admin.css",
   allChunks: true
@@ -141,7 +142,6 @@ module.exports = [
     plugins: [extractSass].filter(Boolean),
     devtool: "source-map"
   },
-
   {
     entry: "admin.scss",
     context: path.resolve(__dirname, "css"),
