@@ -23,6 +23,13 @@ export const LoginUnconnected = ({ authorize }) => {
         placeholder="password"
       />
       <input id="submit" type="submit" value="login" />
+      <br />
+      <p>
+        Due to a backend change by ProPublica, you may be presented with two
+        login screens. Use your same email and password as before for both
+        logins. Please email adcollector@propublica.org if your login does not
+        work on the other log in screen.
+      </p>
     </form>
   );
 };
