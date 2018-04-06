@@ -2,9 +2,8 @@ import { headers, serialize } from "utils.js";
 import { debounce } from "lodash";
 import history from "./history.js";
 
-const URL_ROOT = location.href.indexOf("localhost")
-  ? "http://localhost:3000"
-  : "";
+export const URL_ROOT =
+  window.location.href.indexOf("localhost") > -1 ? "http://localhost:3000" : "";
 
 export const NEW_ADS = "new_ads";
 export const newAds = ads => ({
