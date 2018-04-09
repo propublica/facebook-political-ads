@@ -6,6 +6,7 @@
 @import "colors";
 @import "typography";
 @import "ads";
+@import "../node_modules/rc-slider/assets/index.css";
 
 html,
 body,
@@ -178,6 +179,11 @@ img {
   margin-top: 10rem;
 }
 
+#login p {
+  margin-top: 1em;
+  font-size: 11px;
+}
+
 #search {
   display: block;
   width: 80%;
@@ -270,4 +276,8 @@ ul.tools li h1 {
     max-width: unset;
     width: 100%;
   }
+}
+
+.rc-slider {
+  margin-bottom: 1em;
 }
