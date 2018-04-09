@@ -18,7 +18,7 @@ use hyper_tls::HttpsConnector;
 use kuchiki;
 use kuchiki::iter::{Descendants, Elements, Select};
 use kuchiki::traits::*;
-use url::Url;
+use url::{ParseError, Url};
 use targeting_parser::{collect_advertiser, collect_targeting, Targeting};
 use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
@@ -101,7 +101,15 @@ fn get_images(document: &kuchiki::NodeRef) -> Result<Vec<String>> {
 
 fn get_real_image_uri(uri: Uri) -> Uri {
     let url = uri.to_string().parse::<Url>();
-    let query_map: HashMap<_, _> = url.unwrap().query_pairs().into_owned().collect();
+    let real_url = match url {
+        Err(ParseError::RelativeUrlWithoutBase) => {
+            let base_url = Url::parse("https://facebook.com");
+            base_url.unwrap().join(&uri.to_string()).unwrap()
+        }
+        Err(e) => panic!(e.to_string()),
+        Ok(u) => u, // basically just unwrap
+    };
+    let query_map: HashMap<_, _> = real_url.query_pairs().into_owned().collect();
     query_map.get("url")
         .map(|u| u.parse::<Uri>()) // Option<Result>
         .unwrap_or_else(|| Ok(uri.clone())) // Result
