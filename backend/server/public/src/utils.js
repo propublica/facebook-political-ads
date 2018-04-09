@@ -38,7 +38,6 @@ const s = (plural, singular, map) => {
 
 const serializeEntities = s("entities", "entity", entity => ({ entity }));
 const serializeAdvertisers = s("advertisers", "advertiser");
-const serializeTargets = s("targets", "target", target => ({ target }));
 
 const serialize = state => {
   // N.B. this used to take store, now it takes state; so just give it store.getState()
@@ -48,10 +47,20 @@ const serialize = state => {
     params.set("search", state.search);
   }
 
-  params = [serializeAdvertisers, serializeTargets, serializeEntities].reduce(
+  params = [serializeAdvertisers, serializeEntities].reduce(
     (params, cb) => cb(params, state),
     params
   );
+
+  if (state.targets) {
+    const items = state.targets.filter(it => it.active).map(it =>
+      (({ target, segment }) => ({
+        target,
+        segment
+      }))(it)
+    );
+    if (items.length > 0) params.set("targets", JSON.stringify(items));
+  }
 
   if (state.pagination && state.pagination.page) {
     params.set("page", state.pagination.page);

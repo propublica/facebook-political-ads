@@ -141,7 +141,7 @@ export const getGroupedAttrs = (
   root_url = `${URL_ROOT}/fbpac-api/ads`
 ) => {
   let path = `${root_url}/${
-    recent === RECENT ? "recent_" : "by_"
+    recent === RECENT ? "this_month_" : "by_"
   }${groupingKind + "s"}`;
   return dispatch => {
     dispatch(requestingRecentGroupedAttr());

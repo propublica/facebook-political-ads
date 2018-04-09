@@ -3,6 +3,18 @@ import { connect } from "react-redux";
 import { withRouter, Link } from "react-router-dom";
 import { getGroupedAttrs, newSearch, RECENT } from "actions.js";
 
+// maps groupingType to a URL function
+const groupedAttrUrl = {
+  target: ({ target }) => `targets=%5B"target"%3A"${target}"%5D`,
+  advertiser: ({ advertiser }) => `advertisers=%5B"${advertiser}"%5D`,
+  segment: ({ segment }) => {
+    const split = segment.split(" → ");
+    return `targets=%5B%7B"target"%3A"${split[0]}","segment"%3A"${
+      split[1]
+    }"%7D%5D`;
+  }
+};
+
 export class GroupedAttrsUnconnected extends React.Component {
   componentWillMount() {
     // TODO: follow this pattern to get various kinds of grouped attrs (advertisers, recent advertisers, etc.)
@@ -43,9 +55,9 @@ export class GroupedAttrsUnconnected extends React.Component {
               <tr key={groupedItem[this.state.groupingType]}>
                 <td>
                   <Link
-                    to={`/facebook-ads/admin/ads?${
+                    to={`/facebook-ads/admin/ads?${groupedAttrUrl[
                       this.state.groupingType
-                    }s=%5B"${groupedItem[this.state.groupingType]}"%5D`}
+                    ](groupedItem)}`}
                   >
                     {groupedItem[this.state.groupingType]}
                   </Link>
