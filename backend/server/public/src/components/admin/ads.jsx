@@ -30,6 +30,17 @@ export class AdsUnconnected extends React.Component {
           <label htmlFor="range-1a">Political Probability:</label>
           <Range
             defaultValue={[70, 100]}
+            marks={{
+              10: "10%",
+              20: "20%",
+              30: "30%",
+              40: "40%",
+              50: "50%",
+              60: "60%",
+              70: "70%",
+              80: "80%",
+              90: "90%"
+            }}
             onChange={this.props.onSliderChange}
           />
         </div>
@@ -70,7 +81,7 @@ export const AdsUnrouted = connect(
     },
     onSliderChange: vals => {
       console.log(vals);
-      throttledDispatchAny(dispatch, vals, changePoliticalProbability);
+      throttledDispatchAny(dispatch, changePoliticalProbability, vals);
     }
   })
 )(AdsUnconnected);

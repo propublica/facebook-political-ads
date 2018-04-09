@@ -6,6 +6,7 @@
 @import "colors";
 @import "typography";
 @import "ads";
+@import "../node_modules/rc-slider/assets/index.css";
 
 html,
 body,
@@ -270,4 +271,8 @@ ul.tools li h1 {
     max-width: unset;
     width: 100%;
   }
+}
+
+.rc-slider {
+  margin-bottom: 1em;
 }
