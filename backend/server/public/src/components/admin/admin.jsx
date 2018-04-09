@@ -3,11 +3,22 @@ import { connect } from "react-redux";
 import { withRouter, Route, Link } from "react-router-dom";
 import Ads from "components/admin/ads.jsx";
 import AdDetail from "components/admin/addetail.jsx";
-import Login from "components/admin/login.jsx";
 import GroupedAttrs from "components/admin/groupedattrs.jsx";
 import AdminTools from "components/admin/tools.jsx";
+import { URL_ROOT } from "actions.js";
 
 export const LoggedInApp = () => {
+  fetch(`${URL_ROOT}/fbpac-api/loggedin`, {
+    method: "GET",
+    credentials: "include",
+    redirect: "follow" // in case we get redirected to the login page.
+  }).then(resp => {
+    if (resp.redirected === true) {
+      window.location.href = `${URL_ROOT}/fbpac-api/partners/sign_in`;
+      return <div>An error has occurred</div>;
+    }
+  });
+
   return (
     <div>
       <Route exact path="/facebook-ads/admin" component={Ads} />
@@ -39,7 +50,7 @@ export const AdminUnconnected = ({ credentials }) => {
           </li>
         </ul>
       </nav>
-      {credentials && credentials.token ? <LoggedInApp /> : <Login />}
+      <LoggedInApp />
     </div>
   );
 };
