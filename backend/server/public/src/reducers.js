@@ -17,7 +17,8 @@ import {
   GOT_THAT_AD,
   REQUESTING_ONE_AD,
   GOT_RECENT_GROUPED_ATTR,
-  REQUESTING_RECENT_GROUPED_ATTR
+  REQUESTING_RECENT_GROUPED_ATTR,
+  CHANGE_POLITICAL_PROBABILITY
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -153,6 +154,16 @@ export const pagination = (state = { page: 0, total: 0 }, action) => {
     case SET_TOTAL: {
       const total = Math.ceil(action.value / PER_PAGE);
       return { total, page: 0 };
+    }
+    default:
+      return state;
+  }
+};
+
+export const politicalProbability = (state = [], action) => {
+  switch (action.type) {
+    case CHANGE_POLITICAL_PROBABILITY: {
+      return action.value;
     }
     default:
       return state;

@@ -19,7 +19,8 @@ import {
   ad,
   credentials,
   enableBatching,
-  groupedAttribute
+  groupedAttribute,
+  politicalProbability
 } from "reducers.js";
 import { go } from "i18n.js";
 import Admin from "components/admin/admin.jsx";
@@ -36,7 +37,8 @@ const reducer = enableBatching(
     pagination,
     credentials,
     lang,
-    groupedAttribute
+    groupedAttribute,
+    politicalProbability
   })
 );
 
