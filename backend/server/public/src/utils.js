@@ -56,6 +56,11 @@ const serialize = state => {
     params.set("page", state.pagination.page);
   }
 
+  if (state.politicalProbability) {
+    params.set("poliprob", state.politicalProbability[0]);
+    params.set("maxpoliprob", state.politicalProbability[1]);
+  }
+
   if (state.lang !== i18next.language) {
     params.set("lang", state.lang);
   }
