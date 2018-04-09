@@ -64,6 +64,11 @@ export const fetchSearch = query => asyncResetPage(newSearch(query));
 export const throttledDispatch = debounce((dispatch, input) => {
   dispatch(fetchSearch(input));
 }, 750);
+// throttledDispatchAny(dispatch, fetchSearch, input) // TODO
+
+export const throttledDispatchAny = debounce((dispatch, func, input) => {
+  dispatch(func(input));
+}, 750);
 
 export const BATCH = "batch";
 export const batch = (...actions) => ({
@@ -98,6 +103,11 @@ export const toggleAdvertiser = () => ({ type: TOGGLE_ADVERTISER });
 export const toggleEntity = () => ({ type: TOGGLE_ENTITY });
 export const resetDropdowns = () => ({ type: RESET_DROPDOWNS });
 
+export const CHANGE_POLITICAL_PROBABILITY = "change_poliprob";
+export const filterbyPoliticalProbability = a(CHANGE_POLITICAL_PROBABILITY);
+export const changePoliticalProbability = t =>
+  asyncResetPage(filterbyPoliticalProbability(t));
+
 export const NEXT_PAGE = "next_page";
 export const PREV_PAGE = "prev_page";
 export const SET_PAGE = "set_page";
@@ -114,8 +124,7 @@ export const getOneAd = (ad_id, url = `${URL_ROOT}/fbpac-api/ads`) => {
   if (!ad_id) return () => null;
 
   let path = `${url}/${ad_id}`;
-  return (dispatch, getState) => {
-    let state = getState();
+  return dispatch => {
     dispatch(requestingOneAd(ad_id));
     return fetch(path, { method: "GET", credentials: "include" })
       .then(res => res.json())
@@ -134,13 +143,11 @@ export const getGroupedAttrs = (
   let path = `${root_url}/${
     recent === RECENT ? "recent_" : "by_"
   }${groupingKind + "s"}`;
-  return (dispatch, getState) => {
-    let state = getState();
+  return dispatch => {
     dispatch(requestingRecentGroupedAttr());
     return (
       fetch(path, {
         method: "GET",
-        // headers: headers(state.credentials, state.lang),
         credentials: "include",
         redirect: "follow" // in case we get redirected to the login page.
       })
@@ -192,7 +199,7 @@ export const hideAd = ad => ({
 });
 
 export const suppressAd = ad => {
-  return (dispatch, getState) => {
+  return dispatch => {
     dispatch(hideAd(ad));
     return fetch(`${URL_ROOT}/fbpac-api/ads/${ad.id}/suppress`, {
       method: "PUT",

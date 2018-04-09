@@ -35,7 +35,7 @@ export const LoggedInApp = () => {
   );
 };
 
-export const AdminUnconnected = ({ credentials }) => {
+export const AdminUnconnected = () => {
   return (
     <div id="app">
       <nav>
@@ -54,6 +54,4 @@ export const AdminUnconnected = ({ credentials }) => {
     </div>
   );
 };
-export default withRouter(
-  connect(({ credentials }) => ({ credentials }))(AdminUnconnected)
-);
+export default withRouter(connect(() => ({}))(AdminUnconnected));
