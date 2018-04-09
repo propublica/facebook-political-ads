@@ -124,8 +124,7 @@ export const getOneAd = (ad_id, url = `${URL_ROOT}/fbpac-api/ads`) => {
   if (!ad_id) return () => null;
 
   let path = `${url}/${ad_id}`;
-  return (dispatch, getState) => {
-    let state = getState();
+  return dispatch => {
     dispatch(requestingOneAd(ad_id));
     return fetch(path, { method: "GET", credentials: "include" })
       .then(res => res.json())
@@ -144,13 +143,11 @@ export const getGroupedAttrs = (
   let path = `${root_url}/${
     recent === RECENT ? "recent_" : "by_"
   }${groupingKind + "s"}`;
-  return (dispatch, getState) => {
-    let state = getState();
+  return dispatch => {
     dispatch(requestingRecentGroupedAttr());
     return (
       fetch(path, {
         method: "GET",
-        // headers: headers(state.credentials, state.lang),
         credentials: "include",
         redirect: "follow" // in case we get redirected to the login page.
       })
@@ -202,7 +199,7 @@ export const hideAd = ad => ({
 });
 
 export const suppressAd = ad => {
-  return (dispatch, getState) => {
+  return dispatch => {
     dispatch(hideAd(ad));
     return fetch(`${URL_ROOT}/fbpac-api/ads/${ad.id}/suppress`, {
       method: "PUT",

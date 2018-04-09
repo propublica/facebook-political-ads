@@ -11,7 +11,8 @@ import {
   newTargets,
   filterAdvertiser,
   filterEntity,
-  filterTarget
+  filterTarget,
+  changePoliticalProbability
 } from "actions.js";
 
 const auth = credentials =>
@@ -56,7 +57,7 @@ const serialize = state => {
     params.set("page", state.pagination.page);
   }
 
-  if (state.politicalProbability) {
+  if (state.politicalProbability && state.politicalProbability.length > 0) {
     params.set("poliprob", state.politicalProbability[0]);
     params.set("maxpoliprob", state.politicalProbability[1]);
   }
@@ -104,6 +105,15 @@ const deserialize = dispatch => {
   if (params.has("page")) {
     actions.push(setTotal(10000));
     actions.push(setPage(parseInt(params.get("page"), 10)));
+  }
+
+  if (params.has("poliprob") || params.has("maxpoliprob")) {
+    actions.push(
+      changePoliticalProbability(
+        parseInt(params.get("poliprob") || "70", 10),
+        parseInt(params.get("maxpoliprob") || "100", 10)
+      )
+    );
   }
 
   if (actions.length === 0) {
