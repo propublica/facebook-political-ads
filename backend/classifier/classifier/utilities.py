@@ -22,6 +22,8 @@ CLASSIFIER = "MultinomialNB"
 def equalize_classes(predictor, response):
     """
     Equalize classes in training data for better representation.
+
+    https://en.wikipedia.org/wiki/Oversampling_and_undersampling_in_data_analysis#SMOTE
     """
     return SMOTE().fit_sample(predictor, response)
 

@@ -22,8 +22,11 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>{ad.title}</td>
         </tr>
         <tr>
-          <td>text</td>
-          <td dangerouslySetInnerHTML={{ __html: ad.html }} />
+          <td>ad</td>
+          <td
+            className="message"
+            dangerouslySetInnerHTML={{ __html: ad.html }}
+          />
         </tr>
         <tr>
           <td>targeting</td>

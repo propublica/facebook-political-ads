@@ -4,46 +4,56 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "node test/test.js",
-    "build": "webpack --progress",
-    "watch": "webpack -w --progress",
-    "dist":
-      "NODE_ENV=production webpack --progress -p && web-ext build -s dist",
+    "test": "jest",
+    "test:watch": "npm test -- --watch",
+    "coverage": "jest --coverage",
+    "build": "webpack --progress --mode development",
+    "watch": "webpack -w --progress --mode development",
+    "dist": "NODE_ENV=production webpack --progress --mode production && web-ext build -s dist",
     "ff": "web-ext run -s build",
-    "ffde":
-      "web-ext run -s build --pref intl.locale.requested=de-DE --pref intl.locale.matchOS=false --pref intl.accept_languages=de-DE,de"
+    "ffde": "web-ext run -s build --pref intl.locale.requested=de-DE --pref intl.locale.matchOS=false --pref intl.accept_languages=de-DE,de"
   },
   "author": "Jeff Larson <jeff.larson@propublica.org>",
   "license": "ISC",
   "devDependencies": {
-    "babel-core": "^6.26.0",
+    "@babel/core": "^7.0.0-beta.40",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.40",
+    "@babel/plugin-transform-runtime": "^7.0.0-beta.40",
+    "@babel/preset-env": "^7.0.0-beta.40",
+    "@babel/preset-react": "^7.0.0-beta.40",
+    "babel-cli": "^6.26.0",
+    "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^8.2.2",
-    "babel-loader": "^7.1.4",
-    "babel-plugin-external-helpers": "^6.22.0",
-    "babel-plugin-jsx-pragmatic": "^1.0.2",
-    "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-plugin-transform-react-constant-elements": "^6.23.0",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.6.1",
-    "copy-webpack-plugin": "^4.5.0",
-    "css-loader": "^0.28.10",
-    "eslint": "^4.18.2",
+    "babel-jest": "^22.4.3",
+    "babel-loader": "^8.0.0-beta.2",
+    "copy-webpack-plugin": "^4.5.1",
+    "css-loader": "^0.28.11",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "enzyme-to-json": "^3.3.3",
+    "eslint": "^4.19",
+    "eslint-config-prettier": "^2.9.0",
+    "eslint-plugin-jest": "^21.14.0",
+    "eslint-plugin-prettier": "^2.6.0",
     "eslint-plugin-react": "^7.7.0",
-    "extract-text-webpack-plugin": "^3.0.2",
-    "html-webpack-plugin": "^3.0.5",
-    "jsdom": "^11.6.2",
+    "html-webpack-plugin": "^3.0.7",
+    "jest": "^22.4.3",
+    "jest-fetch-mock": "^1.5.0",
+    "react-test-renderer": "^16.2.0",
+    "redux-mock-store": "^1.5.1",
     "source-map-loader": "^0.2.3",
-    "style-loader": "^0.20.2",
-    "uglifyjs-webpack-plugin": "^1.2.2",
-    "web-ext": "^2.4.0",
-    "webpack": "^4.1.0"
+    "style-loader": "^0.20.3",
+    "uglifyjs-webpack-plugin": "^1.2.4",
+    "web-ext": "^2.5.0",
+    "webpack": "^4.2.0",
+    "webpack-cli": "^2.0.12"
   },
   "dependencies": {
+    "@babel/runtime": "^7.0.0-beta.40",
     "base64url": "^2.0.0",
     "i18n-iso-countries": "^3.6.1",
     "langs": "^2.0.0",
     "lodash": "^4.17.5",
-    "npm": "^5.7.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.7",
@@ -51,5 +61,21 @@
     "redux-localstorage": "^0.4.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0"
+  },
+  "jest": {
+    "modulePaths": [
+      "<rootDir>/src/"
+    ],
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
+    "setupFiles": [
+      "<rootDir>/__tests__/setup.js",
+      "<rootDir>/__tests__/vm.js"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/__tests__/setup.js",
+      "<rootDir>/__tests__/vm.js"
+    ]
   }
 }

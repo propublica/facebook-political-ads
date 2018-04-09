@@ -1,4 +1,5 @@
 import "url-search-params-polyfill";
+import i18next from "i18next";
 import {
   batch,
   setLang,
@@ -55,7 +56,7 @@ const serialize = state => {
     params.set("page", state.pagination.page);
   }
 
-  if (state.lang === "de-DE") {
+  if (state.lang !== i18next.language) {
     params.set("lang", state.lang);
   }
 

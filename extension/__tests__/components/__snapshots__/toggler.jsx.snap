@@ -1,0 +1,266 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toggle should render a toggle 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Connect(Component)
+    amount={1000}
+    type="rater"
+  >
+    <Component
+      amount={1000}
+      dispatch={[Function]}
+      getMessage={[Function]}
+      language={Object {}}
+      type="rater"
+    >
+      <div
+        className="toggle"
+        onClick={[Function]}
+      >
+        TK(undefined)
+        <b>
+          100+
+        </b>
+      </div>
+    </Component>
+  </Connect(Component)>
+</Provider>
+`;
+
+exports[`toggle should render a toggle 2`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Connect(Component)
+    amount={0}
+    type="ads"
+  >
+    <Component
+      amount={0}
+      dispatch={[Function]}
+      getMessage={[Function]}
+      language={Object {}}
+      type="ads"
+    >
+      <div
+        className="toggle"
+        onClick={[Function]}
+      >
+        TK(undefined)
+      </div>
+    </Component>
+  </Connect(Component)>
+</Provider>
+`;
+
+exports[`toggler should render a toggler 1`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Connect(TogglerUnconnected)>
+    <TogglerUnconnected
+      active="rater"
+      ads={Array []}
+      dispatch={[Function]}
+      language={Object {}}
+      ratings={Array []}
+    >
+      <div
+        id="toggler"
+      >
+        <div
+          id="tabs"
+        >
+          <Connect(Component)
+            active="rater"
+            amount={0}
+            message="rate_ads"
+            type="rater"
+          >
+            <Component
+              active="rater"
+              amount={0}
+              dispatch={[Function]}
+              getMessage={[Function]}
+              language={Object {}}
+              message="rate_ads"
+              type="rater"
+            >
+              <div
+                className="toggle active"
+                onClick={[Function]}
+              >
+                Ads I'm Seeing
+              </div>
+            </Component>
+          </Connect(Component)>
+          <Connect(Component)
+            active="rater"
+            amount={0}
+            message="see_ads"
+            type="ads"
+          >
+            <Component
+              active="rater"
+              amount={0}
+              dispatch={[Function]}
+              getMessage={[Function]}
+              language={Object {}}
+              message="see_ads"
+              type="ads"
+            >
+              <div
+                className="toggle"
+                onClick={[Function]}
+              >
+                Ads Others are Seeing
+              </div>
+            </Component>
+          </Connect(Component)>
+        </div>
+        <div
+          id="container"
+        >
+          <Connect(Ratings)
+            ratings={Array []}
+          >
+            <Ratings
+              onRatingClick={[Function]}
+              ratings={Array []}
+            >
+              <div
+                id="ratings"
+              />
+            </Ratings>
+          </Connect(Ratings)>
+        </div>
+      </div>
+    </TogglerUnconnected>
+  </Connect(TogglerUnconnected)>
+</Provider>
+`;
+
+exports[`toggler should render a toggler 2`] = `
+<Provider
+  store={
+    Object {
+      "clearActions": [Function],
+      "dispatch": [Function],
+      "getActions": [Function],
+      "getState": [Function],
+      "replaceReducer": [Function],
+      "subscribe": [Function],
+    }
+  }
+>
+  <Connect(TogglerUnconnected)>
+    <TogglerUnconnected
+      active="ads"
+      ads={Array []}
+      dispatch={[Function]}
+      language={Object {}}
+      ratings={Array []}
+    >
+      <div
+        id="toggler"
+      >
+        <div
+          id="tabs"
+        >
+          <Connect(Component)
+            active="ads"
+            amount={0}
+            message="rate_ads"
+            type="rater"
+          >
+            <Component
+              active="ads"
+              amount={0}
+              dispatch={[Function]}
+              getMessage={[Function]}
+              language={Object {}}
+              message="rate_ads"
+              type="rater"
+            >
+              <div
+                className="toggle"
+                onClick={[Function]}
+              >
+                Ads I'm Seeing
+              </div>
+            </Component>
+          </Connect(Component)>
+          <Connect(Component)
+            active="ads"
+            amount={0}
+            message="see_ads"
+            type="ads"
+          >
+            <Component
+              active="ads"
+              amount={0}
+              dispatch={[Function]}
+              getMessage={[Function]}
+              language={Object {}}
+              message="see_ads"
+              type="ads"
+            >
+              <div
+                className="toggle active"
+                onClick={[Function]}
+              >
+                Ads Others are Seeing
+              </div>
+            </Component>
+          </Connect(Component)>
+        </div>
+        <div
+          id="container"
+        >
+          <Connect(AdsUnconnected)
+            ads={Array []}
+          >
+            <AdsUnconnected
+              ads={Array []}
+              onAdClick={[Function]}
+            >
+              <div
+                id="ads"
+              />
+            </AdsUnconnected>
+          </Connect(AdsUnconnected)>
+        </div>
+      </div>
+    </TogglerUnconnected>
+  </Connect(TogglerUnconnected)>
+</Provider>
+`;
