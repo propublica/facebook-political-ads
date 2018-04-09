@@ -1,6 +1,7 @@
-import { memoize } from "lodash";
+import memoize from "lodash/memoize";
 import { connect } from "react-redux";
 import countries from "i18n-iso-countries";
+import * as messages from "locales.js";
 
 // active ones get prioritised in the ui (pull downs)
 // ISO 3166-1 Alpha-2 (upper case)
@@ -15,27 +16,18 @@ export const activeCountries = [
   "FI",
   "CA",
   "SE",
-  "BE"
+  "BE",
+  "SV"
 ];
 // ISO 639-1 (2 characters, lower case)
 export const activeLanguages = ["da", "de", "en", "it", "nl", "fi", "fr", "sv"];
 
 // load country names in our languages
-activeLanguages
-  .concat(["sv"])
-  .forEach(lang =>
-    countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
-  );
+activeLanguages.forEach(lang =>
+  countries.registerLocale(require(`i18n-iso-countries/langs/${lang}.json`))
+);
 
-// load all messages from ../_locales
-const requireLocales = require.context("../_locales", true, /messages\.json$/);
-const messages = requireLocales.keys().reduce((index, key) => {
-  const locale = key.split("/")[1]; // example key: './de_CH/messages.json'
-  index[locale] = requireLocales(key);
-  return index;
-}, {});
-
-const createFormatter = (...locales) => {
+export const createFormatter = (...locales) => {
   const index = locales.reduceRight(Object.assign, {});
 
   const formatter = (key, replacements) => {
@@ -54,7 +46,7 @@ const createFormatter = (...locales) => {
   return formatter;
 };
 
-const getFormatter = memoize(({ language, country }) =>
+export const getFormatter = memoize(({ language, country }) =>
   createFormatter(
     messages[`${language}_${country}`],
     messages[language],
@@ -66,3 +58,14 @@ export const withI18n = connect(({ language }) => ({
   getMessage: getFormatter(language),
   language
 }));
+
+export const getBrowserLocale = () => {
+  const lang =
+    navigator.languages && navigator.languages.length
+      ? navigator.languages[0]
+      : navigator.language;
+  return {
+    language: lang.split("-")[0],
+    country: lang.split("-")[1]
+  };
+};
