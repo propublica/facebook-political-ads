@@ -134,15 +134,12 @@ export const getOneAd = (ad_id, url = `${URL_ROOT}/fbpac-api/ads`) => {
   };
 };
 
-export const RECENT = "recent";
 export const getGroupedAttrs = (
   groupingKind = "advertiser",
-  recent = null,
+  recent = "by",
   root_url = `${URL_ROOT}/fbpac-api/ads`
 ) => {
-  let path = `${root_url}/${
-    recent === RECENT ? "this_month_" : "by_"
-  }${groupingKind + "s"}`;
+  let path = `${root_url}/${recent}_${groupingKind + "s"}`;
   return dispatch => {
     dispatch(requestingRecentGroupedAttr());
     return (

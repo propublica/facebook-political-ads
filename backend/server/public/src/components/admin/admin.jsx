@@ -26,9 +26,15 @@ export const LoggedInApp = () => {
       <Route exact path="/facebook-ads/admin/ads" component={Ads} />
       <Route
         exact
-        path="/facebook-ads/admin/grouped/:groupingType"
+        path="/facebook-ads/admin/grouped/:groupingType/:timing"
         component={GroupedAttrs}
       />
+      <Route
+        exact
+        path="/facebook-ads/admin/grouped/:groupingType/"
+        component={GroupedAttrs}
+      />
+
       <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
       <Route path="/facebook-ads/admin/tools" component={AdminTools} />
     </div>
