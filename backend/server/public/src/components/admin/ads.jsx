@@ -27,7 +27,7 @@ export class AdsUnconnected extends React.Component {
           search={this.props.search}
         />
         <div className="rangeslider">
-          <label htmlFor="range-1a">Political Probability:</label>
+          <label htmlFor="range-1a">Political Likelihood:</label>
           <Range
             defaultValue={[70, 100]}
             marks={{

@@ -39,7 +39,7 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           </td>
         </tr>
         <tr>
-          <td>likelihood</td>
+          <td>political likelihood</td>
           <td>{ad.political_probability}</td>
         </tr>
         <tr>
