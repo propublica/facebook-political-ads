@@ -1,17 +1,21 @@
 import React from "react";
 import { connect } from "react-redux";
 import { withRouter, Link } from "react-router-dom";
-import { getGroupedAttrs, newSearch, RECENT } from "actions.js";
+import { getGroupedAttrs, newSearch } from "actions.js";
 
 // maps groupingType to a URL function
 const groupedAttrUrl = {
-  target: ({ target }) => `targets=%5B"target"%3A"${target}"%5D`,
+  target: ({ target }) => `targets=%5B%7B"target"%3A"${target}"%7D%5D`,
   advertiser: ({ advertiser }) => `advertisers=%5B"${advertiser}"%5D`,
   segment: ({ segment }) => {
-    const split = segment.split(" → ");
-    return `targets=%5B%7B"target"%3A"${split[0]}","segment"%3A"${
-      split[1]
-    }"%7D%5D`;
+    if (segment === "List → " || segment === "Like  → ") {
+      return `targets=%5B%7B"target"%3A"${segment.slice(0, 4)}"%7D%5D`;
+    } else {
+      const split = segment.split(" → ");
+      return `targets=%5B%7B"target"%3A"${split[0]}","segment"%3A"${
+        split[1]
+      }"%7D%5D`;
+    }
   }
 };
 
@@ -22,15 +26,10 @@ export class GroupedAttrsUnconnected extends React.Component {
     let recent = false;
     if (this.props.match) {
       // `match` is from React Router -- it's the bit of the URL that matches.
-      groupingType = this.props.match.params.groupingType
-        .replace("recent_", "")
-        .replace("by_", "");
+      groupingType = this.props.match.params.groupingType;
+      recent = this.props.match.params.timing;
       // the varieties of allowed groupingTypes are defined in Rust, in server.rs
       this.setState({ groupingType: groupingType });
-      recent =
-        this.props.match.params.groupingType.indexOf("recent") >= 0
-          ? RECENT
-          : null;
     }
     this.props.getGroupedAttrs(groupingType, recent);
   }
