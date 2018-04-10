@@ -102,7 +102,7 @@ describe("components", () => {
     it("should deserialize on mount", () => {
       const initialState = { ads: [{ id: "1234567890" }], pagination: null };
       const store = mockStore(initialState);
-      fetchMock.getOnce("/facebook-ads/ads?", JSON.stringify([]));
+      fetchMock.getOnce("/fbpac-api/ads?", JSON.stringify([]));
       const wrapper = shallow(<AdsUnrouted store={store} />, {
         disableLifecycleMethods: false
       }).dive();

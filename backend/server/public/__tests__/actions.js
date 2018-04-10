@@ -159,10 +159,7 @@ describe("async actions", () => {
 
   it("should get an ad on getOneAd", async () => {
     const ad = ads.ads[0];
-    fetchMock.getOnce(
-      "http://localhost:3000/fbpac-api/ads/" + ad.id,
-      JSON.stringify(ad)
-    );
+    fetchMock.getOnce("/fbpac-api/ads/" + ad.id, JSON.stringify(ad));
     const expected = [actions.requestingOneAd(ad.id), actions.receiveOneAd(ad)];
     const store = mockStore({});
     await store.dispatch(actions.getOneAd(ad.id));
@@ -171,17 +168,14 @@ describe("async actions", () => {
 
   test("getAds updates the URL", async () => {
     const store = mockStore({ search: "Trump", pagination: { page: 2 } });
-    fetchMock.getOnce(
-      "http://localhost:3000/fbpac-api/ads?search=Trump&page=2",
-      ads
-    );
+    fetchMock.getOnce("/fbpac-api/ads?search=Trump&page=2", ads);
     await store.dispatch(actions.getAds());
     expect(location.search).toEqual("?search=Trump&page=2");
   });
 
   test("async filters, pages and search", async () => {
     const store = mockStore({});
-    fetchMock.get("http://localhost:3000/fbpac-api/ads?", ads);
+    fetchMock.get("/fbpac-api/ads?", ads);
     const entity = { entity: ads.entities[0].entity };
     await store.dispatch(actions.fetchEntity(entity));
     expect(store.getActions()[0]).toEqual(actions.setPage(0));
@@ -243,35 +237,10 @@ describe("async actions", () => {
 
   test("getAds dispatches some actions that eventually get us a new_ads action", async () => {
     const store = mockStore({});
-    fetchMock.getOnce("http://localhost:3000/fbpac-api/ads?", ads);
+    fetchMock.getOnce("/fbpac-api/ads?", ads);
     await store.dispatch(actions.getAds());
     expect(store.getActions()[0].actions.map(({ type }) => type)).toContain(
       actions.NEW_ADS
     );
-  });
-
-  it("should suppress an ad", async () => {
-    const ad = ads.ads[0];
-    const url = `http://localhost:3000/fbpac-api/ads/${ad.id}/suppress`;
-    fetchMock.putOnce(url, "ok");
-    const store = mockStore({});
-    await store.dispatch(actions.suppressAd(ad));
-    expect(store.getActions()).toEqual([actions.hideAd(ad)]);
-  });
-
-  it("should allow a user to login", async () => {
-    fetchMock.postOnce("/facebook-ads/login", "ok");
-    const store = mockStore({});
-    await store.dispatch(actions.authorize("test", "test"));
-    expect(store.getActions()).toEqual([
-      actions.login({
-        token:
-          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QifQ."
-      })
-    ]);
-
-    expect(TextEncoder.prototype.encode.mock.calls).toHaveLength(2);
-    expect(crypto.subtle.importKey.mock.calls).toHaveLength(1);
-    expect(crypto.subtle.sign.mock.calls).toHaveLength(1);
   });
 });

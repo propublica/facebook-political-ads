@@ -10,11 +10,13 @@ import { Ads } from "../../../src/components/admin/ads.jsx";
 import { AdDetail } from "../../../src/components/admin/addetail.jsx";
 import GroupedAttrs from "../../../src/components/admin/groupedattrs.jsx";
 import AdminTools from "../../../src/components/admin/tools.jsx";
+import fetchMock from "fetch-mock";
 
 Enzyme.configure({ adapter: new Adapter() });
 
 function setup(path) {
   const props = {};
+  fetchMock.get("/fbpac-api/loggedin", "null");
 
   const enzymeWrapper = shallow(
     <MemoryRouter initialEntries={[path]}>
@@ -57,46 +59,20 @@ describe("components", () => {
     it("should render the Tools page for route /admin/tools", () => {
       expect(pathMap["/facebook-ads/admin/tools"]).toBe(AdminTools);
     });
+
+    it("should check if we're logged in", () => {
+      expect(fetchMock.called()).toEqual(true);
+    });
   });
   describe("AdminUnconnected", () => {
-    it("should not render LoggedInApp when credentials is empty ", () => {
+    it("should render LoggedInApp ", () => {
       const enzymeWrapper = shallow(
         <StaticRouter context={{}}>
-          <AdminUnconnected credentials={{}} />
+          <AdminUnconnected />
         </StaticRouter>
       )
         .dive()
         .dive();
-
-      expect(enzymeWrapper.find("Connect(LoginUnconnected)").exists()).toBe(
-        true
-      );
-      expect(enzymeWrapper.find("LoggedInApp").exists()).toBe(false);
-    });
-    it("should not render LoggedInApp when credentials doesnt have a token ", () => {
-      const enzymeWrapper = shallow(
-        <StaticRouter context={{}}>
-          <AdminUnconnected credentials={{ token: false }} />
-        </StaticRouter>
-      )
-        .dive()
-        .dive();
-      expect(enzymeWrapper.find("Connect(LoginUnconnected)").exists()).toBe(
-        true
-      );
-      expect(enzymeWrapper.find("LoggedInApp").exists()).toBe(false);
-    });
-    it("should render LoggedInApp when credentials.token exists ", () => {
-      const enzymeWrapper = shallow(
-        <StaticRouter context={{}}>
-          <AdminUnconnected credentials={{ token: "asfdasdfas" }} />
-        </StaticRouter>
-      )
-        .dive()
-        .dive();
-      expect(enzymeWrapper.find("Connect(LoginUnconnected)").exists()).toBe(
-        false
-      );
       expect(enzymeWrapper.find("LoggedInApp").exists()).toBe(true);
     });
   });
