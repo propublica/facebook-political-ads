@@ -12,8 +12,6 @@ import {
   PREV_PAGE,
   SET_PAGE,
   SET_TOTAL,
-  LOGIN,
-  LOGOUT,
   GOT_THAT_AD,
   REQUESTING_ONE_AD,
   GOT_RECENT_GROUPED_ATTR,
@@ -165,18 +163,6 @@ export const politicalProbability = (state = [], action) => {
     case CHANGE_POLITICAL_PROBABILITY: {
       return action.value;
     }
-    default:
-      return state;
-  }
-};
-
-// Admin reducers
-export const credentials = (state = {}, action) => {
-  switch (action.type) {
-    case LOGIN:
-      return action.value;
-    case LOGOUT:
-      return {};
     default:
       return state;
   }

@@ -15,11 +15,7 @@ import {
   changePoliticalProbability
 } from "actions.js";
 
-const auth = credentials =>
-  credentials ? { Authorization: `Bearer ${credentials.token}` } : {};
-
-const headers = (credentials, lang) =>
-  Object.assign({}, auth(credentials), language(lang));
+const headers = lang => Object.assign({}, language(lang));
 
 const language = lang => ({ "Accept-Language": lang + ";q=1.0" });
 
@@ -124,4 +120,4 @@ const deserialize = dispatch => {
   return dispatch(batch(...actions));
 };
 
-export { auth, language, headers, serialize, deserialize };
+export { language, headers, serialize, deserialize };

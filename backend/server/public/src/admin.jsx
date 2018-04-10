@@ -17,7 +17,6 @@ import {
   lang,
   ads,
   ad,
-  credentials,
   enableBatching,
   groupedAttribute,
   politicalProbability
@@ -35,7 +34,6 @@ const reducer = enableBatching(
     targets,
     filters,
     pagination,
-    credentials,
     lang,
     groupedAttribute,
     politicalProbability
