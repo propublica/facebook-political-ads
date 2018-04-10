@@ -51,11 +51,17 @@ describe("components", () => {
     it("should render the Ads dashboard for route /", () => {
       expect(pathMap["/facebook-ads/admin/"]).toBe(Ads);
     });
-    it("should render the GroupedAttrs page for route /grouped/by_advertiser", () => {
-      expect(pathMap["/facebook-ads/admin/grouped/:groupingType"]).toBe(
+    it("should render the GroupedAttrs page for route /grouped/advertiser", () => {
+      expect(pathMap["/facebook-ads/admin/grouped/:groupingType/"]).toBe(
         GroupedAttrs
       );
     });
+    it("should render the GroupedAttrs page for route /grouped/advertiser/this_month", () => {
+      expect(pathMap["/facebook-ads/admin/grouped/:groupingType/:timing"]).toBe(
+        GroupedAttrs
+      );
+    });
+
     it("should render the Tools page for route /admin/tools", () => {
       expect(pathMap["/facebook-ads/admin/tools"]).toBe(AdminTools);
     });

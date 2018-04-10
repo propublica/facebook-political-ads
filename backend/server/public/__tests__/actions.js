@@ -131,12 +131,6 @@ describe("actions", () => {
       id
     });
   });
-
-  it("should return LOGIN on login", () =>
-    expect(actions.login()).toEqual({ type: actions.LOGIN }));
-
-  it("should return LOGOUT on logout", () =>
-    expect(actions.logout()).toEqual({ type: actions.LOGOUT }));
 });
 
 const mockStore = configureMockStore([thunk]);
