@@ -54,7 +54,7 @@ describe("components", () => {
 
   describe("Term", () => {
     const mockStore = configureMockStore([thunk]);
-    fetchMock.get("http://localhost:3000/fbpac-api/ads?", "{ \"total\": 4 }");
+    fetchMock.get("/fbpac-api/ads?", '{ "total": 4 }');
     let store, wrapper;
     beforeEach(() => {
       const initialState = {};
