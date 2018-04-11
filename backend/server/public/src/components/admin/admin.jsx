@@ -13,7 +13,6 @@ export const LoggedInApp = () => {
     credentials: "include",
     redirect: "follow" // in case we get redirected to the login page.
   }).then(resp => {
-    console.log("resp", resp);
     if (resp.redirected === true || !resp.ok) {
       window.location.href = `${URL_ROOT}/fbpac-api/partners/sign_in`;
       return <div>An error has occurred</div>;
