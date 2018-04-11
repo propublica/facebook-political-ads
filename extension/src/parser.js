@@ -1,9 +1,7 @@
 export const TIMELINE_SELECTOR = ".userContentWrapper";
 export const SIDEBAR_SELECTOR = ".ego_unit";
 export const DEBUG =
-  (process.env.NODE_ENV === "dev" || process.env.NODE_ENV) === "development"
-    ? "development"
-    : "production";
+  (process.env.NODE_ENV === "dev") || (process.env.NODE_ENV === "development");
 
 const adCache = new Map();
 const targetingCache = new Map();
