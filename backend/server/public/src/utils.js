@@ -74,7 +74,7 @@ const serialize = state => {
   return params;
 };
 
-const deserialize = (dispatch, forceLang) => {
+const deserialize = (dispatch, allowedLangs) => {
   const params = new URLSearchParams(location.search);
   const actions = [];
   if (params.has("search")) {
@@ -99,7 +99,9 @@ const deserialize = (dispatch, forceLang) => {
 
   if (params.has("advertisers")) {
     const advertisers = JSON.parse(params.get("advertisers")).map(
-      advertiser => ({ advertiser })
+      advertiser => ({
+        advertiser
+      })
     );
     actions.push(newAdvertisers(advertisers));
     advertisers.map(advertiser => {
@@ -125,16 +127,23 @@ const deserialize = (dispatch, forceLang) => {
     actions.push(newSearch(""));
   }
 
-  // if the forceLang param is set (it'll be set to en-US)
-  // then we're goign to give you en-US ads, no matter what
+  // if the allowedLangs param is set (it'll be set to [en-US, de-DE])
+  // then we're going to give you the language you ask for iff it's in the array
   // otherwise -- only in admin -- we'll give you the lang you asked for
   // or the lang your browser asks for.
-  if (
-    forceLang ||
-    (params.get("lang") && params.get("lang") !== i18next.language)
-  ) {
-    actions.push(setLang(forceLang || params.get("lang")));
+
+  if (allowedLangs) {
+    if (allowedLangs.indexOf(params.get("lang")) > -1) {
+      actions.push(setLang(params.get("lang")));
+    } else if (allowedLangs.indexOf(i18next.language) > -1) {
+      actions.push(setLang(i18next.language));
+    } else {
+      actions.push(setLang("en-US"));
+    }
+  } else {
+    actions.push(setLang(params.get("lang") || i18next.language));
   }
+
   return dispatch(batch(...actions));
 };
 
