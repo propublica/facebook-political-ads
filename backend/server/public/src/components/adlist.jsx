@@ -73,7 +73,7 @@ export const AdListUnrouted = connect(
       );
     },
     deserialize: () => {
-      deserialize(dispatch, "en-US");
+      deserialize(dispatch, ["en-US", "de-DE"]);
       dispatch(getAds());
     }
   })
