@@ -3,11 +3,22 @@ import { connect } from "react-redux";
 import { withRouter, Route, Link } from "react-router-dom";
 import Ads from "components/admin/ads.jsx";
 import AdDetail from "components/admin/addetail.jsx";
-import Login from "components/admin/login.jsx";
 import GroupedAttrs from "components/admin/groupedattrs.jsx";
 import AdminTools from "components/admin/tools.jsx";
+import { URL_ROOT } from "actions.js";
 
 export const LoggedInApp = () => {
+  fetch(`${URL_ROOT}/fbpac-api/loggedin`, {
+    method: "POST",
+    credentials: "include",
+    redirect: "follow" // in case we get redirected to the login page.
+  }).then(resp => {
+    if (resp.redirected === true || !resp.ok) {
+      window.location.href = `${URL_ROOT}/fbpac-api/partners/sign_in`;
+      return <div>An error has occurred</div>;
+    }
+  });
+
   return (
     <div>
       <Route exact path="/facebook-ads/admin" component={Ads} />
@@ -15,16 +26,22 @@ export const LoggedInApp = () => {
       <Route exact path="/facebook-ads/admin/ads" component={Ads} />
       <Route
         exact
-        path="/facebook-ads/admin/grouped/:groupingType"
+        path="/facebook-ads/admin/grouped/:groupingType/:timing"
         component={GroupedAttrs}
       />
+      <Route
+        exact
+        path="/facebook-ads/admin/grouped/:groupingType/"
+        component={GroupedAttrs}
+      />
+
       <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
       <Route path="/facebook-ads/admin/tools" component={AdminTools} />
     </div>
   );
 };
 
-export const AdminUnconnected = ({ credentials }) => {
+export const AdminUnconnected = () => {
   return (
     <div id="app">
       <nav>
@@ -39,10 +56,8 @@ export const AdminUnconnected = ({ credentials }) => {
           </li>
         </ul>
       </nav>
-      {credentials && credentials.token ? <LoggedInApp /> : <Login />}
+      <LoggedInApp />
     </div>
   );
 };
-export default withRouter(
-  connect(({ credentials }) => ({ credentials }))(AdminUnconnected)
-);
+export default withRouter(connect(() => ({}))(AdminUnconnected));

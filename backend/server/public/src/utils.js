@@ -1,4 +1,5 @@
 import "url-search-params-polyfill";
+import i18next from "i18next";
 import {
   batch,
   setLang,
@@ -10,14 +11,11 @@ import {
   newTargets,
   filterAdvertiser,
   filterEntity,
-  filterTarget
+  filterTarget,
+  changePoliticalProbability
 } from "actions.js";
 
-const auth = credentials =>
-  credentials ? { Authorization: `Bearer ${credentials.token}` } : {};
-
-const headers = (credentials, lang) =>
-  Object.assign({}, auth(credentials), language(lang));
+const headers = lang => Object.assign({}, language(lang));
 
 const language = lang => ({ "Accept-Language": lang + ";q=1.0" });
 
@@ -36,7 +34,6 @@ const s = (plural, singular, map) => {
 
 const serializeEntities = s("entities", "entity", entity => ({ entity }));
 const serializeAdvertisers = s("advertisers", "advertiser");
-const serializeTargets = s("targets", "target", target => ({ target }));
 
 const serialize = state => {
   // N.B. this used to take store, now it takes state; so just give it store.getState()
@@ -46,23 +43,38 @@ const serialize = state => {
     params.set("search", state.search);
   }
 
-  params = [serializeAdvertisers, serializeTargets, serializeEntities].reduce(
+  params = [serializeAdvertisers, serializeEntities].reduce(
     (params, cb) => cb(params, state),
     params
   );
+
+  if (state.targets) {
+    const items = state.targets.filter(it => it.active).map(it =>
+      (({ target, segment }) => ({
+        target,
+        segment
+      }))(it)
+    );
+    if (items.length > 0) params.set("targets", JSON.stringify(items));
+  }
 
   if (state.pagination && state.pagination.page) {
     params.set("page", state.pagination.page);
   }
 
-  if (state.lang === "de-DE") {
+  if (state.politicalProbability && state.politicalProbability.length > 0) {
+    params.set("poliprob", state.politicalProbability[0]);
+    params.set("maxpoliprob", state.politicalProbability[1]);
+  }
+
+  if (state.lang && state.lang !== i18next.language) {
     params.set("lang", state.lang);
   }
 
   return params;
 };
 
-const deserialize = dispatch => {
+const deserialize = (dispatch, allowedLangs) => {
   const params = new URLSearchParams(location.search);
   const actions = [];
   if (params.has("search")) {
@@ -87,7 +99,9 @@ const deserialize = dispatch => {
 
   if (params.has("advertisers")) {
     const advertisers = JSON.parse(params.get("advertisers")).map(
-      advertiser => ({ advertiser })
+      advertiser => ({
+        advertiser
+      })
     );
     actions.push(newAdvertisers(advertisers));
     advertisers.map(advertiser => {
@@ -100,12 +114,37 @@ const deserialize = dispatch => {
     actions.push(setPage(parseInt(params.get("page"), 10)));
   }
 
+  if (params.has("poliprob") || params.has("maxpoliprob")) {
+    actions.push(
+      changePoliticalProbability(
+        parseInt(params.get("poliprob") || "70", 10),
+        parseInt(params.get("maxpoliprob") || "100", 10)
+      )
+    );
+  }
+
   if (actions.length === 0) {
     actions.push(newSearch(""));
   }
 
-  actions.push(setLang(params.get("lang") || "en-US"));
+  // if the allowedLangs param is set (it'll be set to [en-US, de-DE])
+  // then we're going to give you the language you ask for iff it's in the array
+  // otherwise -- only in admin -- we'll give you the lang you asked for
+  // or the lang your browser asks for.
+
+  if (allowedLangs) {
+    if (allowedLangs.indexOf(params.get("lang")) > -1) {
+      actions.push(setLang(params.get("lang")));
+    } else if (allowedLangs.indexOf(i18next.language) > -1) {
+      actions.push(setLang(i18next.language));
+    } else {
+      actions.push(setLang("en-US"));
+    }
+  } else {
+    actions.push(setLang(params.get("lang") || i18next.language));
+  }
+
   return dispatch(batch(...actions));
 };
 
-export { auth, language, headers, serialize, deserialize };
+export { language, headers, serialize, deserialize };
