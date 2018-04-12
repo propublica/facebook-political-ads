@@ -601,7 +601,7 @@ pub struct NewAd<'a> {
 
 impl<'a> NewAd<'a> {
     pub fn new(ad: &'a AdPost, lang: &'a str) -> Result<NewAd<'a>> {
-        info!("saving {}", ad.id);
+        info!("saving {} with targeting {:?}", ad.id, ad.targeting);
         let document = kuchiki::parse_html().one(ad.html.clone());
 
         let thumb = get_image(&document)?;
