@@ -40,7 +40,7 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
         </tr>
         <tr>
           <td>political likelihood</td>
-          <td>{ad.political_probability}</td>
+          <td>{parseInt(ad.political_probability * 10000) / 100}%</td>
         </tr>
         <tr>
           <td>impressions</td>
