@@ -2,6 +2,11 @@
    v2.0 | 20110126
    License: none (public domain)
 */
+@import "reset";
+@import "colors";
+@import "typography";
+@import "ads";
+@import "../node_modules/rc-slider/assets/index.css";
 
 html,
 body,
@@ -145,7 +150,8 @@ body {
   background-color: #eceff1;
 }
 
-table {
+.ad table,
+table.breakdown {
   width: 80%;
   margin-left: auto;
   margin-right: auto;
@@ -154,11 +160,13 @@ table {
   background-color: #fff;
 }
 
-table td {
+.ad table td,
+table.breakdown td {
   padding: 0.5rem;
 }
 
-table td:first-child {
+.ad table td:first-child,
+table.breakdown td:first-child {
   text-transform: uppercase;
   font-weight: bold;
 }
@@ -172,6 +180,11 @@ img {
   margin-left: auto;
   margin-right: auto;
   margin-top: 10rem;
+}
+
+#login p {
+  margin-top: 1em;
+  font-size: 11px;
 }
 
 #search {
@@ -234,3 +247,44 @@ ul.tools {
 ul.tools li,
 ul.tools li h1 {
 } */
+
+.ad .message {
+  font-family: unset;
+  font-weight: 400;
+  font-size: 14px;
+  margin: colspan(g, 4) 0;
+
+  a {
+    color: rgb(54, 88, 153);
+    border: none;
+    &:hover,
+    &:focus {
+      border: none;
+    }
+    text-decoration: none;
+  }
+  p + p {
+    margin-top: 6px;
+  }
+  .no_ads {
+    text-align: center;
+    font-size: 16px;
+    padding: 16px;
+    font-weight: bold;
+  }
+
+  img {
+    display: block;
+    height: auto;
+    max-width: unset;
+    width: 100%;
+  }
+
+  ._5mfr .img {
+    display: none;
+  }
+}
+
+.rc-slider {
+  margin-bottom: 1em;
+}

@@ -1,5 +1,9 @@
 import { headers, serialize } from "utils.js";
 import { debounce } from "lodash";
+import history from "./history.js";
+
+export const URL_ROOT =
+  window.location.href.indexOf("localhost") > -1 ? "http://localhost:3000" : "";
 
 export const NEW_ADS = "new_ads";
 export const newAds = ads => ({
@@ -60,6 +64,11 @@ export const fetchSearch = query => asyncResetPage(newSearch(query));
 export const throttledDispatch = debounce((dispatch, input) => {
   dispatch(fetchSearch(input));
 }, 750);
+// throttledDispatchAny(dispatch, fetchSearch, input) // TODO
+
+export const throttledDispatchAny = debounce((dispatch, func, input) => {
+  dispatch(func(input));
+}, 750);
 
 export const BATCH = "batch";
 export const batch = (...actions) => ({
@@ -94,6 +103,11 @@ export const toggleAdvertiser = () => ({ type: TOGGLE_ADVERTISER });
 export const toggleEntity = () => ({ type: TOGGLE_ENTITY });
 export const resetDropdowns = () => ({ type: RESET_DROPDOWNS });
 
+export const CHANGE_POLITICAL_PROBABILITY = "change_poliprob";
+export const filterbyPoliticalProbability = a(CHANGE_POLITICAL_PROBABILITY);
+export const changePoliticalProbability = t =>
+  asyncResetPage(filterbyPoliticalProbability(t));
+
 export const NEXT_PAGE = "next_page";
 export const PREV_PAGE = "prev_page";
 export const SET_PAGE = "set_page";
@@ -106,17 +120,13 @@ export const setPage = page => ({ type: SET_PAGE, value: page });
 export const fetchPage = page => async(setPage(page));
 export const setTotal = total => ({ type: SET_TOTAL, value: total });
 
-export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
+export const getOneAd = (ad_id, url = `${URL_ROOT}/fbpac-api/ads`) => {
   if (!ad_id) return () => null;
 
   let path = `${url}/${ad_id}`;
-  return (dispatch, getState) => {
-    let state = getState();
+  return dispatch => {
     dispatch(requestingOneAd(ad_id));
-    return fetch(path, {
-      method: "GET",
-      headers: headers(state.credentials, state.lang)
-    })
+    return fetch(path, { method: "GET", credentials: "include" })
       .then(res => res.json())
       .then(ad => {
         dispatch(receiveOneAd(ad));
@@ -124,41 +134,44 @@ export const getOneAd = (ad_id, url = "/facebook-ads/ads") => {
   };
 };
 
-export const RECENT = "recent";
 export const getGroupedAttrs = (
   groupingKind = "advertiser",
-  recent = null,
-  root_url = "/facebook-ads"
+  recent = "by",
+  root_url = `${URL_ROOT}/fbpac-api/ads`
 ) => {
-  let path = `${root_url}/${recent === RECENT ? "recent_" : ""}${groupingKind +
-    "s"}`;
-  return (dispatch, getState) => {
-    let state = getState();
+  let path = `${root_url}/${recent}_${groupingKind + "s"}`;
+  return dispatch => {
     dispatch(requestingRecentGroupedAttr());
-    return fetch(path, {
-      method: "GET",
-      headers: headers(state.credentials, state.lang)
-    })
-      .then(res => res.json())
-      .then(resp => {
-        dispatch(receiveRecentGroupedAttr(resp));
-      });
+    return (
+      fetch(path, {
+        method: "GET",
+        credentials: "include",
+        redirect: "follow" // in case we get redirected to the login page.
+      })
+        .then(resp => {
+          if (resp.redirected === true) {
+            window.location.href = `${URL_ROOT}/fbpac-api/partners/sign_in`;
+            return null;
+          }
+          return resp.json();
+        })
+        // .then(res => res.json())
+        .then(resp => {
+          dispatch(receiveRecentGroupedAttr(resp));
+        })
+    );
   };
 };
 
-export const getAds = (url = "/facebook-ads/ads") => {
+export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
   return (dispatch, getState) => {
     let state = getState();
     const params = serialize(state);
     let path = `${url}?${params.toString()}`;
 
     let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-    history.pushState({ search: query }, "", `${location.pathname}${query}`);
-
-    return fetch(path, {
-      method: "GET",
-      headers: headers(state.credentials, state.lang)
-    })
+    history.push({ search: query }, "", `${location.pathname}${query}`);
+    return fetch(path, { method: "GET", credentials: "include" })
       .then(res => res.json())
       .then(ads => {
         dispatch(
@@ -183,75 +196,16 @@ export const hideAd = ad => ({
 });
 
 export const suppressAd = ad => {
-  return (dispatch, getState) => {
+  return dispatch => {
     dispatch(hideAd(ad));
-    return fetch("/facebook-ads/admin/ads", {
-      method: "POST",
+    return fetch(`${URL_ROOT}/fbpac-api/ads/${ad.id}/suppress`, {
+      method: "PUT",
       body: ad.id,
-      headers: headers(getState().credentials)
+      credentials: "include"
     }).then(resp => {
       if (!resp.ok) {
-        dispatch(logout());
+        window.location = `${URL_ROOT}/fbpac-api/partners/sign_in`;
       }
     });
   };
-};
-
-export const LOGIN = "login";
-export const login = credentials => ({
-  type: LOGIN,
-  value: credentials
-});
-
-export const LOGOUT = "logout";
-export const logout = () => ({
-  type: LOGOUT
-});
-
-export const b64 = thing =>
-  btoa(thing)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=/g, "");
-
-export const createJWT = (username, password) => {
-  const encoder = new TextEncoder();
-  const header = {
-    alg: "HS256",
-    typ: "JWT"
-  };
-  const payload = {
-    username
-  };
-  const base = `${b64(JSON.stringify(header))}.${b64(JSON.stringify(payload))}`;
-  const encoded = encoder.encode(base);
-  return crypto.subtle
-    .importKey(
-      "raw",
-      encoder.encode(password),
-      { name: "HMAC", hash: { name: "SHA-256" } },
-      false,
-      ["sign"]
-    )
-    .then(key => crypto.subtle.sign({ name: "HMAC" }, key, encoded))
-    .then(signature => ({
-      token: `${base}.${b64(
-        String.fromCharCode.apply(null, new Uint8Array(signature))
-      )}`
-    }));
-};
-
-export const authorize = (username, password) => {
-  // create jwt
-  return dispatch =>
-    createJWT(username, password).then(token => {
-      return fetch("/facebook-ads/login", {
-        method: "POST",
-        headers: headers(token)
-      }).then(resp => {
-        if (resp.ok) {
-          dispatch(login(token));
-        }
-      });
-    });
 };

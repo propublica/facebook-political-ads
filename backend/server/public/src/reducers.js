@@ -12,12 +12,11 @@ import {
   PREV_PAGE,
   SET_PAGE,
   SET_TOTAL,
-  LOGIN,
-  LOGOUT,
   GOT_THAT_AD,
   REQUESTING_ONE_AD,
   GOT_RECENT_GROUPED_ATTR,
-  REQUESTING_RECENT_GROUPED_ATTR
+  REQUESTING_RECENT_GROUPED_ATTR,
+  CHANGE_POLITICAL_PROBABILITY
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -159,13 +158,11 @@ export const pagination = (state = { page: 0, total: 0 }, action) => {
   }
 };
 
-// Admin reducers
-export const credentials = (state = {}, action) => {
+export const politicalProbability = (state = [], action) => {
   switch (action.type) {
-    case LOGIN:
+    case CHANGE_POLITICAL_PROBABILITY: {
       return action.value;
-    case LOGOUT:
-      return {};
+    }
     default:
       return state;
   }

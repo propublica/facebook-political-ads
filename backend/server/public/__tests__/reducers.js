@@ -149,21 +149,6 @@ describe("filters", () => {
   );
 });
 
-describe("credentials", () => {
-  it("should login", () =>
-    expect(reducers.credentials(null, actions.login({ login: "ok" }))).toEqual({
-      login: "ok"
-    }));
-  it("should logout", () =>
-    expect(reducers.credentials({ login: "ok" }, actions.logout())).toEqual(
-      {}
-    ));
-  it("should ignore other actions", () =>
-    expect(
-      reducers.credentials({ login: "ok" }, actions.newSearch("trump"))
-    ).toEqual({ login: "ok" }));
-});
-
 describe("pagination", () => {
   const initial = reducers.pagination(
     reducers.pagination(undefined, {}),

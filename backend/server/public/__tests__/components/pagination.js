@@ -117,7 +117,7 @@ describe("components", () => {
 
   describe("Pagination", () => {
     const mockStore = configureMockStore([thunk]);
-    fetchMock.get("/facebook-ads/ads?page=2", '{ "total": 4 }');
+    fetchMock.get("/fbpac-api/ads?page=2", "{ \"total\": 4 }");
 
     let store, wrapper;
     beforeEach(() => {

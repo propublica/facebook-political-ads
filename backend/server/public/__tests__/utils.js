@@ -24,10 +24,6 @@ describe("utils", () => {
     store.clearActions();
   });
 
-  test("auth returns the right header", () => {
-    expect(utils.auth({ token: "" })).toEqual({ Authorization: "Bearer " });
-  });
-
   test("language returns the right header", () => {
     expect(utils.language("en-US")).toEqual({
       "Accept-Language": "en-US;q=1.0"
@@ -35,17 +31,14 @@ describe("utils", () => {
   });
 
   test("headers returns the right headers", () => {
-    const auth = utils.auth({ token: "" });
     const lang = utils.language("en-US");
-    expect(utils.headers({ token: "" }, "en-US")).toEqual(
-      Object.assign({}, auth, lang)
-    );
-    expect(utils.headers(null, "en-US")).toEqual(lang);
+    expect(utils.headers("en-US")).toEqual(Object.assign({}, lang));
+    expect(utils.headers("en-US")).toEqual(lang);
   });
 
   test("serialize deserialize", () => {
     const query =
-      "search=Trump&advertisers=%5B%22NRDC%2B%28Natural%2BResources%2BDefense%2BCouncil%29%22%5D&targets=%5B%7B%22target%22%3A%22Age%22%7D%5D&entities=%5B%7B%22entity%22%3A%22Donald+Trump%22%7D%5D&page=1&lang=de-DE";
+      "search=Trump&advertisers=%5B%22NRDC%2B%28Natural%2BResources%2BDefense%2BCouncil%29%22%5D&entities=%5B%7B%22entity%22%3A%22Donald+Trump%22%7D%5D&targets=%5B%7B%22target%22%3A%22Age%22%7D%5D&page=1&lang=de-DE";
 
     expect(utils.serialize(store.getState()).toString()).toEqual(query);
     history.pushState({}, "", "/facebook-ads/ads?" + query);
@@ -76,9 +69,7 @@ describe("utils", () => {
     history.pushState({}, "", "/facebook-ads/ads");
     fetchMock.getOnce("/facebook-ads/ads", ads);
     await utils.deserialize(store.dispatch);
-    expect(store.getActions()).toEqual([
-      actions.batch(actions.newSearch(""), actions.setLang("en-US"))
-    ]);
+    expect(store.getActions()).toEqual([actions.batch(actions.newSearch(""))]);
 
     const newStore = mockStore({
       ...JSON.parse(ads),

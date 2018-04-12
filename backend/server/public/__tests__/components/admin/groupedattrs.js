@@ -41,5 +41,46 @@ describe("components", () => {
         props.groupedAttribute.length
       );
     });
+
+    it("should render the right URL format for advertisers", () => {
+      const { enzymeWrapper } = setup();
+      expect(enzymeWrapper.find("Link").props().to).toEqual(
+        "/facebook-ads/admin/ads?advertisers=%5B\"Fake\"%5D"
+      );
+    });
+    it("should render the right URL format for targets", () => {
+      const props = {
+        match: { params: { groupingType: "target" } },
+        groupedAttribute: [{ target: "List", count: "1134" }],
+        getGroupedAttrs: jest.fn()
+      };
+      const enzymeWrapper = shallow(<GroupedAttrsUnconnected {...props} />);
+      expect(enzymeWrapper.find("Link").props().to).toEqual(
+        "/facebook-ads/admin/ads?targets=%5B%7B\"target\"%3A\"List\"%7D%5D"
+      );
+    });
+
+    it("should render the right URL format for List/Like target segments", () => {
+      const props = {
+        match: { params: { groupingType: "segment" } },
+        groupedAttribute: [{ segment: "List → ", count: "1134" }],
+        getGroupedAttrs: jest.fn()
+      };
+      const enzymeWrapper = shallow(<GroupedAttrsUnconnected {...props} />);
+      expect(enzymeWrapper.find("Link").props().to).toEqual(
+        "/facebook-ads/admin/ads?targets=%5B%7B\"target\"%3A\"List\"%7D%5D"
+      );
+    });
+    it("should render the right URL format for two-pronged target segments", () => {
+      const props = {
+        match: { params: { groupingType: "segment" } },
+        groupedAttribute: [{ segment: "Agency → Experian", count: "1134" }],
+        getGroupedAttrs: jest.fn()
+      };
+      const enzymeWrapper = shallow(<GroupedAttrsUnconnected {...props} />);
+      expect(enzymeWrapper.find("Link").props().to).toEqual(
+        "/facebook-ads/admin/ads?targets=%5B%7B\"target\"%3A\"Agency\",\"segment\"%3A\"Experian\"%7D%5D"
+      );
+    });
   });
 });

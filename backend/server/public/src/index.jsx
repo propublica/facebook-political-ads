@@ -1,7 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { applyMiddleware, combineReducers, compose, createStore } from "redux";
-import { BrowserRouter } from "react-router-dom";
+import { Router } from "react-router-dom";
+import history from "./history.js";
 import thunkMiddleware from "redux-thunk";
 import { Provider } from "react-redux";
 import { createLogger } from "redux-logger";
@@ -39,11 +40,19 @@ const store = createStore(reducer, compose(applyMiddleware(...middleware)));
 
 go(() => {
   ReactDOM.render(
-    <BrowserRouter>
+    <Router history={history}>
       <Provider store={store}>
         <Frontend />
       </Provider>
-    </BrowserRouter>,
+    </Router>,
     document.querySelector("#graphic")
   );
+  history.listen(() => {
+    if (window.dataLayer) {
+      window.dataLayer.push({
+        event: "Pageview",
+        url: location.pathname + location.search
+      });
+    }
+  });
 });
