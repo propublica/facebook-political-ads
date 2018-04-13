@@ -1,7 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import { withRouter, Link } from "react-router-dom";
-import { getGroupedAttrs, newSearch } from "actions.js";
+import { getGroupedAttrs, newSearch, setLang } from "actions.js";
+import i18next from "i18next";
 
 // maps groupingType to a URL function
 const groupedAttrUrl = {
@@ -31,6 +32,11 @@ export class GroupedAttrsUnconnected extends React.Component {
       // the varieties of allowed groupingTypes are defined in Rust, in server.rs
       this.setState({ groupingType: groupingType });
     }
+    const params = new URLSearchParams(location.search);
+
+    this.props.setLang(
+      this.props.lang || params.get("lang") || i18next.language
+    );
     this.props.getGroupedAttrs(groupingType, recent);
   }
 
@@ -77,12 +83,15 @@ export class GroupedAttrsUnconnected extends React.Component {
 
 const GroupedAttrs = withRouter(
   connect(
-    ({ groupedAttribute }) => ({
-      groupedAttribute
+    ({ groupedAttribute, lang }) => ({
+      groupedAttribute,
+      lang
     }),
     dispatch => ({
       onClick: term => dispatch(newSearch(term)),
-      getGroupedAttrs: (kind, recent) => dispatch(getGroupedAttrs(kind, recent))
+      getGroupedAttrs: (kind, recent) =>
+        dispatch(getGroupedAttrs(kind, recent)),
+      setLang: lang => dispatch(setLang(lang))
     })
   )(GroupedAttrsUnconnected)
 );
