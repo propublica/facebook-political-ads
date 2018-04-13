@@ -1,4 +1,4 @@
-import { headers, serialize } from "utils.js";
+import { serialize } from "utils.js";
 import { debounce } from "lodash";
 import history from "./history.js";
 
@@ -140,7 +140,11 @@ export const getGroupedAttrs = (
   root_url = `${URL_ROOT}/fbpac-api/ads`
 ) => {
   let path = `${root_url}/${recent}_${groupingKind + "s"}`;
-  return dispatch => {
+  return (dispatch, getState) => {
+    let state = getState();
+    if (state.lang) {
+      path = path + `?lang=${state.lang}`;
+    }
     dispatch(requestingRecentGroupedAttr());
     return (
       fetch(path, {
