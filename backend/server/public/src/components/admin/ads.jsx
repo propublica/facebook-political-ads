@@ -55,6 +55,7 @@ export class AdsUnconnected extends React.Component {
               onSuppressClick={this.props.onSuppressClick}
             />
           ))}
+        {this.props.pagination ? <Pagination /> : ""}
       </div>
     );
   }
