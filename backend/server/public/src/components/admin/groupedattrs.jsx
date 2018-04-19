@@ -22,14 +22,14 @@ const groupedAttrUrl = {
 
 export class GroupedAttrsUnconnected extends React.Component {
   componentWillMount() {
-    // TODO: follow this pattern to get various kinds of grouped attrs (advertisers, recent advertisers, etc.)
+    // follow this pattern to get various kinds of grouped attrs (advertisers, recent advertisers, etc.)
     let groupingType = "advertiser"; // default
     let recent = false;
     if (this.props.match) {
       // `match` is from React Router -- it's the bit of the URL that matches.
       groupingType = this.props.match.params.groupingType;
       recent = this.props.match.params.timing;
-      // the varieties of allowed groupingTypes are defined in Rust, in server.rs
+      // the varieties of allowed groupingTypes are defined in Ruby fbpac-api, in ads_controller and routes.rb
       this.setState({ groupingType: groupingType });
     }
     const params = new URLSearchParams(location.search);

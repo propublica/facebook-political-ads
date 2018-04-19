@@ -7,7 +7,8 @@ import {
   throttledDispatch,
   getAds,
   changePoliticalProbability,
-  throttledDispatchAny
+  throttledDispatchAny,
+  clearAdvertisersTargetsAndEntities
 } from "actions.js";
 import { deserialize } from "utils.js";
 import Range from "rc-slider/lib/Range";
@@ -46,15 +47,17 @@ export class AdsUnconnected extends React.Component {
         </div>
 
         {this.props.pagination ? <Pagination /> : ""}
-        {this.props.ads
-          .filter(ad => !ad.suppressed)
-          .map(ad => (
+        {this.props.ads.length > 0 ? (
+          this.props.ads.map(ad => (
             <Ad
               ad={ad}
               key={ad.id}
               onSuppressClick={this.props.onSuppressClick}
             />
-          ))}
+          ))
+        ) : (
+          <div>No ads found (or they&apos;re still loading).</div>
+        )}
       </div>
     );
   }
@@ -62,7 +65,7 @@ export class AdsUnconnected extends React.Component {
 
 export const AdsUnrouted = connect(
   ({ ads, search, page, pagination }) => ({
-    ads,
+    ads: ads.filter(ad => !ad.suppressed),
     search,
     pagination,
     page
@@ -74,13 +77,13 @@ export const AdsUnrouted = connect(
     },
     onKeyUp: e => {
       e.preventDefault();
+      dispatch(clearAdvertisersTargetsAndEntities());
       throttledDispatch(
         dispatch,
         e.target.value.length ? e.target.value : null
       );
     },
     onSliderChange: vals => {
-      console.log(vals);
       throttledDispatchAny(dispatch, changePoliticalProbability, vals);
     }
   })
