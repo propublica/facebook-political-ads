@@ -1,9 +1,9 @@
 {
   "manifest_version": 2,
-  "name":"__MSG_name__",
+  "name": "__MSG_name__",
   "short_name": "__MSG_short_name__",
-  "description":"__MSG_description__",
-  "version": "1.6.1",
+  "description": "__MSG_description__",
+  "version": "1.6.2",
   "default_locale": "en",
   "permissions": [
     "https://projects.propublica.org/facebook-ads/*",
@@ -18,8 +18,10 @@
     "default_title": "__MSG_name__",
     "default_popup": "index.html"
   },
-  "content_scripts": [{
-    "js": ["content.js"],
-    "matches": ["*://*.facebook.com/*"]
-  }]
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "matches": ["*://*.facebook.com/*"]
+    }
+  ]
 }
