@@ -79,6 +79,8 @@ const deserialize = (dispatch, allowedLangs) => {
   const actions = [];
   if (params.has("search")) {
     actions.push(newSearch(params.get("search")));
+  } else {
+    actions.push(newSearch(null)); // this resets the search in `state` if you click on a link from the Tools grouping pages.
   }
 
   if (params.has("entities")) {
