@@ -507,15 +507,18 @@ const checkSponsor = node => {
         .getPropertyValue("content");
       return [
         "Gesponsord",
-        "Sponsored",
+        "Sponsored", // en-US
         "Gesponsert",
         "Sponsrad",
         "Sponsorlu",
         "Sponsoroitu",
-        "إعلان مُموَّل",
+        "إعلان مُموَّل", // ar
         "Sponsoreret",
         "Sponsorizzata",
-        "Chartered"
+        "Chartered", // en-PIRATE :)
+        "Commandité", // fr-CA
+        "Sponsorisé", // fr-FR
+        "Patrocinado" // pt-BR
       ].some(sponsor => {
         if (text === sponsor || style === `"${sponsor}"`) return true;
         return false;
