@@ -13,7 +13,7 @@
     "description": "Description of the extension"
   },
   "rate_ads": {
-    "message": "Les publicités que je vois",
+    "message": "Publicités que je vois",
     "description": "Text for the 'Ads I'm Seeing' button in the extension."
   },
   "see_ads": {
