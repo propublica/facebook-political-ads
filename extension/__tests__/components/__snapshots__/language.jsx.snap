@@ -33,6 +33,12 @@ exports[`language should render and let folks change their country 1`] = `
           Belgium
         </option>
         <option
+          key="BR"
+          value="BR"
+        >
+          Brazil
+        </option>
+        <option
           key="CA"
           value="CA"
         >
@@ -258,12 +264,6 @@ exports[`language should render and let folks change their country 1`] = `
           value="BV"
         >
           Bouvet Island
-        </option>
-        <option
-          key="BR"
-          value="BR"
-        >
-          Brazil
         </option>
         <option
           key="IO"
@@ -1608,6 +1608,14 @@ exports[`language should render and let folks change their language 1`] = `
           Italiano
         </option>
         <option
+          key="pt"
+          value="pt"
+        >
+          Portuguese
+           / 
+          Português
+        </option>
+        <option
           key="sv"
           value="sv"
         >
@@ -2589,14 +2597,6 @@ exports[`language should render and let folks change their language 1`] = `
           پښتو
         </option>
         <option
-          key="pt"
-          value="pt"
-        >
-          Portuguese
-           / 
-          Português
-        </option>
-        <option
           key="qu"
           value="qu"
         >
@@ -3135,6 +3135,14 @@ exports[`language should show the terms 1`] = `
                     Italian
                      / 
                     Italiano
+                  </option>
+                  <option
+                    key="pt"
+                    value="pt"
+                  >
+                    Portuguese
+                     / 
+                    Português
                   </option>
                   <option
                     key="sv"
@@ -4118,14 +4126,6 @@ exports[`language should show the terms 1`] = `
                     پښتو
                   </option>
                   <option
-                    key="pt"
-                    value="pt"
-                  >
-                    Portuguese
-                     / 
-                    Português
-                  </option>
-                  <option
                     key="qu"
                     value="qu"
                   >
@@ -4585,6 +4585,12 @@ exports[`language should show the terms 1`] = `
                     Belgium
                   </option>
                   <option
+                    key="BR"
+                    value="BR"
+                  >
+                    Brazil
+                  </option>
+                  <option
                     key="CA"
                     value="CA"
                   >
@@ -4810,12 +4816,6 @@ exports[`language should show the terms 1`] = `
                     value="BV"
                   >
                     Bouvet Island
-                  </option>
-                  <option
-                    key="BR"
-                    value="BR"
-                  >
-                    Brazil
                   </option>
                   <option
                     key="IO"
