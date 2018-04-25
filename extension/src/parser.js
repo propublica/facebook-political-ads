@@ -296,7 +296,7 @@ export class Parser extends StateMachine {
           this.ad.targeting = targeting;
           this.promote(states.DONE);
         } catch (e) {
-          if (DEBUG) console.log(e);
+          if (DEBUG) console.log("error getting targeting", e);
           targetingBlocked = true;
           setTimeout(() => (targetingBlocked = false), 15 * 16 * 1000);
           this.promote(states.DONE);
@@ -442,7 +442,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  "a[href=\"\"]",
+  'a[href=""]',
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -467,7 +467,8 @@ const cleanAd = html => {
         attr.name !== "id" &&
         attr.name !== "class" &&
         attr.name !== "src" &&
-        attr.name !== "href"
+        attr.name !== "href" &&
+        attr.name !== "data-hovercard"
       )
         node.removeAttribute(attr.name);
       // remove tracking get variables from links and l.facebook.com
@@ -478,6 +479,27 @@ const cleanAd = html => {
             url = new URL(new URLSearchParams(url.search).get("u"));
           if (url.origin && url.pathname) {
             node.setAttribute(attr.name, url.origin + url.pathname);
+          } else {
+            node.removeAttribute(attr.name);
+          }
+        } catch (e) {
+          node.removeAttribute(attr.name);
+        }
+      } else if (attr.name === "data-hovercard") {
+        try {
+          let url = new URL(attr.value, window.location); // it's a relative URL, so we have to give it a base or it errors out.
+          console.log(
+            "hovercard",
+            url,
+            url.pathname.indexOf("/ajax/hovercard/page.php")
+          );
+          if (url.pathname.indexOf("/ajax/hovercard/page.php") === 0) {
+            // for links with a href="#" and data-hovercard="/ajax/hovercard/page.php?id=1234567890"
+            // keep the data-hovercard attr.
+            node.setAttribute(
+              attr.name,
+              "https://www.facebook.com/" + url.searchParams.get("id")
+            );
           } else {
             node.removeAttribute(attr.name);
           }
@@ -531,7 +553,7 @@ const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    "localStorage.setItem(\"pageVariable\", (" +
+    'localStorage.setItem("pageVariable", (' +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
