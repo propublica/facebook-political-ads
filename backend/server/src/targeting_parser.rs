@@ -184,12 +184,12 @@ named!(segment(&str) -> TargetingParsed,
         )
         | do_parse!(
             take_until_and_consume!("an audience called '")  >>
-            segment: take_until!("'") >>
+            segment: take_until_and_consume!("'") >>
             (TargetingParsed::Segment(segment))
         )
         | do_parse!(
             take_until_and_consume!("an audience called \"")  >>
-            segment: take_until!("\"") >>
+            segment: take_until_and_consume!("\"") >>
             (TargetingParsed::Segment(segment))
         )
 
@@ -271,7 +271,7 @@ named!(age(&str) -> TargetingParsed,
             ws!(tag!("age")) >>
             ws!(opt!(tag!("s"))) >>
             ws!(opt!(tag!("d"))) >>
-            complete: ws!(take_until!(" who ")) >>
+            complete: ws!(take_until_and_consume!(" who")) >>
             (TargetingParsed::Age(complete))
         )
     )
