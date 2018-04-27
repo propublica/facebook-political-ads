@@ -431,5 +431,13 @@ mod tests {
                 ],
             )
         );
+
+        assert_eq!(
+            segment(" an audience called 'Member of a family-based household.'"),
+            IResult::Done(
+                "'",
+                TargetingParsed::Segment("Member of a family-based household.")
+            )
+        );
     }
 }
