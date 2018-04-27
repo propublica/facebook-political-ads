@@ -33,6 +33,14 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td dangerouslySetInnerHTML={{ __html: ad.targeting }} />
         </tr>
         <tr>
+          <td>parsed targets</td>
+          <td>
+            {ad.targets
+              .map(({ target, segment }) => `${target}: ${segment}`)
+              .join(", ")}
+          </td>
+        </tr>
+        <tr>
           <td>political / not political</td>
           <td>
             {ad.political} / {ad.not_political}
