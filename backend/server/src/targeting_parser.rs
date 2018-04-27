@@ -168,18 +168,31 @@ named!(language(&str) -> TargetingParsed,
 );
 
 named!(segment(&str) -> TargetingParsed,
-    do_parse!(
-        alt!(
-            take_until_and_consume!("„<b>") |
-            take_until_and_consume!("<b>\"") |
-            take_until_and_consume!("<b>„")
-        ) >>
-        segment: alt!(
-            take_until!("\"</b>") |
-            take_until!("</b>“") |
-            take_until!("“</b>")
-        ) >>
-        (TargetingParsed::Segment(segment))
+    alt!(
+        do_parse!(
+            alt!(
+                take_until_and_consume!("„<b>") |
+                take_until_and_consume!("<b>\"") |
+                take_until_and_consume!("<b>„")
+            ) >>
+            segment: alt!(
+                take_until!("\"</b>") |
+                take_until!("</b>“") |
+                take_until!("“</b>")
+            ) >>
+            (TargetingParsed::Segment(segment))
+        )
+        | do_parse!(
+            take_until_and_consume!("an audience called '")  >>
+            segment: take_until!("'") >>
+            (TargetingParsed::Segment(segment))
+        )
+        | do_parse!(
+            take_until_and_consume!("an audience called \"")  >>
+            segment: take_until!("\"") >>
+            (TargetingParsed::Segment(segment))
+        )
+
     )
 );
 
@@ -234,7 +247,7 @@ named!(retargeting(&str) -> TargetingParsed,
     )
 );
 
-named!(age(&str) -> Option<TargetingParsed>,
+named!(age(&str) -> TargetingParsed,
     alt!(
         do_parse!(
           ws!(alt!(
@@ -252,21 +265,21 @@ named!(age(&str) -> Option<TargetingParsed>,
               | take_until_and_consume!("che vivono")
               | take_until_and_consume!(",")
           )) >>
-          (Some(TargetingParsed::Age(complete)))
+          (TargetingParsed::Age(complete))
         ) |
         do_parse!(
             ws!(tag!("age")) >>
             ws!(opt!(tag!("s"))) >>
             ws!(opt!(tag!("d"))) >>
-            complete: ws!(take_until_and_consume!(" who")) >>
-            (Some(TargetingParsed::Age(complete)))
+            complete: ws!(take_until!(" who ")) >>
+            (TargetingParsed::Age(complete))
         )
     )
 );
 
 named!(region(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
-         tag!("live") >>
+         tag!("live")>>
          ws!(take_until_and_consume!("in")) >>
          country: until_b >>
          (vec![Some(TargetingParsed::Region(country))])
@@ -288,7 +301,7 @@ named!(city_state(&str) -> Vec<Option<TargetingParsed>>,
 
 named!(age_and_location(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
-        a: ws!(age) >>
+        a: opt!(ws!(age)) >>
         l: ws!(alt!(city_state | region)) >>
         (vec![&vec![a][..], &l[..]].concat())
     )
@@ -389,7 +402,7 @@ mod tests {
         assert_eq!(gender("<b>people"), IResult::Done("", None));
         assert_eq!(
             age(" ages 26 to 62 who "),
-            IResult::Done("", Some(TargetingParsed::Age("26 to 62")))
+            IResult::Done("who ", TargetingParsed::Age("26 to 62"))
         );
         assert_eq!(
             region("live in United States</b>"),
