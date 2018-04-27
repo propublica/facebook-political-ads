@@ -1,0 +1,104 @@
+{
+  "name": {
+    "message": "Facebook Political Ad Collector",
+    "description": "Extension name"
+  },
+  "short_name": {
+    "message": "Facebook PAC",
+    "description": "Extension short name"
+  },
+  "description": {
+    "message": "Esta extensão coleta anúncios políticos no Facebook.",
+    "description": "Description of the extension"
+  },
+  "rate_ads": {
+    "message": "Anúncios no meu Facebook",
+    "description": "Text for the 'Ads I'm Seeing' button in the extension."
+  },
+  "see_ads": {
+    "message": "Outros Anúncios",
+    "description":
+      "Text for the 'Ads Others are Seeing' button in the extension."
+  },
+  "political": {
+    "message": "Propaganda política",
+    "description": "Label for political radio button"
+  },
+  "normal": {
+    "message": "Anúncio normal",
+    "description": "Label for normal radio button"
+  },
+  "rating_question": {
+    "message": "Que tipo de anúncio é este?",
+    "description": "Question to ask for rating an ad"
+  },
+  "verify_question": {
+    "message": "Este anúncio é político?",
+    "description": "Question to ask for rating an ad"
+  },
+  "language_settings": {
+    "message": "Configurações de Idioma",
+    "description": "Your Language Settings"
+  },
+  "you_speak": {
+    "message":
+      "Seu navegador acha que você fala <b>$language$</b> e mora em <b>$country$</b>.",
+    "description": "Your language and country",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      },
+      "country": {
+        "content": "$2"
+      }
+    }
+  },
+  "language_instructions": {
+    "message":
+      "Se não for o caso, selecione seu idioma e país nos menus abaixo.",
+    "description": "Instructions to adapt if needed."
+  },
+  "language": {
+    "message": "Idioma: ",
+    "description": "Language"
+  },
+  "country": {
+    "message": "País: ",
+    "description": "Country: "
+  },
+  "terms_of_service": {
+    "message":
+      "<h2>Gostaríamos da sua autorização</h2><p>A ProPublica acredita na transparência em seu trabalho. Então, antes que você comece a usar essa extensão, gostaríamos de explicar o que ela faz exatamente.</p><h2>O que a extensão faz?</h2><p>Essa extensão insere scripts em todas as páginas do Facebook que você visita. O script identifica os anúcios exibidos e os armazena em seu computador.>/p><h2>Como você pode ajudar?</h2><p>Sempre que você quiser nos ajudar em nossa missão, basta clicar no ícone da ProPublica no seu navegador, e uma janela será exibida contendo todos os anúncios salvos no seu computador. Você poderá, então, “ensinar” à extensão quais deles são políticos ou não.</p><h2>Que tipo de informação chega até nós?</h2><p>Nosso servidor receberá o código HTML dos anúncios, livre de qualquer informação pessoal sua; os identificadores e parâmetros demográficos do público-alvo dos anúncios (por exemplo: pessoas de mais de 18 anos que morem nos EUA); sua classificação (anúncio político ou não); e as configurações de idioma do seu navegador. Fizemos de tudo para garantir que a extensão não colete dados que possam identificar os usuários individualmente.</p><h2>O que faremos com essas informações?</h2><p>As informações coletadas serão usadas para alimentar o nosso algoritmo, para que ele aprenda a identificar anúncios políticos com mais precisão. Também podemos mostrar anúncios políticos que foram exibidos para outros usuários. Para saber que tipo de anúncios os outros estão vendo, basta clicar no botão “Outros Anúncios” para receber um lote de 100 anúncios. Em seguida, a extensão compara o lote com os anúncios salvos no seu computador e mostra apenas os que ainda não foram exibidos para você – e essa informação não chega até nós.</p><h2>E se eu quiser retirar a minha autorização?</h2><p>Ao instalar o plugin, você confirma que os dados mencionados acima – bem como a classificação dos anúncios feita por você – poderão ser usados no contexto deste projeto. </p><p>Você pode interromper sua participação a qualquer momento – basta desintalar a extensão (veja como desabilitar extensões no <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=pt\">Chrome</a> e no <a href=\"https://support.mozilla.org/pt-BR/kb/disable-or-remove-add-ons\">Firefox</a>). Se o plugin for desabilitado ou desinstalado, o envio de dados ao nosso servidor será interrompido.</p><p><b>Perguntas, receios, sugestões? Entre em contato conosco no e-mail <a href=\"adcollector@propublica.org\">adcollector@propublica.org</a>.",
+    "description": "The terms of service"
+  },
+  "terms_of_service_accept": {
+    "message": "Aceitar",
+    "description": "The terms of service accept button"
+  },
+
+  "thanks1": {
+    "message": "Obrigado! 🙂",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks2": {
+    "message": "Obrigado pela contribuição!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks3": {
+    "message": "Sem você esse trabalho não seria possível!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks4": {
+    "message": "Obrigado por ajudar!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks5": {
+    "message": "Obrigado! Você já classificou $count$ anúncios.",
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  }
+}

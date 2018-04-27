@@ -3,7 +3,7 @@ import { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR, DEBUG } from "parser";
 let running = false;
 const sendAds = function() {
   if (running) return;
-  console.log("sending Ads");
+  if (DEBUG) console.log("sending Ads");
   running = true;
   let posts = Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)).concat(
     Array.from(document.querySelectorAll(TIMELINE_SELECTOR))
@@ -26,9 +26,9 @@ const sendAds = function() {
   );
 
   scraper.then(() => {
-    console.log(results);
+    if (DEBUG) console.log("sending these: ", results);
     chrome.runtime.sendMessage(results);
-    console.log("done sending Ads");
+    if (DEBUG) console.log("done sending Ads, sent", results.length);
     running = false;
   });
 };

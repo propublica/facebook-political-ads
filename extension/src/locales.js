@@ -5,5 +5,7 @@ import * as en from "../_locales/en/messages.json";
 import * as it from "../_locales/it/messages.json";
 import * as nl from "../_locales/nl/messages.json";
 import * as sv from "../_locales/sv/messages.json";
+import * as fr from "../_locales/fr/messages.json";
+import * as pt from "../_locales/pt/messages.json";
 
-export { da, de, de_CH, en, it, nl, sv };
+export { da, de, de_CH, en, it, nl, sv, fr, pt };

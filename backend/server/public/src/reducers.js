@@ -16,7 +16,8 @@ import {
   REQUESTING_ONE_AD,
   GOT_RECENT_GROUPED_ATTR,
   REQUESTING_RECENT_GROUPED_ATTR,
-  CHANGE_POLITICAL_PROBABILITY
+  CHANGE_POLITICAL_PROBABILITY,
+  CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -126,6 +127,8 @@ const makeReducer = (plural, singular) => {
             return filter;
           }
         });
+      case CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES:
+        return [];
       default:
         return state;
     }

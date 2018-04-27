@@ -1,0 +1,106 @@
+{
+  "name": {
+    "message": "Facebook Political Ad Collector",
+    "description": "Extension name"
+  },
+  "short_name": {
+    "message": "Facebook PAC",
+    "description": "Extension short name"
+  },
+  "description": {
+    "message":
+      "Cette extension détecte les publicités politiques sur Facebook.",
+    "description": "Description of the extension"
+  },
+  "rate_ads": {
+    "message": "Publicités que je vois",
+    "description": "Text for the 'Ads I'm Seeing' button in the extension."
+  },
+  "see_ads": {
+    "message": "Publicités que les autres voient",
+    "description":
+      "Text for the 'Ads Others are Seeing' button in the extension."
+  },
+  "political": {
+    "message": "Publicité politique",
+    "description": "Label for political radio button"
+  },
+  "normal": {
+    "message": "Publicité non politique",
+    "description": "Label for normal radio button"
+  },
+  "rating_question": {
+    "message": "Quel type de publicité est-ce?",
+    "description": "Question to ask for rating an ad"
+  },
+  "verify_question": {
+    "message": "Est-ce une publicité politique?",
+    "description": "Question to ask for rating an ad"
+  },
+  "language_settings": {
+    "message": "Votre langue de préférence",
+    "description": "Your Language Settings"
+  },
+  "you_speak": {
+    "message":
+      "Selon votre fureteur, vous parlez <b>$language$</b> et habitez ce pays: <b>$country$</b>.",
+    "description": "Your language and country",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      },
+      "country": {
+        "content": "$2"
+      }
+    }
+  },
+  "language_instructions": {
+    "message":
+      "Si ces réglages sont incorrects, modifiez-les à partir des menus déroulants",
+    "description": "Instructions to adapt if needed."
+  },
+  "language": {
+    "message": "Langue: ",
+    "description": "Language"
+  },
+  "country": {
+    "message": "Pays: ",
+    "description": "Country: "
+  },
+  "terms_of_service": {
+    "message":
+      "<h2>Voudriez-vous nous donner votre consentement?</h2> <p> ProPublica est soucieux de faire preuve de transparence quant à son mandat. Donc, avant d’activer cette extension, veuillez prendre un moment pour comprendre ses fonctionnalités. </p> <h2>Que fait cette extension?</h2> <p> L’extension met un script de contenu sur chaque page Facebook que vous visitez. Ce script recherche les publicités et les enregistre dans votre ordinateur. </p> <h2>Comment vous pouvez y contribuer</h2> <p> Si vous voulez contribuer à notre projet, vous pouvez cliquer sur l’icône ProPublica dans la barre de votre navigateur, et une fenêtre contextuelle s’ouvrira. Elle contiendra toutes les publicités sauvegardées sur votre ordinateur. Vous pouvez « donner des directives » à l’extension en classant les publicités dans les catégories « politique » ou « non politique ». </p> <h2>Les informations que nous recevrons</h2> <p> Notre serveur recevra une version html « propre » et sans identifiant des pages publicitaires, leurs identifiants Facebook et les paramètres de ciblage démographique (par exemple, les personnes âgées de 18 ans et plus résidant aux États-Unis), leur classification (politique ou non politique) et les paramètres de langue de votre navigateur. Par ailleurs, nous avons fait tout notre possible pour que l'extension ne recueille pas de données qui pourraient servir à vous identifier individuellement. </p> <h2>Ce que nous allons faire avec ces informations</h2> <p> Nous allons incorporer ces informations dans notre algorithme de manière à ce qu’il soit en mesure de détecter les publicités politiques. Nous vous enverrons également des publicités politiques que nous n’avez jamais vues mais que d’autres nous ont signalées. Si vous souhaitez voir les publicités que les autres nous ont signalées, cliquez sur l'icône \"Publicités que les autres voient\" sur votre navigateur et nous vous enverrons un lot d'environ 100 publicités. L'extension comparera alors ces publicités avec celles qui sont déjà enregistrées sur votre ordinateur et ne vous montrera que celles que vous n'avez pas vues.</p><h2>Et si je souhaite retirer mon consentement?</h2><p>En installant le module d'extension, je confirme que les données mentionnées ci-dessus, tout comme ma classification des publicités dans la catégorie politique, peuvent être utilisées dans le cadre de ce projet.</p><p>Vous pouvez en tout temps interrompre votre participation à ce projet en désinstallant l'extension (voici les instructions pour désinstaller l'extension <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=en\">Chrome</a> et <a href=\"https://support.mozilla.org/en-US/kb/disable-or-remove-add-ons\">Firefox.</a>) Dès que l’extension sera désactivée ou désinstallée, aucune autre donnée ne vous sera envoyée.</p><p><b>Pour toute question, suggestion ou préoccupation, veuillez nous écrire à : <a href=\"adcollector@propublica.org\">adcollector@propublica.org</a>",
+    "description": "The terms of service"
+  },
+  "terms_of_service_accept": {
+    "message": "D’accord",
+    "description": "The terms of service accept button"
+  },
+
+  "thanks1": {
+    "message": "Merci! 🙂",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks2": {
+    "message": "Votre contribution est appréciée!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks3": {
+    "message": "“ue serions-nous sans vous…!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks4": {
+    "message": "Merci pour votre aide!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks5": {
+    "message":
+      "Bravo! Vous avez identifié $count$ publicités jusqu’à maintenant.",
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  }
+}

@@ -84,6 +84,12 @@ export const newEntities = a(NEW_ENTITIES);
 export const newAdvertisers = a(NEW_ADVERTISERS);
 export const newTargets = a(NEW_TARGETS);
 
+export const CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES =
+  "clear_advertisers_targets_and_entities";
+export const clearAdvertisersTargetsAndEntities = () => ({
+  type: CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES
+});
+
 export const FILTER_ENTITY = "filter_entity";
 export const FILTER_ADVERTISER = "filter_advertiser";
 export const FILTER_TARGET = "filter_target";
