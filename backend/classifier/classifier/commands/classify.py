@@ -59,6 +59,8 @@ def classify(ctx, newest, lang):
                 "id": record["id"],
                 "probability": probability
             }
+            if record["political_probability"] > update["probability"] and record["political_probability"] >= 0.70 and update["probability"] < 0.70 and not record["suppressed"]:
+                print("refusing to downgrade probability of ad {}".format(record["id"]))
             updates.append(update)
             out = "Classified {pid[id]} ({info[idx]} of {info[length]}) with {pid[probability]}"
             print(out.format(pid=update, info={"length": length, "idx": idx}))

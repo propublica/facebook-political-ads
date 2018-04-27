@@ -160,10 +160,18 @@
   clear: both;
 }
 // emojis
-.userContent img,
-.mbs._6m6 img,
-._6a img {
-  display: none;
+.ad .message {
+  .userContent img,
+  .mbs._6m6 img,
+  ._6a img {
+    display: none;
+  }
+
+  img._51mq {
+    // inline emoji in the status headline, e.g. http://localhost:8080/facebook-ads/admin/ads/6089753382223
+    display: inline;
+    width: unset;
+  }
 }
 
 .text_exposed_show {

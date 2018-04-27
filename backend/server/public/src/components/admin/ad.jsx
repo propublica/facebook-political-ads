@@ -56,7 +56,7 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
                   return onSuppressClick(ad);
                 }}
               >
-                Suppress
+                Suppress (Is this ad not political?)
               </button>
             )}
           </td>
@@ -69,7 +69,13 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
 const AdminAd = connect(
   () => ({}),
   dispatch => ({
-    onSuppressClick: ad => dispatch(suppressAd(ad))
+    onSuppressClick: ad => {
+      if (
+        confirm("Are you sure that you want to mark this ad is NOT POLITICAL?")
+      ) {
+        dispatch(suppressAd(ad));
+      }
+    }
   })
 )(AdminAdUnconnected);
 

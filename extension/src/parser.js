@@ -1,7 +1,7 @@
 export const TIMELINE_SELECTOR = ".userContentWrapper";
 export const SIDEBAR_SELECTOR = ".ego_unit";
 export const DEBUG =
-  (process.env.NODE_ENV === "dev") || (process.env.NODE_ENV === "development");
+  process.env.NODE_ENV === "dev" || process.env.NODE_ENV === "development";
 
 const adCache = new Map();
 const targetingCache = new Map();
@@ -442,7 +442,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  'a[href=""]',
+  "a[href=\"\"]",
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -497,7 +497,9 @@ const checkSponsor = node => {
   return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
     a => {
       a = a.cloneNode(true);
-      const canary = Array.from(a.querySelectorAll("._2lgs"));
+      const canary = Array.from(a.querySelectorAll("._2lgs")).concat(
+        Array.from(a.querySelectorAll(".v_1qa6-is7r2"))
+      );
       Array.from(canary).forEach(canary => canary.remove());
       const text = a.textContent;
       const style = window
@@ -505,15 +507,18 @@ const checkSponsor = node => {
         .getPropertyValue("content");
       return [
         "Gesponsord",
-        "Sponsored",
+        "Sponsored", // en-US
         "Gesponsert",
         "Sponsrad",
         "Sponsorlu",
         "Sponsoroitu",
-        "إعلان مُموَّل",
+        "إعلان مُموَّل", // ar
         "Sponsoreret",
         "Sponsorizzata",
-        "Chartered"
+        "Chartered", // en-PIRATE :)
+        "Commandité", // fr-CA
+        "Sponsorisé", // fr-FR
+        "Patrocinado" // pt-BR
       ].some(sponsor => {
         if (text === sponsor || style === `"${sponsor}"`) return true;
         return false;
@@ -526,7 +531,7 @@ const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    'localStorage.setItem("pageVariable", (' +
+    "localStorage.setItem(\"pageVariable\", (" +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
