@@ -79,7 +79,7 @@ pub fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
 pub fn get_author_link(
     document: &kuchiki::NodeRef,
 ) -> Result<kuchiki::NodeDataRef<kuchiki::ElementData>> {
-    document_select(document, ".fwb > a")?
+    document_select(document, ".fwb a")?
         .nth(0)
         .ok_or_else(|| "Couldn't find advertiser link".into())
 }
@@ -684,6 +684,22 @@ mod tests {
             kuchiki::parse_html().one(new_ad.message).text_contents(),
             kuchiki::parse_html().one("<p><a class=\"_58cn\" href=\"https://www.facebook.com/hashtag/valerian\"><span class=\"_5afx\"><span class=\"_58cl _5afz\">#</span><span class=\"_58cm\">Valerian</span></span></a> is “the best experience since ‘Avatar.’” See it in 3D and RealD3D theaters this Friday. Get tickets now: <a>ValerianTickets.com</a></p>").text_contents()
         );
+    }
+
+    #[test]
+    fn page_href_parsing() {
+        let ad = include_str!("./another-html-test.txt");
+        let post = AdPost {
+            id: "test".to_string(),
+            html: ad.to_string(),
+            political: None,
+            targeting: None,
+        };
+        let new_ad = NewAd::new(&post, "en-US").unwrap();
+        assert!(new_ad.thumbnail.len() > 0);
+        assert!(new_ad.title.len() > 0);
+        println!("{:?}", new_ad.page);
+        assert!(new_ad.page.unwrap_or_else(|| String::from("")).len() > 0);
     }
 
     #[test]
