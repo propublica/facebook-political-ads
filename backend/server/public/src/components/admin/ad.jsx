@@ -36,8 +36,10 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>parsed targets</td>
           <td>
             {ad.targets
-              .map(({ target, segment }) => `${target}: ${segment}`)
-              .join(", ")}
+              ? ad.targets
+                  .map(({ target, segment }) => `${target}: ${segment}`)
+                  .join(", ")
+              : ""}
           </td>
         </tr>
         <tr>
