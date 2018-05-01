@@ -442,7 +442,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  "a[href=\"\"]",
+  'a[href=""]',
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -509,12 +509,12 @@ const checkSponsor = node => {
         "Gesponsord",
         "Sponsored", // en-US
         "Gesponsert",
-        "Sponsrad",
-        "Sponsorlu",
-        "Sponsoroitu",
+        "Sponsrad", // sv
+        "Sponsorlu", // turkish?
+        "Sponsoroitu", // fn?
         "إعلان مُموَّل", // ar
-        "Sponsoreret",
-        "Sponsorizzata",
+        "Sponsoreret", // dk
+        "Sponsorizzata", //it
         "Chartered", // en-PIRATE :)
         "Commandité", // fr-CA
         "Sponsorisé", // fr-FR
@@ -531,7 +531,7 @@ const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    "localStorage.setItem(\"pageVariable\", (" +
+    'localStorage.setItem("pageVariable", (' +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
