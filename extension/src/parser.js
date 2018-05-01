@@ -488,11 +488,12 @@ const cleanAd = html => {
       } else if (attr.name === "data-hovercard") {
         try {
           let url = new URL(attr.value, window.location); // it's a relative URL, so we have to give it a base or it errors out.
-          console.log(
-            "hovercard",
-            url,
-            url.pathname.indexOf("/ajax/hovercard/page.php")
-          );
+          if (DEBUG)
+            console.log(
+              "hovercard",
+              url,
+              url.pathname.indexOf("/ajax/hovercard/page.php")
+            );
           if (url.pathname.indexOf("/ajax/hovercard/page.php") === 0) {
             // for links with a href="#" and data-hovercard="/ajax/hovercard/page.php?id=1234567890"
             // keep the data-hovercard attr.
@@ -519,10 +520,16 @@ const checkSponsor = node => {
   return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
     a => {
       a = a.cloneNode(true);
-      const canary = Array.from(a.querySelectorAll("._2lgs")).concat(
-        Array.from(a.querySelectorAll(".v_1qa6-is7r2"))
-      );
-      Array.from(canary).forEach(canary => canary.remove());
+      const canary = Array.from(a.querySelectorAll("div"));
+
+      Array.from(canary)
+        .filter(
+          div =>
+            div.className.split(" ").length === 2 &&
+            div.textContent.length === 1
+        )
+        .forEach(canary => canary.remove());
+
       const text = a.textContent;
       const style = window
         .getComputedStyle(a, ":after")
@@ -534,7 +541,7 @@ const checkSponsor = node => {
         "Sponsrad", // sv
         "Sponsorlu", // turkish?
         "Sponsoroitu", // fn?
-        "إعلان مُموَّل", // ar
+        "مُموَّل", // ar
         "Sponsoreret", // dk
         "Sponsorizzata", //it
         "Chartered", // en-PIRATE :)
