@@ -4,7 +4,7 @@ extern crate kuchiki;
 extern crate server;
 use dotenv::dotenv;
 use diesel::pg::PgConnection;
-use diesel::dsl::sql;
+use diesel::dsl::{not, sql};
 use diesel::sql_types::Bool;
 use diesel::prelude::*;
 use kuchiki::traits::*;
@@ -22,7 +22,7 @@ fn main() {
     let dbads: Vec<Ad> = ads.order(created_at.desc())
         .filter(political_probability.gt(0.70))
         .filter(lang.eq("en-US"))
-        .filter(suppressed.eq(false))
+        .filter(not(suppressed.eq(true)))
         .filter(sql::<Bool>("targeting is not null"))
         // .filter(sql::<Bool>("targeting ilike '%part of an audience%'"))
         .load::<Ad>(&conn)
@@ -67,19 +67,24 @@ fn main() {
             }
         } else {
             if let Some(new_targets) = get_targets(&ad.targeting) {
-                newly_parses_correctly += 1;
+                if new_targets.as_array().unwrap().len() > 0 {
+                    newly_parses_correctly += 1;
+                } else {
+                    still_doesnt_parse += 1;
+                }
             } else {
                 still_doesnt_parse += 1;
+                println!("{:?}", ad.id);
             }
         }
 
-        // diesel::update(ads.find(ad.id))
-        //     .set((
-        //         targets.eq(get_targets(&ad.targeting)),
-        //         advertiser.eq(get_advertiser(&ad.targeting, &document)),
-        //     ))
-        //     .execute(&conn)
-        //     .unwrap();
+        diesel::update(ads.find(ad.id))
+            .set((
+                targets.eq(get_targets(&ad.targeting)),
+                advertiser.eq(get_advertiser(&ad.targeting, &document)),
+            ))
+            .execute(&conn)
+            .unwrap();
     }
     println!(
         "{:?}/{:?} parse successfully",
