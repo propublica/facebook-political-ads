@@ -17,7 +17,9 @@ import {
   GOT_RECENT_GROUPED_ATTR,
   REQUESTING_RECENT_GROUPED_ATTR,
   CHANGE_POLITICAL_PROBABILITY,
-  CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES
+  CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES,
+  REQUESTING_SUMMARY,
+  GOT_SUMMARY
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -82,6 +84,17 @@ export const groupedAttribute = (state = [], action) => {
     case GOT_RECENT_GROUPED_ATTR:
       return action.groupedAttrs;
     case REQUESTING_RECENT_GROUPED_ATTR:
+      return null;
+    default:
+      return state;
+  }
+};
+
+export const summary = (state = {}, action) => {
+  switch (action.type) {
+    case GOT_SUMMARY:
+      return action.summary;
+    case REQUESTING_SUMMARY:
       return null;
     default:
       return state;

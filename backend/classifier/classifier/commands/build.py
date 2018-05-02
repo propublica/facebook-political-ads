@@ -6,13 +6,18 @@ import dill
 from classifier.utilities import (get_classifier, confs, get_vectorizer,
                                   classifier_path, train_classifier)
 
+@click.option("--lang", help="Limit to language")
+
+
 @click.command("build")
 @click.pass_context
-def build(ctx):
+def build(ctx, lang):
     """
     Build classifiers for each of our languages.
     """
     for (directory, conf) in confs(ctx.obj["base"]):
+        if lang and conf["language"] != lang:
+            continue 
         model = train_classifier(get_classifier(), get_vectorizer(conf),
                                  directory, conf["language"])
         model_path = classifier_path(directory)
