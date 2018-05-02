@@ -5,6 +5,7 @@ import Ads from "components/admin/ads.jsx";
 import AdDetail from "components/admin/addetail.jsx";
 import GroupedAttrs from "components/admin/groupedattrs.jsx";
 import AdminTools from "components/admin/tools.jsx";
+import Summary from "components/admin/summary.jsx";
 import { URL_ROOT } from "actions.js";
 
 export const LoggedInApp = () => {
@@ -37,6 +38,7 @@ export const LoggedInApp = () => {
 
       <Route path="/facebook-ads/admin/ads/:ad_id" component={AdDetail} />
       <Route path="/facebook-ads/admin/tools" component={AdminTools} />
+      <Route path="/facebook-ads/admin/summary" component={Summary} />
     </div>
   );
 };
