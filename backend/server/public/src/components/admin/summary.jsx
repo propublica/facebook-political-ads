@@ -16,27 +16,10 @@ export class SummaryUnconnected extends React.Component {
   }
 
   render() {
-    // ads_this_week: ads_this_week,
-    // ads_today: ads_today,
-    // daily_political_ratio: daily_political_ratio,
-    // weekly_political_ratio: weekly_political_ratio,
-    // last_received_at: last_received_at
-    // total_political_ads: political_ads_count,
-
     var width = 500,
       height = 300,
-      margins = { left: 100, right: 100, top: 50, bottom: 50 },
-      // chart series,
-      // field: is what field your data want to be selected
-      // name: the name of the field that display in legend
-      // color: what color is the line
-      // your x accessor
-      x = function(d) {
-        return parseDate(d[0]);
-      },
-      xScale = "time";
-
-    var daily_chart_data =
+      margins = { left: 100, right: 100, top: 50, bottom: 50 };
+    var daily_ratio_chart_data =
       this.props.summary && this.props.summary.daily_political_ratio
         ? [
             {
@@ -49,7 +32,7 @@ export class SummaryUnconnected extends React.Component {
           ]
         : [];
     /* I am gonna make it ... */ var this_year = new Date().getFullYear();
-    var weekly_chart_data =
+    var weekly_ratio_chart_data =
       this.props.summary && this.props.summary.weekly_political_ratio
         ? [
             {
@@ -63,12 +46,39 @@ export class SummaryUnconnected extends React.Component {
             }
           ]
         : [];
-    console.log(weekly_chart_data);
-    var daily_chart_or_not =
+    var daily_total_ads_chart_data =
+      this.props.summary && this.props.summary.daily_political_ratio
+        ? [
+            {
+              id: "daily",
+              data: this.props.summary.daily_political_ratio.map(a => ({
+                x: a[0].slice(5),
+                y: a[2]
+              }))
+            }
+          ]
+        : [];
+    /* I am gonna make it ... */ var this_year = new Date().getFullYear();
+    var weekly_total_ads_chart_data =
+      this.props.summary && this.props.summary.weekly_political_ratio
+        ? [
+            {
+              id: "weekly",
+              data: this.props.summary.weekly_political_ratio.map(a => ({
+                x: new Date(this_year, 0, 1 + (a[0] - 1) * 7)
+                  .toISOString()
+                  .slice(5, 10),
+                y: a[2]
+              }))
+            }
+          ]
+        : [];
+
+    var daily_total_ads_chart_or_not =
       this.props.summary && this.props.summary.daily_political_ratio ? (
         <Line
           margin={margins}
-          data={daily_chart_data}
+          data={daily_total_ads_chart_data}
           stacked={false}
           width={width}
           height={height}
@@ -85,11 +95,11 @@ export class SummaryUnconnected extends React.Component {
       ) : (
         <div />
       );
-    var weekly_chart_or_not =
+    var weekly_total_ads_chart_or_not =
       this.props.summary && this.props.summary.weekly_political_ratio ? (
         <Line
           margin={margins}
-          data={weekly_chart_data}
+          data={weekly_total_ads_chart_data}
           stacked={false}
           width={width}
           height={height}
@@ -106,7 +116,48 @@ export class SummaryUnconnected extends React.Component {
       ) : (
         <div />
       );
-
+    var daily_ratio_chart_or_not =
+      this.props.summary && this.props.summary.daily_political_ratio ? (
+        <Line
+          margin={margins}
+          data={daily_ratio_chart_data}
+          stacked={false}
+          width={width}
+          height={height}
+          axisBottom={{
+            orient: "bottom",
+            tickSize: 5,
+            tickPadding: 5,
+            tickRotation: 0,
+            legend: "date",
+            legendOffset: 36,
+            legendPosition: "center"
+          }}
+        />
+      ) : (
+        <div />
+      );
+    var weekly_ratio_chart_or_not =
+      this.props.summary && this.props.summary.weekly_political_ratio ? (
+        <Line
+          margin={margins}
+          data={weekly_ratio_chart_data}
+          stacked={false}
+          width={width}
+          height={height}
+          axisBottom={{
+            orient: "bottom",
+            tickSize: 5,
+            tickPadding: 5,
+            tickRotation: 0,
+            legend: "date",
+            legendOffset: 36,
+            legendPosition: "center"
+          }}
+        />
+      ) : (
+        <div />
+      );
     return this.props.summary ? (
       <div id="summary">
         <div className="last-ad">
@@ -146,12 +197,38 @@ export class SummaryUnconnected extends React.Component {
         <div className="halves">
           <div className="col">
             <h3>Ratio of political ads to all ads, by day, past week</h3>
-            {daily_chart_or_not}
+            {daily_ratio_chart_or_not}
+            <p>
+              This gives us a *rough* guess as to whether more of the ads we've
+              seen lately are political. Weird variations in the classifier may
+              cause noise here... and, of course, our data isn't representative.
+            </p>
           </div>
           <div className="col">
             <h3>Ratio of political ads to all ads, by week, past few months</h3>
-            {weekly_chart_or_not}
+            {weekly_ratio_chart_or_not}
           </div>
+          <div className="clearboth" />
+        </div>
+        <div className="halves">
+          <div className="col">
+            <h3>Total ads received, by day, past week</h3>
+            {daily_ratio_chart_or_not}
+            <p>
+              This chart will tell you if recent promotion efforts may have been
+              successful
+            </p>
+          </div>
+          <div className="col">
+            <h3>Total ads received, by week, past few months</h3>
+            {weekly_ratio_chart_or_not}
+            <p>
+              This chart will indicate a mixture of (a) if there are more
+              political ads being aired and (b) if we have more participants
+              using the tool more often.
+            </p>
+          </div>
+          <div className="clearboth" />
         </div>
       </div>
     ) : (

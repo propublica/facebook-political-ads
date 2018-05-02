@@ -301,9 +301,17 @@ ul.tools li h1 {
   margin-bottom: 0.1em;
 }
 
+h3 {
+  font-size: 1.2em;
+}
+
+p {
+  font-size: 0.9em;
+}
+
 .col {
   margin-left: 1%;
-  marginn-right: 1%;
+  margin-right: 1%;
 }
 .halves,
 .thirds {
@@ -313,7 +321,7 @@ ul.tools li h1 {
   }
 }
 .halves .col {
-  width: 48%;
+  width: 47%;
   float: left;
 }
 .thirds .col {
