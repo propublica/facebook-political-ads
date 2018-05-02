@@ -547,7 +547,8 @@ const checkSponsor = node => {
         "Chartered", // en-PIRATE :)
         "Commandité", // fr-CA
         "Sponsorisé", // fr-FR
-        "Patrocinado" // pt-BR
+        "Patrocinado", // pt-BR
+        "Publicidad" // es
       ].some(sponsor => {
         if (text === sponsor || style === `"${sponsor}"`) return true;
         return false;
