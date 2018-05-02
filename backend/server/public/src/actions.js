@@ -34,6 +34,15 @@ export const requestingRecentGroupedAttr = () => ({
   type: REQUESTING_RECENT_GROUPED_ATTR
 });
 
+export const GOT_SUMMARY = "GOT_SUMMARY";
+export const receivedSummary = summary => ({
+  type: GOT_SUMMARY,
+  summary
+});
+
+export const REQUESTING_SUMMARY = "REQUESTING_SUMMARY";
+export const requestingSummary = () => ({ type: REQUESTING_SUMMARY });
+
 export const SET_LANG = "set_lang";
 export const setLang = lang => ({
   type: SET_LANG,
@@ -168,6 +177,35 @@ export const getGroupedAttrs = (
         // .then(res => res.json())
         .then(resp => {
           dispatch(receiveRecentGroupedAttr(resp));
+        })
+    );
+  };
+};
+
+export const getSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
+  let path = `${root_url}/summarize`;
+  return (dispatch, getState) => {
+    let state = getState();
+    if (state.lang) {
+      path = path + `?lang=${state.lang}`;
+    }
+    dispatch(requestingSummary());
+    return (
+      fetch(path, {
+        method: "GET",
+        credentials: "include",
+        redirect: "follow" // in case we get redirected to the login page.
+      })
+        .then(resp => {
+          if (resp.redirected === true) {
+            window.location.href = `${URL_ROOT}/fbpac-api/partners/sign_in`;
+            return null;
+          }
+          return resp.json();
+        })
+        // .then(res => res.json())
+        .then(resp => {
+          dispatch(receivedSummary(resp));
         })
     );
   };

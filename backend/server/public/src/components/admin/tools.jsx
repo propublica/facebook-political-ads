@@ -97,6 +97,12 @@ const AdminTools = () => (
             </Link>
           </td>
         </tr>
+
+        <tr>
+          <td>
+            <Link to="/facebook-ads/admin/summary">Summary Stats</Link>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>

@@ -1,7 +1,12 @@
 import React from "react";
 import { connect } from "react-redux";
 import { withRouter, Link } from "react-router-dom";
-import { getGroupedAttrs, newSearch, setLang } from "actions.js";
+import {
+  getGroupedAttrs,
+  newSearch,
+  setLang,
+  clearAdvertisersTargetsAndEntities
+} from "actions.js";
 import i18next from "i18next";
 
 // maps groupingType to a URL function
@@ -11,7 +16,7 @@ const groupedAttrUrl = {
   segment: ({ segment }) => {
     if (segment === "List → " || segment === "Like  → ") {
       return `targets=%5B%7B"target"%3A"${segment.slice(0, 4)}"%7D%5D`;
-    } else {
+    } else if (segment) {
       const split = segment.split(" → ");
       return `targets=%5B%7B"target"%3A"${split[0]}","segment"%3A"${
         split[1]
@@ -34,6 +39,7 @@ export class GroupedAttrsUnconnected extends React.Component {
     }
     const params = new URLSearchParams(location.search);
 
+    this.props.onLoad(); // clears any search stuff that's in state or in the URL.
     this.props.setLang(
       this.props.lang || params.get("lang") || i18next.language
     );
@@ -88,6 +94,7 @@ const GroupedAttrs = withRouter(
       lang
     }),
     dispatch => ({
+      onLoad: () => dispatch(clearAdvertisersTargetsAndEntities()),
       onClick: term => dispatch(newSearch(term)),
       getGroupedAttrs: (kind, recent) =>
         dispatch(getGroupedAttrs(kind, recent)),

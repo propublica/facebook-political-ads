@@ -288,3 +288,46 @@ ul.tools li h1 {
 .rc-slider {
   margin-bottom: 1em;
 }
+
+.number--large strong {
+  font-size: 2.75em !important;
+  line-height: 1em !important;
+}
+
+.number strong {
+  color: #e49c26;
+  display: block;
+  font-weight: normal;
+  margin-bottom: 0.1em;
+}
+
+h3 {
+  font-size: 1.2em;
+}
+
+p {
+  font-size: 0.9em;
+}
+
+.col {
+  margin-left: 1%;
+  margin-right: 1%;
+}
+.halves,
+.thirds {
+  margin-top: 30px;
+  figure {
+    font-size: 0.75em;
+  }
+}
+.halves .col {
+  width: 47%;
+  float: left;
+}
+.thirds .col {
+  width: 31%;
+  float: left;
+}
+.clearboth {
+  clear: both;
+}

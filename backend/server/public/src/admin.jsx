@@ -14,6 +14,7 @@ import {
   filters,
   pagination,
   search,
+  summary,
   lang,
   ads,
   ad,
@@ -35,6 +36,7 @@ const reducer = enableBatching(
     filters,
     pagination,
     lang,
+    summary,
     groupedAttribute,
     politicalProbability
   })
