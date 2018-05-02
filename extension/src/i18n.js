@@ -18,7 +18,9 @@ export const activeCountries = [
   "SE",
   "BE",
   "SV",
-  "BR"
+  "BR",
+  "ES",
+  "MX"
 ];
 // ISO 639-1 (2 characters, lower case)
 export const activeLanguages = [
@@ -30,7 +32,8 @@ export const activeLanguages = [
   "fi",
   "fr",
   "sv",
-  "pt"
+  "pt",
+  "es"
 ];
 
 // load country names in our languages
