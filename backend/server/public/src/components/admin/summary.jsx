@@ -22,56 +22,56 @@ export class SummaryUnconnected extends React.Component {
     var daily_ratio_chart_data =
       this.props.summary && this.props.summary.daily_political_ratio
         ? [
-            {
-              id: "daily",
-              data: this.props.summary.daily_political_ratio.map(a => ({
-                x: a[0].slice(5),
-                y: a[1]
-              }))
-            }
-          ]
+          {
+            id: "daily",
+            data: this.props.summary.daily_political_ratio.map(a => ({
+              x: a[0].slice(5),
+              y: a[1]
+            }))
+          }
+        ]
         : [];
     /* I am gonna make it ... */ var this_year = new Date().getFullYear();
     var weekly_ratio_chart_data =
       this.props.summary && this.props.summary.weekly_political_ratio
         ? [
-            {
-              id: "weekly",
-              data: this.props.summary.weekly_political_ratio.map(a => ({
-                x: new Date(this_year, 0, 1 + (a[0] - 1) * 7)
-                  .toISOString()
-                  .slice(5, 10),
-                y: a[1]
-              }))
-            }
-          ]
+          {
+            id: "weekly",
+            data: this.props.summary.weekly_political_ratio.map(a => ({
+              x: new Date(this_year, 0, 1 + (a[0] - 1) * 7)
+                .toISOString()
+                .slice(5, 10),
+              y: a[1]
+            }))
+          }
+        ]
         : [];
     var daily_total_ads_chart_data =
       this.props.summary && this.props.summary.daily_political_ratio
         ? [
-            {
-              id: "daily",
-              data: this.props.summary.daily_political_ratio.map(a => ({
-                x: a[0].slice(5),
-                y: a[2]
-              }))
-            }
-          ]
+          {
+            id: "daily",
+            data: this.props.summary.daily_political_ratio.map(a => ({
+              x: a[0].slice(5),
+              y: a[2]
+            }))
+          }
+        ]
         : [];
     /* I am gonna make it ... */ var this_year = new Date().getFullYear();
     var weekly_total_ads_chart_data =
       this.props.summary && this.props.summary.weekly_political_ratio
         ? [
-            {
-              id: "weekly",
-              data: this.props.summary.weekly_political_ratio.map(a => ({
-                x: new Date(this_year, 0, 1 + (a[0] - 1) * 7)
-                  .toISOString()
-                  .slice(5, 10),
-                y: a[2]
-              }))
-            }
-          ]
+          {
+            id: "weekly",
+            data: this.props.summary.weekly_political_ratio.map(a => ({
+              x: new Date(this_year, 0, 1 + (a[0] - 1) * 7)
+                .toISOString()
+                .slice(5, 10),
+              y: a[2]
+            }))
+          }
+        ]
         : [];
 
     var daily_total_ads_chart_or_not =
@@ -213,7 +213,7 @@ export class SummaryUnconnected extends React.Component {
         <div className="halves">
           <div className="col">
             <h3>Total ads received, by day, past week</h3>
-            {daily_ratio_chart_or_not}
+            {daily_total_ads_chart_or_not}
             <p>
               This chart will tell you if recent promotion efforts may have been
               successful
@@ -221,7 +221,7 @@ export class SummaryUnconnected extends React.Component {
           </div>
           <div className="col">
             <h3>Total ads received, by week, past few months</h3>
-            {weekly_ratio_chart_or_not}
+            {weekly_total_ads_chart_or_not}
             <p>
               This chart will indicate a mixture of (a) if there are more
               political ads being aired and (b) if we have more participants
