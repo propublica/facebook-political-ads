@@ -37,6 +37,7 @@ impl<'a> From<TargetingParsed<'a>> for Targeting {
             TargetingParsed::School(s) => Targeting::new("School", Some(s)),
             TargetingParsed::Like => Targeting::new("Like", None),
             TargetingParsed::List => Targeting::new("List", None),
+            TargetingParsed::EngagedWithContent => Targeting::new("Engaged with Content", None),
             TargetingParsed::Advertiser(_) => {
                 panic!("Advertiser is not allowed as a targeting field")
             }
@@ -73,6 +74,7 @@ pub enum TargetingParsed<'a> {
     School(&'a str),
     Like,
     List,
+    EngagedWithContent,
     // This is a special field that allows us to tie a page to a name
     Advertiser(&'a str),
 }
@@ -83,6 +85,19 @@ named!(list(&str) -> TargetingParsed,
    do_parse!(
        take_until!("added you to a list of people they want to reach on Facebook.") >>
        (TargetingParsed::List)
+   )
+);
+
+// two variants: `wants to reach people who have engaged with them or with their content`
+//               `wants to reach people who engaged with them or their content`
+
+named!(engaged_with_content(&str) -> TargetingParsed,
+   do_parse!(
+       alt!(
+           take_until!("wants to reach people who engaged with them or their content.")
+            | take_until!("wants to reach people who have engaged with them or with their content" )
+        ) >>
+       (TargetingParsed::EngagedWithContent)
    )
 );
 
@@ -168,18 +183,31 @@ named!(language(&str) -> TargetingParsed,
 );
 
 named!(segment(&str) -> TargetingParsed,
-    do_parse!(
-        alt!(
-            take_until_and_consume!("„<b>") |
-            take_until_and_consume!("<b>\"") |
-            take_until_and_consume!("<b>„")
-        ) >>
-        segment: alt!(
-            take_until!("\"</b>") |
-            take_until!("</b>“") |
-            take_until!("“</b>")
-        ) >>
-        (TargetingParsed::Segment(segment))
+    alt!(
+        do_parse!(
+            alt!(
+                take_until_and_consume!("„<b>") |
+                take_until_and_consume!("<b>\"") |
+                take_until_and_consume!("<b>„")
+            ) >>
+            segment: alt!(
+                take_until!("\"</b>") |
+                take_until!("</b>“") |
+                take_until!("“</b>")
+            ) >>
+            (TargetingParsed::Segment(segment))
+        )
+        | do_parse!(
+            take_until_and_consume!("an audience called '")  >>
+            segment: take_until_and_consume!("'") >>
+            (TargetingParsed::Segment(segment))
+        )
+        | do_parse!(
+            take_until_and_consume!("an audience called \"")  >>
+            segment: take_until_and_consume!("\"") >>
+            (TargetingParsed::Segment(segment))
+        )
+
     )
 );
 
@@ -234,7 +262,7 @@ named!(retargeting(&str) -> TargetingParsed,
     )
 );
 
-named!(age(&str) -> Option<TargetingParsed>,
+named!(age(&str) -> TargetingParsed,
     alt!(
         do_parse!(
           ws!(alt!(
@@ -252,21 +280,22 @@ named!(age(&str) -> Option<TargetingParsed>,
               | take_until_and_consume!("che vivono")
               | take_until_and_consume!(",")
           )) >>
-          (Some(TargetingParsed::Age(complete)))
+          (TargetingParsed::Age(complete))
         ) |
         do_parse!(
             ws!(tag!("age")) >>
             ws!(opt!(tag!("s"))) >>
             ws!(opt!(tag!("d"))) >>
-            complete: ws!(take_until_and_consume!(" who")) >>
-            (Some(TargetingParsed::Age(complete)))
+            complete: alt!(ws!(take_until_and_consume!(" who")) | until_b ) >>
+            (TargetingParsed::Age(complete))
         )
     )
 );
-
+// Donald J. Trump wants to reach <b>people who live in the United States</b>
 named!(region(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
-         tag!("live") >>
+         ws!(opt!(tag!("who"))) >>
+         alt!(tag!("live") | tag!("were recently")) >>
          ws!(take_until_and_consume!("in")) >>
          country: until_b >>
          (vec![Some(TargetingParsed::Region(country))])
@@ -288,12 +317,13 @@ named!(city_state(&str) -> Vec<Option<TargetingParsed>>,
 
 named!(age_and_location(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
-        a: ws!(age) >>
-        l: ws!(alt!(city_state | region)) >>
-        (vec![&vec![a][..], &l[..]].concat())
+        age: opt!(ws!(age)) >>
+        location: ws!(alt!(city_state | region | value!( vec![] ) )) >>
+        (vec![&vec![age][..], &location[..]].concat())
     )
 );
 
+// TODO: implement engaged_with_content
 named!(get_targeting(&str) -> Vec<TargetingParsed>,
     do_parse!(
         advertiser_first: opt!(advertiser_b) >>
@@ -389,7 +419,7 @@ mod tests {
         assert_eq!(gender("<b>people"), IResult::Done("", None));
         assert_eq!(
             age(" ages 26 to 62 who "),
-            IResult::Done("", Some(TargetingParsed::Age("26 to 62")))
+            IResult::Done("", TargetingParsed::Age("26 to 62"))
         );
         assert_eq!(
             region("live in United States</b>"),
@@ -406,6 +436,13 @@ mod tests {
             )
         );
         assert_eq!(
+            segment(" an audience called 'Member of a family-based household.'"),
+            IResult::Done(
+                "",
+                TargetingParsed::Segment("Member of a family-based household.")
+            )
+        );
+        assert_eq!(
             age_and_location(
                 "ages 18 and older who live or were recently near San Francisco, California</b>",
             ),
@@ -418,5 +455,116 @@ mod tests {
                 ],
             )
         );
+        assert_eq!(
+            age_and_location("ages 18 and older who live or were recently in Utah</b>",),
+            IResult::Done(
+                "</b>",
+                vec![
+                    Some(TargetingParsed::Age("18 and older")),
+                    Some(TargetingParsed::Region("Utah")),
+                ],
+            )
+        );
+        assert_eq!(
+            age_and_location(
+                "aged 18 and older who live or have recently been in the United States</b>",
+            ),
+            IResult::Done(
+                "</b>",
+                vec![
+                    Some(TargetingParsed::Age("18 and older")),
+                    Some(TargetingParsed::Region("the United States")),
+                ],
+            )
+        );
+        assert_eq!(
+            age_and_location("ages 25 and older who were recently in the United States</b>",),
+            IResult::Done(
+                "</b>",
+                vec![
+                    Some(TargetingParsed::Age("25 and older")),
+                    Some(TargetingParsed::Region("the United States")),
+                ],
+            )
+        );
+
+        // One reason you're seeing this ad is that <b id="ad_prefs_advertiser">American Immigration Lawyers Association</b> wants to reach people interested in <b id="ad_prefs_interest">Immigration</b>, based on activity such as liking Pages or clicking on ads.</div></span><div class="_4hcd"><span>There may be other reasons you're seeing this ad, including that American Immigration Lawyers Association wants to reach <b>people ages 23 to 60 who live or were recently in the United States</b>.
+        assert_eq!(
+            advertiser_b(
+                "<b id=\"ad_prefs_advertiser\">American Immigration Lawyers Association</b>"
+            ),
+            IResult::Done(
+                "</b>",
+                TargetingParsed::Advertiser("American Immigration Lawyers Association")
+            )
+        );
+        assert_eq!(
+            interest("<b id=\"ad_prefs_interest\">Immigration</b>"),
+            IResult::Done("</b>", TargetingParsed::Interest("Immigration"))
+        );
+        assert_eq!(
+            age_and_location("ages 23 to 60 who live or were recently in the United States</b>",),
+            IResult::Done(
+                "</b>",
+                vec![
+                    Some(TargetingParsed::Age("23 to 60")),
+                    Some(TargetingParsed::Region("the United States")),
+                ]
+            )
+        );
+        assert_eq!(
+            advertiser_wants(
+                "including that American Immigration Lawyers Association wants to reach",
+            ),
+            IResult::Done(
+                " wants to reach",
+                TargetingParsed::Advertiser("American Immigration Lawyers Association")
+            )
+        );
+
+        //  <div><div class="_4-i0 _26c5"><div class="clearfix"><div class="_51-u rfloat _ohf"><a class="_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-" href="nullblank">Close</a></div><div><h3 id="u_re_0" class="_52c9">About This Facebook Ad</h3></div></div></div><div class="_4-i2 _pig _4s3a _50f4"><div class="_4uov"><div class="_4uoz"><div id="u_re_1"></div><div class="_3-8x"><span class="_4v6n"><div id="u_re_2">One reason you're seeing this ad is that <b id="ad_prefs_advertiser">World Wildlife Fund</b> wants to reach people who have visited their website or used one of their apps. This is based on customer information provided by World Wildlife Fund.</div></span><div class="_4hcd"><span>There may be other reasons you're seeing this ad, including that World Wildlife Fund wants to reach <b>people ages 25 and older who live or were recently in the United States</b>. This is information based on your Facebook profile and where you've connected to the internet.</span>
+        assert_eq!(
+            advertiser_b("<b id=\"ad_prefs_advertiser\">World Wildlife Fund</b>"),
+            IResult::Done("</b>", TargetingParsed::Advertiser("World Wildlife Fund"))
+        );
+        assert_eq!(
+            website(
+                "wants to reach people who have visited their website or used one of their apps"
+            ),
+            IResult::Done(
+                "",
+                TargetingParsed::Website(
+                    "people who have visited their website or used one of their apps"
+                )
+            )
+        );
+        assert_eq!(
+            age_and_location(
+                " ages 25 and older who live or were recently in the United States</b>",
+            ),
+            IResult::Done(
+                "</b>",
+                vec![
+                    Some(TargetingParsed::Age("25 and older")),
+                    Some(TargetingParsed::Region("the United States")),
+                ]
+            )
+        );
+        assert_eq!(
+            advertiser_wants("including that World Wildlife Fund wants to reach",),
+            IResult::Done(
+                " wants to reach",
+                TargetingParsed::Advertiser("World Wildlife Fund")
+            )
+        );
+        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_34_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_34_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_34_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>Donald J. Trump</b> wants to reach <b>people who may be similar to their customers</b>. <a id='ad_prefs_link'>Learn more.</a></div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that Donald J. Trump wants to reach <b>people who live in the United States</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div><div></div>", vec![TargetingParsed::Retargeting("people who may be similar to their customers"), TargetingParsed::Advertiser("Donald J. Trump"), TargetingParsed::Region("the United States")]));
+
+        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_o_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_o_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_o_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>PayPal</b> wants to reach people interested in <b id='ad_prefs_interest'>Do it yourself (DIY)</b>, based on activity such as liking Pages or clicking on ads.</div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that PayPal wants to reach <b>people ages 25 and older who were recently in the United States</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div>", vec![TargetingParsed::Advertiser("PayPal"), TargetingParsed::Age("25 and older"), TargetingParsed::Region("the United States")]));
+
+        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-'>Close</a></div><div><h3 id='u_6u_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_6u_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_6u_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>NRDC (Natural Resources Defense Council)</b> wants to reach <b>people who may be similar to their customers</b>. <a id='ad_prefs_link'>Learn more.</a></div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that NRDC (Natural Resources Defense Council) wants to reach <b>people ages 18 and older</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div><div></div>", vec![TargetingParsed::Retargeting("people who may be similar to their customers"), TargetingParsed::Advertiser("NRDC (Natural Resources Defense Council)"), TargetingParsed::Age("18 and older")]));
+
+        // TODO: implement engaged_with_content.
+        // the problem is that it doesn't appear with the second strin g("There may be other reasons") from which we get second advertiser, gender, age and location.
+        // assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_1c_0' class='_52c9'>About this Facebook ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_1c_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_1c_2'>One reason why you're seeing this ad is because <b>International Rescue Committee</b> wants to reach people who have engaged with them or with their content.</div></span></div></div><div></div><div class='_4uor _52jw'><div class='_5aj7' id='u_1c_3'><div class='_4bl9'></div><div class='_4bl7 _5r7v'><i class='img sp_PVuC7pFCHqd sx_1baca1'><u>gear</u></i></div><div class='_4bl7'><a href='https://www.facebook.com/ads/preferences/'>Manage Your ad preferences</a></div></div></div>"), IResult::Done("", vec![]));
     }
 }
