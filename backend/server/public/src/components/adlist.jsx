@@ -16,6 +16,12 @@ export class AdListUnconnected extends React.Component {
     this.props.deserialize();
   }
 
+  componentDidUpdate() {
+    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+      .filter(t => t.textContent.length == 1)
+      .forEach(t => t.remove());
+  }
+
   render() {
     return (
       <div>

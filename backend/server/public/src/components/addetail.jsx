@@ -11,6 +11,11 @@ export class AdDetailUnconnected extends React.Component {
     // `match` is from React Router -- it's the bit of the URL that matches.
     this.props.getOneAd(ad_id);
   }
+  componentDidUpdate() {
+    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+      .filter(t => t.textContent.length == 1)
+      .forEach(t => t.remove());
+  }
 
   render() {
     let ad_or_error = null;
