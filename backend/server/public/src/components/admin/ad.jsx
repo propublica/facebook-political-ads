@@ -37,9 +37,12 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>
             {ad.targets
               ? ad.targets
-                  .map(({ target, segment }) => `${target}: ${segment}`)
-                  .join(", ")
-              : ""}
+                .map(
+                  ({ target, segment }) =>
+                    segment ? `${target}: ${segment}` : target
+                )
+                .join(", ")
+              : "NONE"}
           </td>
         </tr>
         <tr>
@@ -81,7 +84,7 @@ const AdminAd = connect(
   dispatch => ({
     onSuppressClick: ad => {
       if (
-        confirm("Are you sure that you want to mark this ad is NOT POLITICAL?")
+        confirm("Are you sure that you want to mark this ad as NOT POLITICAL?")
       ) {
         dispatch(suppressAd(ad));
       }
