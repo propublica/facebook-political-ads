@@ -2,109 +2,88 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const AdminTools = () => (
-  <div>
+  <div id="tools">
     <p>
       Here are some tools to hopefully help you find interesting and newsworthy
       ads.
     </p>
-    <table className="tools">
-      <tbody>
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/grouped/advertiser">
-              All ads grouped by advertiser
-            </Link>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/grouped/advertiser/this_month">
-              Ads first submitted this month grouped by advertiser
-            </Link>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/grouped/advertiser/this_week">
-              Ads first submitted this week grouped by advertiser
-            </Link>
-          </td>
-        </tr>
 
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/grouped/segment">
-              All ads grouped by targeting segment
-            </Link>
-          </td>
-          <td>
-            (i.e. all ads targeted at people over 18, or all ads targeted by
-            gender only to men)
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/grouped/segment/this_month">
-              Ads first submitted this month grouped by targeting segment
-            </Link>
-          </td>
-          <td>
-            (i.e. all ads targeted at people over 18, or all ads targeted by
-            gender only to men)
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/grouped/segment/this_week">
-              Ads first submitted this week grouped by targeting segment
-            </Link>
-          </td>
-          <td>
-            (i.e. all ads targeted at people over 18, or all ads targeted by
-            gender only to men)
-          </td>
-        </tr>
+    <div className="tools-section">
+      <h3>ads grouped by advertiser</h3>
+      <p>(e.g. ads from Bernie Sanders)</p>
+      <ul>
+        <li>
+          <Link to="/facebook-ads/admin/grouped/advertiser">all</Link>
+        </li>
+        <li>
+          <Link to="/facebook-ads/admin/grouped/advertiser/this_month">
+            first submitted this month
+          </Link>
+        </li>
+        <li>
+          <Link to="/facebook-ads/admin/grouped/advertiser/this_week">
+            first submitted this week
+          </Link>
+        </li>
+      </ul>
+    </div>
 
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/grouped/target">
-              All ads grouped by targeting method
-            </Link>
-          </td>
-          <td>(i.e. all ads targeted by age, or all ads targeted by gender)</td>
-        </tr>
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/grouped/target/this_month">
-              Ads first submitted this month grouped by targeting method
-            </Link>
-          </td>
-          <td>(i.e. all ads targeted by age, or all ads targeted by gender)</td>
-        </tr>
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/grouped/target/this_week">
-              Ads first submitted this week grouped by targeting method
-            </Link>
-          </td>
-          <td>(i.e. all ads targeted by age, or all ads targeted by gender)</td>
-        </tr>
+    <div className="tools-section">
+      <h3>ads grouped by targeting segment</h3>
+      <p>
+        (e.g. all ads targeted at people over 18, or all ads targeted by gender
+        only to men)
+      </p>
+      <ul>
+        <li>
+          <Link to="/facebook-ads/admin/grouped/segment">all</Link>
+        </li>
+        <li>
+          <Link to="/facebook-ads/admin/grouped/segment/this_month">
+            first submitted this month
+          </Link>
+        </li>
+        <li>
+          <Link to="/facebook-ads/admin/grouped/segment/this_week">
+            first submitted this week
+          </Link>
+        </li>
+      </ul>
+    </div>
 
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/ads?search=Donald+J.+Trump&advertisers=%5B%22Donald+J.+Trump%22%5D">
-              Trump ads
-            </Link>
-          </td>
-        </tr>
+    <div className="tools-section">
+      <h3>ads grouped by targeting method</h3>
+      <p> (e.g. all ads targeted by age; or all ads targeted by a Like)</p>
+      <ul>
+        <li>
+          <Link to="/facebook-ads/admin/grouped/target">all</Link>
+        </li>
+        <li>
+          <Link to="/facebook-ads/admin/grouped/target/this_month">
+            first submitted this month
+          </Link>
+        </li>
+        <li>
+          <Link to="/facebook-ads/admin/grouped/target/this_week">
+            first submitted this week
+          </Link>
+        </li>
+      </ul>
+    </div>
 
-        <tr>
-          <td>
-            <Link to="/facebook-ads/admin/summary">Summary Stats</Link>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div className="tools-section">
+      <h3>other stuff</h3>
+      <ul>
+        <li>
+          <Link to="/facebook-ads/admin/ads?search=Donald+J.+Trump&advertisers=%5B%22Donald+J.+Trump%22%5D">
+            Trump ads
+          </Link>
+        </li>
+        <li>
+          <Link to="/facebook-ads/admin/summary">Summary Stats</Link>
+        </li>
+      </ul>
+    </div>
   </div>
 );
 
