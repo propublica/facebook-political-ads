@@ -27,3 +27,4 @@ __pycache__
 passwords.txt
 coverage
 facebook_ads_*.sql
+facebook_ads-*.sql
