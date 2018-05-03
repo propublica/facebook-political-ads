@@ -36,10 +36,6 @@ fn main() {
     for ad in dbads {
         total += 1;
         let document = kuchiki::parse_html().one(ad.html.clone());
-        // println!("{:?}", ad.targeting);
-        // println!("{:?}", get_targets(&ad.targeting));
-        // println!("");
-
         // find any cases where the revised targeting parser removes an element
         ;
         if let Some(ref old_targets) = ad.targets {
@@ -58,10 +54,6 @@ fn main() {
                 if old_targets.as_array().unwrap().len() == 0 {
                     still_doesnt_parse += 1;
                 } else {
-                    println!("failed to parse: ");
-                    println!("{:?}", ad.targeting);
-                    println!("{:?}", old_targets);
-                    println!("");
                     parse_failed += 1;
                 }
             }
@@ -69,12 +61,16 @@ fn main() {
             if let Some(new_targets) = get_targets(&ad.targeting) {
                 if new_targets.as_array().unwrap().len() > 0 {
                     newly_parses_correctly += 1;
+                    println!("{:?}", new_targets.as_array().unwrap())
+                // how to parse in Ruby.
+                // output = open("targeting_output.txt", 'r').read.gsub("\n24865/24877 parse successfully\n1520/24877 now parse correctly\n0/24877 now parse worse than before\n0/24877 newly fail\n12/24877 still fail\n", "")
+                // lines = output.gsub("Object(", "").gsub("String(", "").gsub('")', '"').gsub(')}', '').gsub("})", "}").gsub('\\\\"', '"').split("\n")
+                // parsed_lines = lines.map{|line| JSON.parse(line)}
                 } else {
                     still_doesnt_parse += 1;
                 }
             } else {
                 still_doesnt_parse += 1;
-                println!("{:?}", ad.id);
             }
         }
 
