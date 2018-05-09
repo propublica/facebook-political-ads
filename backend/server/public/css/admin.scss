@@ -337,3 +337,20 @@ p {
 .clearboth {
   clear: both;
 }
+
+#help {
+  width: 800px;
+
+  strong {
+    font-weight: bold;
+  }
+
+  h2 {
+    margin-top: 1em;
+    font-weight: 500;
+  }
+  p {
+    line-spacing: 1.2em;
+    margin-top: 1.3em;
+  }
+}
