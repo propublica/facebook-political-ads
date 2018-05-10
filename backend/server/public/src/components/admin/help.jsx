@@ -20,7 +20,7 @@ const AdminHelp = () => (
       </a>.
     </p>
 
-    <h2>How to search</h2>
+    <h2>How to find ads — and stories</h2>
     <p>
       Once you visit that page, you can search, with the search bar at the top,
       for whatever’s most interesting to you: Trump, Trudeau, housing, etc.
@@ -34,6 +34,44 @@ const AdminHelp = () => (
       Party inviting people to their convention are being seen as non-political,
       since they don’t talk about issues -- just the convention. If you wanted
       to see all of those ads, you’d want to lower the slider’s threshold.)
+    </p>
+
+    <p>
+      There are three main types of newsworthy things you might find in this
+      database: advertisers, messaging and targeting.{" "}
+      <strong>Advertisers</strong>: It’s no surprise that candidates and parties
+      are running ads, but “dark money” groups and PACs may be pushing their
+      views in ways that would otherwise be hard to trace.{" "}
+      <strong>Messaging</strong>: Does an ad from a candidate or interest group
+      need fact-checking? Is a candidate saying one thing out loud and another
+      to specially-selected voters on Facebook? <strong>Targeting</strong>: Is a
+      candidate pushing a certain message only to certain discrete groups, like
+      voters older than age 65 or only to women? This can be a story on its own.
+    </p>
+    <p>
+      You can find ads grouped by Advertiser on the “Tools” page of the admin
+      dashboard; there’s a similar grouping of ads grouped by Advertiser that
+      have first appeared in the past month. This may help you find new groups
+      advertising on politics.
+      <p />
+      Here are some examples:
+      <ul>
+        <li>
+          We wrote{" "}
+          <a href="https://www.propublica.org/article/democrats-facebook-likes-arizona-special-election-hiral-tipirneni">
+            a story about how Democrats’ ad targeting strategies, focusing on
+            Hiral Tipirneni
+          </a>, a candidate in a special election in Arizona, who advertised to
+          people who liked the pages of, say, Elizabeth Warren.
+        </li>
+        <li>
+          We also{" "}
+          <a href="https://twitter.com/ProPublica/status/993925750632910850">
+            reported on a candidate’s negative ads that didn’t have a disclosure
+          </a>: Rich Cordray who had bragged about running a positive campaign,
+          ran ads criticizing his opponent under the name “Ohio Primary Info.”
+        </li>
+      </ul>
     </p>
 
     <h2>What each item of metadata means</h2>
