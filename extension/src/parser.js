@@ -1,3 +1,26 @@
+//  ******************************  //
+//                                  //
+//  Are you a Facebook engineer?    //
+//                                  //
+//  ******************************  //
+
+// Hi!   Glad that you're here.
+// I'm Jeremy Merrill. I'm a journalist and programmer at ProPublica. I'd love to hear from you.
+// What are thoughts on Facebook's transparency efforts regarding political ads?
+// Maybe you think this controversy is overblown, or Facebook's getting a bad rap in the press?
+// What do you think about this project to keep track of political ads of Facebook, to keep politicians -- and Facebook -- honest?
+// Is there something you’d like to tell us? I _really_ want to hear from you
+// ... especially if you're visiting this page as part of your job duties.
+
+// Email me at jeremy.merrill@propublica.org.
+
+// We can talk confidentially ("on background").
+// My PGP key ID is 0x7780C4694F621BA0. Or email me and ask for my Signal number.
+// You can email me from a burner email account if you want.
+
+// I bet you have thoughts about Facebook's role in our current political situation.
+// Let's talk.
+
 export const TIMELINE_SELECTOR = ".userContentWrapper";
 export const SIDEBAR_SELECTOR = ".ego_unit";
 export const DEBUG =
@@ -442,7 +465,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  'a[href=""]',
+  "a[href=\"\"]",
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -561,7 +584,7 @@ const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    'localStorage.setItem("pageVariable", (' +
+    "localStorage.setItem(\"pageVariable\", (" +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
