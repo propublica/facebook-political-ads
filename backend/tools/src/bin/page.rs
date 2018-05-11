@@ -22,9 +22,10 @@ fn main() {
         .filter(page.is_null())
         .load::<Ad>(&conn)
         .expect("Couldn't get ads.");
+    println!("{:?}", "got ads");
     for ad in dbads {
         let document = kuchiki::parse_html().one(ad.html.clone());
-
+        println!("{:?}", ad.id);
         let html_page = get_author_link(&document)
             .ok()
             .and_then(|l| l.attributes.borrow().get("href").map(|i| i.to_string()));
