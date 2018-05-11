@@ -24,8 +24,6 @@ export class AdDetailUnconnected extends React.Component {
       if (this.props.ad.id) {
         return (
           <div id="ad">
-            <input id="search" placeholder="Search for ads" />
-
             <Ad
               ad={this.props.ad}
               onSuppressClick={this.props.onSuppressClick}
