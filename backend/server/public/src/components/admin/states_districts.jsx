@@ -5,7 +5,7 @@ import {
   getStatesAndDistricts,
   newSearch,
   setLang,
-  clearAdvertisersTargetsAndEntities
+  clearAllFilters
 } from "actions.js";
 import i18next from "i18next";
 
@@ -83,7 +83,7 @@ const StatesAndDistricts = withRouter(
       lang
     }),
     dispatch => ({
-      onLoad: () => dispatch(clearAdvertisersTargetsAndEntities()),
+      onLoad: () => dispatch(clearAllFilters()),
       onClick: term => dispatch(newSearch(term)),
       getStatesAndDistricts: (kind, recent) =>
         dispatch(getStatesAndDistricts(kind, recent)),

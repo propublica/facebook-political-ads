@@ -111,10 +111,10 @@ export const newStates = a(NEW_STATES);
 export const newParties = a(NEW_PARTIES);
 export const newDistricts = a(NEW_DISTRICTS);
 
-export const CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES =
-  "clear_advertisers_targets_and_entities";
-export const clearAdvertisersTargetsAndEntities = () => ({
-  type: CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES
+// resets advertisers, targets, entities, states, districts, parties
+export const CLEAR_ALL_FILTERS = "clear_all_filters";
+export const clearAllFilters = () => ({
+  type: CLEAR_ALL_FILTERS
 });
 
 export const FILTER_ENTITY = "filter_entity";

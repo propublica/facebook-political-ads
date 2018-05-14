@@ -17,11 +17,12 @@ import {
   GOT_RECENT_GROUPED_ATTR,
   REQUESTING_RECENT_GROUPED_ATTR,
   CHANGE_POLITICAL_PROBABILITY,
-  CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES,
+  CLEAR_ALL_FILTERS,
   REQUESTING_SUMMARY,
   GOT_SUMMARY,
   RECEIVE_STATES_AND_DISTRICTS,
-  REQUESTING_STATES_AND_DISTRICTS
+  REQUESTING_STATES_AND_DISTRICTS,
+  CLEAR_ALL_FILTERS
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -166,7 +167,7 @@ const makeObjectReducer = (plural, singular) => {
             return filter;
           }
         });
-      case CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES:
+      case CLEAR_ALL_FILTERS:
         return [];
       default:
         return state;
@@ -182,7 +183,7 @@ const makeArrayReducer = plural => {
       }
       case `filter_${plural}`:
         return state;
-      case CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES:
+      case CLEAR_ALL_FILTERS:
         return [];
       default:
         return state;

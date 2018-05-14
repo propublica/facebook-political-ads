@@ -8,7 +8,7 @@ import {
   getAds,
   changePoliticalProbability,
   throttledDispatchAny,
-  clearAdvertisersTargetsAndEntities
+  clearAllFilters
 } from "actions.js";
 import { deserialize } from "utils.js";
 import Range from "rc-slider/lib/Range";
@@ -140,7 +140,7 @@ export const AdsUnrouted = connect(
     },
     onKeyUp: e => {
       e.preventDefault();
-      dispatch(clearAdvertisersTargetsAndEntities());
+      dispatch(clearAllFilters());
       throttledDispatch(
         dispatch,
         e.target.value.length ? e.target.value : null
