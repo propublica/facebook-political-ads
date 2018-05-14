@@ -32,6 +32,45 @@ export class AdsUnconnected extends React.Component {
           onKeyUp={this.props.onKeyUp}
           search={this.props.search}
         />
+        <div className="filters">
+          Active filters:{" "}
+          {this.props.states.length > 0 ? (
+            <span>States: {this.props.states.join(", ")}</span>
+          ) : null}
+          {this.props.districts.length > 0 ? (
+            <span>Districts: {this.props.districts.join(", ")}</span>
+          ) : null}
+          {this.props.parties.length > 0 ? (
+            <span>Parties: {this.props.parties.join(", ")}</span>
+          ) : null}
+          {this.props.advertisers.length > 0 ? (
+            <span>
+              Advertisers:{" "}
+              {this.props.advertisers
+                .map(filter => filter.advertiser)
+                .join(", ")}
+            </span>
+          ) : null}
+          {this.props.targets.length > 0 ? (
+            <span>
+              Targets:{" "}
+              {this.props.targets
+                .map(
+                  filter =>
+                    filter.segment
+                      ? `${filter.target} → ${filter.segment}`
+                      : filter.target
+                )
+                .join(", ")}
+            </span>
+          ) : null}
+          {this.props.entities.length > 0 ? (
+            <span>
+              Entities:{" "}
+              {this.props.entities.map(filter => filter.entity).join(", ")}
+            </span>
+          ) : null}
+        </div>
         <div className="rangeslider">
           <label htmlFor="range-1a">Political Likelihood:</label>
           <Range
@@ -70,11 +109,29 @@ export class AdsUnconnected extends React.Component {
 }
 
 export const AdsUnrouted = connect(
-  ({ ads, search, page, pagination }) => ({
+  ({
+    ads,
+    search,
+    page,
+    pagination,
+    states,
+    districts,
+    parties,
+    targets,
+    entities,
+    advertisers
+  }) => ({
     ads: ads.filter(ad => !ad.suppressed),
     search,
     pagination,
-    page
+    page,
+
+    states,
+    districts,
+    parties,
+    targets: targets.filter(it => it.active),
+    entities: entities.filter(it => it.active),
+    advertisers: advertisers.filter(it => it.active)
   }),
   dispatch => ({
     deserialize: () => {

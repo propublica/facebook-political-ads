@@ -21,7 +21,10 @@ import {
   enableBatching,
   groupedAttribute,
   politicalProbability,
-  statesAndDistricts
+  statesAndDistricts,
+  states,
+  parties,
+  districts
 } from "reducers.js";
 import { go } from "i18n.js";
 import Admin from "components/admin/admin.jsx";
@@ -40,7 +43,10 @@ const reducer = enableBatching(
     summary,
     groupedAttribute,
     politicalProbability,
-    statesAndDistricts
+    statesAndDistricts,
+    states,
+    parties,
+    districts
   })
 );
 

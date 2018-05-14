@@ -24,11 +24,10 @@ export class StatesDistricts extends React.Component {
       <div id="statesAndDistricts">
         <h1>State</h1>
         <div id="states" className="breakdown">
-          {this.props.statesAndDistricts &&
-          this.props.statesAndDistricts.states ? (
+          {this.props.statesAndDistricts.states ? (
             this.props.statesAndDistricts.states.map(state => (
               <div key={state.abbrev} className="state">
-                <Link to={`/facebook-ads/admin/ads?state={state.abbrev}`}>
+                <Link to={`/facebook-ads/admin/ads?state=${state.abbrev}`}>
                   {state.abbrev}
                 </Link>
               </div>
@@ -42,8 +41,7 @@ export class StatesDistricts extends React.Component {
 
         <h1>House Districts</h1>
         <div id="districts" className="breakdown">
-          {this.props.statesAndDistricts &&
-          this.props.statesAndDistricts.districts ? (
+          {this.props.statesAndDistricts.districts ? (
             Object.entries(this.props.statesAndDistricts.districts)
               .sort(a => a[0])
               .map(state_districts => (
@@ -51,12 +49,14 @@ export class StatesDistricts extends React.Component {
                   <h3>{state_districts[0]}</h3>
                   <ul>
                     {state_districts[1]
-                      .filter(({ office }) => office == "H")
+                      .filter(({ office }) => office === "H")
                       .sort(({ name }) => name)
                       .map(district => (
-                        <li>
+                        <li key={district.id}>
                           <Link
-                            to={`/facebook-ads/admin/ads?state={state_districts[0]}&district={district["name"]}`}
+                            to={`/facebook-ads/admin/ads?state=${
+                              state_districts[0]
+                            }&district=${district["name"]}`}
                           >
                             {district["state"]}-{district["name"]}
                           </Link>
@@ -79,7 +79,7 @@ export class StatesDistricts extends React.Component {
 const StatesAndDistricts = withRouter(
   connect(
     ({ statesAndDistricts, lang }) => ({
-      statesAndDistricts,
+      statesAndDistricts: statesAndDistricts || {},
       lang
     }),
     dispatch => ({

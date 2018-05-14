@@ -37,11 +37,11 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>
             {ad.targets
               ? ad.targets
-                .map(
-                  ({ target, segment }) =>
-                    segment ? `${target}: ${segment}` : target
-                )
-                .join(", ")
+                  .map(
+                    ({ target, segment }) =>
+                      segment ? `${target}: ${segment}` : target
+                  )
+                  .join(", ")
               : "NONE"}
           </td>
         </tr>
