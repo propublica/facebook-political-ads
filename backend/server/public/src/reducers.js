@@ -19,7 +19,9 @@ import {
   CHANGE_POLITICAL_PROBABILITY,
   CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES,
   REQUESTING_SUMMARY,
-  GOT_SUMMARY
+  GOT_SUMMARY,
+  RECEIVE_STATES_AND_DISTRICTS,
+  REQUESTING_STATES_AND_DISTRICTS
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -95,6 +97,17 @@ export const summary = (state = {}, action) => {
     case GOT_SUMMARY:
       return action.summary;
     case REQUESTING_SUMMARY:
+      return null;
+    default:
+      return state;
+  }
+};
+
+export const statesAndDistricts = (state = {}, action) => {
+  switch (action.type) {
+    case RECEIVE_STATES_AND_DISTRICTS:
+      return action.statesAndDistricts;
+    case REQUESTING_STATES_AND_DISTRICTS:
       return null;
     default:
       return state;

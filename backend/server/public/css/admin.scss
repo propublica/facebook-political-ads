@@ -354,3 +354,20 @@ p {
     margin-top: 1.3em;
   }
 }
+
+#statesAndDistricts {
+  #states {
+    width: 100%;
+    .state {
+      float: left;
+      margin: 20px 10px;
+      font-size: 18px;
+    }
+  }
+  h1 {
+    clear: both;
+  }
+  li {
+    margin-left: 1em;
+  }
+}

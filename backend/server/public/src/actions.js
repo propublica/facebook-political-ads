@@ -34,6 +34,18 @@ export const requestingRecentGroupedAttr = () => ({
   type: REQUESTING_RECENT_GROUPED_ATTR
 });
 
+export const RECEIVE_STATES_AND_DISTRICTS = "RECEIVE_STATES_AND_DISTRICTS";
+export const receiveStatesAndDistricts = statesAndDistricts => ({
+  type: RECEIVE_STATES_AND_DISTRICTS,
+  statesAndDistricts
+});
+
+export const REQUESTING_STATES_AND_DISTRICTS =
+  "REQUESTING_STATES_AND_DISTRICTS";
+export const requestingStatesAndDistricts = () => ({
+  type: REQUESTING_STATES_AND_DISTRICTS
+});
+
 export const GOT_SUMMARY = "GOT_SUMMARY";
 export const receivedSummary = summary => ({
   type: GOT_SUMMARY,
@@ -145,6 +157,33 @@ export const getOneAd = (ad_id, url = `${URL_ROOT}/fbpac-api/ads`) => {
       .then(res => res.json())
       .then(ad => {
         dispatch(receiveOneAd(ad));
+      });
+  };
+};
+
+export const getStatesAndDistricts = () => {
+  let path = `${URL_ROOT}/fbpac-api/states_and_districts`;
+  return (dispatch, getState) => {
+    let state = getState();
+
+    if (state.lang) {
+      path = path + `?lang=${state.lang}`;
+    }
+    dispatch(requestingStatesAndDistricts());
+    return fetch(path, {
+      method: "GET",
+      credentials: "include",
+      redirect: "follow"
+    })
+      .then(resp => {
+        if (resp.redirected === true) {
+          window.location.href = `${URL_ROOT}/fbpac-api/partners/sign_in`;
+          return null;
+        }
+        return resp.json();
+      })
+      .then(resp => {
+        dispatch(receiveStatesAndDistricts(resp));
       });
   };
 };
