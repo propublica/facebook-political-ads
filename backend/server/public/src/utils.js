@@ -12,6 +12,12 @@ import {
   filterAdvertiser,
   filterEntity,
   filterTarget,
+  newStates,
+  filterState,
+  newParties,
+  filterParty,
+  newDistricts,
+  filterDistrict,
   changePoliticalProbability
 } from "actions.js";
 
@@ -19,7 +25,7 @@ const headers = lang => Object.assign({}, language(lang));
 
 const language = lang => ({ "Accept-Language": lang + ";q=1.0" });
 
-const s = (plural, singular, map) => {
+const serializeToJSON = (plural, singular, map) => {
   return (params, state) => {
     if (!state[plural]) return params;
     const items = state[plural]
@@ -32,8 +38,25 @@ const s = (plural, singular, map) => {
   };
 };
 
-const serializeEntities = s("entities", "entity", entity => ({ entity }));
-const serializeAdvertisers = s("advertisers", "advertiser");
+const serializeEntities = serializeToJSON("entities", "entity", entity => ({
+  entity
+}));
+const serializeAdvertisers = serializeToJSON("advertisers", "advertiser");
+
+const serializeToArray = (plural, map) => {
+  return (params, state) => {
+    if (!state[plural] || state[plural].length == 0) return params;
+
+    params.set(
+      plural,
+      state[plural].map(obj => (map ? map(obj) : obj)).join(",")
+    );
+    return params;
+  };
+};
+const serializeStates = serializeToArray("states");
+const serializeDistricts = serializeToArray("districts");
+const serializeParties = serializeToArray("parties");
 
 const serialize = state => {
   // N.B. this used to take store, now it takes state; so just give it store.getState()
@@ -43,10 +66,13 @@ const serialize = state => {
     params.set("search", state.search);
   }
 
-  params = [serializeAdvertisers, serializeEntities].reduce(
-    (params, cb) => cb(params, state),
-    params
-  );
+  params = [
+    serializeAdvertisers,
+    serializeEntities,
+    serializeStates,
+    serializeParties,
+    serializeDistricts
+  ].reduce((params, cb) => cb(params, state), params);
 
   if (state.targets) {
     const items = state.targets.filter(it => it.active).map(it =>
@@ -67,9 +93,10 @@ const serialize = state => {
     params.set("maxpoliprob", state.politicalProbability[1]);
   }
 
-  if (state.lang && state.lang !== i18next.language) {
-    params.set("lang", state.lang);
-  }
+  if (state.states)
+    if (state.lang && state.lang !== i18next.language) {
+      params.set("lang", state.lang);
+    }
 
   return params;
 };
@@ -123,6 +150,28 @@ const deserialize = (dispatch, allowedLangs) => {
         parseInt(params.get("maxpoliprob") || "100", 10)
       )
     );
+  }
+
+  if (params.has("states")) {
+    const states = params.get("states").split(",");
+    actions.push(newStates(states));
+    states.map(it => {
+      actions.push(filterState(it));
+    });
+  }
+  if (params.has("parties")) {
+    const parties = params.get("parties").split(",");
+    actions.push(newParties(parties));
+    parties.map(it => {
+      actions.push(filterParty(it));
+    });
+  }
+  if (params.has("district")) {
+    const targeting = params.get("district").split(",");
+    actions.push(newDistricts(targeting));
+    targeting.map(it => {
+      actions.push(filterDistrict(it));
+    });
   }
 
   if (actions.length === 0) {

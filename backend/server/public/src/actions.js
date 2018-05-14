@@ -101,9 +101,15 @@ const a = type => arg => ({ type, value: arg });
 export const NEW_ENTITIES = "new_entities";
 export const NEW_ADVERTISERS = "new_advertisers";
 export const NEW_TARGETS = "new_targets";
+export const NEW_STATES = "new_states";
+export const NEW_PARTIES = "new_parties";
+export const NEW_DISTRICTS = "new_districts";
 export const newEntities = a(NEW_ENTITIES);
 export const newAdvertisers = a(NEW_ADVERTISERS);
 export const newTargets = a(NEW_TARGETS);
+export const newStates = a(NEW_STATES);
+export const newParties = a(NEW_PARTIES);
+export const newDistricts = a(NEW_DISTRICTS);
 
 export const CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES =
   "clear_advertisers_targets_and_entities";
@@ -114,12 +120,21 @@ export const clearAdvertisersTargetsAndEntities = () => ({
 export const FILTER_ENTITY = "filter_entity";
 export const FILTER_ADVERTISER = "filter_advertiser";
 export const FILTER_TARGET = "filter_target";
+export const FILTER_STATE = "filter_states";
+export const FILTER_PARTY = "filter_parties";
+export const FILTER_DISTRICT = "filter_districts";
 export const filterEntity = a(FILTER_ENTITY);
 export const filterAdvertiser = a(FILTER_ADVERTISER);
 export const filterTarget = a(FILTER_TARGET);
+export const filterState = a(FILTER_STATE);
+export const filterParty = a(FILTER_PARTY);
+export const filterDistrict = a(FILTER_DISTRICT);
 export const fetchEntity = e => asyncResetPage(filterEntity(e));
 export const fetchAdvertiser = a => asyncResetPage(filterAdvertiser(a));
 export const fetchTarget = t => asyncResetPage(filterTarget(t));
+export const fetchState = e => asyncResetPage(filterState(e));
+export const fetchParty = a => asyncResetPage(filterParty(a));
+export const fetchDistrict = t => asyncResetPage(filterDistrict(t));
 
 export const TOGGLE_TARGET = "toggle_target";
 export const TOGGLE_ADVERTISER = "toggle_advertiser";

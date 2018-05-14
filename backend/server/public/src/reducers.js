@@ -129,18 +129,31 @@ export const filters = (state = {}, action) => {
   }
 };
 
-const makeReducer = (plural, singular) => {
+const makeObjectReducer = (plural, singular) => {
   return (state = [], action) => {
     switch (action.type) {
       case `new_${plural}`: {
         const lookup = new Set(
           state.filter(filter => filter.active).map(it => it[singular])
         );
-        return action.value.map(filter => ({
-          ...filter,
-          key: filter[singular],
-          active: lookup.has(filter[singular])
-        }));
+        const filtersWithSegments = state.filter(filter => filter.segment);
+        return action.value.map(filter => {
+          let oldFilter = filtersWithSegments.find(
+            old => old[singular] === filter[singular]
+          );
+          return singular !== "target" || !oldFilter
+            ? {
+                ...filter,
+                key: filter[singular],
+                active: lookup.has(filter[singular])
+              }
+            : {
+                ...filter,
+                key: filter[singular],
+                active: lookup.has(filter[singular]),
+                segment: oldFilter.segment
+              };
+        });
       }
       case `filter_${singular}`:
         return state.map(filter => {
@@ -161,9 +174,28 @@ const makeReducer = (plural, singular) => {
   };
 };
 
-export const entities = makeReducer("entities", "entity");
-export const advertisers = makeReducer("advertisers", "advertiser");
-export const targets = makeReducer("targets", "target");
+const makeArrayReducer = plural => {
+  return (state = [], action) => {
+    switch (action.type) {
+      case `new_${plural}`: {
+        return action.value;
+      }
+      case `filter_${plural}`:
+        return state;
+      case CLEAR_ADVERTISERS_TARGETS_AND_ENTITIES:
+        return [];
+      default:
+        return state;
+    }
+  };
+};
+
+export const entities = makeObjectReducer("entities", "entity");
+export const advertisers = makeObjectReducer("advertisers", "advertiser");
+export const targets = makeObjectReducer("targets", "target");
+export const states = makeArrayReducer("states");
+export const parties = makeArrayReducer("parties");
+export const districts = makeArrayReducer("districts");
 
 const PER_PAGE = 20;
 const min = state => Math.min(state.page, state.total);
