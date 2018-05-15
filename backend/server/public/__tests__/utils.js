@@ -69,7 +69,9 @@ describe("utils", () => {
     history.pushState({}, "", "/facebook-ads/ads");
     fetchMock.getOnce("/facebook-ads/ads", ads);
     await utils.deserialize(store.dispatch);
-    expect(store.getActions()).toEqual([actions.batch(actions.newSearch(""))]);
+    expect(store.getActions()).toEqual([
+      actions.batch(actions.newSearch(null), actions.setLang(undefined))
+    ]);
 
     const newStore = mockStore({
       ...JSON.parse(ads),
@@ -78,7 +80,7 @@ describe("utils", () => {
     });
 
     fetchMock.reset().restore();
-    await utils.deserialize(newStore.dispatch);
+    await utils.deserialize(newStore.dispatch, ["en-US", "de-DE"]);
     expect(fetchMock.called()).toEqual(false);
   });
 });

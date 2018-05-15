@@ -93,10 +93,9 @@ const serialize = state => {
     params.set("maxpoliprob", state.politicalProbability[1]);
   }
 
-  if (state.states)
-    if (state.lang && state.lang !== i18next.language) {
-      params.set("lang", state.lang);
-    }
+  if (state.lang && state.lang !== i18next.language) {
+    params.set("lang", state.lang);
+  }
 
   return params;
 };

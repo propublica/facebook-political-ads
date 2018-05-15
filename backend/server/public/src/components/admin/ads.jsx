@@ -34,22 +34,22 @@ export class AdsUnconnected extends React.Component {
         />
         <div className="filters">
           Active filters:{" "}
-          {this.props.states.length > 0 ? (
+          {(this.props.states || []).length > 0 ? (
             <span>
               States: <strong>{this.props.states.join(", ")} </strong>
             </span>
           ) : null}
-          {this.props.districts.length > 0 ? (
+          {(this.props.districts || []).length > 0 ? (
             <span>
               Districts: <strong>{this.props.districts.join(", ")} </strong>
             </span>
           ) : null}
-          {this.props.parties.length > 0 ? (
+          {(this.props.parties || []).length > 0 ? (
             <span>
               Parties: <strong>{this.props.parties.join(", ")} </strong>
             </span>
           ) : null}
-          {this.props.advertisers.length > 0 ? (
+          {(this.props.advertisers || []).length > 0 ? (
             <span>
               Advertisers:{" "}
               <strong>
@@ -59,7 +59,7 @@ export class AdsUnconnected extends React.Component {
               </strong>
             </span>
           ) : null}
-          {this.props.targets.length > 0 ? (
+          {(this.props.targets || []).length > 0 ? (
             <span>
               Targets:{" "}
               <strong>
@@ -74,7 +74,7 @@ export class AdsUnconnected extends React.Component {
               </strong>
             </span>
           ) : null}
-          {this.props.entities.length > 0 ? (
+          {(this.props.entities || []).length > 0 ? (
             <span>
               Entities:{" "}
               <strong>
@@ -115,8 +115,8 @@ export class AdsUnconnected extends React.Component {
             />
           ))
         ) : (
-          <div>No ads found (or they&apos;re still loading).</div>
-        )}
+            <div>No ads found (or they&apos;re still loading).</div>
+          )}
         {this.props.pagination ? <Pagination /> : ""}
       </div>
     );
@@ -144,9 +144,9 @@ export const AdsUnrouted = connect(
     states,
     districts,
     parties,
-    targets: targets.filter(it => it.active),
-    entities: entities.filter(it => it.active),
-    advertisers: advertisers.filter(it => it.active)
+    targets: (targets || []).filter(it => it.active),
+    entities: (entities || []).filter(it => it.active),
+    advertisers: (advertisers || []).filter(it => it.active)
   }),
   dispatch => ({
     deserialize: () => {
