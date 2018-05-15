@@ -16,7 +16,7 @@ Enzyme.configure({ adapter: new Adapter() });
 
 function setup(path) {
   const props = {};
-  fetchMock.get("/fbpac-api/loggedin", "null");
+  fetchMock.post("/fbpac-api/loggedin", "null");
 
   const enzymeWrapper = shallow(
     <MemoryRouter initialEntries={[path]}>

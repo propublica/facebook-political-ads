@@ -10,7 +10,9 @@ function setup(newProps = {}) {
     ...{
       match: { params: { groupingType: "advertiser" } },
       groupedAttribute: [{ advertiser: "Fake", count: "1134" }],
-      getGroupedAttrs: jest.fn()
+      getGroupedAttrs: jest.fn(),
+      onLoad: jest.fn(),
+      setLang: jest.fn()
     },
     ...newProps
   };
@@ -52,7 +54,9 @@ describe("components", () => {
       const props = {
         match: { params: { groupingType: "target" } },
         groupedAttribute: [{ target: "List", count: "1134" }],
-        getGroupedAttrs: jest.fn()
+        getGroupedAttrs: jest.fn(),
+        onLoad: jest.fn(),
+        setLang: jest.fn()
       };
       const enzymeWrapper = shallow(<GroupedAttrsUnconnected {...props} />);
       expect(enzymeWrapper.find("Link").props().to).toEqual(
@@ -64,7 +68,9 @@ describe("components", () => {
       const props = {
         match: { params: { groupingType: "segment" } },
         groupedAttribute: [{ segment: "List → ", count: "1134" }],
-        getGroupedAttrs: jest.fn()
+        getGroupedAttrs: jest.fn(),
+        onLoad: jest.fn(),
+        setLang: jest.fn()
       };
       const enzymeWrapper = shallow(<GroupedAttrsUnconnected {...props} />);
       expect(enzymeWrapper.find("Link").props().to).toEqual(
@@ -75,7 +81,9 @@ describe("components", () => {
       const props = {
         match: { params: { groupingType: "segment" } },
         groupedAttribute: [{ segment: "Agency → Experian", count: "1134" }],
-        getGroupedAttrs: jest.fn()
+        getGroupedAttrs: jest.fn(),
+        onLoad: jest.fn(),
+        setLang: jest.fn()
       };
       const enzymeWrapper = shallow(<GroupedAttrsUnconnected {...props} />);
       expect(enzymeWrapper.find("Link").props().to).toEqual(
