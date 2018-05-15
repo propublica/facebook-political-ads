@@ -165,8 +165,8 @@ const deserialize = (dispatch, allowedLangs) => {
       actions.push(filterParty(it));
     });
   }
-  if (params.has("district")) {
-    const targeting = params.get("district").split(",");
+  if (params.has("districts")) {
+    const targeting = params.get("districts").split(",");
     actions.push(newDistricts(targeting));
     targeting.map(it => {
       actions.push(filterDistrict(it));

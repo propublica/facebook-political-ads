@@ -27,16 +27,16 @@ export class StatesDistricts extends React.Component {
           {this.props.statesAndDistricts.states ? (
             this.props.statesAndDistricts.states.map(state => (
               <div key={state.abbrev} className="state">
-                <Link to={`/facebook-ads/admin/ads?state=${state.abbrev}`}>
+                <Link to={`/facebook-ads/admin/ads?states=${state.abbrev}`}>
                   {state.abbrev}
                 </Link>
               </div>
             ))
           ) : (
-            <div>
-              <h2>Loading...</h2>
-            </div>
-          )}
+              <div>
+                <h2>Loading...</h2>
+              </div>
+            )}
         </div>
 
         <h1>House Districts</h1>
@@ -59,9 +59,9 @@ export class StatesDistricts extends React.Component {
                       .map(district => (
                         <li key={district.id}>
                           <Link
-                            to={`/facebook-ads/admin/ads?state=${
-                              state_districts[0]
-                            }&district=${district["name"]}`}
+                            to={`/facebook-ads/admin/ads?districts=${
+                              district["state"]
+                              }-${district["name"]}`}
                           >
                             {district["state"]}-{district["name"]}
                           </Link>
@@ -71,10 +71,10 @@ export class StatesDistricts extends React.Component {
                 </div>
               ))
           ) : (
-            <div>
-              <h2>Loading...</h2>
-            </div>
-          )}
+              <div>
+                <h2>Loading...</h2>
+              </div>
+            )}
         </div>
       </div>
     );
