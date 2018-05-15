@@ -35,41 +35,56 @@ export class AdsUnconnected extends React.Component {
         <div className="filters">
           Active filters:{" "}
           {this.props.states.length > 0 ? (
-            <span>States: {this.props.states.join(", ")}</span>
+            <span>
+              States: <strong>{this.props.states.join(", ")} </strong>
+            </span>
           ) : null}
           {this.props.districts.length > 0 ? (
-            <span>Districts: {this.props.districts.join(", ")}</span>
+            <span>
+              Districts: <strong>{this.props.districts.join(", ")} </strong>
+            </span>
           ) : null}
           {this.props.parties.length > 0 ? (
-            <span>Parties: {this.props.parties.join(", ")}</span>
+            <span>
+              Parties: <strong>{this.props.parties.join(", ")} </strong>
+            </span>
           ) : null}
           {this.props.advertisers.length > 0 ? (
             <span>
               Advertisers:{" "}
-              {this.props.advertisers
-                .map(filter => filter.advertiser)
-                .join(", ")}
+              <strong>
+                {this.props.advertisers
+                  .map(filter => filter.advertiser)
+                  .join(", ")}{" "}
+              </strong>
             </span>
           ) : null}
           {this.props.targets.length > 0 ? (
             <span>
               Targets:{" "}
-              {this.props.targets
-                .map(
-                  filter =>
-                    filter.segment
-                      ? `${filter.target} → ${filter.segment}`
-                      : filter.target
-                )
-                .join(", ")}
+              <strong>
+                {this.props.targets
+                  .map(
+                    filter =>
+                      filter.segment
+                        ? `${filter.target} → ${filter.segment}`
+                        : filter.target
+                  )
+                  .join(", ")}{" "}
+              </strong>
             </span>
           ) : null}
           {this.props.entities.length > 0 ? (
             <span>
               Entities:{" "}
-              {this.props.entities.map(filter => filter.entity).join(", ")}
+              <strong>
+                {this.props.entities.map(filter => filter.entity).join(", ")}{" "}
+              </strong>
             </span>
           ) : null}
+          <a href="#" onClick={this.props.clearAllFilters}>
+            Clear All
+          </a>
         </div>
         <div className="rangeslider">
           <label htmlFor="range-1a">Political Likelihood:</label>
@@ -148,6 +163,10 @@ export const AdsUnrouted = connect(
     },
     onSliderChange: vals => {
       throttledDispatchAny(dispatch, changePoliticalProbability, vals);
+    },
+    clearAllFilters: () => {
+      dispatch(clearAllFilters());
+      dispatch(getAds());
     }
   })
 )(AdsUnconnected);

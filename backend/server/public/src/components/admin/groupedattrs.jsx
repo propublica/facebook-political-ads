@@ -5,7 +5,7 @@ import {
   getGroupedAttrs,
   newSearch,
   setLang,
-  clearAdvertisersTargetsAndEntities
+  clearAllFilters
 } from "actions.js";
 import i18next from "i18next";
 
@@ -94,7 +94,7 @@ const GroupedAttrs = withRouter(
       lang
     }),
     dispatch => ({
-      onLoad: () => dispatch(clearAdvertisersTargetsAndEntities()),
+      onLoad: () => dispatch(clearAllFilters()),
       onClick: term => dispatch(newSearch(term)),
       getGroupedAttrs: (kind, recent) =>
         dispatch(getGroupedAttrs(kind, recent)),

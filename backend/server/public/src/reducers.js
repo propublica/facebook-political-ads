@@ -22,7 +22,6 @@ import {
   GOT_SUMMARY,
   RECEIVE_STATES_AND_DISTRICTS,
   REQUESTING_STATES_AND_DISTRICTS,
-  CLEAR_ALL_FILTERS
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -144,16 +143,16 @@ const makeObjectReducer = (plural, singular) => {
           );
           return singular !== "target" || !oldFilter
             ? {
-                ...filter,
-                key: filter[singular],
-                active: lookup.has(filter[singular])
-              }
+              ...filter,
+              key: filter[singular],
+              active: lookup.has(filter[singular])
+            }
             : {
-                ...filter,
-                key: filter[singular],
-                active: lookup.has(filter[singular]),
-                segment: oldFilter.segment
-              };
+              ...filter,
+              key: filter[singular],
+              active: lookup.has(filter[singular]),
+              segment: oldFilter.segment
+            };
         });
       }
       case `filter_${singular}`:
