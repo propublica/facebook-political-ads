@@ -8,6 +8,7 @@ from .commands.diagnostics import diagnostics
 from .commands.entities import entities
 from .commands.seed import seed
 from .commands.targeting import targeting
+from .commands.add_seeds_from_id import add_seeds_from_id
 
 
 @click.group()
@@ -26,3 +27,4 @@ cli.add_command(diagnostics)
 cli.add_command(entities)
 cli.add_command(seed)
 cli.add_command(targeting)
+cli.add_command(add_seeds_from_id)
