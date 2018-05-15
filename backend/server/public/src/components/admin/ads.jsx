@@ -115,8 +115,8 @@ export class AdsUnconnected extends React.Component {
             />
           ))
         ) : (
-            <div>No ads found (or they&apos;re still loading).</div>
-          )}
+          <div>No ads found (or they&apos;re still loading).</div>
+        )}
         {this.props.pagination ? <Pagination /> : ""}
       </div>
     );
