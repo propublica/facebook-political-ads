@@ -72,18 +72,36 @@ const AdminTools = () => (
     </div>
 
     <div className="tools-section">
-      <h3>other stuff</h3>
+      <h3>US politics stuff</h3>
+      <p>Mostly federal candidates, for now...</p>
       <ul>
         <li>
           <Link to="/facebook-ads/admin/ads?search=Donald+J.+Trump&advertisers=%5B%22Donald+J.+Trump%22%5D">
             Trump ads
           </Link>
         </li>
+
         <li>
-          <Link to="/facebook-ads/admin/summary">Summary Stats</Link>
+          <Link to="/facebook-ads/admin/ads?parties=DEM,DFL">
+            Democratic candidate ads
+          </Link>
+        </li>
+
+        <li>
+          <Link to="/facebook-ads/admin/ads?parties=REP,GOP">
+            Republican candidate ads
+          </Link>
+        </li>
+        <li>
+          <Link to="/facebook-ads/admin/states">
+            Links to candidate ads by state and congressional district
+          </Link>
         </li>
       </ul>
     </div>
+    <li>
+      <Link to="/facebook-ads/admin/summary">Summary Stats</Link>
+    </li>
   </div>
 );
 
