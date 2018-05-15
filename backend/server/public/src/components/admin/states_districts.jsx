@@ -43,14 +43,19 @@ export class StatesDistricts extends React.Component {
         <div id="districts" className="breakdown">
           {this.props.statesAndDistricts.districts ? (
             Object.entries(this.props.statesAndDistricts.districts)
-              .sort(a => a[0])
+              .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
               .map(state_districts => (
                 <div key={state_districts[0]} className="districts">
                   <h3>{state_districts[0]}</h3>
                   <ul>
                     {state_districts[1]
                       .filter(({ office }) => office === "H")
-                      .sort(({ name }) => name)
+                      .sort(
+                        (a, b) =>
+                          a["name"] < b["name"]
+                            ? -1
+                            : a["name"] > b["name"] ? 1 : 0
+                      )
                       .map(district => (
                         <li key={district.id}>
                           <Link
