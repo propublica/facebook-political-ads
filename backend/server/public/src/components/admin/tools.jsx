@@ -5,7 +5,7 @@ const AdminTools = () => (
   <div id="tools">
     <p>
       Here are some tools to hopefully help you find interesting and newsworthy
-      ads.
+      ads. <Link to="/facebook-ads/admin/summary">Summary Stats</Link>
     </p>
 
     <div className="tools-section">
@@ -99,9 +99,6 @@ const AdminTools = () => (
         </li>
       </ul>
     </div>
-    <li>
-      <Link to="/facebook-ads/admin/summary">Summary Stats</Link>
-    </li>
   </div>
 );
 

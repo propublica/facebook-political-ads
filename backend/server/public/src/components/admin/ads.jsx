@@ -33,7 +33,7 @@ export class AdsUnconnected extends React.Component {
           search={this.props.search}
         />
         <div className="filters">
-          Active filters:{" "}
+          Total ads: {this.props.pagination.total_ads} Active filters:{" "}
           {(this.props.states || []).length > 0 ? (
             <span>
               States: <strong>{this.props.states.join(", ")} </strong>
@@ -115,8 +115,8 @@ export class AdsUnconnected extends React.Component {
             />
           ))
         ) : (
-          <div>No ads found (or they&apos;re still loading).</div>
-        )}
+            <div>No ads found (or they&apos;re still loading).</div>
+          )}
         {this.props.pagination ? <Pagination /> : ""}
       </div>
     );
