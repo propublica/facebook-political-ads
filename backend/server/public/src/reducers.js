@@ -21,7 +21,7 @@ import {
   REQUESTING_SUMMARY,
   GOT_SUMMARY,
   RECEIVE_STATES_AND_DISTRICTS,
-  REQUESTING_STATES_AND_DISTRICTS,
+  REQUESTING_STATES_AND_DISTRICTS
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -199,7 +199,7 @@ export const districts = makeArrayReducer("districts");
 
 const PER_PAGE = 20;
 const min = state => Math.min(state.page, state.total);
-export const pagination = (state = { page: 0, total: 0 }, action) => {
+export const pagination = (state = { page: 0, total: 0, total_ads: 0 }, action) => {
   switch (action.type) {
     case NEXT_PAGE:
       return { ...state, page: min({ ...state, page: state.page + 1 }) };
@@ -211,8 +211,9 @@ export const pagination = (state = { page: 0, total: 0 }, action) => {
         page: min({ page: action.value, total: state.total })
       };
     case SET_TOTAL: {
+      const total_ads = action.value;
       const total = Math.ceil(action.value / PER_PAGE);
-      return { total, page: 0 };
+      return { total, total_ads, page: 0 };
     }
     default:
       return state;
