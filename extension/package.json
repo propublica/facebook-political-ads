@@ -13,7 +13,11 @@
     "ff": "web-ext run -s build",
     "ffde": "web-ext run -s build --pref intl.locale.requested=de-DE --pref intl.locale.matchOS=false --pref intl.accept_languages=de-DE,de"
   },
-  "author": "Jeff Larson <jeff.larson@propublica.org>",
+  "author": "Jeremy Merrill <Jeremy.Merrill@propublica.org>",
+  "contributors": [
+    "Jeff Larson <jeff.larson@propublica.org>",
+    "Jeremy Merrill <Jeremy.Merrill@propublica.org>"
+  ],
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.40",
