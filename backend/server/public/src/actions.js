@@ -272,7 +272,16 @@ export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
     let path = `${url}?${params.toString()}`;
 
     let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-    history.push({ search: query }, "", `${location.pathname}${query}`);
+    let new_url = `${location.pathname}${query}`;
+    if (location.search !== query) {
+      // this history.push is just for when the state got changed  via dropdowns/searches
+      // and then we got ads back
+      // and then we changed the URL to match
+      // we skip the history.push if location.search === query
+      // which is true when we got here via a <Link>
+      // mutating history OUTSIDE of react-router gets things very confused and you end up with dumb URLs.
+      history.push({ search: query }, "", new_url);
+    }
     return fetch(path, { method: "GET", credentials: "include" })
       .then(res => res.json())
       .then(ads => {
