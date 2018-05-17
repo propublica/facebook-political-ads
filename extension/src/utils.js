@@ -48,7 +48,7 @@ export const mergeAds = (ads, newAds) => {
     Array.from(ids.values()),
     a => -1 * Date.parse(a.created_at)
   );
-  return sortBy(idSort, a => a.rating === "political").slice(0, 200);
+  return sortBy(idSort, a => a.rating === "political").slice(0, 100);
 };
 
 export const updateBadge = ratings => {
