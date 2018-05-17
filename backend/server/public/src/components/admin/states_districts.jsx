@@ -33,10 +33,10 @@ export class StatesDistricts extends React.Component {
               </div>
             ))
           ) : (
-              <div>
-                <h2>Loading...</h2>
-              </div>
-            )}
+            <div>
+              <h2>Loading...</h2>
+            </div>
+          )}
         </div>
 
         <h1>House Districts</h1>
@@ -61,7 +61,7 @@ export class StatesDistricts extends React.Component {
                           <Link
                             to={`/facebook-ads/admin/ads?districts=${
                               district["state"]
-                              }-${district["name"]}`}
+                            }-${district["name"]}`}
                           >
                             {district["state"]}-{district["name"]}
                           </Link>
@@ -71,10 +71,48 @@ export class StatesDistricts extends React.Component {
                 </div>
               ))
           ) : (
-              <div>
-                <h2>Loading...</h2>
-              </div>
-            )}
+            <div>
+              <h2>Loading...</h2>
+            </div>
+          )}
+        </div>
+
+        <h1>State Races</h1>
+        <div id="state_races" className="breakdown">
+          {this.props.statesAndDistricts.state_races ? (
+            Object.entries(this.props.statesAndDistricts.state_races)
+              .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
+              .map(state_districts => (
+                <div key={state_districts[0]} className="districts">
+                  <h3>{state_districts[0]}</h3>
+                  <ul>
+                    {state_districts[1]
+                      .filter(({ office }) => office !== "H")
+                      .sort(
+                        (a, b) =>
+                          a["name"] < b["name"]
+                            ? -1
+                            : a["name"] > b["name"] ? 1 : 0
+                      )
+                      .map(district => (
+                        <li key={district.id}>
+                          <Link
+                            to={`/facebook-ads/admin/ads?districts=${
+                              district["state"]
+                            }-${district["name"]}`}
+                          >
+                            {district["state"]} {district["name"]}
+                          </Link>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              ))
+          ) : (
+            <div>
+              <h2>Loading...</h2>
+            </div>
+          )}
         </div>
       </div>
     );

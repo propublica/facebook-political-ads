@@ -73,7 +73,10 @@ const AdminTools = () => (
 
     <div className="tools-section">
       <h3>US politics stuff</h3>
-      <p>Mostly federal candidates, for now...</p>
+      <p>
+        Let me know if we're missing someone! This should be all federal races
+        plus statewide state races (governor, lt gov, etc.)
+      </p>
       <ul>
         <li>
           <Link to="/facebook-ads/admin/ads?search=Donald+J.+Trump&advertisers=%5B%22Donald+J.+Trump%22%5D">
@@ -94,7 +97,7 @@ const AdminTools = () => (
         </li>
         <li>
           <Link to="/facebook-ads/admin/states">
-            Links to candidate ads by state and congressional district
+            Links to candidate ads by state, office and congressional district
           </Link>
         </li>
       </ul>
