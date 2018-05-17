@@ -9,7 +9,7 @@ import {
 } from "actions.js";
 import i18next from "i18next";
 
-export class StatesDistricts extends React.Component {
+export class StatesAndDistrictsUnrouted extends React.Component {
   componentWillMount() {
     const params = new URLSearchParams(location.search);
     this.props.onLoad(); // clears any search stuff that's in state or in the URL.
@@ -22,6 +22,20 @@ export class StatesDistricts extends React.Component {
   render() {
     return (
       <div id="statesAndDistricts">
+        <h1>Party</h1>
+        <div id="parties" className="breakdown">
+          <div key="dem" className="state">
+            <Link to="/facebook-ads/admin/ads?parties=DEM,DFL">
+              Democratic candidate ads
+            </Link>
+          </div>
+          <div key="gop" className="state">
+            <Link to="/facebook-ads/admin/ads?parties=REP,GOP">
+              Republican candidate ads
+            </Link>
+          </div>
+        </div>
+
         <h1>State</h1>
         <div id="states" className="breakdown">
           {this.props.statesAndDistricts.states ? (
@@ -33,10 +47,10 @@ export class StatesDistricts extends React.Component {
               </div>
             ))
           ) : (
-            <div>
-              <h2>Loading...</h2>
-            </div>
-          )}
+              <div>
+                <h2>Loading...</h2>
+              </div>
+            )}
         </div>
 
         <h1>House Districts</h1>
@@ -61,7 +75,7 @@ export class StatesDistricts extends React.Component {
                           <Link
                             to={`/facebook-ads/admin/ads?districts=${
                               district["state"]
-                            }-${district["name"]}`}
+                              }-${district["name"]}`}
                           >
                             {district["state"]}-{district["name"]}
                           </Link>
@@ -71,10 +85,10 @@ export class StatesDistricts extends React.Component {
                 </div>
               ))
           ) : (
-            <div>
-              <h2>Loading...</h2>
-            </div>
-          )}
+              <div>
+                <h2>Loading...</h2>
+              </div>
+            )}
         </div>
 
         <h1>State Races</h1>
@@ -99,7 +113,7 @@ export class StatesDistricts extends React.Component {
                           <Link
                             to={`/facebook-ads/admin/ads?districts=${
                               district["state"]
-                            }-${district["name"]}`}
+                              }-${district["name"]}`}
                           >
                             {district["state"]} {district["name"]}
                           </Link>
@@ -109,10 +123,10 @@ export class StatesDistricts extends React.Component {
                 </div>
               ))
           ) : (
-            <div>
-              <h2>Loading...</h2>
-            </div>
-          )}
+              <div>
+                <h2>Loading...</h2>
+              </div>
+            )}
         </div>
       </div>
     );
@@ -132,6 +146,6 @@ const StatesAndDistricts = withRouter(
         dispatch(getStatesAndDistricts(kind, recent)),
       setLang: lang => dispatch(setLang(lang))
     })
-  )(StatesDistricts)
+  )(StatesAndDistrictsUnrouted)
 );
 export default StatesAndDistricts;
