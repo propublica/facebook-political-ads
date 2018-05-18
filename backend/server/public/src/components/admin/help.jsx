@@ -26,6 +26,11 @@ const AdminHelp = () => (
       for whatever’s most interesting to you: Trump, Trudeau, housing, etc.
     </p>
 
+    <p>Or (if you're in the US), click Tools ->  US Politics Stuff -> <a href="/facebook-ads/admin/states">
+      Links to candidate ads by state, office and congressional district</a> to find links to <strong>ads in your state</strong>{" "}
+      or <strong>ads from candidates in specific races</strong>. You can also find ads by party. Note that these are just ads from candidates; parties and interest groups wouldn't show up.
+    </p>
+
     <p>
       By default, we only show ads that our “classifier” algorithm believes are
       at least 70% likely to be political ads. The slider underneath the search
@@ -45,8 +50,8 @@ const AdminHelp = () => (
       <strong>Messaging</strong>: Does an ad from a candidate or interest group
       need fact-checking? Is a candidate saying one thing out loud and another
       to specially-selected voters on Facebook? <strong>Targeting</strong>: Is a
-      candidate pushing a certain message only to certain discrete groups, like
-      voters older than age 65 or only to women? This can be a story on its own.
+        candidate pushing a certain message only to certain discrete groups, like
+        voters older than age 65 or only to women? This can be a story on its own.
     </p>
     <p>
       You can find ads grouped by Advertiser on the “Tools” page of the admin
@@ -62,14 +67,14 @@ const AdminHelp = () => (
             a story about how Democrats’ ad targeting strategies, focusing on
             Hiral Tipirneni
           </a>, a candidate in a special election in Arizona, who advertised to
-          people who liked the pages of, say, Elizabeth Warren.
+            people who liked the pages of, say, Elizabeth Warren.
         </li>
         <li>
           We also{" "}
           <a href="https://twitter.com/ProPublica/status/993925750632910850">
             reported on a candidate’s negative ads that didn’t have a disclosure
           </a>: Rich Cordray who had bragged about running a positive campaign,
-          ran ads criticizing his opponent under the name “Ohio Primary Info.”
+            ran ads criticizing his opponent under the name “Ohio Primary Info.”
         </li>
       </ul>
     </p>
@@ -78,8 +83,8 @@ const AdminHelp = () => (
     <p>
       Each result includes a picture of the ad and some details about when it
       was <strong>first seen</strong>. “<strong>Impressions</strong>” is the
-      number of times that that ad has been seen by participants in the project.
-      (We have no idea how many times the ad has been seen overall.)
+        number of times that that ad has been seen by participants in the project.
+        (We have no idea how many times the ad has been seen overall.)
     </p>
 
     <p>
@@ -123,8 +128,8 @@ const AdminHelp = () => (
       the past month: the number of ads by a given advertiser, by a given
       targeting <i>method</i> (e.g. ads shown only to people in a certain
       location) or by a given targeting <i>segment</i> (e.g. ads shown only to
-      people in Ottawa). If you click any of the links there, you can see all
-      the ads that are, for instance, shown only to people in Ottawa.
+        people in Ottawa). If you click any of the links there, you can see all
+        the ads that are, for instance, shown only to people in Ottawa.
     </p>
   </div>
 );
