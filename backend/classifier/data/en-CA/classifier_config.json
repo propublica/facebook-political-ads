@@ -1,5 +1,6 @@
 {
   "language": "en-CA",
   "n_features": 500000,
-  "classifier_type": "MultinomialNB"
+  "classifier_type": "MultinomialNB",
+  "vectorizer_type": "doc2vec"
 }
