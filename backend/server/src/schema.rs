@@ -20,5 +20,6 @@ table! {
         advertiser -> Nullable<Text>,
         entities -> Nullable<Jsonb>,
         page -> Nullable<Text>,
+        lower_page -> Nullable<Text>,
     }
 }

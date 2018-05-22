@@ -343,6 +343,7 @@ pub struct Ad {
     pub advertiser: Option<String>,
     pub entities: Option<Value>,
     pub page: Option<String>,
+    pub lower_page: Option<String>,
 }
 // Define our special functions for searching
 sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
@@ -597,6 +598,7 @@ pub struct NewAd<'a> {
     pub targets: Option<Value>,
     advertiser: Option<String>,
     page: Option<String>,
+    lower_page: Option<String>,
 }
 
 impl<'a> NewAd<'a> {
@@ -607,6 +609,9 @@ impl<'a> NewAd<'a> {
         let images = get_images(&document)?;
         let message = get_message(&document)?;
         let title = get_title(&document)?;
+        let page = get_author_link(&document)
+            .ok()
+            .and_then(|l| l.attributes.borrow().get("href").map(|i| i.to_string()));
 
         Ok(NewAd {
             id: &ad.id,
@@ -624,9 +629,8 @@ impl<'a> NewAd<'a> {
             targeting: ad.targeting.clone(),
             targets: get_targets(&ad.targeting),
             advertiser: get_advertiser(&ad.targeting, &document),
-            page: get_author_link(&document)
-                .ok()
-                .and_then(|l| l.attributes.borrow().get("href").map(|i| i.to_string())),
+            page: page.clone(),
+            lower_page: page.map(|s| s.to_lowercase()),
         })
     }
 
@@ -727,6 +731,7 @@ mod tests {
             advertiser: None,
             entities: None,
             page: None,
+            lower_page: None,
         };
         let urls = saved_ad.image_urls();
         let images = Images::from_ad(&saved_ad, &urls).unwrap();
