@@ -130,7 +130,7 @@ def get_text(advert):
     """
     return " ".join([get_html_text(advert["html"]),
                      get_targets(advert["targeting"]),
-                     get_profile_links(advert["html"])])
+                     get_profile_links(advert["html"])]).replace("triangle-down triangle-up Like share Share It looks like you may be having problems playing this video. If so, please try restarting your browser. Close", '')
 
 
 def confs(base):
