@@ -3,14 +3,16 @@
   "name": "__MSG_name__",
   "short_name": "__MSG_short_name__",
   "description": "__MSG_description__",
-  "version": "1.6.5",
+  "version": "1.6.6",
   "default_locale": "en",
   "permissions": [
     "https://projects.propublica.org/facebook-ads/*",
     "unlimitedStorage"
   ],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": [
+      "background.js"
+    ],
     "persistent": false
   },
   "browser_action": {
@@ -20,8 +22,12 @@
   },
   "content_scripts": [
     {
-      "js": ["content.js"],
-      "matches": ["*://*.facebook.com/*"]
+      "js": [
+        "content.js"
+      ],
+      "matches": [
+        "*://*.facebook.com/*"
+      ]
     }
   ]
 }
