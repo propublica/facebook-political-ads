@@ -311,7 +311,7 @@ export class Parser extends StateMachine {
         try {
           const targeting = cleanAd(
             JSON.parse(req.response.replace("for (;;);", ""))["jsmods"][
-              "markup"
+                "markup"
             ][0][1]["__html"]
           );
           if (!targeting) return this.promote(states.DONE);
@@ -465,7 +465,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  "a[href=\"\"]",
+  'a[href=""]',
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -511,12 +511,7 @@ const cleanAd = html => {
       } else if (attr.name === "data-hovercard") {
         try {
           let url = new URL(attr.value, window.location); // it's a relative URL, so we have to give it a base or it errors out.
-          if (DEBUG)
-            console.log(
-              "hovercard",
-              url,
-              url.pathname.indexOf("/ajax/hovercard/page.php")
-            );
+          if (DEBUG) console.log("hovercard", url, url.searchParams.get("id"));
           if (url.pathname.indexOf("/ajax/hovercard/page.php") === 0) {
             // for links with a href="#" and data-hovercard="/ajax/hovercard/page.php?id=1234567890"
             // keep the data-hovercard attr.
@@ -539,7 +534,7 @@ const cleanAd = html => {
   return node.innerHTML.replace(/&amp;/g, "&");
 };
 
-const checkSponsor = node => {
+export const checkSponsor = node => {
   return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
     a => {
       a = a.cloneNode(true);
@@ -553,7 +548,7 @@ const checkSponsor = node => {
         )
         .forEach(canary => canary.remove());
 
-      const text = a.textContent;
+      const text = a.textContent.replace(/^\s+|\s+$/g, "").split(" ")[0];
       const style = window
         .getComputedStyle(a, ":after")
         .getPropertyValue("content");
@@ -584,7 +579,7 @@ const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    "localStorage.setItem(\"pageVariable\", (" +
+    'localStorage.setItem("pageVariable", (' +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
