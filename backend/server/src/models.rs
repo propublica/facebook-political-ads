@@ -1,26 +1,25 @@
-use chrono::DateTime;
 use chrono::offset::Utc;
+use chrono::DateTime;
 use diesel;
 use diesel::dsl::sql;
+use diesel::pg::types::sql_types::Array;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use diesel::r2d2::ConnectionManager;
 use diesel::sql_types::{BigInt, Bool, Text};
 use diesel_full_text_search::*;
 use errors::*;
-use futures::future::Either;
 use futures::future;
+use futures::future::Either;
 use futures::{stream, Future, Stream};
 use futures_cpupool::CpuPool;
-use hyper::{Body, Client, Uri};
 use hyper::client::HttpConnector;
+use hyper::{Body, Client, Uri};
 use hyper_tls::HttpsConnector;
 use kuchiki;
 use kuchiki::iter::{Descendants, Elements, Select};
 use kuchiki::traits::*;
-use url::{ParseError, Url};
-use targeting_parser::{collect_advertiser, collect_targeting, Targeting};
-use diesel::r2d2::ConnectionManager;
 use r2d2::Pool;
 use rusoto_core::Region;
 use rusoto_s3::{PutObjectRequest, S3, S3Client};
@@ -28,8 +27,10 @@ use schema::ads;
 use schema::ads::BoxedQuery;
 use serde_json;
 use serde_json::Value;
-use std::collections::HashMap;
 use server::AdPost;
+use std::collections::HashMap;
+use targeting_parser::{collect_advertiser, collect_targeting, Targeting};
+use url::{ParseError, Url};
 
 const ENDPOINT: &str = "https://pp-facebook-ads.s3.amazonaws.com/";
 
@@ -174,16 +175,16 @@ impl Images {
 }
 
 macro_rules! agg {
-    ($query:expr) => ({
+    ($query:expr) => {{
         $query.select((
-                sql::<BigInt>("count(*) as count"),
-                sql::<Text>(Self::column()),
-            ))
-            .group_by(sql::<Text>(Self::field()))
-            /* Ideally we'd have a .having() here, but it's not implemented yet in Diesel. */
-            .order(sql::<BigInt>("count desc"))
-            .filter(sql::<Text>(Self::null_check()).is_not_null())
-    })
+                    sql::<BigInt>("count(*) as count"),
+                    sql::<Text>(Self::column()),
+                ))
+                .group_by(sql::<Text>(Self::field()))
+                /* Ideally we'd have a .having() here, but it's not implemented yet in Diesel. */
+                .order(sql::<BigInt>("count desc"))
+                .filter(sql::<Text>(Self::null_check()).is_not_null())
+    }};
 }
 
 pub trait Aggregate<T: Queryable<(BigInt, Text), Pg>> {
@@ -281,7 +282,8 @@ where
 #[derive(Serialize, Deserialize)]
 pub struct EntityFilter {
     entity: String,
-    #[serde(skip_serializing_if = "Option::is_none")] entity_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    entity_type: Option<String>,
 }
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Clone)]
@@ -338,12 +340,14 @@ pub struct Ad {
     pub impressions: i32,
     pub political_probability: f64,
     pub targeting: Option<String>,
-    #[serde(skip_serializing)] pub suppressed: bool,
-    pub targets: Option<Value>,
+    #[serde(skip_serializing)]
+    pub suppressed: bool,
+    pub targets: Option<Targeting>,
     pub advertiser: Option<String>,
     pub entities: Option<Value>,
     pub page: Option<String>,
     pub lower_page: Option<String>,
+    pub targetings: Option<Vec<String>>,
 }
 // Define our special functions for searching
 sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
@@ -599,6 +603,7 @@ pub struct NewAd<'a> {
     advertiser: Option<String>,
     page: Option<String>,
     lower_page: Option<String>,
+    targetings: Option<Vec<String>>,
 }
 
 impl<'a> NewAd<'a> {
@@ -631,11 +636,13 @@ impl<'a> NewAd<'a> {
             advertiser: get_advertiser(&ad.targeting, &document),
             page: page.clone(),
             lower_page: page.map(|s| s.to_lowercase()),
+            targetings: ad.targeting.clone().map_or(None, |targ| Some(vec![targ])),
         })
     }
 
     pub fn save(&self, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<Ad> {
         use schema::ads;
+        use schema::ads::columns::*;
         use schema::ads::dsl::*;
         let connection = pool.get()?;
         // increment impressions if this is a background save,
@@ -652,6 +659,7 @@ impl<'a> NewAd<'a> {
             ))
             .get_result(&*connection)?;
 
+        // overwrite the old targeting/targets if the old one was empty.
         if self.targeting.is_some() && !ad.targeting.is_some() {
             diesel::update(ads.find(self.id))
                 .set((
@@ -661,9 +669,44 @@ impl<'a> NewAd<'a> {
                 .execute(&*connection)?;
         };
 
+        if self.targeting.is_some() {
+            let mut empty: Vec<serde_json::Value> = Vec::new();
+
+            // ad.targets is the targets column value for the old, pre-existing ad.
+            let mut old_targets = ad.targets
+                .clone()
+                .map(|targets_json| {
+                    let targets = serde_json::from_value(targets_json).unwrap();
+                    targets.unwrap()
+                })
+                .unwrap_or(&mut empty);
+            // let mut new_targets = get_targets(&ad.targeting)
+            //     .map(|targets_json| {
+            //         let targets = serde_json::to_value(targets_json).unwrap();
+            //         targets.as_array_mut().unwrap()
+            //     })
+            //     .unwrap_or(&mut vec![]);
+            // let all_targets = old_targets; // in place
+            // all_targets.append(new_targets);
+            // all_targets.dedup(); // in place.
+            // diesel::update(ads.find(self.id))
+            //     .set((
+            //         targetings.eq(self.targeting.clone().map_or(None, |targ| Some(vec![targ]))),
+            //         targets.eq(
+            //             serde_json::to_value(ad.targets.clone().map(|targets_json| {
+            //                 let targets = targets_json.as_array_mut().unwrap();
+            //                 targets.unwrap()
+            //             }).unwrap_or(&mut empty)),
+            //     ))
+            //     .execute(&*connection)?;
+        };
+
         Ok(ad)
     }
 }
+
+//            .map(|t| serde_json::to_value(t).unwrap())
+// .ok(),
 
 #[cfg(test)]
 mod tests {
@@ -732,6 +775,7 @@ mod tests {
             entities: None,
             page: None,
             lower_page: None,
+            targetings: vec![],
         };
         let urls = saved_ad.image_urls();
         let images = Images::from_ad(&saved_ad, &urls).unwrap();
