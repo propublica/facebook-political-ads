@@ -342,7 +342,7 @@ pub struct Ad {
     pub targeting: Option<String>,
     #[serde(skip_serializing)]
     pub suppressed: bool,
-    pub targets: Option<Targeting>,
+    pub targets: Option<Value>,
     pub advertiser: Option<String>,
     pub entities: Option<Value>,
     pub page: Option<String>,
@@ -642,7 +642,7 @@ impl<'a> NewAd<'a> {
 
     pub fn save(&self, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<Ad> {
         use schema::ads;
-        use schema::ads::columns::*;
+        use schema::ads::columns::targets;
         use schema::ads::dsl::*;
         let connection = pool.get()?;
         // increment impressions if this is a background save,
@@ -669,36 +669,38 @@ impl<'a> NewAd<'a> {
                 .execute(&*connection)?;
         };
 
-        if self.targeting.is_some() {
-            let mut empty: Vec<serde_json::Value> = Vec::new();
-
-            // ad.targets is the targets column value for the old, pre-existing ad.
-            let mut old_targets = ad.targets
-                .clone()
-                .map(|targets_json| {
-                    let targets = serde_json::from_value(targets_json).unwrap();
-                    targets.unwrap()
-                })
-                .unwrap_or(&mut empty);
-            // let mut new_targets = get_targets(&ad.targeting)
-            //     .map(|targets_json| {
-            //         let targets = serde_json::to_value(targets_json).unwrap();
-            //         targets.as_array_mut().unwrap()
-            //     })
-            //     .unwrap_or(&mut vec![]);
-            // let all_targets = old_targets; // in place
-            // all_targets.append(new_targets);
-            // all_targets.dedup(); // in place.
-            // diesel::update(ads.find(self.id))
-            //     .set((
-            //         targetings.eq(self.targeting.clone().map_or(None, |targ| Some(vec![targ]))),
-            //         targets.eq(
-            //             serde_json::to_value(ad.targets.clone().map(|targets_json| {
-            //                 let targets = targets_json.as_array_mut().unwrap();
-            //                 targets.unwrap()
-            //             }).unwrap_or(&mut empty)),
-            //     ))
-            //     .execute(&*connection)?;
+        if self.targeting.is_some() && ad.targeting.is_some() {
+            diesel::update(ads.find(self.id))
+                .set((
+                    targetings.eq(
+                        self.targeting.clone().map_or(None, |targ| {
+                            let mut tings = vec![targ];
+                            if ad.targeting.is_some() {
+                                tings.push(ad.targeting.clone().unwrap())
+                            }
+                            Some(tings)
+                        })
+                        
+                        ),
+                    targets.eq(
+                        ad.targets.clone().map(|old_targets_json| {
+                            let mut old_targets_val = serde_json::to_value(old_targets_json).unwrap();
+                            let old_targets = old_targets_val.as_array_mut().unwrap();
+                            let new_targets : Vec<Value> = collect_targeting(&self.targeting.clone().unwrap()).unwrap()
+                                .iter().map(|t| serde_json::to_value(t).unwrap()).collect();
+                            let mut all_targets = old_targets.clone();
+                            info!("old: {:?}", old_targets);
+                            info!("new: {:?}", new_targets);
+                            all_targets.extend(&mut new_targets.iter().cloned());
+                            info!("all: {:?}", all_targets);
+                            all_targets.sort_unstable_by(|x, y| x.to_string().cmp(&y.to_string()) );
+                            all_targets.dedup();
+                            info!("deduped: {:?}", all_targets);
+                            serde_json::to_value(all_targets).unwrap()
+                        })
+                    ),
+                ))
+                .execute(&*connection)?;
         };
 
         Ok(ad)
