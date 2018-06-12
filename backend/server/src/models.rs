@@ -686,7 +686,7 @@ impl<'a> NewAd<'a> {
                         ad.targets.clone().map(|old_targets_json| {
                             let mut old_targets_val = serde_json::to_value(old_targets_json).unwrap();
                             let old_targets = old_targets_val.as_array_mut().unwrap();
-                            let new_targets : Vec<Value> = collect_targeting(&self.targeting.clone().unwrap()).unwrap()
+                            let new_targets : Vec<Value> = collect_targeting(&self.targeting.clone().unwrap()).unwrap_or(vec![])
                                 .iter().map(|t| serde_json::to_value(t).unwrap()).collect();
                             let mut all_targets = old_targets.clone();
                             info!("old: {:?}", old_targets);
