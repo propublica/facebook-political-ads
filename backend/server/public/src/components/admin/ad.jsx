@@ -59,6 +59,22 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>impressions</td>
           <td>{ad.impressions}</td>
         </tr>
+
+        {ad.lang == "en-US" ? (
+          <tr>
+            <td>Facebook database link</td>
+            <td>
+              <a
+                href={`https://www.facebook.com/politicalcontentads/?active_status=all&q=${
+                  ad.advertiser
+                }`}
+              >
+                {ad.advertiser}
+              </a>
+            </td>
+          </tr>
+        ) : null}
+
         <tr>
           <td colSpan="2">
             {ad.suppressed ? (
