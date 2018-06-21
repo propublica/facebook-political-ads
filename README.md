@@ -35,6 +35,10 @@ The backend server is a rust application that runs on top of [diesel](https://di
 
     cargo install diesel_cli
     diesel database setup
+    
+You'll also need to clone the [fbpac-api](https://www.github.com/propublica/fbpac-api-public) app and run its migrations, to add a few other columns.
+
+    rake db:migrate
 
 You can kick the tires by running:
 
@@ -50,7 +54,7 @@ This will give a server running at `localhost:8080`. You will also need to build
 
 This will build the required static assets (javascript & css) to view the admin console at `localhost:8080/facebook-ads/`.
 
-If you make any changes to the database, after you run the migration, you'll want to update `the schema with diesel print-schema > src/schema.rs`.
+If you make any changes to the database, after you run the migration, you'll want to update `the schema with diesel print-schema > src/schema.rs`. You'll need to do this even if you make changes via a Rails migration.
 
 The backend has both unit and integration tests. You will need to set up a test database alongside your actual database in order to run the integration tests. To do this, you will need to the same as above, but substitute out the database test URL:
 
