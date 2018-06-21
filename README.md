@@ -82,11 +82,11 @@ To download the seeds for the classifier, you'll need a Facebook app and you'll 
 
 And to build the classifier you'll want to run:
 
-    ./classify build
+    pipenv run ./classify build
 
 To classify the ads you've collected you can run:
 
-    ./classify classify
+    pipenv run ./classify classify
 
 ### Internationalization and Localization
 
