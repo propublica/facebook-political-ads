@@ -1,6 +1,10 @@
 import React from "react";
 import { Filters } from "components/filters.jsx";
 import Pagination from "components/pagination.jsx";
+import FbpacFeltrons from "components/fbpac_feltrons.jsx";
+import SelectorsAndPersonae from "components/selectors_and_personae.jsx";
+import PleaseInstall from "components/please_install.jsx";
+
 import Term from "components/term.jsx";
 import Ad from "components/ad.jsx";
 import { t } from "i18n.js";
@@ -25,6 +29,12 @@ export class AdListUnconnected extends React.Component {
   render() {
     return (
       <div>
+        <FbpacFeltrons />
+
+        <SelectorsAndPersonae />
+
+        <PleaseInstall />
+
         <form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
           <fieldset className="prefabs">
             <legend>{t("search_terms")}</legend>
