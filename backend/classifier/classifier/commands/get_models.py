@@ -2,9 +2,8 @@
 Downloads existing classifiers
 """
 import click
-import boto3
-import botocore
 from classifier.utilities import ( confs )
+from subprocess import call
 
 @click.option("--lang", help="Limit to language")
 @click.command("get_models")
@@ -16,14 +15,5 @@ def get_models(ctx, lang):
     for (directory, conf) in confs(ctx.obj["base"]):
         if lang and conf["language"] != lang:
             continue 
-        model_path = "fbpac-models/{}/classifier.dill".format(conf["language"])
-        s3 = boto3.resource('s3')
-
-        print(model_path)
-        try:
-            s3.Bucket("pp-data").download_file(model_path, "data/{}/classifier.dill".format(conf["language"]))
-        except botocore.exceptions.ClientError as e:
-            if e.response['Error']['Code'] == "404":
-                print("The object does not exist.")
-            else:
-                raise
+        model_path = "data/{}/classifier.dill".format(conf["language"])
+        call(["wget", "-O", model_path, "https://s3.amazonaws.com/pp-data/fbpac-models/{}/classifier.dill".format(conf["language"])])
