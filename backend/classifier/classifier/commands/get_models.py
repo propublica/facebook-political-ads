@@ -16,4 +16,4 @@ def get_models(ctx, lang):
         if lang and conf["language"] != lang:
             continue 
         model_path = "data/{}/classifier.dill".format(conf["language"])
-        call(["wget", "-O", model_path, "https://s3.amazonaws.com/pp-data/fbpac-models/{}/classifier.dill".format(conf["language"])])
+        call(["wget", "-nv", "-O", model_path, "https://s3.amazonaws.com/pp-data/fbpac-models/{}/classifier.dill".format(conf["language"])])
