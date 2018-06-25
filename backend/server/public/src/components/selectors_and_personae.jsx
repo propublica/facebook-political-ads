@@ -21,10 +21,15 @@ const SelectorsAndPersonae = () => (
       </select>.
     </p>
     <div>
-      <p>Or see who is targeting someone like</p>
-      <ul>
-        {["Donald J. Trump", "Barack Obama", "Someoen Else"].map(name => (
-          <li key={name}>
+      <p>Or see who is targeting someone like:</p>
+      <ul className="flexy">
+        {[
+          "Donald J. Trump",
+          "Barack Obama",
+          "Billy Joel",
+          "Warren Buffett"
+        ].map(name => (
+          <li key={name} className="quarter">
             <Persona name={name} />
           </li>
         ))}
