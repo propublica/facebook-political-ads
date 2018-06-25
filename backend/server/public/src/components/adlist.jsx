@@ -9,7 +9,7 @@ import Term from "components/term.jsx";
 import Ad from "components/ad.jsx";
 import { t } from "i18n.js";
 import { connect } from "react-redux";
-import { throttledDispatch, getAds } from "actions.js";
+import { throttledDispatch, getAds, getHomepageSummary } from "actions.js";
 import { withRouter } from "react-router-dom";
 import { deserialize } from "utils.js";
 
@@ -91,6 +91,7 @@ export const AdListUnrouted = connect(
     deserialize: () => {
       deserialize(dispatch, ["en-US", "de-DE"]);
       dispatch(getAds());
+      dispatch(getHomepageSummary());
     }
   })
 )(AdListUnconnected);

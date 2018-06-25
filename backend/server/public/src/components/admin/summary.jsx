@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-import { getSummary, setLang } from "actions.js";
+import { getAdminSummary, setLang } from "actions.js";
 import i18next from "i18next";
 import PropTypes from "prop-types";
 import { Line } from "nivo";
@@ -12,7 +12,7 @@ export class SummaryUnconnected extends React.Component {
     this.props.setLang(
       this.props.lang || params.get("lang") || i18next.language
     );
-    this.props.getSummary();
+    this.props.getAdminSummary();
   }
 
   render() {
@@ -58,7 +58,6 @@ export class SummaryUnconnected extends React.Component {
           }
         ]
         : [];
-    /* I am gonna make it ... */ var this_year = new Date().getFullYear();
     var weekly_total_ads_chart_data =
       this.props.summary && this.props.summary.weekly_political_ratio
         ? [
@@ -244,7 +243,7 @@ const Summary = withRouter(
       lang
     }),
     dispatch => ({
-      getSummary: () => dispatch(getSummary()),
+      getAdminSummary: () => dispatch(getAdminSummary()),
       setLang: lang => dispatch(setLang(lang))
     })
   )(SummaryUnconnected)

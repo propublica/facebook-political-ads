@@ -46,14 +46,27 @@ export const requestingStatesAndDistricts = () => ({
   type: REQUESTING_STATES_AND_DISTRICTS
 });
 
-export const GOT_SUMMARY = "GOT_SUMMARY";
-export const receivedSummary = summary => ({
-  type: GOT_SUMMARY,
+export const GOT_ADMIN_SUMMARY = "GOT_ADMIN_SUMMARY";
+export const receivedAdminSummary = summary => ({
+  type: GOT_ADMIN_SUMMARY,
   summary
 });
 
-export const REQUESTING_SUMMARY = "REQUESTING_SUMMARY";
-export const requestingSummary = () => ({ type: REQUESTING_SUMMARY });
+export const REQUESTING_ADMIN_SUMMARY = "REQUESTING_ADMIN_SUMMARY";
+export const requestingAdminSummary = () => ({
+  type: REQUESTING_ADMIN_SUMMARY
+});
+
+export const GOT_HOMEPAGE_SUMMARY = "GOT_HOMEPAGE_SUMMARY";
+export const receivedHomepageSummary = summary => ({
+  type: GOT_HOMEPAGE_SUMMARY,
+  summary
+});
+
+export const REQUESTING_HOMEPAGE_SUMMARY = "REQUESTING_HOMEPAGE_SUMMARY";
+export const requestingHomepageSummary = () => ({
+  type: REQUESTING_HOMEPAGE_SUMMARY
+});
 
 export const SET_LANG = "set_lang";
 export const setLang = lang => ({
@@ -236,14 +249,14 @@ export const getGroupedAttrs = (
   };
 };
 
-export const getSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
+export const getAdminSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
   let path = `${root_url}/summarize`;
   return (dispatch, getState) => {
     let state = getState();
     if (state.lang) {
       path = path + `?lang=${state.lang}`;
     }
-    dispatch(requestingSummary());
+    dispatch(requestingAdminSummary());
     return (
       fetch(path, {
         method: "GET",
@@ -259,12 +272,28 @@ export const getSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
         })
         // .then(res => res.json())
         .then(resp => {
-          dispatch(receivedSummary(resp));
+          dispatch(receivedAdminSummary(resp));
         })
     );
   };
 };
 
+export const getHomepageSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
+  let path = `${root_url}/homepage_stats`;
+  return dispatch => {
+    // only support English
+    // let state = getState();
+    // if (state.lang) {
+    //   path = path + `?lang=${state.lang}`;
+    // }
+    dispatch(requestingHomepageSummary());
+    return fetch(path)
+      .then(resp => resp.json())
+      .then(resp => {
+        dispatch(receivedHomepageSummary(resp));
+      });
+  };
+};
 export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
   return (dispatch, getState) => {
     let state = getState();

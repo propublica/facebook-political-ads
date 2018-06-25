@@ -16,6 +16,7 @@ import {
   advertisers,
   filters,
   pagination,
+  homepage_stats,
   lang
 } from "reducers.js";
 import { go } from "i18n.js";
@@ -31,7 +32,8 @@ const reducer = enableBatching(
     advertisers,
     filters,
     pagination,
-    lang
+    lang,
+    homepage_stats
   })
 );
 
