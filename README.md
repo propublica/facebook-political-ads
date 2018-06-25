@@ -76,17 +76,19 @@ We train the classifier using python and scikit learn and the source is in `back
     pipenv install
     pipenv shell
 
-To download the seeds for the classifier, you'll need a Facebook app and you'll run the seed command like this.:
+To download the seeds for the classifier, you'll need a Facebook app with the proper permissions and you'll run the seed command like this:
 
     FACEBOOK_APP_ID=whatever FACEBOOK_APP_SECRET=whatever DATABASE_URL=postgres://whatever/facebook_ads ./classify seed en-US`
 
-And to build the classifier you'll want to run:
+Alternatively, you can build the model without seeds, relying instead just on votes in the extension and suppressions in the admin. And to build the classifier you'll want to run:
 
     pipenv run ./classify build
 
 To classify the ads you've collected you can run:
 
     pipenv run ./classify classify
+    
+You can download pre-trained models with `pipenv run ./classify get_models`.
 
 ### Internationalization and Localization
 
