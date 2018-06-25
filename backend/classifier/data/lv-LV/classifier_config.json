@@ -1,5 +1,5 @@
 {
-  "language": "lv_LV",
+  "language": "lv-LV",
   "n_features": 500000,
   "classifier_type": "MultinomialNB"
 }
