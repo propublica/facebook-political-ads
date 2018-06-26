@@ -6,10 +6,10 @@ const SelectorsAndPersonae = () => (
     <p>
       Fill out your infomration to see who is targeting a{" "}
       <select>
-        <option>48 year old</option>
+        <option>48 year old</option>{" "}
       </select>
       <select>
-        <option>male</option>
+        <option>male</option>{" "}
       </select>
       living in{" "}
       <select>
