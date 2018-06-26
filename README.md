@@ -50,7 +50,7 @@ This will give a server running at `localhost:8080`. You will also need to build
 
     cd backend/server/public
     npm install
-    npm run watch
+    NODE_ENV=development npm run watchnpm run watch
 
 This will build the required static assets (javascript & css) to view the admin console at `localhost:8080/facebook-ads/`.
 
