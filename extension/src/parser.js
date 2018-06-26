@@ -566,6 +566,7 @@ export const checkSponsor = node => {
         "Commandité", // fr-CA
         "Sponsorisé", // fr-FR
         "Patrocinado", // pt-BR
+        "Apmaksāta", // lv-LV (cuts off reklāma as part of the thing that gets rid of the U.S. disclaimer)
         "Publicidad" // es
       ].some(sponsor => {
         if (text === sponsor || style === `"${sponsor}"`) return true;
