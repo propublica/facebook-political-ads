@@ -18,8 +18,10 @@ import {
   REQUESTING_RECENT_GROUPED_ATTR,
   CHANGE_POLITICAL_PROBABILITY,
   CLEAR_ALL_FILTERS,
-  REQUESTING_SUMMARY,
-  GOT_SUMMARY,
+  REQUESTING_ADMIN_SUMMARY,
+  GOT_ADMIN_SUMMARY,
+  REQUESTING_HOMEPAGE_SUMMARY,
+  GOT_HOMEPAGE_SUMMARY,
   RECEIVE_STATES_AND_DISTRICTS,
   REQUESTING_STATES_AND_DISTRICTS
 } from "./actions.js";
@@ -94,9 +96,20 @@ export const groupedAttribute = (state = [], action) => {
 
 export const summary = (state = {}, action) => {
   switch (action.type) {
-    case GOT_SUMMARY:
+    case GOT_ADMIN_SUMMARY:
       return action.summary;
-    case REQUESTING_SUMMARY:
+    case REQUESTING_ADMIN_SUMMARY:
+      return null;
+    default:
+      return state;
+  }
+};
+
+export const homepage_stats = (state = {}, action) => {
+  switch (action.type) {
+    case GOT_HOMEPAGE_SUMMARY:
+      return action.summary;
+    case REQUESTING_HOMEPAGE_SUMMARY:
       return null;
     default:
       return state;
@@ -199,7 +212,10 @@ export const districts = makeArrayReducer("districts");
 
 const PER_PAGE = 20;
 const min = state => Math.min(state.page, state.total);
-export const pagination = (state = { page: 0, total: 0, total_ads: 0 }, action) => {
+export const pagination = (
+  state = { page: 0, total: 0, total_ads: 0 },
+  action
+) => {
   switch (action.type) {
     case NEXT_PAGE:
       return { ...state, page: min({ ...state, page: state.page + 1 }) };
