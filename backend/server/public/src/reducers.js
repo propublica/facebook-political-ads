@@ -23,7 +23,10 @@ import {
   REQUESTING_HOMEPAGE_SUMMARY,
   GOT_HOMEPAGE_SUMMARY,
   RECEIVE_STATES_AND_DISTRICTS,
-  REQUESTING_STATES_AND_DISTRICTS
+  REQUESTING_STATES_AND_DISTRICTS,
+  CLEAR_PERSONA,
+  SET_PERSONA,
+  SET_PERSONA_FACET
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -51,6 +54,19 @@ export const search = (state = null, action) => {
   switch (action.type) {
     case NEW_SEARCH:
       return action.value;
+    default:
+      return state;
+  }
+};
+
+export const persona = (state = null, action) => {
+  switch (action.type) {
+    case CLEAR_PERSONA:
+      return null;
+    case SET_PERSONA:
+      return action.value;
+    case SET_PERSONA_FACET:
+      return state.merge(action.value);
     default:
       return state;
   }

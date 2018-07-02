@@ -80,6 +80,22 @@ export const newSearch = query => ({
   value: query
 });
 
+export const CLEAR_PERSONA = "clear_persona";
+export const clearPersona = () => ({
+  type: CLEAR_PERSONA
+});
+export const SET_PERSONA = "set_persona";
+export const setPersona = persona => ({
+  type: SET_PERSONA,
+  value: persona
+});
+
+export const SET_PERSONA_FACET = "set_persona_facet";
+export const setPersonaFacet = (facet_key, facet_val) => ({
+  type: SET_PERSONA_FACET,
+  value: { [facet_key]: facet_val }
+});
+
 const asyncResetPage = action => {
   return (dispatch, getState) => {
     dispatch(setPage(0));
@@ -320,6 +336,58 @@ export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
             newEntities(ads.entities),
             newAdvertisers(ads.advertisers),
             newTargets(ads.targets),
+            setTotal(ads.total),
+            setPage(parseInt(params.get("page"), 0) || 0)
+          )
+        );
+      });
+  };
+};
+
+export const getAdsByBucket = (url = `${URL_ROOT}/fbpac-api/ads/persona`) => {
+  return (dispatch, getState) => {
+    let state = getState();
+    let params = new URLSearchParams();
+    if (state.persona) {
+      if (state.persona.age) {
+        params.set("age_bucket", state.persona.age);
+      }
+      if (state.persona.location) {
+        params.set("location_bucket", state.persona.location);
+      }
+      if (state.persona.politics) {
+        params.set("politics_bucket", state.persona.politics);
+      }
+      if (state.persona.gender) {
+        params.set("gender", state.persona.gender);
+      }
+    }
+
+    let path = `${url}?${params.toString()}`;
+
+    // TODO: construct a querystring from the bucket params and from
+    let query = params.toString().length > 0 ? `?${params.toString()}` : "";
+    let new_url = `${location.pathname}${query}`;
+
+    if (location.search !== query) {
+      // this history.push is just for when the state got changed  via dropdowns/searches
+      // and then we got ads back
+      // and then we changed the URL to match
+      // we skip the history.push if location.search === query
+      // which is true when we got here via a <Link>
+      // mutating history OUTSIDE of react-router gets things very confused and you end up with dumb URLs.
+      history.push({ search: query }, "", new_url);
+    }
+    return fetch(path, { method: "GET" })
+      .then(res => res.json())
+      .then(ads => {
+        dispatch(
+          batch(
+            newAds(ads.ads),
+            // TODO do we want this?
+            // newEntities(ads.entities),
+            // newAdvertisers(ads.advertisers),
+            // newTargets(ads.targets),
             setTotal(ads.total),
             setPage(parseInt(params.get("page"), 0) || 0)
           )
