@@ -2,7 +2,6 @@ use chrono::offset::Utc;
 use chrono::DateTime;
 use diesel;
 use diesel::dsl::sql;
-use diesel::pg::types::sql_types::Array;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
@@ -75,6 +74,25 @@ pub fn get_message(document: &kuchiki::NodeRef) -> Result<String> {
         .nth(0)
         .ok_or_else(|| "Couldn't find message.".into())
 }
+
+pub fn get_paid_for_by(document: &kuchiki::NodeRef) -> Option<String> {
+    document_select(document, "._5pcq ._3nlk").ok()
+        .and_then(|mut elems| 
+            elems.nth(1).and_then(
+                |elem| Some(String::new() + &elem.as_node().text_contents().to_string())
+            )
+        ) 
+}
+
+// pub fn get_paid_for_by(document: &kuchiki::NodeRef) -> Result<String> {
+//     document_select(document, "._5pcq ._3nlk")
+//         .and_then(|mut elems| 
+//             elems.nth(1).ok_or_else(|| "can't find Paid for by".into())
+//         .and_then(
+//                 |elem| Ok(String::new() + &elem.as_node().text_contents().to_string())
+//             )
+//         ) 
+// }
 
 // Only available in timeline ads
 pub fn get_author_link(
@@ -347,6 +365,7 @@ pub struct Ad {
     pub entities: Option<Value>,
     pub page: Option<String>,
     pub lower_page: Option<String>,
+    pub paid_for_by: Option<String>,
     pub targetings: Option<Vec<String>>,
 }
 // Define our special functions for searching
@@ -603,6 +622,7 @@ pub struct NewAd<'a> {
     advertiser: Option<String>,
     page: Option<String>,
     lower_page: Option<String>,
+    paid_for_by: Option<String>,
     targetings: Option<Vec<String>>,
 }
 
@@ -614,6 +634,7 @@ impl<'a> NewAd<'a> {
         let images = get_images(&document)?;
         let message = get_message(&document)?;
         let title = get_title(&document)?;
+        let paid_for_by = get_paid_for_by(&document);
         let page = get_author_link(&document)
             .ok()
             .and_then(|l| l.attributes.borrow().get("href").map(|i| i.to_string()));
@@ -636,6 +657,7 @@ impl<'a> NewAd<'a> {
             advertiser: get_advertiser(&ad.targeting, &document),
             page: page.clone(),
             lower_page: page.map(|s| s.to_lowercase()),
+            paid_for_by: paid_for_by,
             targetings: ad.targeting.clone().map_or(None, |targ| Some(vec![targ])),
         })
     }
@@ -689,13 +711,9 @@ impl<'a> NewAd<'a> {
                             let new_targets : Vec<Value> = collect_targeting(&self.targeting.clone().unwrap()).unwrap_or(vec![])
                                 .iter().map(|t| serde_json::to_value(t).unwrap()).collect();
                             let mut all_targets = old_targets.clone();
-                            info!("old: {:?}", old_targets);
-                            info!("new: {:?}", new_targets);
                             all_targets.extend(&mut new_targets.iter().cloned());
-                            info!("all: {:?}", all_targets);
                             all_targets.sort_unstable_by(|x, y| x.to_string().cmp(&y.to_string()) );
                             all_targets.dedup();
-                            info!("deduped: {:?}", all_targets);
                             serde_json::to_value(all_targets).unwrap()
                         })
                     ),
@@ -777,6 +795,7 @@ mod tests {
             entities: None,
             page: None,
             lower_page: None,
+            paid_for_by: None,
             targetings: vec![],
         };
         let urls = saved_ad.image_urls();
