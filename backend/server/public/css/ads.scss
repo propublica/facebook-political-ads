@@ -104,6 +104,16 @@
 
 /* NEWS FEED ADS */
 
+#ads {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ad {
+  margin: 0 30px;
+}
+
 ._5pb8._1yz2._8o._8s.lfloat._ohe,
 ._38vo {
   // Profile pic wrapper
@@ -148,7 +158,7 @@
   display: none;
 }
 ._5z3s .img { // pixel. _m54 _5z3s _1jto _3htz
-  display: none !important; 
+  display: none !important;
 }
 ._27vv {
   display: none;

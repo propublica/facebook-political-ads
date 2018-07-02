@@ -10,6 +10,7 @@ const SelectorsAndPersonae = () => (
       </select>
       <select>
         <option>male</option>{" "}
+        <option>female</option>{" "}
       </select>
       living in{" "}
       <select>
@@ -18,6 +19,8 @@ const SelectorsAndPersonae = () => (
       and who is{" "}
       <select>
         <option>conservative</option>
+        <option>liberal</option>
+        <option>moderate</option>
       </select>.
     </p>
     <div>
