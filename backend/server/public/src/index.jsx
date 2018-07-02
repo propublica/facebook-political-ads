@@ -17,7 +17,8 @@ import {
   filters,
   pagination,
   homepage_stats,
-  lang
+  lang,
+  persona
 } from "reducers.js";
 import { go } from "i18n.js";
 import { enableBatching } from "reducers.js";
@@ -33,7 +34,8 @@ const reducer = enableBatching(
     filters,
     pagination,
     lang,
-    homepage_stats
+    homepage_stats,
+    persona
   })
 );
 

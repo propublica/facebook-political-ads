@@ -209,15 +209,18 @@ article {
   display: flex;
 
   .third {
-    width: calc(33% - 0.5em);
+    width: 33.3%;
+    padding: 0.25em;
   }
 
   .quarter {
-    width: calc(25% - 0.5em);
+    width: 25%;
+    padding: 0.25em;
   }
   
   .half {
-    width: calc(50% - 0.5em);
+    width: 50%;
+    padding: 0.25em;
   }
 }
 
