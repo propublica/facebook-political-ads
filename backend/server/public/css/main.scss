@@ -209,15 +209,23 @@ article {
   display: flex;
 
   .third {
-    width: 33.3%;
-    padding: 0.25em;
+    // width: 33.3%;
+    padding: 0.25em 0.9em;
+    font-family: "Graphik", sans-serif;
+    font-weight: 600;
+    border-right: solid 1px;
+    text-align: center;
+  }
+
+  .third:last-child {
+    border: none;
   }
 
   .quarter {
     width: 25%;
     padding: 0.25em;
   }
-  
+
   .half {
     width: 50%;
     padding: 0.25em;
@@ -227,8 +235,8 @@ article {
 .feltrons {
   margin: 2em auto;
   padding: 1em;
-  background-color: #eee;
-  border-radius: 5px;
+  background-color: #F2F2F2;
+  // border-radius: 5px;
   width: 100%;
 
   @include breakpoint-min(lg) {
@@ -241,12 +249,21 @@ article {
 
   p {
     font-size: 0.7em;
-    color: #999;
+    // color: #999;
+    font-weight: normal;
   }
+}
+
+#graphic select {
+  background-color: #CCE8F8;
+font-size: .8em;
 }
 
 .selectorsAndPersonae {
   margin: 1em 0;
+  font-family: "Graphik", sans-serif;
+  text-align: center;
+  font-size: 1.2em;
 }
 
 // -----------------------------------------------------------------------------

@@ -6,20 +6,20 @@ import { getAdsByBucket, setPersonaFacet } from "actions.js";
 const SelectorsAndPersonae = ({ getAdsByBucket, setPersonaFacet, persona }) => (
   <div className="selectorsAndPersonae">
     <p>
-      Fill out your information to see who is targeting a{" "}
+      Fill out your information to see who is targeting {" "}
+    </p>
+    <p>
+      {" "} a {" "}
       <select>
         <option>48 year old</option>{" "}
-        {/* when persona changes, shoudl change these dropdowns */}
+        {/* when persona changes, should change these dropdowns */}
       </select>{" "}
       <select>
-<<<<<<< HEAD
         <option>male</option>{" "}
         <option>female</option>{" "}
-      </select>
-=======
-        <option>male</option>
       </select>{" "}
->>>>>>> b527a0fbc1f6e1a918e0bf9d2407cfaf0fbb23bf
+    </p>
+    <p>  
       living in{" "}
       <select>
         <option>Ohio</option>
