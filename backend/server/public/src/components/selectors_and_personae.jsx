@@ -1,29 +1,63 @@
 import React from "react";
 import Persona from "components/persona.jsx";
 import { connect } from "react-redux";
-import { getAdsByBucket, setPersonaFacet } from "actions.js";
+import { getAds, setPersonaFacet } from "actions.js";
 
-const SelectorsAndPersonae = ({ getAdsByBucket, setPersonaFacet, persona }) => (
+const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
   <div className="selectorsAndPersonae">
     <p>
       Fill out your information to see who is targeting a{" "}
-      <select>
-        <option>48 year old</option>{" "}
+      <select
+        value={persona === null ? "" : persona.age}
+        onChange={event => {
+          setPersonaFacet("age", event.target.value);
+          getAds();
+          }}
+      >
+        <option>college-age</option>
+        <option>young adult</option>
+        <option>thirty-something</option>
+        <option>middle-aged</option>
+        <option>in their fifties</option>
+        <option>golden years</option>
         {/* when persona changes, shoudl change these dropdowns */}
       </select>{" "}
-      <select>
+      <select
+        value={persona === null ? "" : persona.gender}
+        onChange={event => {
+          setPersonaFacet("gender", event.target.value);
+          getAds();
+          }}
+      >
+        <option>female</option>
         <option>male</option>
+        <option>person</option>
       </select>{" "}
       living in{" "}
-      <select>
+      <select
+        value={persona === null ? "" : persona.location}
+        onChange={event => {
+          setPersonaFacet("location", event.target.value);
+          getAds();
+          }}
+      >
         <option>Ohio</option>
         <option>Long Island, NY</option>
         <option>big city</option>
         <option>suburbs</option>
+        <option>rural America</option>
       </select>{" "}
       and who is{" "}
-      <select>
+      <select
+        value={persona === null ? "" : persona.politics}
+        onChange={event => {
+          setPersonaFacet("politics", event.target.value);
+          getAds();
+          }}
+      >
         <option>conservative</option>
+        <option>liberal</option>
+        <option>apolitical</option>
       </select>.
     </p>
     <div>
@@ -58,7 +92,7 @@ const SelectorsAndPersonae = ({ getAdsByBucket, setPersonaFacet, persona }) => (
               cities: "Long Island",
               state: "NY"
             },
-            name: 'William "Billy" Joel'
+            name: "William \"Billy\" Joel"
           },
           {
             age: "28",
@@ -82,7 +116,7 @@ const SelectorsAndPersonae = ({ getAdsByBucket, setPersonaFacet, persona }) => (
 export default connect(
   ({ persona }) => ({ persona }),
   dispatch => ({
-    getAdsByBucket: () => dispatch(getAdsByBucket()),
+    getAds: () => dispatch(getAds()),
     setPersonaFacet: (facet_key, facet_val) =>
       dispatch(setPersonaFacet(facet_key, facet_val))
   })
