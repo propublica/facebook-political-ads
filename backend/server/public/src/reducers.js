@@ -66,7 +66,7 @@ export const persona = (state = null, action) => {
     case SET_PERSONA:
       return action.value;
     case SET_PERSONA_FACET:
-      return state.merge(action.value);
+      return state ? { ...state, ...action.value } : action.value;
     default:
       return state;
   }
@@ -172,16 +172,16 @@ const makeObjectReducer = (plural, singular) => {
           );
           return singular !== "target" || !oldFilter
             ? {
-              ...filter,
-              key: filter[singular],
-              active: lookup.has(filter[singular])
-            }
+                ...filter,
+                key: filter[singular],
+                active: lookup.has(filter[singular])
+              }
             : {
-              ...filter,
-              key: filter[singular],
-              active: lookup.has(filter[singular]),
-              segment: oldFilter.segment
-            };
+                ...filter,
+                key: filter[singular],
+                active: lookup.has(filter[singular]),
+                segment: oldFilter.segment
+              };
         });
       }
       case `filter_${singular}`:
