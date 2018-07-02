@@ -80,6 +80,22 @@ export const newSearch = query => ({
   value: query
 });
 
+export const CLEAR_PERSONA = "clear_persona";
+export const clearPersona = () => ({
+  type: CLEAR_PERSONA
+});
+export const SET_PERSONA = "set_persona";
+export const setPersona = persona => ({
+  type: SET_PERSONA,
+  value: persona
+});
+
+export const SET_PERSONA_FACET = "set_persona_facet";
+export const setPersonaFacet = (facet_key, facet_val) => ({
+  type: SET_PERSONA_FACET,
+  value: { [facet_key]: facet_val }
+});
+
 const asyncResetPage = action => {
   return (dispatch, getState) => {
     dispatch(setPage(0));
@@ -297,7 +313,30 @@ export const getHomepageSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
 export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
   return (dispatch, getState) => {
     let state = getState();
-    const params = serialize(state);
+
+    let params = new URLSearchParams();
+    if (state.persona) {
+      /* this fork here is the equivalent of serialize() in utils.js */
+      url = `${URL_ROOT}/fbpac-api/ads/persona`;
+      if (state.persona.age) {
+        params.set("age_bucket", state.persona.age);
+      }
+      if (state.persona.location) {
+        params.set("location_bucket", state.persona.location);
+      }
+      if (state.persona.politics) {
+        params.set("politics_bucket", state.persona.politics);
+      }
+      if (state.persona.gender) {
+        params.set("gender", state.persona.gender);
+      }
+      if (state.pagination && state.pagination.page) {
+        params.set("page", state.pagination.page);
+      }
+    } else {
+      params = serialize(state);
+    }
+
     let path = `${url}?${params.toString()}`;
 
     let query = params.toString().length > 0 ? `?${params.toString()}` : "";
@@ -314,16 +353,29 @@ export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
     return fetch(path, { method: "GET", credentials: "include" })
       .then(res => res.json())
       .then(ads => {
-        dispatch(
-          batch(
-            newAds(ads.ads),
-            newEntities(ads.entities),
-            newAdvertisers(ads.advertisers),
-            newTargets(ads.targets),
-            setTotal(ads.total),
-            setPage(parseInt(params.get("page"), 0) || 0)
-          )
-        );
+        if (state.persona) {
+          dispatch(
+            batch(
+              newAds(ads.ads),
+              // newEntities(ads.entities),
+              // newAdvertisers(ads.advertisers),
+              // newTargets(ads.targets),
+              setTotal(ads.total),
+              setPage(parseInt(params.get("page"), 0) || 0)
+            )
+          );
+        } else {
+          dispatch(
+            batch(
+              newAds(ads.ads),
+              newEntities(ads.entities),
+              newAdvertisers(ads.advertisers),
+              newTargets(ads.targets),
+              setTotal(ads.total),
+              setPage(parseInt(params.get("page"), 0) || 0)
+            )
+          );
+        }
       });
   };
 };
