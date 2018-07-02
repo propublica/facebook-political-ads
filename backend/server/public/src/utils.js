@@ -18,7 +18,8 @@ import {
   filterParty,
   newDistricts,
   filterDistrict,
-  changePoliticalProbability
+  changePoliticalProbability,
+  setPersona
 } from "actions.js";
 
 const headers = lang => Object.assign({}, language(lang));
@@ -105,7 +106,14 @@ const deserialize = (dispatch, allowedLangs) => {
   const actions = [];
   if (params.has("search")) {
     actions.push(newSearch(params.get("search")));
-  } else {
+  } else if (
+    !(
+      params.has("age_bucket") ||
+      params.has("location_bucket") ||
+      params.has("politics_bucket") ||
+      params.has("gender")
+    )
+  ) {
     actions.push(newSearch(null)); // this resets the search in `state` if you click on a link from the Tools grouping pages.
   }
 
@@ -171,6 +179,32 @@ const deserialize = (dispatch, allowedLangs) => {
     targeting.map(it => {
       actions.push(filterDistrict(it));
     });
+  }
+
+  // {
+  //   age: "65 or older",
+  //   gender: "men",
+  //   politics: "conservative",
+  //   location: {
+  //     city: "Washington",
+  //     state: "DC" // okay okay it's not a state, geez.
+  //   },
+  // },
+
+  if (
+    params.has("age_bucket") ||
+    params.has("location_bucket") ||
+    params.has("politics_bucket") ||
+    params.has("gender")
+  ) {
+    const persona = {};
+    if (params.has("gender")) persona["gender"] = params.get("gender");
+    if (params.has("politics_bucket"))
+      persona["politics"] = params.get("politics_bucket");
+    if (params.has("location_bucket"))
+      persona["location"] = params.get("location_bucket"); // TODO: you can't put an Object in a URL!
+    if (params.has("age_bucket")) persona["age"] = params.get("age_bucket");
+    actions.push(setPersona(persona));
   }
 
   if (actions.length === 0) {

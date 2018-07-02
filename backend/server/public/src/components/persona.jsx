@@ -1,13 +1,13 @@
 import React from "react";
-import { getAdsByBucket, setPersona } from "actions.js";
+import { getAds, setPersona } from "actions.js";
 import { connect } from "react-redux";
 
-const Persona = ({ persona, setPersona, getAdsByBucket }) => (
+const Persona = ({ persona, setPersona, getAds }) => (
   <div
     className="persona"
     onClick={() => {
       setPersona(persona);
-      getAdsByBucket();
+      getAds();
     }}
   >
     :)<br />
@@ -18,7 +18,7 @@ const Persona = ({ persona, setPersona, getAdsByBucket }) => (
 export default connect(
   () => ({}),
   dispatch => ({
-    getAdsByBucket: () => dispatch(getAdsByBucket()),
+    getAds: () => dispatch(getAds()),
     setPersona: persona => dispatch(setPersona(persona))
   })
 )(Persona);

@@ -313,7 +313,30 @@ export const getHomepageSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
 export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
   return (dispatch, getState) => {
     let state = getState();
-    const params = serialize(state);
+
+    let params = new URLSearchParams();
+    if (state.persona) {
+      /* this fork here is the equivalent of serialize() in utils.js */
+      url = `${URL_ROOT}/fbpac-api/ads/persona`;
+      if (state.persona.age) {
+        params.set("age_bucket", state.persona.age);
+      }
+      if (state.persona.location) {
+        params.set("location_bucket", state.persona.location);
+      }
+      if (state.persona.politics) {
+        params.set("politics_bucket", state.persona.politics);
+      }
+      if (state.persona.gender) {
+        params.set("gender", state.persona.gender);
+      }
+      if (state.pagination && state.pagination.page) {
+        params.set("page", state.pagination.page);
+      }
+    } else {
+      params = serialize(state);
+    }
+
     let path = `${url}?${params.toString()}`;
 
     let query = params.toString().length > 0 ? `?${params.toString()}` : "";
@@ -330,68 +353,29 @@ export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
     return fetch(path, { method: "GET", credentials: "include" })
       .then(res => res.json())
       .then(ads => {
-        dispatch(
-          batch(
-            newAds(ads.ads),
-            newEntities(ads.entities),
-            newAdvertisers(ads.advertisers),
-            newTargets(ads.targets),
-            setTotal(ads.total),
-            setPage(parseInt(params.get("page"), 0) || 0)
-          )
-        );
-      });
-  };
-};
-
-export const getAdsByBucket = (url = `${URL_ROOT}/fbpac-api/ads/persona`) => {
-  return (dispatch, getState) => {
-    let state = getState();
-    let params = new URLSearchParams();
-    if (state.persona) {
-      if (state.persona.age) {
-        params.set("age_bucket", state.persona.age);
-      }
-      if (state.persona.location) {
-        params.set("location_bucket", state.persona.location);
-      }
-      if (state.persona.politics) {
-        params.set("politics_bucket", state.persona.politics);
-      }
-      if (state.persona.gender) {
-        params.set("gender", state.persona.gender);
-      }
-    }
-
-    let path = `${url}?${params.toString()}`;
-
-    // TODO: construct a querystring from the bucket params and from
-    let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-    let new_url = `${location.pathname}${query}`;
-
-    if (location.search !== query) {
-      // this history.push is just for when the state got changed  via dropdowns/searches
-      // and then we got ads back
-      // and then we changed the URL to match
-      // we skip the history.push if location.search === query
-      // which is true when we got here via a <Link>
-      // mutating history OUTSIDE of react-router gets things very confused and you end up with dumb URLs.
-      history.push({ search: query }, "", new_url);
-    }
-    return fetch(path, { method: "GET" })
-      .then(res => res.json())
-      .then(ads => {
-        dispatch(
-          batch(
-            newAds(ads.ads),
-            // TODO do we want this?
-            // newEntities(ads.entities),
-            // newAdvertisers(ads.advertisers),
-            // newTargets(ads.targets),
-            setTotal(ads.total),
-            setPage(parseInt(params.get("page"), 0) || 0)
-          )
-        );
+        if (state.persona) {
+          dispatch(
+            batch(
+              newAds(ads.ads),
+              // newEntities(ads.entities),
+              // newAdvertisers(ads.advertisers),
+              // newTargets(ads.targets),
+              setTotal(ads.total),
+              setPage(parseInt(params.get("page"), 0) || 0)
+            )
+          );
+        } else {
+          dispatch(
+            batch(
+              newAds(ads.ads),
+              newEntities(ads.entities),
+              newAdvertisers(ads.advertisers),
+              newTargets(ads.targets),
+              setTotal(ads.total),
+              setPage(parseInt(params.get("page"), 0) || 0)
+            )
+          );
+        }
       });
   };
 };
