@@ -130,11 +130,11 @@ article {
 .hed {
   font-size: $scale-9;
   font-weight: bold;
-  line-height: 1.2;
+  line-height: 1.3;
 
   @include breakpoint-min(md) {
     font-size: $scale-10;
-    line-height: 1;
+    line-height: 1.2;
   }
 
   @include breakpoint-min(lg) {
