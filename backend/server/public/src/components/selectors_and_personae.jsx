@@ -34,7 +34,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         <option>person</option>
       </select>{" "}
     </p>
-    <p>  
+    <p>
       living in{" "}
       <select
         value={persona === null ? "" : persona.location}
@@ -59,11 +59,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
       >
         <option>conservative</option>
         <option>liberal</option>
-<<<<<<< HEAD
-        <option>moderate</option>
-=======
         <option>apolitical</option>
->>>>>>> b9fb7e5bf18d3cd83cdef6e0ef4cebbacc7d0624
       </select>.
     </p>
     <div>
