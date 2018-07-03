@@ -259,6 +259,10 @@ article {
 font-size: .8em;
 }
 
+#race-selector:focus {
+  background-color: red;
+}
+
 .selectorsAndPersonae {
   margin: 1em 0;
   font-family: "Graphik", sans-serif;

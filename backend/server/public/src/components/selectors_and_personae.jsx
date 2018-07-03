@@ -6,7 +6,7 @@ import { getAds, setPersonaFacet } from "actions.js";
 const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
   <div className="selectorsAndPersonae">
     <p>
-      Fill out your information to see who is targeting a{" "}
+      Fill out your information to see who is targeting a person who is{" "}
       <select
         value={persona === null ? "" : persona.age}
         onChange={event => {
@@ -22,6 +22,18 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         <option>golden years</option>
         {/* when persona changes, shoudl change these dropdowns */}
       </select>{" "}
+
+      {/*,{" "} <div id="race-selector">
+        <span>any race</span>
+        <div id="race-info">
+          <p>We don't let you choose race but wanted to highlight that we don't let you choose it.</p>
+        </div>
+      </div>
+
+      <select id="race-selector">
+        <option>any race</option>
+        <option>We don't let you choose race but wanted to highlight that we don't let you choose it.</option>
+      </select>*/}
       <select
         value={persona === null ? "" : persona.gender}
         onChange={event => {
