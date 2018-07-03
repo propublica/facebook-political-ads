@@ -26,7 +26,7 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
       </div>
     </div>
     <div className="third political-ratio">
-      <h3>How Many Are Political?</h3>
+      <h3>More Political Ads?</h3>
       <PoliticalRatioChart
         weekly_political_ratio={
           homepage_stats && homepage_stats.weekly_political_ratio

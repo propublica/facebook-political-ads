@@ -7,18 +7,18 @@ export default class PoliticalRatioChart extends React.Component {
     /* I am gonna make it ... */ var this_year = new Date().getFullYear();
     var weekly_ratio_chart_data = this.props.weekly_political_ratio
       ? [
-        {
-          id: "weekly",
-          data: this.props.weekly_political_ratio.map(a => ({
-            x: new Date(this_year, 0, 1 + (a[0] - 1) * 7)
-              .toISOString()
-              .slice(5, 10)
-              .replace("-", "/")
-                .replace(/^0/, ""),
-            y: a[1]
-          }))
-        }
-      ]
+          {
+            id: "weekly",
+            data: this.props.weekly_political_ratio.map(a => ({
+              x: new Date(this_year, 0, 1 + (a[0] - 1) * 7)
+                .toISOString()
+                .slice(5, 10)
+                .replace("-", "/")
+              .replace(/^0/, ""),
+              y: a[1]
+            }))
+          }
+        ]
       : [];
 
     var margins = { left: 10, right: 10, top: 20, bottom: 30 };
@@ -34,6 +34,7 @@ export default class PoliticalRatioChart extends React.Component {
         colors={["#217ce3"]}
         enableGridX={false}
         enableGridY={false}
+        enableDots={false}
         theme={{
           axis: {
             fontSize: "9px"
