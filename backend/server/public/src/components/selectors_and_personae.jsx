@@ -7,27 +7,21 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
   <div className="selectorsAndPersonae">
     <p>
       Fill out your information to see who is targeting a{" "}
-      <select
+      <input
+        type="number"
         value={persona === null ? "" : persona.age}
         onChange={event => {
           setPersonaFacet("age", event.target.value);
           getAds();
-          }}
-      >
-        <option>college-age</option>
-        <option>young adult</option>
-        <option>thirty-something</option>
-        <option>middle-aged</option>
-        <option>in their fifties</option>
-        <option>golden years</option>
-        {/* when persona changes, shoudl change these dropdowns */}
-      </select>{" "}
+        }}
+      />{" "}
+      year old{" "}
       <select
         value={persona === null ? "" : persona.gender}
         onChange={event => {
           setPersonaFacet("gender", event.target.value);
           getAds();
-          }}
+        }}
       >
         <option>female</option>
         <option>male</option>
@@ -41,7 +35,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         onChange={event => {
           setPersonaFacet("location", event.target.value);
           getAds();
-          }}
+        }}
       >
         <option>Ohio</option>
         <option>Long Island, NY</option>
@@ -55,7 +49,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         onChange={event => {
           setPersonaFacet("politics", event.target.value);
           getAds();
-          }}
+        }}
       >
         <option>conservative</option>
         <option>liberal</option>
@@ -94,7 +88,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
               cities: "Long Island",
               state: "NY"
             },
-            name: "William \"Billy\" Joel"
+            name: 'William "Billy" Joel'
           },
           {
             age: "28",
