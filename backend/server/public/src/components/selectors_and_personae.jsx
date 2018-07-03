@@ -108,7 +108,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         {[
           {
             age: "65 or older",
-            gender: "men",
+            gender: "male",
             politics: "conservative",
             location: {
               city: "Washington",
@@ -118,7 +118,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
           },
           {
             age: "56",
-            gender: "men",
+            gender: "male",
             politics: "liberal",
             location: {
               city: "Washington",
@@ -128,19 +128,20 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
           },
           {
             age: "69",
-            gender: "men",
+            gender: "male",
             politics: "apolitical",
             location: {
-              cities: "Long Island",
+              city: "Long Island",
               state: "NY"
             },
             name: "William \"Billy\" Joel"
           },
           {
             age: "28",
-            gender: "women",
+            gender: "female",
             politics: "apolitical",
             location: {
+              city: "Nashville",
               state: "TN"
             },
             name: "Taylor Swift"
