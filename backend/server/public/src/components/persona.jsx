@@ -12,6 +12,12 @@ const Persona = ({ persona, setPersona, getAds }) => (
   >
     :)<br />
     {persona.name}
+    <div className="persona-info">
+      <p>Age: <span class="trait-category">{persona.age}</span></p>
+      <p>Gender: <span class="trait-category">{persona.gender}</span></p>
+      <p>Location: <span class="trait-category">{persona.location.city + ", " + persona.location.state}</span></p>
+      <p>Politics: <span class="trait-category">{persona.politics}</span></p>
+    </div>
   </div>
 );
 
