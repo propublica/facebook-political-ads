@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
+import PoliticalRatioChart from "components/political_ratio_chart.jsx";
 
 const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
   <div className="feltrons flexy">
@@ -24,14 +25,13 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
         </div>
       </div>
     </div>
-    <div className="third">
-      <h3>How many are political?</h3>
-      <span className="feltron">
-        ~{homepage_stats && homepage_stats.political_ads_ratio
-          ? (homepage_stats.political_ads_ratio * 100).toString().split(".")[0]
-          : "--"}%
-      </span>
-      <p>of U.S. Facebook ads collected this week</p>
+    <div className="third political-ratio">
+      <h3>How Many Are Political?</h3>
+      <PoliticalRatioChart
+        weekly_political_ratio={
+          homepage_stats ? homepage_stats.weekly_political_ratio : null
+        }
+      />
     </div>
     <div className="third">
       <h3>Contributors</h3>

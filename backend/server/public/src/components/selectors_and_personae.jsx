@@ -9,7 +9,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
       Fill out your information to see who is targeting a{" "}
       <input
         type="number"
-        value={persona === null ? "" : persona.age}
+        value={persona === null ? 28 : persona.age}
         onChange={event => {
           setPersonaFacet("age", event.target.value);
           getAds();
