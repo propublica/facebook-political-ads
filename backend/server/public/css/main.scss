@@ -254,7 +254,10 @@ article {
   }
 }
 
-#graphic select {
+#graphic input[type="number"] {
+  width: 3em;
+}
+#graphic select, #graphic input {
   background-color: #CCE8F8;
 font-size: .8em;
 }

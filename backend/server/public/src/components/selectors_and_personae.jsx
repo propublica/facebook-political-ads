@@ -6,40 +6,22 @@ import { getAds, setPersonaFacet } from "actions.js";
 const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
   <div className="selectorsAndPersonae">
     <p>
-      Fill out your information to see who is targeting a person who is{" "}
-      <select
+      Fill out your information to see who is targeting a{" "}
+      <input
+        type="number"
         value={persona === null ? "" : persona.age}
         onChange={event => {
           setPersonaFacet("age", event.target.value);
           getAds();
-          }}
-      >
-        <option>college-age</option>
-        <option>young adult</option>
-        <option>thirty-something</option>
-        <option>middle-aged</option>
-        <option>in their fifties</option>
-        <option>golden years</option>
-        {/* when persona changes, shoudl change these dropdowns */}
-      </select>{" "}
-
-      {/*,{" "} <div id="race-selector">
-        <span>any race</span>
-        <div id="race-info">
-          <p>We don't let you choose race but wanted to highlight that we don't let you choose it.</p>
-        </div>
-      </div>
-
-      <select id="race-selector">
-        <option>any race</option>
-        <option>We don't let you choose race but wanted to highlight that we don't let you choose it.</option>
-      </select>*/}
+        }}
+      />{" "}
+      year old{" "}
       <select
         value={persona === null ? "" : persona.gender}
         onChange={event => {
           setPersonaFacet("gender", event.target.value);
           getAds();
-          }}
+        }}
       >
         <option>female</option>
         <option>male</option>
@@ -53,13 +35,59 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         onChange={event => {
           setPersonaFacet("location", event.target.value);
           getAds();
-          }}
+        }}
       >
         <option>Ohio</option>
-        <option>Long Island, NY</option>
-        <option>big city</option>
-        <option>suburbs</option>
-        <option>rural America</option>
+        <option>Alabama</option>
+        <option>Alaska</option>
+        <option>Arizona</option>
+        <option>Arkansas</option>
+        <option>California</option>
+        <option>Colorado</option>
+        <option>Connecticut</option>
+        <option>Delaware</option>
+        <option>Florida</option>
+        <option>Georgia</option>
+        <option>Hawaii</option>
+        <option>Idaho</option>
+        <option>Illinois</option>
+        <option>Indiana</option>
+        <option>Iowa</option>
+        <option>Kansas</option>
+        <option>Kentucky</option>
+        <option>Louisiana</option>
+        <option>Maine</option>
+        <option>Maryland</option>
+        <option>Massachusetts</option>
+        <option>Michigan</option>
+        <option>Minnesota</option>
+        <option>Mississippi</option>
+        <option>Missouri</option>
+        <option>Montana</option>
+        <option>Nebraska</option>
+        <option>Nevada</option>
+        <option>New Hampshire</option>
+        <option>New Jersey</option>
+        <option>New Mexico</option>
+        <option>New York</option>
+        <option>North Carolina</option>
+        <option>North Dakota</option>
+        <option>Ohio</option>
+        <option>Oklahoma</option>
+        <option>Oregon</option>
+        <option>Pennsylvania</option>
+        <option>Rhode Island</option>
+        <option>South Carolina</option>
+        <option>South Dakota</option>
+        <option>Tennessee</option>
+        <option>Texas</option>
+        <option>Utah</option>
+        <option>Vermont</option>
+        <option>Virginia</option>
+        <option>Washington</option>
+        <option>West Virginia</option>
+        <option>Wisconsin</option>
+        <option>Wyoming</option>
       </select>{" "}
       and who is{" "}
       <select
@@ -67,7 +95,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         onChange={event => {
           setPersonaFacet("politics", event.target.value);
           getAds();
-          }}
+        }}
       >
         <option>conservative</option>
         <option>liberal</option>
