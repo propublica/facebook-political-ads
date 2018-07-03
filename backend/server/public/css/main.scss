@@ -268,7 +268,11 @@ article {
 }
 #graphic select, #graphic input {
   background-color: #CCE8F8;
-font-size: .8em;
+  font-size: 1em;
+  height: 1.5em;
+  padding: 5px;
+  border-radius: 6px;
+  border: none;
 }
 
 #race-selector:focus {
@@ -280,6 +284,14 @@ font-size: .8em;
   font-family: "Graphik", sans-serif;
   text-align: center;
   font-size: 1.2em;
+}
+
+.selectorsOnly {
+  margin: 3em 0;
+}
+
+.selectorsOnly p {
+  line-height: 1.9;
 }
 
 // -----------------------------------------------------------------------------
