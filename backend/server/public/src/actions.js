@@ -330,6 +330,9 @@ export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
       if (state.persona.gender) {
         params.set("gender", state.persona.gender);
       }
+      if (state.persona.name) {
+        params.set("persona", state.persona.name);
+      }
       if (state.pagination && state.pagination.page) {
         params.set("page", state.pagination.page);
       }

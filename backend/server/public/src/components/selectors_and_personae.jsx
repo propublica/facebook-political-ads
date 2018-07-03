@@ -103,7 +103,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
           <option>apolitical</option>
         </select>.
       </p>
-    </div>  
+    </div>
     <div>
       <p>Or see who is targeting someone like:</p>
       <ul className="flexy">

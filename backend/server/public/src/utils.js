@@ -204,6 +204,7 @@ const deserialize = (dispatch, allowedLangs) => {
     if (params.has("location_bucket"))
       persona["location"] = params.get("location_bucket"); // TODO: you can't put an Object in a URL!
     if (params.has("age_bucket")) persona["age"] = params.get("age_bucket");
+    if (params.has("age_bucket")) persona["name"] = params.get("persona");
     actions.push(setPersona(persona));
   }
 
