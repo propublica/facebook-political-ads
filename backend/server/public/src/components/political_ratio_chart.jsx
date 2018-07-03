@@ -21,7 +21,7 @@ export default class PoliticalRatioChart extends React.Component {
       ]
       : [];
 
-    var margins = { left: 10, right: 5, top: 20, bottom: 30 };
+    var margins = { left: 10, right: 10, top: 20, bottom: 30 };
 
     var weekly_ratio_chart_or_not = this.props.weekly_political_ratio ? (
       <ResponsiveLine

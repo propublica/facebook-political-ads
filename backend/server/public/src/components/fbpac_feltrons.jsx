@@ -17,8 +17,8 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
           <span className="feltron">
             {homepage_stats && homepage_stats.political_ads_total
               ? homepage_stats.political_ads_total
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "--"}
           </span>
           <p>ads overall</p>
@@ -29,7 +29,12 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
       <h3>How Many Are Political?</h3>
       <PoliticalRatioChart
         weekly_political_ratio={
-          homepage_stats ? homepage_stats.weekly_political_ratio : null
+          homepage_stats && homepage_stats.weekly_political_ratio
+            ? homepage_stats.weekly_political_ratio.slice(
+                0,
+                homepage_stats.weekly_political_ratio.length - 1
+              )
+            : null
         }
       />
     </div>
@@ -38,8 +43,8 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
       <span className="feltron">
         {homepage_stats && homepage_stats.user_count
           ? homepage_stats.user_count
-              .toString()
-              .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            .toString()
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
           : "--"}
       </span>
       <p>all readers like you!</p>
