@@ -30,7 +30,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         </select>{" "}
       </p>
       <p>
-        living in{" "}
+        of any race living in{" "}
         <select
           value={persona === null ? "" : persona.location}
           onChange={event => {
@@ -105,7 +105,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
       </p>
     </div>
     <div>
-      <p>Or see who is targeting someone like:</p>
+      <p className="personaIntro">Or see who is targeting someone like:</p>
       <ul className="flexy">
         {[
           {

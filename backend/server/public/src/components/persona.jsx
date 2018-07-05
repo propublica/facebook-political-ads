@@ -10,7 +10,7 @@ const Persona = ({ persona, setPersona, getAds }) => (
       getAds();
     }}
   >
-    <img src="https://assets.propublica.org/images/series/_threeTwo1200w/20180620-electionland-2018-3x2.png" alt="celebrity-face-cutout" role="img"></img>
+    <div className="persona-cutout img"></div>
     {persona.name}
     <div className="persona-info">
       <p>
