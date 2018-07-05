@@ -11,9 +11,7 @@ const Persona = ({ persona, setPersona, getAds }) => (
     }}
   >
 
-
-
-    <div className='emoji' id={persona.img}></div>
+<div className='emoji' id={persona.img}></div>
    
     <div className="persona-info">
       <p>

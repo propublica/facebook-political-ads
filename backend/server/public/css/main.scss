@@ -221,6 +221,10 @@ article {
     border: none;
   }
 
+  .third h3 {
+    font-weight: 500;
+  }
+
   .quarter {
     width: 25%;
     padding: 1em .25em .5em;
@@ -230,6 +234,10 @@ article {
     width: 50%;
     padding: 0.25em;
   }
+}
+
+.persona-cutout .img {
+  background-image: "https://assets.propublica.org/images/series/_threeTwo1200w/20180620-electionland-2018-3x2.png";
 }
 
 .persona-info {
@@ -313,6 +321,7 @@ article {
 .selectorsAndPersonae {
   margin: 1em 0;
   font-family: "Graphik", sans-serif;
+
   text-align: center;
   font-size: 1.2em;
 }
@@ -380,7 +389,12 @@ article {
 }
 
 .selectorsOnly p {
-  line-height: 1.9;
+  line-height: 2.3;
+  font-weight: 500;
+}
+
+.personaIntro {
+  font-size: .9em;
 }
 
 .race-note {
@@ -575,6 +589,12 @@ article {
     width: 100%;
     margin: 1em 0;
   }
+}
+
+.why-these-ads {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #6d6d6d;
 }
 
 // -----------------------------------------------------------------------------

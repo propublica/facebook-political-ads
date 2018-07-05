@@ -55,11 +55,13 @@ export class AdListUnconnected extends React.Component {
           <Filters />
         </form>
         <div className="facebook-pac-ads">
+        <p className="why-these-ads">The following ads target one or more of the traits selected above.</p>
           {this.props.ads.length > 0 ? (
             <Pagination />
           ) : (
             <p className="no_ads">No ads found for {this.props.search}.</p>
           )}
+
           <div id="ads">
             {this.props.ads.map(ad => <Ad ad={ad} key={ad.id} />)}
           </div>

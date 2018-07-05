@@ -30,15 +30,14 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         </select>{" "}
       </p>
       <p>
-        living in{" "}
+        of any race living in{" "}
         <select
-          value={persona === null ? "" : persona.location}
+          value={persona === null ? "" : persona.location[0]}
           onChange={event => {
             setPersonaFacet("location", [event.target.value, null]);
             getAds();
           }}
         >
-          <option>Ohio</option>
           <option>Alabama</option>
           <option>Alaska</option>
           <option>Arizona</option>
@@ -105,13 +104,16 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
       </p>
 
       <div className="race-note">
-        <p>Note: We don't let you filter by race because few advertisers target using Facebook’s “multicultural affinity” category.</p>
+        <p>
+          Note: We don't let you filter by race because few advertisers target
+          using Facebook’s “multicultural affinity” category.
+        </p>
       </div>
-
-
     </div>
     <div>
+
       <p>Or see who is targeting a:</p>
+
       <ul className="flexy">
         {[
           {
@@ -150,8 +152,6 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
       </ul>
     </div>
   </div>
-
-
 );
 
 export default connect(
