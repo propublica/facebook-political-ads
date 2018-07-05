@@ -291,21 +291,30 @@ article {
 }
 
 .glad-you-here {
-    max-width: 80%;
+    max-width: 600px;
     margin: 40px auto;
-    padding: 20px;
+    padding: 20px 0px;
     border-top: 2px solid #444;
-  
+
   > div {
     float:left;
-    margin-bottom:50px
   }
   div:first-child {
-    width:20%;
-    min-width: 100px
+    @include breakpoint-max(sm) {
+      width:100%;
+    }
+    width:12%;
+    min-width: 100px;
+    margin-right:5px
+    
   }
   div:last-child {
-    width:80%;
+    @include breakpoint-max(sm) {
+      width:100%;
+      text-align: center;
+    }
+    width:78%;
+    margin-bottom:50px
   }
   h2 {
     font-size:1.3em;
@@ -320,10 +329,11 @@ article {
 
   p {
     font-size: .8em;
-    margin-bottom:10px
+    margin-bottom:10px;
   } 
   img {
-    max-width: 100px
+    max-width: 100px;
+    margin: auto;
   }
   a {
     padding:5px 10px;
@@ -354,6 +364,7 @@ article {
   font-family: $fonts-sans;
   font-size: $scale-5;
   margin: colspan(g, 4) 0;
+  display:inline-block;
   @include clearfix;
   @include breakpoint-min(sm) {
     width: colspan(4, 6);
