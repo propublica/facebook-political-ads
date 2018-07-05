@@ -22,7 +22,9 @@ const Persona = ({ persona, setPersona, getAds }) => (
       <p>
         Location:{" "}
         <span className="trait-category">
-          {persona.location.city + ", " + persona.location.state}
+          {persona.location.length >= 2
+            ? persona.location[1] + ", " + persona.location[0]
+            : persona.location}
         </span>
       </p>
       <p>

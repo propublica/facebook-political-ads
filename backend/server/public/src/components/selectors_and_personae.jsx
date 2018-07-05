@@ -10,7 +10,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         Fill out your information to see who is targeting a{" "}
         <input
           type="number"
-          value={persona === null ? "" : persona.age}
+          value={persona === null ? "28" : persona.age}
           onChange={event => {
             setPersonaFacet("age", event.target.value);
             getAds();
@@ -34,7 +34,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
         <select
           value={persona === null ? "" : persona.location}
           onChange={event => {
-            setPersonaFacet("location", event.target.value);
+            setPersonaFacet("location", [event.target.value, null]);
             getAds();
           }}
         >
@@ -103,6 +103,12 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
           <option>apolitical</option>
         </select>.
       </p>
+
+      <div className="race-note">
+        <p>Note: We don't let you filter by race because few advertisers target using Facebook’s “multicultural affinity” category.</p>
+      </div>
+
+
     </div>
     <div>
       <p className="personaIntro">Or see who is targeting someone like:</p>
@@ -112,40 +118,28 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
             age: "65 or older",
             gender: "male",
             politics: "conservative",
-            location: {
-              city: "Washington",
-              state: "DC" // okay okay it's not a state, geez.
-            },
+            location: ["DC", "Washington"],
             name: "Donald J. Trump"
           },
           {
             age: "56",
             gender: "male",
             politics: "liberal",
-            location: {
-              city: "Washington",
-              state: "DC" // okay okay it's not a state, geez.
-            },
+            location: ["DC", "Washington"],
             name: "Barack Obama"
           },
           {
             age: "69",
             gender: "male",
             politics: "apolitical",
-            location: {
-              city: "Long Island",
-              state: "NY"
-            },
-            name: "William \"Billy\" Joel"
+            location: ["NY", "Long Island"],
+            name: 'William "Billy" Joel'
           },
           {
             age: "28",
             gender: "female",
             politics: "apolitical",
-            location: {
-              city: "Nashville",
-              state: "TN"
-            },
+            location: ["TN", "Nashville"],
             name: "Taylor Swift"
           }
         ].map(persona => (
@@ -156,6 +150,8 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
       </ul>
     </div>
   </div>
+
+
 );
 
 export default connect(

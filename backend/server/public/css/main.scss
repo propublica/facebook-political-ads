@@ -299,6 +299,64 @@ article {
   font-size: 1.2em;
 }
 
+.glad-you-here {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px 0px;
+    border-top: 2px solid #444;
+
+  > div {
+    float:left;
+  }
+  div:first-child {
+    @include breakpoint-max(sm) {
+      width:100%;
+    }
+    width:12%;
+    min-width: 100px;
+    margin-right:5px
+    
+  }
+  div:last-child {
+    @include breakpoint-max(sm) {
+      width:100%;
+      text-align: center;
+    }
+    width:78%;
+    margin-bottom:50px
+  }
+  h2 {
+    font-size:1.3em;
+    font-weight:bold;
+    margin-bottom:5px
+  }
+  h4 {
+    font-size: .8em;
+    font-family: "Graphik", sans-serif;
+    margin-bottom:10px
+  }
+
+  p {
+    font-size: .8em;
+    margin-bottom:10px;
+  } 
+  img {
+    max-width: 100px;
+    margin: auto;
+  }
+  a {
+    padding:5px 10px;
+    background: #196aa7;
+    color:white;
+    border-radius: 5px;
+    font-size:.7em;
+    margin-top:10px;
+    font-weight: 600
+  }
+}
+
+
+
 .selectorsOnly {
   margin: 3em 0;
 }
@@ -312,6 +370,13 @@ article {
   font-size: .9em;
 }
 
+.race-note {
+    font-size: .7em;
+    margin: 30px 0px 0px;
+    font-style:italic
+}
+
+
 // -----------------------------------------------------------------------------
 // FACEBOOK AD BROWSER FORM STYLES
 // -----------------------------------------------------------------------------
@@ -320,6 +385,7 @@ article {
   font-family: $fonts-sans;
   font-size: $scale-5;
   margin: colspan(g, 4) 0;
+  display:inline-block;
   @include clearfix;
   @include breakpoint-min(sm) {
     width: colspan(4, 6);
