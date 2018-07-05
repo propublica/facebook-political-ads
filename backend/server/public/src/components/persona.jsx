@@ -10,7 +10,11 @@ const Persona = ({ persona, setPersona, getAds }) => (
       getAds();
     }}
   >
-    <img src="https://assets.propublica.org/images/series/_threeTwo1200w/20180620-electionland-2018-3x2.png" alt="celebrity-face-cutout" role="img"></img>
+    <img
+      src="https://assets.propublica.org/images/series/_threeTwo1200w/20180620-electionland-2018-3x2.png"
+      alt="celebrity-face-cutout"
+      role="img"
+    />
     {persona.name}
     <div className="persona-info">
       <p>
@@ -22,7 +26,9 @@ const Persona = ({ persona, setPersona, getAds }) => (
       <p>
         Location:{" "}
         <span className="trait-category">
-          {persona.location.city + ", " + persona.location.state}
+          {persona.location.length >= 2
+            ? persona.location[1] + ", " + persona.location[0]
+            : persona.location}
         </span>
       </p>
       <p>

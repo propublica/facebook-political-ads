@@ -181,16 +181,6 @@ const deserialize = (dispatch, allowedLangs) => {
     });
   }
 
-  // {
-  //   age: "65 or older",
-  //   gender: "men",
-  //   politics: "conservative",
-  //   location: {
-  //     city: "Washington",
-  //     state: "DC" // okay okay it's not a state, geez.
-  //   },
-  // },
-
   if (
     params.has("age_bucket") ||
     params.has("location_bucket") ||
@@ -202,7 +192,7 @@ const deserialize = (dispatch, allowedLangs) => {
     if (params.has("politics_bucket"))
       persona["politics"] = params.get("politics_bucket");
     if (params.has("location_bucket"))
-      persona["location"] = params.get("location_bucket"); // TODO: you can't put an Object in a URL!
+      persona["location"] = params.get("location_bucket").split(",");
     if (params.has("age_bucket")) persona["age"] = params.get("age_bucket");
     if (params.has("age_bucket")) persona["name"] = params.get("persona");
     actions.push(setPersona(persona));
