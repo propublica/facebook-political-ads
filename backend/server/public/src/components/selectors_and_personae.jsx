@@ -103,6 +103,12 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
           <option>apolitical</option>
         </select>.
       </p>
+
+      <div className="race-note">
+        <p>Note: We don't let you filter by race because few advertisers target using Facebook’s “multicultural affinity” category.</p>
+      </div>
+
+
     </div>
     <div>
       <p>Or see who is targeting someone like:</p>
@@ -144,6 +150,8 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
       </ul>
     </div>
   </div>
+
+
 );
 
 export default connect(
