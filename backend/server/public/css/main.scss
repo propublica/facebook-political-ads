@@ -290,6 +290,54 @@ article {
   font-size: 1.2em;
 }
 
+.glad-you-here {
+    max-width: 80%;
+    margin: 40px auto;
+    padding: 20px;
+    border-top: 2px solid #444;
+  
+  > div {
+    float:left;
+    margin-bottom:50px
+  }
+  div:first-child {
+    width:20%;
+    min-width: 100px
+  }
+  div:last-child {
+    width:80%;
+  }
+  h2 {
+    font-size:1.3em;
+    font-weight:bold;
+    margin-bottom:5px
+  }
+  h4 {
+    font-size: .8em;
+    font-family: "Graphik", sans-serif;
+    margin-bottom:10px
+  }
+
+  p {
+    font-size: .8em;
+    margin-bottom:10px
+  } 
+  img {
+    max-width: 100px
+  }
+  a {
+    padding:5px 10px;
+    background: #196aa7;
+    color:white;
+    border-radius: 5px;
+    font-size:.7em;
+    margin-top:10px;
+    font-weight: 600
+  }
+}
+
+
+
 .selectorsOnly {
   margin: 3em 0;
 }
