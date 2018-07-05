@@ -10,29 +10,14 @@ const Persona = ({ persona, setPersona, getAds }) => (
       getAds();
     }}
   >
-    <img
-      src="https://assets.propublica.org/images/series/_threeTwo1200w/20180620-electionland-2018-3x2.png"
-      alt="celebrity-face-cutout"
-      role="img"
-    />
-    {persona.name}
+
+
+
+    <div className='emoji' id={persona.img}></div>
+   
     <div className="persona-info">
       <p>
-        Age: <span className="trait-category">{persona.age}</span>
-      </p>
-      <p>
-        Gender: <span className="trait-category">{persona.gender}</span>
-      </p>
-      <p>
-        Location:{" "}
-        <span className="trait-category">
-          {persona.location.length >= 2
-            ? persona.location[1] + ", " + persona.location[0]
-            : persona.location}
-        </span>
-      </p>
-      <p>
-        Politics: <span className="trait-category">{persona.politics}</span>
+        A {persona.age}-year-old { persona.gender} living in { persona.location} who is { persona.politics}.
       </p>
     </div>
   </div>

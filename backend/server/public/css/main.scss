@@ -223,7 +223,7 @@ article {
 
   .quarter {
     width: 25%;
-    padding: 0.25em;
+    padding: 1em .25em .5em;
   }
 
   .half {
@@ -235,6 +235,33 @@ article {
 .persona-info {
   font-size: .6em;
   text-align: left;
+}
+
+
+#man-65 {
+  background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/male-office-worker.png") top left no-repeat;
+  background-size: 100%;
+}
+
+#woman-40 {
+   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/female-farmer.png") top left no-repeat;
+   background-size: 100%;
+}
+
+#man-20 {
+   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/male-teacher.png") top left no-repeat;
+   background-size: 100%;
+}
+
+#woman-32 {
+   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/female-health-worker.png") top left no-repeat;
+   background-size: 100%;
+}
+
+.persona .emoji {
+  display:inline-block;
+  width:30px;
+  height: 30px;
 }
 
 .trait-category {

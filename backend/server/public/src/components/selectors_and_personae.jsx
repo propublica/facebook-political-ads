@@ -111,36 +111,36 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
 
     </div>
     <div>
-      <p>Or see who is targeting someone like:</p>
+      <p>Or see who is targeting a:</p>
       <ul className="flexy">
         {[
           {
-            age: "65 or older",
+            age: "65",
             gender: "male",
             politics: "conservative",
-            location: ["DC", "Washington"],
-            name: "Donald J. Trump"
+            location: "Washington, D.C.",
+            img: "man-65"
           },
           {
-            age: "56",
-            gender: "male",
-            politics: "liberal",
-            location: ["DC", "Washington"],
-            name: "Barack Obama"
-          },
-          {
-            age: "69",
-            gender: "male",
-            politics: "apolitical",
-            location: ["NY", "Long Island"],
-            name: 'William "Billy" Joel'
-          },
-          {
-            age: "28",
+            age: "40",
             gender: "female",
+            politics: "liberal",
+            location: "California",
+            img: "woman-40"
+          },
+          {
+            age: "20",
+            gender: "male",
             politics: "apolitical",
-            location: ["TN", "Nashville"],
-            name: "Taylor Swift"
+            location: "Ohio",
+            img: "man-20"
+          },
+          {
+            age: "32",
+            gender: "female",
+            politics: "conservative",
+            location: "Florida",
+            img: "woman-32"
           }
         ].map(persona => (
           <li key={persona.name} className="quarter">
