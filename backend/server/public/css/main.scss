@@ -284,21 +284,34 @@ article {
   background-color: #F2F2F2;
   // border-radius: 5px;
   width: 100%;
+  font-family: "Graphik", sans-serif;
 
   @include breakpoint-min(lg) {
     width: 80%;
   }
-
   .feltron {
     font-size: 32px; /* we should incorporate the newsapps-styles stuff rather than faking it */
   }
-
   p {
     font-size: 0.7em;
     // color: #999;
     font-weight: normal;
   }
+  .top-feltrons-container {
+    display: flex;
+    justify-content: center;
+
+    .top-feltrons {
+      padding: 20px;
+    }
+  }
+  .stats-sentence {
+    margin: 20px;
+    text-align: center;
+  }
 }
+
+
 
 #graphic input[type="number"] {
   width: 3em;
@@ -314,6 +327,10 @@ article {
 
 .political-ratio svg text {
   font-weight: normal;
+}
+
+.political-ratio {
+  border-right: solid 1px #6b6b6b;
 }
 
 #race-selector:focus {
