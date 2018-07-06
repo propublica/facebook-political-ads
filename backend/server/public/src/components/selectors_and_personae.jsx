@@ -44,6 +44,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
           <option>Colorado</option>
           <option>Connecticut</option>
           <option>Delaware</option>
+          <option>District of Columbia</option>
           <option>Florida</option>
           <option>Georgia</option>
           <option>Hawaii</option>
@@ -118,32 +119,36 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
             age: "65",
             gender: "male",
             politics: "conservative",
-            location: "Washington, D.C.",
+            location: ["District of Columbia", "Washington"],
+            pretty_location: "Washington, D.C.",
             img: "man-65"
           },
           {
             age: "40",
             gender: "female",
             politics: "liberal",
-            location: "California",
+            location: ["California"],
+            pretty_location: "California",
             img: "woman-40"
           },
           {
             age: "20",
             gender: "male",
             politics: "apolitical",
-            location: "Ohio",
+            location: ["Ohio"],
+            pretty_location: "Ohio",
             img: "man-20"
           },
           {
             age: "32",
             gender: "female",
             politics: "conservative",
-            location: "Florida",
+            location: ["Florida"],
+            pretty_location: "Florida",
             img: "woman-32"
           }
         ].map(persona => (
-          <li key={persona.name} className="quarter">
+          <li key={persona.img} className="quarter">
             <Persona persona={persona} />
           </li>
         ))}
