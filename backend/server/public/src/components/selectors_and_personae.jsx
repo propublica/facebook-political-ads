@@ -9,7 +9,6 @@ export class SelectorsAndPersonae extends React.Component {
     var eloffset = el.offsetTop;
     
     window.onscroll = function() {
-      console.log("scrolling")
       var windowTop = window.scrollY;
       if (windowTop > eloffset) {
         el.classList.add('sticky')
@@ -41,9 +40,10 @@ export class SelectorsAndPersonae extends React.Component {
               this.props.getAds();
             }}
           >
-            <option>female</option>
-            <option>male</option>
-            <option>person</option>
+
+            <option>woman</option>
+            <option>man</option>
+            <option>all genders</option>
           </select>{" "}
           of any race living in{" "}
           <select
@@ -119,14 +119,14 @@ export class SelectorsAndPersonae extends React.Component {
             <option>apolitical</option>
           </select>.
         </p>
-
+        </div>
         <div className="race-note">
           <p>
             Note: We don't let you filter by race because few political advertisers target
             using Facebook’s “multicultural affinity” category.
           </p>
         </div>
-      </div>
+      
       <div>
 
         <p>Or see who is targeting a:</p>
@@ -135,7 +135,7 @@ export class SelectorsAndPersonae extends React.Component {
           {[
             {
               age: "72",
-              gender: "male",
+              gender: "man",
               politics: "conservative",
               location: ["District of Columbia", "Washington"],
               pretty_location: "Washington, D.C.",
@@ -143,7 +143,7 @@ export class SelectorsAndPersonae extends React.Component {
             },
             {
               age: "40",
-              gender: "female",
+              gender: "woman",
               politics: "liberal",
               location: ["California"],
               pretty_location: "California",
@@ -151,7 +151,7 @@ export class SelectorsAndPersonae extends React.Component {
             },
             {
               age: "20",
-              gender: "male",
+              gender: "man",
               politics: "apolitical",
               location: ["Wisconsin"],
               pretty_location: "Wisconsin",
@@ -159,7 +159,7 @@ export class SelectorsAndPersonae extends React.Component {
             },
             {
               age: "32",
-              gender: "female",
+              gender: "woman",
               politics: "conservative",
               location: ["Texas"],
               pretty_location: "Texas",
