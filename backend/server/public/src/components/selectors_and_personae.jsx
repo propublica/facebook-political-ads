@@ -40,9 +40,10 @@ export class SelectorsAndPersonae extends React.Component {
               this.props.getAds();
             }}
           >
-            <option>female</option>
-            <option>male</option>
-            <option>person</option>
+
+            <option>woman</option>
+            <option>man</option>
+            <option>all genders</option>
           </select>{" "}
           of any race living in{" "}
           <select
@@ -134,7 +135,7 @@ export class SelectorsAndPersonae extends React.Component {
           {[
             {
               age: "72",
-              gender: "male",
+              gender: "man",
               politics: "conservative",
               location: ["District of Columbia", "Washington"],
               pretty_location: "Washington, D.C.",
@@ -142,7 +143,7 @@ export class SelectorsAndPersonae extends React.Component {
             },
             {
               age: "40",
-              gender: "female",
+              gender: "woman",
               politics: "liberal",
               location: ["California"],
               pretty_location: "California",
@@ -150,7 +151,7 @@ export class SelectorsAndPersonae extends React.Component {
             },
             {
               age: "20",
-              gender: "male",
+              gender: "man",
               politics: "apolitical",
               location: ["Wisconsin"],
               pretty_location: "Wisconsin",
@@ -158,7 +159,7 @@ export class SelectorsAndPersonae extends React.Component {
             },
             {
               age: "32",
-              gender: "female",
+              gender: "woman",
               politics: "conservative",
               location: ["Texas"],
               pretty_location: "Texas",
