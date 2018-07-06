@@ -259,19 +259,17 @@ article {
     border-radius: 5px;
     border: 1px solid #cecece;
     cursor:pointer;
+    max-width:100%;
+    @include breakpoint-max(sm) {
+      padding:5px;
+    }
+
 }
 
 .persona:hover {
   background:#dddcdb
 }
 
-.sticky {
-    max-width: 62%;
-    width:890px;
-    position: fixed;
-    top: 0;
-    background: #fff;
-}
 
 #man-65 {
   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/male-office-worker.png") top left no-repeat;
@@ -297,6 +295,7 @@ article {
   display:inline-block;
   width:90px;
   height: 92px;
+  max-width: 100%;
 }
 
 .trait-category {
@@ -446,29 +445,11 @@ article {
 .selectorsOnly {
   margin: 2em 0 1em;
   min-height: 120px;
-  @include breakpoint-max(md) {
-     min-height: 120px;
+  @include breakpoint-max(lg) {
+    min-height: 80px;
   }
-}
-
-.selectorsOnly p {
-  line-height: 2.3;
-  font-weight: 500;
-  padding: 10px 0px;
-    transition: all 0.20s ease-in-out;
-  -webkit-transition: all 0.20s ease-in-out;
-  -moz-transition: all 0.20s ease-in-out;
-  -o-transition: all 0.20s ease-in-out;
-  font-size:.9em;
-  @include breakpoint-max(md) {
-    font-size:.7em;
-  }
-}
-
-.selectorsOnly p.sticky {
-  font-size: .8em;
-  @include breakpoint-max(md) {
-    font-size:.7em;
+  @include breakpoint-max(sm) {
+    min-height: 80px;
   }
 }
 
@@ -485,6 +466,45 @@ article {
     p {
       line-height: 1.5;
     }
+}
+
+#sticky_nav {
+  text-align: center;
+  z-index: 5;
+  position: absolute;
+  width: 100%;
+  left: 0px;
+  background: #fff;
+}
+
+#sticky_nav.sticky {
+  position: fixed;
+  top:0px;
+}
+
+#sticky_nav p {
+  max-width: 75%;
+  width:890px;
+  margin:auto;
+  line-height: 2.3;
+  font-weight: 500;
+  padding: 10px 0px;
+  font-size:.9em;
+      transition: all 0.20s ease-in-out;
+  -webkit-transition: all 0.20s ease-in-out;
+  -moz-transition: all 0.20s ease-in-out;
+  -o-transition: all 0.20s ease-in-out;
+  @include breakpoint-max(lg) {
+    font-size:.7em;
+  }
+  @include breakpoint-max(sm) {
+    font-size:.7em;
+    line-height: 1.7em;
+  } 
+}
+
+#sticky_nav.sticky p {
+  font-size:.75em;
 }
 
 
@@ -580,6 +600,7 @@ article {
     color: $pp-blue;
     margin-bottom: 1em;
     cursor: pointer;
+    z-index: 0;
 
     @include breakpoint-min(lg) {
       float: left;

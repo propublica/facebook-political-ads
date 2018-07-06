@@ -23,7 +23,8 @@ export class SelectorsAndPersonae extends React.Component {
   render() {
     return (<div className="selectorsAndPersonae">
       <div className="selectorsOnly">
-        <p id="sticky_nav">
+      <div id="sticky_nav">
+        <p>
           See ads targeted to people who are:{" "}
           <input
             type="number"
@@ -121,6 +122,7 @@ export class SelectorsAndPersonae extends React.Component {
             <option>liberal</option>
           </select>.
         </p>
+        </div>
         </div>
         <div className="race-note">
           <p>
