@@ -118,7 +118,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
             age: "65",
             gender: "male",
             politics: "conservative",
-            location: ["DC", "Washington"],
+            location: ["District of Columbia", "Washington"],
             pretty_location: "Washington, D.C.",
             img: "man-65"
           },
@@ -126,7 +126,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
             age: "40",
             gender: "female",
             politics: "liberal",
-            location: ["CA"],
+            location: ["California"],
             pretty_location: "California",
             img: "woman-40"
           },
@@ -134,7 +134,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
             age: "20",
             gender: "male",
             politics: "apolitical",
-            location: ["OH"],
+            location: ["Ohio"],
             pretty_location: "Ohio",
             img: "man-20"
           },
@@ -142,7 +142,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
             age: "32",
             gender: "female",
             politics: "conservative",
-            location: ["FL"],
+            location: ["Florida"],
             pretty_location: "Florida",
             img: "woman-32"
           }
