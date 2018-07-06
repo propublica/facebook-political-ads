@@ -75,6 +75,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
           <option>Oklahoma</option>
           <option>Oregon</option>
           <option>Pennsylvania</option>
+          <option>Puerto Rico</option>
           <option>Rhode Island</option>
           <option>South Carolina</option>
           <option>South Dakota</option>
