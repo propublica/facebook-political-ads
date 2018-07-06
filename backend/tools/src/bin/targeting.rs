@@ -37,15 +37,16 @@ fn main() {
         total += 1;
         let document = kuchiki::parse_html().one(ad.html.clone());
         // find any cases where the revised targeting parser removes an element
-        ;
         if let Some(ref old_targets) = ad.targets {
+            println!("{:?}",ad.targeting);
+
             if let Some(new_targets) = get_targets(&ad.targeting) {
                 if old_targets.to_string().len() > new_targets.to_string().len() {
-                    println!("lost target -->");
-                    println!("{:?}", ad.targeting);
-                    println!("{:?}", get_targets(&ad.targeting));
-                    println!("{:?}", old_targets);
-                    println!("");
+                    // println!("lost target -->");
+                    // println!("{:?}", ad.targeting);
+                    // println!("{:?}", get_targets(&ad.targeting));
+                    // println!("{:?}", old_targets);
+                    // println!("");
                     parse_got_worse += 1;
                 } else {
                     still_parses_correctly += 1;

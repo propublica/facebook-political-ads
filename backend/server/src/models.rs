@@ -2,7 +2,6 @@ use chrono::offset::Utc;
 use chrono::DateTime;
 use diesel;
 use diesel::dsl::sql;
-use diesel::pg::types::sql_types::Array;
 use diesel::pg::Pg;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
@@ -777,7 +776,7 @@ mod tests {
             entities: None,
             page: None,
             lower_page: None,
-            targetings: vec![],
+            targetings: Some(vec![]),
         };
         let urls = saved_ad.image_urls();
         let images = Images::from_ad(&saved_ad, &urls).unwrap();

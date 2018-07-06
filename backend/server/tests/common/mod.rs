@@ -71,10 +71,10 @@ pub fn unseed(connection: &PgConnection) {
 fn make_targeting() -> String {
     let mut rng = thread_rng();
 
-    let targetings = include_str!("targetings.txt")
+    let targetings_str = include_str!("targetings.txt")
         .lines()
         .map(|s| String::from_str(s).expect("Error reading string"))
         .collect::<Vec<_>>();
 
-    rng.choose(&targetings).unwrap().clone()
+    rng.choose(&targetings_str).unwrap().clone()
 }

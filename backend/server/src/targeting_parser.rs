@@ -27,6 +27,8 @@ impl<'a> From<TargetingParsed<'a>> for Targeting {
             TargetingParsed::State(s) => Targeting::new("State", Some(s)),
             TargetingParsed::Region(s) => Targeting::new("Region", Some(s)),
             TargetingParsed::Age(s) => Targeting::new("Age", Some(s)),
+            TargetingParsed::MinAge(s) => Targeting::new("MinAge", Some(s)),
+            TargetingParsed::MaxAge(s) => Targeting::new("MaxAge", Some(s)),
             TargetingParsed::Interest(s) => Targeting::new("Interest", Some(s)),
             TargetingParsed::Segment(s) => Targeting::new("Segment", Some(s)),
             TargetingParsed::Retargeting(s) => Targeting::new("Retargeting", Some(s)),
@@ -64,6 +66,8 @@ pub enum TargetingParsed<'a> {
     State(&'a str),
     Region(&'a str),
     Age(&'a str),
+    MinAge(&'a str),
+    MaxAge(&'a str),
     Interest(&'a str),
     Segment(&'a str),
     Retargeting(&'a str),
@@ -291,6 +295,68 @@ named!(age(&str) -> TargetingParsed,
         )
     )
 );
+
+#[derive(Clone, Debug, PartialEq)]
+enum InternalMaxAge<'a> {
+    Some(&'a str),
+    None
+}
+
+named!(max_age_parser(&str) -> Option<InternalMaxAge>,
+    do_parse!(
+        max_age: alt_complete!(
+            do_parse!(
+                ws!(take_until_and_consume!("and ")) >>
+                older: tag!("older") >>
+                (older)
+            ) | 
+            do_parse!(
+                ws!(take_until_and_consume!("to ")) >>
+                actual_age: ws!(take_while1!(|n: char| n.is_numeric() )) >>
+                (actual_age)
+            ) | 
+            do_parse!(
+                tag!("") >>
+                ("")
+            )
+        ) >>
+        (match max_age {
+            "" => None,
+            "older" => Some(InternalMaxAge::None),
+            _ => Some(InternalMaxAge::Some(max_age))
+        })
+        // (if max_age == "older" { None } else { Some( InternalMaxAge(max_age) ) } )
+    )
+);
+
+named!(min_max_age(&str) -> Vec<Option<TargetingParsed>>,
+    do_parse!(
+        min_age: complete!(opt!(ws!(take_while1!(|n: char| n.is_numeric() )))) >>
+        max_age: max_age_parser >>
+        (vec![
+            min_age.map(|l| TargetingParsed::MinAge(l)), 
+            max_age.or_else(|| // if there's no "and older" or "to NN", then it's just a single age -- or no age statement at all.
+                match min_age {
+                    Some(_) => Option::Some(InternalMaxAge::Some(min_age.unwrap())),
+                    _ => None 
+                }
+            ).and_then(|max_age_|
+                match max_age_ {
+                    InternalMaxAge::Some(max_age_str) => Option::Some(TargetingParsed::MaxAge(max_age_str)), // if there's a max age, leave it be.
+                    InternalMaxAge::None  => Option::None,       // if it's Some(None), then it's "and older", so  just return a None.
+                }
+            )
+        ])
+    )
+);
+
+
+        // min_age: complete!(opt!(ws!(take_while1!(|n: char| n.is_numeric() )))) >>
+        // opt!(ws!(alt!(take_until_and_consume!("and ") | take_until_and_consume!("to ")))) >>
+        // max_age: opt!(ws!(take_while1!(|n: char| n.is_numeric() ))) >>
+        // (vec![min_age.map(|l| TargetingParsed::MinAge(l)), max_age.map(|l| TargetingParsed::MaxAge(l))])
+
+
 // Donald J. Trump wants to reach <b>people who live in the United States</b>
 named!(region(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
@@ -319,7 +385,12 @@ named!(age_and_location(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
         age: opt!(ws!(age)) >>
         location: ws!(alt!(city_state | region | value!( vec![] ) )) >>
-        (vec![&vec![age][..], &location[..]].concat())
+        (vec![&vec![age.clone()][..], &min_max_age(match age.unwrap_or(TargetingParsed::Age("")) {
+            TargetingParsed::Age(a) => a,
+            _ => ""
+        }).to_result().unwrap_or(vec![]).into_iter().filter(|ref i|i.is_some() ).collect::<Vec<Option<TargetingParsed>>>()[..], &location[..]].concat())
+        
+            
     )
 );
 
@@ -391,9 +462,46 @@ pub fn parse_targeting(thing: &str) -> Result<Vec<TargetingParsed>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    use nom::ErrorKind::Complete;
     #[test]
     fn test_targeting() {
+
+        assert_eq!(
+            max_age_parser("and older"), 
+            IResult::Done("", Some(InternalMaxAge::None))
+        );
+        assert_eq!(
+            max_age_parser("to 64"), 
+            IResult::Done("", Some(InternalMaxAge::Some("64")))
+        );
+        assert_eq!(
+            max_age_parser(" and older"), 
+            IResult::Done("", Some(InternalMaxAge::None))
+        );
+        assert_eq!(
+            max_age_parser(" to 64"), 
+            IResult::Done("", Some(InternalMaxAge::Some("64")))
+        );
+
+
+        assert_eq!(
+            min_max_age("45 and older"), 
+            IResult::Done("", vec![Some(TargetingParsed::MinAge("45")), None])
+        );
+        assert_eq!(
+            min_max_age("45 to 64"), 
+            IResult::Done("", vec![Some(TargetingParsed::MinAge("45")), Some(TargetingParsed::MaxAge("64"))])
+        );
+        assert_eq!(
+            min_max_age(""), 
+            IResult::Error(Complete)
+        );
+        assert_eq!(
+            min_max_age("65 "), 
+            IResult::Done("", vec![Some(TargetingParsed::MinAge("65")), Some(TargetingParsed::MaxAge("65"))])
+        );
+
+
         assert_eq!(
             segment("<b>\"Generation X\"</b>"),
             IResult::Done("\"</b>", TargetingParsed::Segment("Generation X"))
@@ -450,6 +558,7 @@ mod tests {
                 "</b>",
                 vec![
                     Some(TargetingParsed::Age("18 and older")),
+                    Some(TargetingParsed::MinAge("18")),
                     Some(TargetingParsed::City("San Francisco")),
                     Some(TargetingParsed::State("California")),
                 ],
@@ -461,6 +570,7 @@ mod tests {
                 "</b>",
                 vec![
                     Some(TargetingParsed::Age("18 and older")),
+                    Some(TargetingParsed::MinAge("18")),
                     Some(TargetingParsed::Region("Utah")),
                 ],
             )
@@ -473,6 +583,7 @@ mod tests {
                 "</b>",
                 vec![
                     Some(TargetingParsed::Age("18 and older")),
+                    Some(TargetingParsed::MinAge("18")),
                     Some(TargetingParsed::Region("the United States")),
                 ],
             )
@@ -483,6 +594,7 @@ mod tests {
                 "</b>",
                 vec![
                     Some(TargetingParsed::Age("25 and older")),
+                    Some(TargetingParsed::MinAge("25")),
                     Some(TargetingParsed::Region("the United States")),
                 ],
             )
@@ -508,6 +620,8 @@ mod tests {
                 "</b>",
                 vec![
                     Some(TargetingParsed::Age("23 to 60")),
+                    Some(TargetingParsed::MinAge("23")),
+                    Some(TargetingParsed::MaxAge("60")),
                     Some(TargetingParsed::Region("the United States")),
                 ]
             )
@@ -546,6 +660,7 @@ mod tests {
                 "</b>",
                 vec![
                     Some(TargetingParsed::Age("25 and older")),
+                    Some(TargetingParsed::MinAge("25")),
                     Some(TargetingParsed::Region("the United States")),
                 ]
             )
@@ -559,9 +674,9 @@ mod tests {
         );
         assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_34_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_34_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_34_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>Donald J. Trump</b> wants to reach <b>people who may be similar to their customers</b>. <a id='ad_prefs_link'>Learn more.</a></div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that Donald J. Trump wants to reach <b>people who live in the United States</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div><div></div>", vec![TargetingParsed::Retargeting("people who may be similar to their customers"), TargetingParsed::Advertiser("Donald J. Trump"), TargetingParsed::Region("the United States")]));
 
-        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_o_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_o_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_o_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>PayPal</b> wants to reach people interested in <b id='ad_prefs_interest'>Do it yourself (DIY)</b>, based on activity such as liking Pages or clicking on ads.</div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that PayPal wants to reach <b>people ages 25 and older who were recently in the United States</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div>", vec![TargetingParsed::Advertiser("PayPal"), TargetingParsed::Age("25 and older"), TargetingParsed::Region("the United States")]));
+        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_o_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_o_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_o_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>PayPal</b> wants to reach people interested in <b id='ad_prefs_interest'>Do it yourself (DIY)</b>, based on activity such as liking Pages or clicking on ads.</div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that PayPal wants to reach <b>people ages 25 and older who were recently in the United States</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div>", vec![TargetingParsed::Advertiser("PayPal"), TargetingParsed::Age("25 and older"), TargetingParsed::MinAge("25"), TargetingParsed::Region("the United States")]));
 
-        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-'>Close</a></div><div><h3 id='u_6u_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_6u_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_6u_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>NRDC (Natural Resources Defense Council)</b> wants to reach <b>people who may be similar to their customers</b>. <a id='ad_prefs_link'>Learn more.</a></div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that NRDC (Natural Resources Defense Council) wants to reach <b>people ages 18 and older</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div><div></div>", vec![TargetingParsed::Retargeting("people who may be similar to their customers"), TargetingParsed::Advertiser("NRDC (Natural Resources Defense Council)"), TargetingParsed::Age("18 and older")]));
+        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-'>Close</a></div><div><h3 id='u_6u_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_6u_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_6u_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>NRDC (Natural Resources Defense Council)</b> wants to reach <b>people who may be similar to their customers</b>. <a id='ad_prefs_link'>Learn more.</a></div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that NRDC (Natural Resources Defense Council) wants to reach <b>people ages 18 and older</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div><div></div>", vec![TargetingParsed::Retargeting("people who may be similar to their customers"), TargetingParsed::Advertiser("NRDC (Natural Resources Defense Council)"), TargetingParsed::Age("18 and older"), TargetingParsed::MinAge("18"),]));
 
         // TODO: implement engaged_with_content.
         // the problem is that it doesn't appear with the second strin g("There may be other reasons") from which we get second advertiser, gender, age and location.
