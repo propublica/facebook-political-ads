@@ -9,12 +9,12 @@ export default class PoliticalRatioChart extends React.Component {
       ? [
           {
             id: "weekly",
-            data: this.props.weekly_political_ratio.map(a => ({
+            data: this.props.weekly_political_ratio.map((a, idx) => ({
               x: new Date(this_year, 0, 1 + (a[0] - 1) * 7)
                 .toISOString()
                 .slice(5, 10)
                 .replace("-", "/")
-              .replace(/^0/, ""),
+                .replace(/^0/, "") + "_" + idx,
               y: a[1]
             }))
           }
@@ -43,6 +43,11 @@ export default class PoliticalRatioChart extends React.Component {
         axisLeft={null}
         axisBottom={{
           orient: "bottom",
+          format: date_idx => {
+            var date, idx;
+            [date, idx] = date_idx.split("_", 2); 
+            return parseInt(idx) % 2 == 0 ? date : ''
+          },
           tickSize: 5,
           tickPadding: 5,
           tickRotation: 0,
