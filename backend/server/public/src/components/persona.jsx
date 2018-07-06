@@ -8,6 +8,11 @@ const Persona = ({ persona, setPersona, getAds }) => (
     onClick={() => {
       setPersona(persona);
       getAds();
+      dataLayer.push({
+       'event': 'Pageview',
+       'url': "https://projects.propublica.org/facebook-political-ads#"+persona["img"]
+       });
+
     }}
   >
 
