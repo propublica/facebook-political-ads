@@ -39,7 +39,7 @@ export class AdListUnconnected extends React.Component {
           {this.props.ads.length > 0 ? (
             <Pagination />
           ) : (
-            <p className="no_ads">No ads found for {this.props.search}.</p>
+            <p className="no_ads">{this.props.search && this.props.search.length > 0 ? `No ads found for ${this.props.search}` : "No ads found" }.</p>
           )}
 
           <div id="ads">
