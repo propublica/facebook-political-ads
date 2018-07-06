@@ -6,7 +6,7 @@ import PleaseInstall from "components/please_install.jsx";
 import KeywordSearch from "components/keyword_search.jsx";
 import Ad from "components/ad.jsx";
 import { connect } from "react-redux";
-import { throttledDispatch, getAds, getHomepageSummary, hideOldSearch, showOldSearch } from "actions.js";
+import { getAds, getHomepageSummary, hideOldSearch, showOldSearch } from "actions.js";
 import { withRouter } from "react-router-dom";
 import { deserialize } from "utils.js";
 
@@ -66,13 +66,6 @@ export const AdListUnrouted = connect(
     show_old_search
   }),
   dispatch => ({
-    onChange: e => {
-      e.preventDefault();
-      throttledDispatch(
-        dispatch,
-        e.target.value.length ? e.target.value : null
-      );
-    },
     deserialize: () => {
       deserialize(dispatch, ["en-US", "de-DE"]);
       dispatch(getAds());
