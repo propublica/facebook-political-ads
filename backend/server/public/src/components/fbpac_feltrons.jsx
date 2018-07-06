@@ -22,9 +22,9 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
         <h3>Top targeted traits</h3>
         <div className="flexy">
           <div className="">
-            <p>age</p>
+            <p>Facebook users similar to the advertiser's current customers</p>
             <p>and</p>
-            <p>region</p>
+            <p>Users on a particular Facebook list</p>
           </div>
         </div>
       </div>

@@ -35,6 +35,7 @@ export default class PoliticalRatioChart extends React.Component {
         enableGridX={false}
         enableGridY={false}
         enableDots={false}
+        enableDotLabel={true}
         theme={{
           axis: {
             fontSize: "9px"
@@ -45,7 +46,7 @@ export default class PoliticalRatioChart extends React.Component {
           orient: "bottom",
           format: date_idx => {
             var date, idx;
-            [date, idx] = date_idx.split("_", 2); 
+            [date, idx] = date_idx.split("_", 2);
             return parseInt(idx) % 2 == 0 ? date : ''
           },
           tickSize: 5,
