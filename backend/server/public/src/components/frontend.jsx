@@ -14,6 +14,8 @@ export const FrontEnd = () => (
       <Route path="/facebook-ads/ad/:ad_id" component={AdDetail} />
     </Switch>
     <div id="which-ads" dangerouslySetInnerHTML={{ __html: t("whichads") }} />
+    <div id="contrib" dangerouslySetInnerHTML={{ __html: t("contrib") }} />
+
   </div>
 );
 
