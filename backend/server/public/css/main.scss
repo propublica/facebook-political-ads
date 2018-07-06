@@ -229,7 +229,6 @@ article {
 
   .quarter {
     width: 25%;
-    padding: 1em .25em .5em;
   }
 
   .half {
@@ -247,6 +246,32 @@ article {
   }
 }
 
+.persona {
+    padding: .75em;
+    background: #f0efee;
+    transition: all 0.10s ease-in-out;
+    -webkit-transition: all 0.10s ease-in-out;
+    -moz-transition: all 0.10s ease-in-out;
+    -o-transition: all 0.10s ease-in-out;
+    display: inline-block;
+    height: 230px;
+    margin: 10px 10px 0px 0px;
+    border-radius: 5px;
+    border: 1px solid #cecece;
+    cursor:pointer
+}
+
+.persona:hover {
+  background:#dddcdb
+}
+
+.sticky {
+    max-width: 960px;
+    position: fixed;
+    top: 0;
+    background: #fff;
+    padding: 10px;
+}
 
 #man-65 {
   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/male-office-worker.png") top left no-repeat;

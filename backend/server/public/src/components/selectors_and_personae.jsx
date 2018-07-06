@@ -6,7 +6,7 @@ import { getAds, setPersonaFacet } from "actions.js";
 const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
   <div className="selectorsAndPersonae">
     <div className="selectorsOnly">
-      <p>
+      <p id="sticky_nav">
         Fill out your information to see who is targeting a{" "}
         <input
           type="number"
@@ -117,7 +117,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
       <ul className="flexy">
         {[
           {
-            age: "65",
+            age: "72",
             gender: "male",
             politics: "conservative",
             location: ["District of Columbia", "Washington"],
@@ -136,16 +136,16 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
             age: "20",
             gender: "male",
             politics: "apolitical",
-            location: ["Ohio"],
-            pretty_location: "Ohio",
+            location: ["Wisconsin"],
+            pretty_location: "Wisconsin",
             img: "man-20"
           },
           {
             age: "32",
             gender: "female",
             politics: "conservative",
-            location: ["Florida"],
-            pretty_location: "Florida",
+            location: ["Texas"],
+            pretty_location: "Texas",
             img: "woman-32"
           }
         ].map(persona => (
