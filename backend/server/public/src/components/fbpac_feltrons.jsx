@@ -4,6 +4,7 @@ import PoliticalRatioChart from "components/political_ratio_chart.jsx";
 
 const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
   <div className="feltrons">
+  <div className="feltron-static"></div>
     <div className="top-feltrons-container">
       <div className="top-feltrons political-ratio">
         <h3>More Political Ads Lately?</h3>
@@ -18,7 +19,7 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
           }
         />
       </div>
-      <div className="top-feltrons">
+      <div className="top-feltrons top-target">
         <h3>Top targeted traits</h3>
         <div className="flexy">
           <div className="">
