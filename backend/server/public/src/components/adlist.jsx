@@ -9,7 +9,7 @@ import Term from "components/term.jsx";
 import Ad from "components/ad.jsx";
 import { t } from "i18n.js";
 import { connect } from "react-redux";
-import { throttledDispatch, getAds, getHomepageSummary } from "actions.js";
+import { throttledDispatch, getAds, getHomepageSummary, hideOldSearch, showOldSearch } from "actions.js";
 import { withRouter } from "react-router-dom";
 import { deserialize } from "utils.js";
 
@@ -32,11 +32,7 @@ export class AdListUnconnected extends React.Component {
         <FbpacFeltrons />
 
         <SelectorsAndPersonae />
-
-        <div>
-          <button id="toggle-topic-search">Search by Topic</button>
-        </div>
-        <form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
+        { this.props.show_old_search ? (<form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
           <fieldset className="prefabs">
             <legend>{t("search_terms")}</legend>
             <ul>
@@ -55,8 +51,11 @@ export class AdListUnconnected extends React.Component {
           />
           <Filters />
         </form>
+        ) : null }
         <div className="facebook-pac-ads">
-        <p className="why-these-ads">The following ads target one or more of the traits selected above.</p>
+        <p className="why-these-ads">The following ads target one or more of the traits selected above. {" "}
+          <button id="toggle-topic-search" onClick={() => this.props.show_old_search ? this.props.hideOldSearch() : this.props.showOldSearch()}>{this.props.show_old_search ? "Hide Keyword Search" : "Search by Keyword"}</button>
+        </p>
           {this.props.ads.length > 0 ? (
             <Pagination />
           ) : (
@@ -76,14 +75,15 @@ export class AdListUnconnected extends React.Component {
 }
 
 export const AdListUnrouted = connect(
-  ({ ads, search, pagination, filters, entities, advertisers, targets }) => ({
+  ({ ads, search, pagination, filters, entities, advertisers, targets, show_old_search }) => ({
     ads,
     search,
     pagination,
     filters,
     entities,
     advertisers,
-    targets
+    targets,
+    show_old_search
   }),
   dispatch => ({
     onChange: e => {
@@ -97,7 +97,9 @@ export const AdListUnrouted = connect(
       deserialize(dispatch, ["en-US", "de-DE"]);
       dispatch(getAds());
       dispatch(getHomepageSummary());
-    }
+    },
+    hideOldSearch: () => dispatch(hideOldSearch()),
+    showOldSearch: () => dispatch(showOldSearch())
   })
 )(AdListUnconnected);
 const AdList = withRouter(AdListUnrouted);

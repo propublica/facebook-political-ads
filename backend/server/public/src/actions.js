@@ -179,6 +179,11 @@ export const filterbyPoliticalProbability = a(CHANGE_POLITICAL_PROBABILITY);
 export const changePoliticalProbability = t =>
   asyncResetPage(filterbyPoliticalProbability(t));
 
+export const SHOW_OLD_SEARCH = "show_old_search";
+export const HIDE_OLD_SEARCH = "hide_old_search";
+export const showOldSearch = () => ({ type: SHOW_OLD_SEARCH });
+export const hideOldSearch = () => ({ type: HIDE_OLD_SEARCH });
+
 export const NEXT_PAGE = "next_page";
 export const PREV_PAGE = "prev_page";
 export const SET_PAGE = "set_page";

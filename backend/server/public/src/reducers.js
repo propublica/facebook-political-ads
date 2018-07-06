@@ -26,7 +26,9 @@ import {
   REQUESTING_STATES_AND_DISTRICTS,
   CLEAR_PERSONA,
   SET_PERSONA,
-  SET_PERSONA_FACET
+  SET_PERSONA_FACET,
+  SHOW_OLD_SEARCH,
+HIDE_OLD_SEARCH
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -58,6 +60,17 @@ export const search = (state = null, action) => {
       return state;
   }
 };
+
+export const show_old_search = (state=false, action) => {
+  switch (action.type) {
+    case SHOW_OLD_SEARCH:
+      return true;
+    case HIDE_OLD_SEARCH:
+      return false;
+    default:
+      return state;
+  }
+}
 
 export const persona = (state = null, action) => {
   switch (action.type) {
