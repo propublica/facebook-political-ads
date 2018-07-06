@@ -12,10 +12,10 @@ const Persona = ({ persona, setPersona, getAds }) => (
   >
 
 <div className='emoji' id={persona.img}></div>
-   
+
     <div className="persona-info">
       <p>
-        A {persona.age}-year-old { persona.gender} living in { persona.location} who is { persona.politics}.
+        <strong>{ persona.age }</strong>-year-old <strong>{ persona.gender }</strong> living in <strong>{ persona.location }</strong> who is <strong>{ persona.politics }</strong>.
       </p>
     </div>
   </div>

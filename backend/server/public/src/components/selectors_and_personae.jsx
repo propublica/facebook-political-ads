@@ -28,8 +28,6 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
           <option>male</option>
           <option>person</option>
         </select>{" "}
-      </p>
-      <p>
         of any race living in{" "}
         <select
           value={persona === null ? "" : persona.location[0]}
