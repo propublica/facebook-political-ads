@@ -103,7 +103,7 @@ const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
 
       <div className="race-note">
         <p>
-          Note: We don't let you filter by race because few advertisers target
+          Note: We don't let you filter by race because few political advertisers target
           using Facebook’s “multicultural affinity” category.
         </p>
       </div>
