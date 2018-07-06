@@ -6,7 +6,7 @@ import { getAds, setPersonaFacet } from "actions.js";
 const SelectorsAndPersonae = ({ getAds, setPersonaFacet, persona }) => (
   <div className="selectorsAndPersonae">
     <div className="selectorsOnly">
-      <p>
+      <p id="sticky_nav">
         Fill out your information to see who is targeting a{" "}
         <input
           type="number"

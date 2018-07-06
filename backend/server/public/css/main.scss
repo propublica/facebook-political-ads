@@ -265,6 +265,14 @@ article {
   background:#dddcdb
 }
 
+.sticky {
+    max-width: 960px;
+    position: fixed;
+    top: 0;
+    background: #fff;
+    padding: 10px;
+}
+
 #man-65 {
   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/male-office-worker.png") top left no-repeat;
   background-size: 100%;
