@@ -65,7 +65,7 @@ export class AdListUnconnected extends React.Component {
 
           <div id="ads">
             {this.props.ads.slice(0,2).map(ad => <Ad ad={ad} key={ad.id} />)}
-            <PleaseInstall />=
+            {this.props.ads.length > 0 ? <PleaseInstall /> : null }
             {this.props.ads.slice(2).map(ad => <Ad ad={ad} key={ad.id} />)}
           </div>
           {this.props.ads.length > 0 ? <Pagination /> : ""}
