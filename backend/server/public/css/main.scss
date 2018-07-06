@@ -384,62 +384,63 @@ article {
   font-size: 1.2em;
 }
 
-.glad-you-here {
-    // max-width: 600px; // removed by JBM 7/6/2018 in order to make this take up full width when mixed in with the ads.
-    margin: 40px auto;
-    padding: 20px 0px;
-    border-top: 2px solid #444;
+.facebook-pac-ads {
+  .glad-you-here {
+      // max-width: 600px; // removed by JBM 7/6/2018 in order to make this take up full width when mixed in with the ads.
+      margin: 40px auto;
+      padding: 20px 0px;
+      border-top: 2px solid #444;
 
-  > div {
-    float:left;
-  }
-  div:first-child {
-    @include breakpoint-max(sm) {
-      width:100%;
+    > div {
+      float:left;
     }
-    width:12%;
-    min-width: 100px;
-    margin-right:5px
+    div:first-child {
+      @include breakpoint-max(sm) {
+        width:100%;
+      }
+      width:12%;
+      min-width: 100px;
+      margin-right:5px
 
-  }
-  div:last-child {
-    @include breakpoint-max(sm) {
-      width:100%;
-      text-align: center;
     }
-    width:78%;
-    margin-bottom:50px
-  }
-  h2 {
-    font-size:1.3em;
-    font-weight:bold;
-    margin-bottom:5px
-  }
-  h4 {
-    font-size: .8em;
-    font-family: "Graphik", sans-serif;
-    margin-bottom:10px
-  }
+    div:last-child {
+      @include breakpoint-max(sm) {
+        width:100%;
+        text-align: center;
+      }
+      width:78%;
+      margin-bottom:50px
+    }
+    h2 {
+      font-size:1.3em;
+      font-weight:bold;
+      margin-bottom:5px
+    }
+    h4 {
+      font-size: .8em;
+      font-family: "Graphik", sans-serif;
+      margin-bottom:10px
+    }
 
-  p {
-    font-size: .8em;
-    margin-bottom:10px;
-  }
-  img {
-    max-width: 100px;
-    margin: auto;
-  }
-  a {
-    padding:5px 10px;
-    background: #196aa7;
-    color:white;
-    border-radius: 5px;
-    font-size:.7em;
-    margin-top:10px;
-    font-weight: 600
+    p {
+      font-size: .8em;
+      margin-bottom:10px;
+    }
+    img {
+      max-width: 100px;
+      margin: auto;
+    }
+    a {
+      padding:5px 10px;
+      background: #196aa7;
+      color:white;
+      border-radius: 5px;
+      font-size:.7em;
+      margin-top:10px;
+      font-weight: 600
+    }
   }
 }
-
 
 
 .selectorsOnly {
