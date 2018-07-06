@@ -33,7 +33,6 @@ export class AdListUnconnected extends React.Component {
 
         <SelectorsAndPersonae />
 
-        <PleaseInstall />
         <div>
           <button id="toggle-topic-search">Search by Topic</button>
         </div>
@@ -65,7 +64,9 @@ export class AdListUnconnected extends React.Component {
           )}
 
           <div id="ads">
-            {this.props.ads.map(ad => <Ad ad={ad} key={ad.id} />)}
+            {this.props.ads.slice(0,2).map(ad => <Ad ad={ad} key={ad.id} />)}
+            <PleaseInstall />=
+            {this.props.ads.slice(2).map(ad => <Ad ad={ad} key={ad.id} />)}
           </div>
           {this.props.ads.length > 0 ? <Pagination /> : ""}
         </div>
