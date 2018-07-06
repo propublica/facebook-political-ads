@@ -10,25 +10,12 @@ const Persona = ({ persona, setPersona, getAds }) => (
       getAds();
     }}
   >
-    <div className="persona-cutout img"></div>
-    {persona.name}
+
+<div className='emoji' id={persona.img}></div>
+
     <div className="persona-info">
       <p>
-        Age: <span className="trait-category">{persona.age}</span>
-      </p>
-      <p>
-        Gender: <span className="trait-category">{persona.gender}</span>
-      </p>
-      <p>
-        Location:{" "}
-        <span className="trait-category">
-          {persona.location.length >= 2
-            ? persona.location[1] + ", " + persona.location[0]
-            : persona.location}
-        </span>
-      </p>
-      <p>
-        Politics: <span className="trait-category">{persona.politics}</span>
+        <strong>{ persona.age }</strong>-year-old <strong>{ persona.gender }</strong> living in <strong>{ persona.location }</strong> who is <strong>{ persona.politics }</strong>.
       </p>
     </div>
   </div>

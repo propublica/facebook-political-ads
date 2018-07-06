@@ -34,7 +34,9 @@ export class AdListUnconnected extends React.Component {
         <SelectorsAndPersonae />
 
         <PleaseInstall />
-
+        <div>
+          <button id="toggle-topic-search">Search by Topic</button>
+        </div>
         <form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
           <fieldset className="prefabs">
             <legend>{t("search_terms")}</legend>

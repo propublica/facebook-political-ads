@@ -207,6 +207,8 @@ article {
 
 .flexy {
   display: flex;
+  margin: auto;
+  max-width: 590px;
 
   .third {
     // width: 33.3%;
@@ -227,7 +229,7 @@ article {
 
   .quarter {
     width: 25%;
-    padding: 0.25em;
+    padding: 1em .25em .5em;
   }
 
   .half {
@@ -236,13 +238,40 @@ article {
   }
 }
 
-.persona-cutout .img {
-  background-image: "https://assets.propublica.org/images/series/_threeTwo1200w/20180620-electionland-2018-3x2.png";
-}
-
 .persona-info {
   font-size: .6em;
   text-align: left;
+
+  p strong {
+    font-weight: 500;
+  }
+}
+
+
+#man-65 {
+  background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/male-office-worker.png") top left no-repeat;
+  background-size: 100%;
+}
+
+#woman-40 {
+   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/female-farmer.png") top left no-repeat;
+   background-size: 100%;
+}
+
+#man-20 {
+   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/male-teacher.png") top left no-repeat;
+   background-size: 100%;
+}
+
+#woman-32 {
+   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/female-health-worker.png") top left no-repeat;
+   background-size: 100%;
+}
+
+.persona .emoji {
+  display:inline-block;
+  width:90px;
+  height: 92px;
 }
 
 .trait-category {
@@ -315,7 +344,7 @@ article {
     width:12%;
     min-width: 100px;
     margin-right:5px
-    
+
   }
   div:last-child {
     @include breakpoint-max(sm) {
@@ -339,7 +368,7 @@ article {
   p {
     font-size: .8em;
     margin-bottom:10px;
-  } 
+  }
   img {
     max-width: 100px;
     margin: auto;
@@ -358,7 +387,7 @@ article {
 
 
 .selectorsOnly {
-  margin: 3em 0;
+  margin: 3em 0 2em;
 }
 
 .selectorsOnly p {
@@ -372,8 +401,13 @@ article {
 
 .race-note {
     font-size: .7em;
-    margin: 30px 0px 0px;
-    font-style:italic
+    margin: 20px auto 0px;
+    font-style:italic;
+    max-width: 620px;
+
+    p {
+      line-height: 1.5;
+    }
 }
 
 
