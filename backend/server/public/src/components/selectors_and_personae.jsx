@@ -9,7 +9,6 @@ export class SelectorsAndPersonae extends React.Component {
     var eloffset = el.offsetTop;
     
     window.onscroll = function() {
-      console.log("scrolling")
       var windowTop = window.scrollY;
       if (windowTop > eloffset) {
         el.classList.add('sticky')
@@ -119,14 +118,14 @@ export class SelectorsAndPersonae extends React.Component {
             <option>apolitical</option>
           </select>.
         </p>
-
+        </div>
         <div className="race-note">
           <p>
             Note: We don't let you filter by race because few political advertisers target
             using Facebook’s “multicultural affinity” category.
           </p>
         </div>
-      </div>
+      
       <div>
 
         <p>Or see who is targeting a:</p>

@@ -258,7 +258,7 @@ article {
     margin: 10px 10px 0px 0px;
     border-radius: 5px;
     border: 1px solid #cecece;
-    cursor:pointer
+    cursor:pointer;
 }
 
 .persona:hover {
@@ -266,11 +266,11 @@ article {
 }
 
 .sticky {
-    max-width: 960px;
+    max-width: 62%;
+    width:890px;
     position: fixed;
     top: 0;
     background: #fff;
-    padding: 10px;
 }
 
 #man-65 {
@@ -429,12 +429,32 @@ article {
 
 
 .selectorsOnly {
-  margin: 3em 0 2em;
+  margin: 2em 0 1em;
+  min-height: 120px;
+  @include breakpoint-max(md) {
+     min-height: 120px;
+  }
 }
 
 .selectorsOnly p {
   line-height: 2.3;
   font-weight: 500;
+  padding: 10px 0px;
+    transition: all 0.20s ease-in-out;
+  -webkit-transition: all 0.20s ease-in-out;
+  -moz-transition: all 0.20s ease-in-out;
+  -o-transition: all 0.20s ease-in-out;
+  font-size:.9em;
+  @include breakpoint-max(md) {
+    font-size:.7em;
+  }
+}
+
+.selectorsOnly p.sticky {
+  font-size: .8em;
+  @include breakpoint-max(md) {
+    font-size:.7em;
+  }
 }
 
 .personaIntro {
@@ -443,7 +463,7 @@ article {
 
 .race-note {
     font-size: .7em;
-    margin: 20px auto 0px;
+    margin: 0px auto 20px;
     font-style:italic;
     max-width: 620px;
 
@@ -747,7 +767,7 @@ article {
 // -----------------------------------------------------------------------------
 
 header[role="banner"] {
-  position: fixed;
+  position: relative;
   top: 0;
   width: 100%;
   height: $navbar-height-offset;
@@ -807,7 +827,7 @@ header[role="banner"] > h2 a {
 }
 
 header[role="banner"] nav {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0.5em;
   font-family: $fonts-sans;
