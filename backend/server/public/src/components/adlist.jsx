@@ -1,13 +1,10 @@
 import React from "react";
-import { Filters } from "components/filters.jsx";
 import Pagination from "components/pagination.jsx";
 import FbpacFeltrons from "components/fbpac_feltrons.jsx";
 import SelectorsAndPersonae from "components/selectors_and_personae.jsx";
 import PleaseInstall from "components/please_install.jsx";
-
-import Term from "components/term.jsx";
+import KeywordSearch from "components/keyword_search.jsx";
 import Ad from "components/ad.jsx";
-import { t } from "i18n.js";
 import { connect } from "react-redux";
 import { throttledDispatch, getAds, getHomepageSummary, hideOldSearch, showOldSearch } from "actions.js";
 import { withRouter } from "react-router-dom";
@@ -32,26 +29,9 @@ export class AdListUnconnected extends React.Component {
         <FbpacFeltrons />
 
         <SelectorsAndPersonae />
-        { this.props.show_old_search ? (<form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>
-          <fieldset className="prefabs">
-            <legend>{t("search_terms")}</legend>
-            <ul>
-              {["Trump", "Obama", "Hillary", "Mueller", "Health", "Taxes"].map(
-                term => (
-                  <Term key={term} search={this.props.search} term={term} />
-                )
-              )}
-            </ul>
-          </fieldset>
-          <input
-            type="search"
-            id="search"
-            placeholder={t("search")}
-            onChange={this.props.onChange}
-          />
-          <Filters />
-        </form>
-        ) : null }
+
+        <KeywordSearch />
+
         <div className="facebook-pac-ads">
         <p className="why-these-ads">The following ads target one or more of the traits selected above. {" "}
           <button id="toggle-topic-search" onClick={() => this.props.show_old_search ? this.props.hideOldSearch() : this.props.showOldSearch()}>{this.props.show_old_search ? "Hide Keyword Search" : "Search by Keyword"}</button>
