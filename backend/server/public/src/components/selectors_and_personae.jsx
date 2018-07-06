@@ -19,20 +19,21 @@ export class SelectorsAndPersonae extends React.Component {
     }
   }
 
+  // See ads targeted to people who are: [ ] year olds, [women|men|any gender], any race, living in [any place] and politically [liberal|conservative|neither liberal nor conservative].
   render() {
     return (<div className="selectorsAndPersonae">
       <div className="selectorsOnly">
         <p id="sticky_nav">
-          Fill out your information to see who is targeting a{" "}
+          See ads targeted to people who are:{" "}
           <input
             type="number"
-            value={this.props.persona === null ? "28" : this.props.persona.age}
+            value={this.props.persona === null ? "--" : this.props.persona.age}
             onChange={event => {
               this.props.setPersonaFacet("age", event.target.value);
               this.props.getAds();
             }}
           />{" "}
-          year old{" "}
+          years old,{" "}
           <select
             value={this.props.persona === null ? "" : this.props.persona.gender}
             onChange={event => {
@@ -40,19 +41,20 @@ export class SelectorsAndPersonae extends React.Component {
               this.props.getAds();
             }}
           >
-
+            <option>any gender</option>
             <option>woman</option>
             <option>man</option>
-            <option>all genders</option>
-          </select>{" "}
-          of any race living in{" "}
+          </select>,{" "}
+          any race,{" "}
+          in{" "}
           <select
-            value={this.props.persona === null ? "" : this.props.persona.location[0]}
+            value={this.props.persona && this.props.persona.location ? this.props.persona.location[0] : "any state"}
             onChange={event => {
               this.props.setPersonaFacet("location", [event.target.value, null]);
               this.props.getAds();
             }}
           >
+            <option>any state</option>
             <option>Alabama</option>
             <option>Alaska</option>
             <option>Arizona</option>
@@ -106,7 +108,7 @@ export class SelectorsAndPersonae extends React.Component {
             <option>Wisconsin</option>
             <option>Wyoming</option>
           </select>{" "}
-          and who is{" "}
+          and politically{" "}
           <select
             value={this.props.persona === null ? "" : this.props.persona.politics}
             onChange={event => {
@@ -114,9 +116,9 @@ export class SelectorsAndPersonae extends React.Component {
               this.props.getAds();
             }}
           >
+            <option>neither liberal nor conservative</option>
             <option>conservative</option>
             <option>liberal</option>
-            <option>apolitical</option>
           </select>.
         </p>
         </div>
@@ -152,7 +154,7 @@ export class SelectorsAndPersonae extends React.Component {
             {
               age: "20",
               gender: "man",
-              politics: "apolitical",
+              politics: "neither liberal nor conservative",
               location: ["Wisconsin"],
               pretty_location: "Wisconsin",
               img: "man-20"
