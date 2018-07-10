@@ -40,6 +40,7 @@ impl<'a> From<TargetingParsed<'a>> for Targeting {
             TargetingParsed::Like => Targeting::new("Like", None),
             TargetingParsed::List => Targeting::new("List", None),
             TargetingParsed::EngagedWithContent => Targeting::new("Engaged with Content", None),
+            TargetingParsed::ActivityOnTheFacebookFamily => Targeting::new("Activity on the Facebook Family", None),
             TargetingParsed::Advertiser(_) => {
                 panic!("Advertiser is not allowed as a targeting field")
             }
@@ -79,6 +80,7 @@ pub enum TargetingParsed<'a> {
     Like,
     List,
     EngagedWithContent,
+    ActivityOnTheFacebookFamily,
     // This is a special field that allows us to tie a page to a name
     Advertiser(&'a str),
 }
@@ -104,6 +106,13 @@ named!(engaged_with_content(&str) -> TargetingParsed,
        (TargetingParsed::EngagedWithContent)
    )
 );
+named!(activity_on_the_facebook_family(&str) -> TargetingParsed, 
+    do_parse!(
+        take_until!("wants to reach people based on their activity on the Facebook family of apps and services") >>
+        (TargetingParsed::ActivityOnTheFacebookFamily)
+    )
+);
+
 
 named!(like(&str) -> TargetingParsed,
    do_parse!(
@@ -155,6 +164,7 @@ named!(advertiser_b(&str) -> TargetingParsed,
     do_parse!(
         alt!(
             take_until_and_consume!("is that <b>") |
+            take_until_and_consume!("is because <b>") |
             take_until_and_consume!("<b id=\"ad_prefs_advertiser\">")
         ) >>
         advertiser: until_b >>
@@ -325,7 +335,6 @@ named!(max_age_parser(&str) -> Option<InternalMaxAge>,
             "older" => Some(InternalMaxAge::None),
             _ => Some(InternalMaxAge::Some(max_age))
         })
-        // (if max_age == "older" { None } else { Some( InternalMaxAge(max_age) ) } )
     )
 );
 
@@ -349,13 +358,6 @@ named!(min_max_age(&str) -> Vec<Option<TargetingParsed>>,
         ])
     )
 );
-
-
-        // min_age: complete!(opt!(ws!(take_while1!(|n: char| n.is_numeric() )))) >>
-        // opt!(ws!(alt!(take_until_and_consume!("and ") | take_until_and_consume!("to ")))) >>
-        // max_age: opt!(ws!(take_while1!(|n: char| n.is_numeric() ))) >>
-        // (vec![min_age.map(|l| TargetingParsed::MinAge(l)), max_age.map(|l| TargetingParsed::MaxAge(l))])
-
 
 // Donald J. Trump wants to reach <b>people who live in the United States</b>
 named!(region(&str) -> Vec<Option<TargetingParsed>>,
@@ -396,28 +398,36 @@ named!(age_and_location(&str) -> Vec<Option<TargetingParsed>>,
 
 // TODO: implement engaged_with_content
 named!(get_targeting(&str) -> Vec<TargetingParsed>,
-    do_parse!(
-        advertiser_first: opt!(advertiser_b) >>
-        sources_and_interests: opt!(alt!(
-            interest
-            | retargeting
-            | employer
-            | school
-            | website
-            | provider
-            | language
-            | segment
-            | like
-            | list
-        )) >>
-        advertiser_second: opt!(advertiser_wants) >>
-        gender: gender >>
-        location: age_and_location >>
-        (vec![&vec![advertiser_first,
-                    sources_and_interests,
-                    advertiser_second,
-                    gender][..], &location[..]]
-              .concat().iter().filter_map(|x| x.clone()).collect())
+    alt!(
+        do_parse!(
+            advertiser_first: opt!(advertiser_b) >>
+            sources_and_interests: opt!(alt!(
+                        interest
+                        | retargeting
+                        | employer
+                        | school
+                        | website
+                        | provider
+                        | language
+                        | segment
+                        | like
+                        | list
+                        | activity_on_the_facebook_family
+            )) >>
+            advertiser_second: opt!(advertiser_wants) >>
+            gender: gender >>
+            location: age_and_location >>
+            (vec![&vec![advertiser_first,
+                        sources_and_interests,
+                        advertiser_second,
+                        gender][..], &location[..]]
+                .concat().iter().filter_map(|x| x.clone()).collect())
+        ) | 
+        do_parse!(
+            advertiser_first: opt!(advertiser_b) >>
+            sources_and_interests: opt!(engaged_with_content) >> 
+            (vec![advertiser_first, sources_and_interests].iter().filter_map(|x| x.clone()).collect())
+        )
     )
 );
 
@@ -676,10 +686,12 @@ mod tests {
 
         assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_o_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_o_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_o_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>PayPal</b> wants to reach people interested in <b id='ad_prefs_interest'>Do it yourself (DIY)</b>, based on activity such as liking Pages or clicking on ads.</div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that PayPal wants to reach <b>people ages 25 and older who were recently in the United States</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div>", vec![TargetingParsed::Advertiser("PayPal"), TargetingParsed::Age("25 and older"), TargetingParsed::MinAge("25"), TargetingParsed::Region("the United States")]));
 
-        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-'>Close</a></div><div><h3 id='u_6u_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_6u_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_6u_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>NRDC (Natural Resources Defense Council)</b> wants to reach <b>people who may be similar to their customers</b>. <a id='ad_prefs_link'>Learn more.</a></div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that NRDC (Natural Resources Defense Council) wants to reach <b>people ages 18 and older</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div>"), IResult::Done("</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div></div></div><div></div>", vec![TargetingParsed::Retargeting("people who may be similar to their customers"), TargetingParsed::Advertiser("NRDC (Natural Resources Defense Council)"), TargetingParsed::Age("18 and older"), TargetingParsed::MinAge("18"),]));
+        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-'>Close</a></div><div><h3 id='u_6u_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_6u_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_6u_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>NRDC (Natural Resources Defense Council)</b> wants to reach <b>people who may be similar to their customers</b>. <a id='ad_prefs_link'>Learn more.</a></div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that NRDC (Natural Resources Defense Council) wants to reach <b>people ages 18 and older</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div>").to_result(), Ok(vec![TargetingParsed::Retargeting("people who may be similar to their customers"), TargetingParsed::Advertiser("NRDC (Natural Resources Defense Council)"), TargetingParsed::Age("18 and older"), TargetingParsed::MinAge("18"),]));
 
         // TODO: implement engaged_with_content.
         // the problem is that it doesn't appear with the second strin g("There may be other reasons") from which we get second advertiser, gender, age and location.
-        // assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_1c_0' class='_52c9'>About this Facebook ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_1c_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_1c_2'>One reason why you're seeing this ad is because <b>International Rescue Committee</b> wants to reach people who have engaged with them or with their content.</div></span></div></div><div></div><div class='_4uor _52jw'><div class='_5aj7' id='u_1c_3'><div class='_4bl9'></div><div class='_4bl7 _5r7v'><i class='img sp_PVuC7pFCHqd sx_1baca1'><u>gear</u></i></div><div class='_4bl7'><a href='https://www.facebook.com/ads/preferences/'>Manage Your ad preferences</a></div></div></div>"), IResult::Done("", vec![]));
+        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_1c_0' class='_52c9'>About this Facebook ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_1c_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_1c_2'>One reason why you're seeing this ad is because <b>International Rescue Committee</b> wants to reach people who have engaged with them or with their content.</div></span></div></div><div></div><div class='_4uor _52jw'><div class='_5aj7' id='u_1c_3'><div class='_4bl9'></div><div class='_4bl7 _5r7v'><i class='img sp_PVuC7pFCHqd sx_1baca1'><u>gear</u></i></div><div class='_4bl7'><a href='https://www.facebook.com/ads/preferences/'>Manage Your ad preferences</a></div></div></div>").to_result(), Ok(vec![TargetingParsed::Advertiser("International Rescue Committee"), TargetingParsed::EngagedWithContent]));
+
+        assert_eq!(get_targeting("<div><div class='_4-i0 _26c5'><div class='clearfix'><div class='_51-u rfloat _ohf'><a class='_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-' href='nullblank'>Close</a></div><div><h3 id='u_18_0' class='_52c9'>About This Facebook Ad</h3></div></div></div><div class='_4-i2 _pig _4s3a _50f4'><div class='_4uov'><div class='_4uoz'><div id='u_18_1'></div><div class='_3-8x'><span class='_4v6n'><div id='u_18_2'>One reason you're seeing this ad is that <b id='ad_prefs_advertiser'>Beto O'Rourke</b> wants to reach people based on their activity on the Facebook family of apps and services. This includes sharing links to their website, interacting with their content (such as clicking ads, watching videos or saving content) or directly interacting (such as messaging) with them.</div></span><div class='_4hcd'><span>There may be other reasons you're seeing this ad, including that Beto O'Rourke wants to reach <b>people ages 18 and older who live or were recently in Texas</b>. This is information based on your Facebook profile and where you've connected to the internet.</span></div></div></div><div></div><div class='_4uor _52jw'><div class='_5aj7' id='u_18_3'><div class='_4bl9'></div><div class='_4bl7 _5r7v'><i class='img sp_lXFspPUe6fO_2x sx_0ec8d2'><u>gear</u></i></div><div class='_4bl7'><a href='https://www.facebook.com/ads/preferences/'>Manage Your Ad Preferences</a></div></div></div><div class='mhs _1ray _1ra- _4uos'></div><div class='_4uou'><div class='_26c6 _3es4 fsl fwb fcb'>Tell Us What You Think</div><div><div class='clearfix _ikh' id='u_18_4'><div class='_4bl7 _3es3'>Was this explanation useful?</div><div class='_4bl7 _2pit'><a href='nullblank' id='u_18_5'>Yes</a></div><div class='_4bl9 _2pit'><a href='nullblank' id='u_18_6'>No</a></div></div><span class='hidden_elem _3es3' id='u_18_7'>Thanks for your rating.</span></div></div></div></div><div class='_5lnf uiOverlayFooter _5a8u _4866'><table class='uiGrid _51mz uiOverlayFooterGrid'><tbody><tr class='_51mx'><td class='_51m- prs uiOverlayFooterMessage'><a><i class='_4868 img sp_-wGGqwqeEPG_2x sx_a15d0e'><u>info</u></i><span class='_4867'>Learn more about Facebook Ads</span></a></td><td class='_51m- uiOverlayFooterButtons _51mw'></td></tr></tbody></table></div></div>").to_result(), Ok(vec![TargetingParsed::ActivityOnTheFacebookFamily, TargetingParsed::Advertiser("Beto O'Rourke"), TargetingParsed::Age("18 and older"), TargetingParsed::MinAge("18"), TargetingParsed::Region("Texas")]))
     }
 }
