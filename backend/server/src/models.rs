@@ -795,7 +795,7 @@ mod tests {
             entities: None,
             page: None,
             lower_page: None,
-            targetings: vec![],
+            targetings: Some(vec![]),
             paid_for_by: None,
         };
         let urls = saved_ad.image_urls();
