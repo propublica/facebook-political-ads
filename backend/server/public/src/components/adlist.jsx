@@ -71,8 +71,8 @@ export const AdListUnrouted = connect(
       dispatch(getAds());
       dispatch(getHomepageSummary());
     },
-    hideOldSearch: () => dispatch(hideOldSearch()),
-    showOldSearch: () => dispatch(showOldSearch())
+    hideOldSearch: () => { window.location.hash = ""; dispatch(hideOldSearch())},
+    showOldSearch: () => { window.location.hash = "facebook-pac-browser";; dispatch(showOldSearch())}
   })
 )(AdListUnconnected);
 const AdList = withRouter(AdListUnrouted);
