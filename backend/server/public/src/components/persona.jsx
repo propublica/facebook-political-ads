@@ -20,7 +20,7 @@ const Persona = ({ persona, setPersona, getAds }) => (
 
     <div className="persona-info">
       <p>
-        <strong>{ persona.age }</strong>-year-old <strong>{ persona.gender }</strong> living in <strong>{ persona.pretty_location }</strong> who is <strong>{ persona.politics }</strong>.
+        <strong>{ persona.age }</strong>-year-old <strong>{ persona.gender }</strong> living in <strong>{ persona.pretty_location }</strong> who is <strong>{ persona.politics }</strong>
       </p>
     </div>
   </div>

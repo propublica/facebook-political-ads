@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { t } from "i18n.js";
 import Term from "components/term.jsx";
 import { Filters } from "components/filters.jsx";
+import { throttledDispatch } from "actions.js";
 
 const KeywordSearchUnconnected = ({ show_old_search, search, onChange }) => (
         show_old_search ? (<form id="facebook-pac-browser" onSubmit={e => e.preventDefault()}>

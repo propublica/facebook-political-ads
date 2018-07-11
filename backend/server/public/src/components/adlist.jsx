@@ -6,7 +6,7 @@ import PleaseInstall from "components/please_install.jsx";
 import KeywordSearch from "components/keyword_search.jsx";
 import Ad from "components/ad.jsx";
 import { connect } from "react-redux";
-import { throttledDispatch, getAds, getHomepageSummary, hideOldSearch, showOldSearch } from "actions.js";
+import { getAds, getHomepageSummary, hideOldSearch, showOldSearch } from "actions.js";
 import { withRouter } from "react-router-dom";
 import { deserialize } from "utils.js";
 
@@ -39,7 +39,7 @@ export class AdListUnconnected extends React.Component {
           {this.props.ads.length > 0 ? (
             <Pagination />
           ) : (
-            <p className="no_ads">No ads found for {this.props.search}.</p>
+            <p className="no_ads">{this.props.search && this.props.search.length > 0 ? `No ads found for ${this.props.search}` : "No ads found" }.</p>
           )}
 
           <div id="ads">
@@ -66,20 +66,13 @@ export const AdListUnrouted = connect(
     show_old_search
   }),
   dispatch => ({
-    onChange: e => {
-      e.preventDefault();
-      throttledDispatch(
-        dispatch,
-        e.target.value.length ? e.target.value : null
-      );
-    },
     deserialize: () => {
       deserialize(dispatch, ["en-US", "de-DE"]);
       dispatch(getAds());
       dispatch(getHomepageSummary());
     },
-    hideOldSearch: () => dispatch(hideOldSearch()),
-    showOldSearch: () => dispatch(showOldSearch())
+    hideOldSearch: () => { window.location.hash = ""; dispatch(hideOldSearch())},
+    showOldSearch: () => { window.location.hash = "facebook-pac-browser";; dispatch(showOldSearch())}
   })
 )(AdListUnconnected);
 const AdList = withRouter(AdListUnrouted);

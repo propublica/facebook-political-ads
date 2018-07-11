@@ -80,6 +80,8 @@ export const persona = (state = null, action) => {
       return action.value;
     case SET_PERSONA_FACET:
       return state ? { ...state, ...action.value } : action.value;
+    case NEW_SEARCH:
+      return null;
     default:
       return state;
   }

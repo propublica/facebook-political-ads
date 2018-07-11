@@ -3,3 +3,5 @@ target
 Dockerfile
 deploy.sh
 server/public/node_modules
+facebook-ads*.sql
+facebook_ads*.sql
