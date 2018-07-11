@@ -18,8 +18,10 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>{new Date(Date.parse(ad.created_at)).toString()}</td>
         </tr>
         <tr>
-          <td>title</td>
-          <td>{ad.title}</td>
+          <td>title / paid for by </td>
+          <td>
+            {ad.title} / Paid for by: {ad.paid_for_by ? ad.paid_for_by : "n/a"}
+          </td>
         </tr>
         <tr>
           <td>ad</td>
