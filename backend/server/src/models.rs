@@ -28,6 +28,7 @@ use serde_json;
 use serde_json::Value;
 use server::AdPost;
 use std::collections::HashMap;
+use std::cmp;
 use targeting_parser::{collect_advertiser, collect_targeting, Targeting};
 use url::{ParseError, Url};
 
@@ -584,6 +585,49 @@ impl Ad {
     }
 }
 
+// the more granularly targeted, the higher the score
+pub fn get_targetedness_score(targets: Option<Value>) -> i8 {
+    match targets.clone() {
+        None => 0,
+        Some(targets_json) => {
+            let mut targets_value = serde_json::to_value(targets_json).unwrap();
+            let targs = targets_value.as_array_mut().unwrap();
+            let targetedness : i8 = targs.iter()
+                .filter(|elem| elem.as_str().unwrap() == "{\"target\": \"Region\", \"segment\": \"the United States\"}") // remove region: US
+                // .sort_unstable_by(|x, y| x.to_string().cmp(&y.to_string()) );
+                // .dedup();
+                .map(|elem| 
+                    match elem.as_object().unwrap().get("target").unwrap().as_str().unwrap() {
+                        "Gender" => 3,
+                        "City" => 4,
+                        "State" => 1,
+                        "Region" => 1,
+                        "Age" => 0,    // this is a pickle that may require special treatment... since for this, we care about the size of the range
+                        "MinAge" => cmp::min((elem.as_object().unwrap().get("segment").unwrap().as_str().unwrap().parse::<i8>().unwrap() - 18 ) / 10, 1) ,
+                        "MaxAge" => cmp::min((65 - elem.as_object().unwrap().get("segment").unwrap().as_str().unwrap().parse::<i8>().unwrap() ) / 10, 1),
+                        "Interest" => 3,
+                        "Segment" => 3,
+                        "Retargeting" => 2, // actually "Near their business" and "Lookalike Audience"
+                        "Agency" => 3,      // Data Brokers
+                        "Website" => 1,
+                        "Language" => 0,
+                        "Employer" => 4,
+                        "School" => 4,
+                        "Like" => 2,
+                        "List" => 3, // Custom Audience
+                        "EngagedWithContent" => 1,
+                        "ActivityOnTheFacebookFamily" => 1,
+                        _ => 0
+                    }
+                )
+                // .collect::<i8>()
+                .sum();
+            // TODO:  sort and uniqify target names (so we don't count two instances of City as more targeted than one)
+            targetedness
+        }
+    }
+}
+
 pub fn get_targets(targeting: &Option<String>) -> Option<Value> {
     match *targeting {
         Some(ref targeting) => collect_targeting(targeting)
@@ -697,9 +741,7 @@ impl<'a> NewAd<'a> {
                     targetings.eq(
                         self.targeting.clone().map_or(None, |targ| {
                             let mut tings = vec![targ];
-                            if ad.targeting.is_some() {
-                                tings.push(ad.targeting.clone().unwrap())
-                            }
+                            tings.push(ad.targeting.clone().unwrap());
                             Some(tings)
                         })
                         
