@@ -368,6 +368,7 @@ pub struct Ad {
     pub lower_page: Option<String>,
     pub paid_for_by: Option<String>,
     pub targetings: Option<Vec<String>>,
+    pub targetedness: Option<i32>
 }
 // Define our special functions for searching
 sql_function!(to_englishtsvector, to_englishtsvector_t, (x: Text) -> TsVector);
@@ -586,14 +587,14 @@ impl Ad {
 }
 
 // the more granularly targeted, the higher the score
-pub fn get_targetedness_score(targets: Option<Value>) -> i8 {
+pub fn get_targetedness_score(targets: Option<Value>) -> Option<i32> {
     match targets.clone() {
-        None => 0,
+        None => None,
         Some(targets_json) => {
             let mut targets_value = serde_json::to_value(targets_json).unwrap();
             let targs = targets_value.as_array_mut().unwrap();
-            let targetedness : i8 = targs.iter()
-                .filter(|elem| elem.as_str().unwrap() == "{\"target\": \"Region\", \"segment\": \"the United States\"}") // remove region: US
+            let targetedness : i32 = targs.iter()
+                .filter(|elem| elem.as_str().unwrap_or_else(|| "") == "{\"target\": \"Region\", \"segment\": \"the United States\"}") // remove region: US
                 // .sort_unstable_by(|x, y| x.to_string().cmp(&y.to_string()) );
                 // .dedup();
                 .map(|elem| 
@@ -603,8 +604,8 @@ pub fn get_targetedness_score(targets: Option<Value>) -> i8 {
                         "State" => 1,
                         "Region" => 1,
                         "Age" => 0,    // this is a pickle that may require special treatment... since for this, we care about the size of the range
-                        "MinAge" => cmp::min((elem.as_object().unwrap().get("segment").unwrap().as_str().unwrap().parse::<i8>().unwrap() - 18 ) / 10, 1) ,
-                        "MaxAge" => cmp::min((65 - elem.as_object().unwrap().get("segment").unwrap().as_str().unwrap().parse::<i8>().unwrap() ) / 10, 1),
+                        "MinAge" => cmp::min((elem.as_object().unwrap().get("segment").unwrap().as_str().unwrap().parse::<i32>().unwrap() - 18 ) / 10, 1) ,
+                        "MaxAge" => cmp::min((65 - elem.as_object().unwrap().get("segment").unwrap().as_str().unwrap().parse::<i32>().unwrap() ) / 10, 1),
                         "Interest" => 3,
                         "Segment" => 3,
                         "Retargeting" => 2, // actually "Near their business" and "Lookalike Audience"
@@ -620,10 +621,9 @@ pub fn get_targetedness_score(targets: Option<Value>) -> i8 {
                         _ => 0
                     }
                 )
-                // .collect::<i8>()
                 .sum();
             // TODO:  sort and uniqify target names (so we don't count two instances of City as more targeted than one)
-            targetedness
+            Some(targetedness)
         }
     }
 }
@@ -668,6 +668,7 @@ pub struct NewAd<'a> {
     lower_page: Option<String>,
     paid_for_by: Option<String>,
     targetings: Option<Vec<String>>,
+    targetedness: Option<i32>
 }
 
 impl<'a> NewAd<'a> {
@@ -682,7 +683,7 @@ impl<'a> NewAd<'a> {
         let page = get_author_link(&document)
             .ok()
             .and_then(|l| l.attributes.borrow().get("href").map(|i| i.to_string()));
-
+        let parsed_targets = get_targets(&ad.targeting);
         Ok(NewAd {
             id: &ad.id,
             html: &ad.html,
@@ -697,12 +698,13 @@ impl<'a> NewAd<'a> {
             images: images,
             impressions: if !ad.political.is_some() { 1 } else { 0 },
             targeting: ad.targeting.clone(),
-            targets: get_targets(&ad.targeting),
+            targets: parsed_targets.clone(),
             advertiser: get_advertiser(&ad.targeting, &document),
             page: page.clone(),
             lower_page: page.map(|s| s.to_lowercase()),
             paid_for_by: paid_for_by,
             targetings: ad.targeting.clone().map_or(None, |targ| Some(vec![targ])),
+            targetedness: get_targetedness_score(parsed_targets)
         })
     }
 
@@ -713,7 +715,7 @@ impl<'a> NewAd<'a> {
         let connection = pool.get()?;
         // increment impressions if this is a background save,
         // otherwise increment political counters
-        let ad: Ad = diesel::insert_into(ads::table)
+        let existing_ad: Ad = diesel::insert_into(ads::table)
             .values(self)
             .on_conflict(id)
             .do_update()
@@ -726,28 +728,30 @@ impl<'a> NewAd<'a> {
             .get_result(&*connection)?;
 
         // overwrite the old targeting/targets if the old one was empty.
-        if self.targeting.is_some() && !ad.targeting.is_some() {
+        if self.targeting.is_some() && !existing_ad.targeting.is_some() {
+            let new_targets = get_targets(&existing_ad.targeting);
             diesel::update(ads.find(self.id))
                 .set((
                     targeting.eq(&self.targeting),
-                    targets.eq(get_targets(&ad.targeting)),
+                    targets.eq(new_targets.clone()),
+                    targetedness.eq(get_targetedness_score(new_targets))
                 ))
                 .execute(&*connection)?;
         };
 
-        if self.targeting.is_some() && ad.targeting.is_some() {
+        if self.targeting.is_some() && existing_ad.targeting.is_some() {
             diesel::update(ads.find(self.id))
                 .set((
                     targetings.eq(
                         self.targeting.clone().map_or(None, |targ| {
                             let mut tings = vec![targ];
-                            tings.push(ad.targeting.clone().unwrap());
+                            tings.extend(existing_ad.targetings.clone().unwrap());
                             Some(tings)
                         })
                         
                         ),
                     targets.eq(
-                        ad.targets.clone().map(|old_targets_json| {
+                        existing_ad.targets.clone().map(|old_targets_json| {
                             let mut old_targets_val = serde_json::to_value(old_targets_json).unwrap();
                             let old_targets = old_targets_val.as_array_mut().unwrap();
                             let new_targets : Vec<Value> = collect_targeting(&self.targeting.clone().unwrap()).unwrap_or(vec![])
@@ -762,8 +766,9 @@ impl<'a> NewAd<'a> {
                 ))
                 .execute(&*connection)?;
         };
+        
 
-        Ok(ad)
+        Ok(existing_ad)
     }
 }
 
@@ -839,6 +844,7 @@ mod tests {
             lower_page: None,
             targetings: Some(vec![]),
             paid_for_by: None,
+            targetedness: Some(0)
         };
         let urls = saved_ad.image_urls();
         let images = Images::from_ad(&saved_ad, &urls).unwrap();
