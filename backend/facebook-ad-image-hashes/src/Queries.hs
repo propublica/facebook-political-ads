@@ -16,40 +16,32 @@ module Queries (
   )where
 
 --------------------------------------------------------------------------------
-import           Control.Concurrent
-import           Control.Concurrent.STM
-import           Control.Exception
+import           Control.Concurrent.STM               (TVar, atomically,
+                                                       modifyTVar, newTVarIO,
+                                                       readTVar, writeTVar)
 import           Data.LruCache                        as LRU
-import           Control.Monad.Trans.Resource
-import           Control.Monad.Except                 (runExceptT)
-import           Control.Concurrent.STM.TBQueue
+import           Control.Monad.Trans.Resource         (ResourceT, runResourceT)
 import           Control.Monad                        (unless)
-import qualified Data.ByteString.Char8                as BS
 import qualified Data.ByteString.Lazy                 as BSL
 import           Data.Int                             (Int64)
-import qualified Data.Traversable                     as T
-import           Data.PHash
+import           Data.PHash                           (PHash(..), imageHash)
 import qualified Data.Text                            as T
-import qualified Data.Text.Encoding                   as E
-import           Data.Typeable
 import qualified Database.PostgreSQL.Simple           as PG
 import qualified Database.PostgreSQL.Simple.Types     as PG
 import           Database.PostgreSQL.Simple.SqlQQ     (sql)
 import           Database.PostgreSQL.Simple.FromField as PG
 import qualified Database.PostgreSQL.Simple.Streaming as PGStream
 import           Database.PostgreSQL.Simple.ToField   as PG
-import           Database.PostgreSQL.Simple           (Only(..), connect)
 import qualified Network.HTTP.Client                  as HTTP
 import qualified Network.HTTP.Client.TLS              as HTTP
-import           Streaming
-import qualified Streaming                            as S
+import           Streaming                            (Stream, Of, chunksOf,
+                                                       liftIO)
 import qualified Streaming.Prelude                    as S
-import           Streaming.Concurrent
-import           System.Directory
-import           System.Random
-import           System.FilePath
-
-import           CliOptions
+import qualified Streaming.Concurrent                 as S
+import           System.Directory                     (getTemporaryDirectory,
+                                                       removePathForcibly)
+import           System.Random                        (randomRIO)
+import           System.FilePath                      (pathSeparator)
 
 ------------------------------------------------------------------------------
 -- | Check several assumptions about the database
@@ -58,9 +50,9 @@ import           CliOptions
 --    - with the right types?
 testDb :: PG.ConnectInfo -> IO ()
 testDb cfg = do
-  conn   <- connect cfg
-  r      <- PG.query_ @(Only Int) conn "select 1"
-  unless (r == [Only 1])
+  conn   <- PG.connect cfg
+  r      <- PG.query_ @(PG.Only Int) conn "select 1"
+  unless (r == [PG.Only 1])
          (error $ "Strange result for query 'select 1': " ++ show r)
   schm   <- PG.query_ @(T.Text, T.Text) conn
             [sql| SELECT column_name, data_type
@@ -76,7 +68,7 @@ testDb cfg = do
 -- | Reset phashes column
 resetPhashes :: PG.ConnectInfo -> IO ()
 resetPhashes cfg = do
-  conn <- connect cfg
+  conn <- PG.connect cfg
   r    <- PG.execute_ conn "UPDATE ads SET phash = '{}'"
   print $ "Updated " ++ show (r :: Int64) ++ " records in ads database"
 
@@ -103,25 +95,25 @@ populatePhashes :: PG.ConnectInfo -> IO ()
 populatePhashes cfg = do
 
   manager <- HTTP.newTlsManager
-  conn <- connect cfg
+  conn <- PG.connect cfg
 
   hashCache <- newTVarIO (LRU.empty 1000000)
 
   -- Inbox/Outbox/ParallelWorker provided by `withBufferedTransform`
-  runResourceT $ withBufferedTransform 5
+  PG.withTransaction conn $ runResourceT $ S.withBufferedTransform 5
 
     -- Parallel workers share per-ad phashing
     (adPhashes manager hashCache)
 
     -- Serial stream of incomig ads
-    (writeStreamBasket $
+    (S.writeStreamBasket $
      PGStream.stream_ conn "SELECT id, images FROM ads WHERE phash = '{}';")
 
     -- Serial chunked stream of db updates
     -- Chunking prevents us from doing a DB query
     -- per row written
-    (\ob -> withStreamBasket ob
-      (S.mapM_ (doInsert conn) . S.mapped S.toList . S.chunksOf 5))
+    (\ob -> S.withStreamBasket ob
+      (S.mapM_ (doInsert conn) . S.mapped S.toList . chunksOf 5))
 
 
 ------------------------------------------------------------------------------
@@ -137,22 +129,23 @@ populatePhashes cfg = do
 --   the cache, so if we want to invalidate it, we need to rerun the query
 adPhashes :: HTTP.Manager
           -> TVar (LRU.LruCache T.Text (Either T.Text PHash))
-          -> OutBasket (AdId, PG.PGArray T.Text)
-          -> InBasket (AdId, PG.PGArray (Either T.Text PHash))
+          -> S.OutBasket (AdId, PG.PGArray T.Text)
+          -> S.InBasket (AdId, PG.PGArray (Either T.Text PHash))
           -> ResourceT IO ()
 adPhashes manager hashCache outBasket inBasket =
-  withStreamBasket outBasket $ \outStream ->
-    let r = S.mapM (\(k,PG.PGArray urls) -> do
-                       hashes <- mapM (liftIO . resolvePhash manager hashCache) urls
-                       return (k, PG.PGArray hashes)
-                   ) outStream
-    in writeStreamBasket r inBasket
-
+  S.withStreamBasket outBasket $ \outStream ->
+    S.writeStreamBasket (S.mapM streamRow outStream) inBasket
+  where
+    streamRow (k, PG.PGArray urls) = do
+      hashes <- mapM (liftIO . resolvePhash manager hashCache) urls
+      return (k, PG.PGArray hashes)
 
 
 ------------------------------------------------------------------------------
 -- | Insert a set of (Ad, phashes) pairs into the `ads` database
-doInsert :: PG.Connection -> [(AdId, PG.PGArray (Either T.Text PHash))] -> ResourceT IO ()
+doInsert :: PG.Connection
+         -> [(AdId, PG.PGArray (Either T.Text PHash))]
+         -> ResourceT IO ()
 doInsert dbConn phashes = do
 
   let formatEntry hashOrError = case  hashOrError of
@@ -167,7 +160,6 @@ doInsert dbConn phashes = do
           WHERE ads.id = upd.id
     |] inserts
   liftIO $ putStrLn $ "Writing " ++ show n ++ " records"
-
 
 
 ------------------------------------------------------------------------------
@@ -210,34 +202,3 @@ resolvePhash manager hashCacheTVar url = do
       atomically $ modifyTVar hashCacheTVar (LRU.insert url hash)
 
       return $  hash
-
-
-------------------------------------------------------------------------------
--- | **Old**  Yesterday's implemetation here was single-threaded in the worker
---   Take a LRU cache in a TVar (for sharing between threads), and
---   return a callback appropriate for use by @withBuffer@. The callback
---   receives URLs from the @Stream (Of [(AdId, PGArray T.Text)]) m a@ parameter,
---   downloads the images, computes their hashes, batches the results,
---   and writes them into the database.
---
---   The LRU cache is updated by each record, and will be consulted before
---   downloading any URLs or computing their phashes. There is no TTL on
---   the cache, so if we want to invalidate it, we need to rerun the query
-handleRecords :: PG.Connection
-              -> HTTP.Manager
-              -> TVar (LRU.LruCache T.Text (Either T.Text PHash))
-              -> Stream (Of (AdId, PG.PGArray T.Text)) (ResourceT IO) ()
-              -> ResourceT IO ()
-handleRecords dbConn manager hashCache urlStream = do
-
-  liftIO (putStrLn "handleRecords")
-
-  -- For each ads row in the stream, sequence all row's images through phash
-  let r = S.mapM  (\(k, PG.PGArray urls) -> do
-                      hashes <- mapM (liftIO . resolvePhash manager hashCache) urls
-                      return (k, PG.PGArray hashes)
-                  ) urlStream
-
-  -- Collect groups of n rows into chunks for bulk DB insert
-  -- For now, n == 5
-  S.mapM_ (doInsert dbConn) $ S.mapped S.toList $ S.chunksOf 5 r
