@@ -53,7 +53,7 @@ const PleaseInstallUnconnected = ({ persona }) =>
           our database. Is this you? Help us help other people like you by using
           the ad collector.
         </p>
-        <a href="#">Use the ad collector</a>
+        <a href="https://projects.propublica.org/political-ad-collector/">Use the ad collector</a>
       </div>
     </div>
   ) : (
@@ -69,7 +69,7 @@ const PleaseInstallUnconnected = ({ persona }) =>
           using the browser extension. Help us help other people like you by
           using the ad collector.
         </p>
-        <a href="#">Use the ad collector</a>
+        <a href="https://projects.propublica.org/political-ad-collector/">Use the ad collector</a>
         </div>
     </div>
   );
