@@ -387,12 +387,14 @@ article {
 .facebook-pac-ads {
   .glad-you-here {
       // max-width: 600px; // removed by JBM 7/6/2018 in order to make this take up full width when mixed in with the ads.
-      margin: 40px auto;
-      padding: 20px 0px;
-      border-top: 2px solid #444;
+      // margin: 40px auto; // removed by AJL 7/12/2018 to format inline with ads.
+      max-width: 500px;
+      margin: 20px;
+      padding: 12px;
+      // border-top: 2px solid #444;
 
     > div {
-      float:left;
+      // float:left;
     }
     div:first-child {
       @include breakpoint-max(sm) {
@@ -408,7 +410,7 @@ article {
         width:100%;
         text-align: center;
       }
-      width:78%;
+      // width:78%; //taken out by AJL 7/12/18 to make same width as ads
       margin-bottom:50px
     }
     h2 {
@@ -424,13 +426,14 @@ article {
     }
 
     .generic-face {
-      font-size: 7em;
+      font-size: 5em;
+      margin-bottom: 0px;
     }
 
     p {
       font-family: $fonts-serif;
       font-size: 1.1em;
-      margin-bottom:10px;
+      margin-bottom: 15px;
       line-height: 1.4;
     }
     img {
