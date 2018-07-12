@@ -412,30 +412,38 @@ article {
       margin-bottom:50px
     }
     h2 {
-      font-size:1.3em;
-      font-weight:bold;
-      margin-bottom:5px
+      font-family: $fonts-serif;
+      font-size: 1.8em;
+      font-weight: bold;
+      margin-bottom: 5px
     }
     h4 {
-      font-size: .8em;
+      font-size: 1.1em;
       font-family: "Graphik", sans-serif;
-      margin-bottom:10px
+      margin: 12px 0;
+    }
+
+    .generic-face {
+      font-size: 7em;
     }
 
     p {
-      font-size: .8em;
+      font-family: $fonts-serif;
+      font-size: 1.1em;
       margin-bottom:10px;
+      line-height: 1.4;
     }
     img {
       max-width: 100px;
       margin: auto;
     }
     a {
+      font-family: $fonts-serif;
       padding:5px 10px;
       background: #196aa7;
       color:white;
       border-radius: 5px;
-      font-size:.7em;
+      font-size:1em;
       margin-top:10px;
       font-weight: 600
     }
@@ -501,7 +509,7 @@ article {
   @include breakpoint-max(sm) {
     font-size:.7em;
     line-height: 1.7em;
-  } 
+  }
 }
 
 #sticky_nav.sticky p {
