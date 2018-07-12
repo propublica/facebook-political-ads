@@ -68,7 +68,7 @@ export class GroupedAttrsUnconnected extends React.Component {
                   <Link
                     to={`/facebook-ads/admin/ads?${groupedAttrUrl[
                       this.state.groupingType
-                    ](groupedItem)}`}
+                    ](groupedItem)}&lang=${this.props.lang}`}
                   >
                     {groupedItem[this.state.groupingType]}
                   </Link>

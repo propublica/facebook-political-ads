@@ -23,6 +23,8 @@ fn main() {
     let conn = PgConnection::establish(&database_url).unwrap();
     let dbads: Vec<Ad> = ads.order(created_at.desc())
         .filter(sql::<Bool>("created_at > '2018-05-24'"))
+        .filter(sql::<Bool>("paid_for_by is null"))
+        .filter(sql::<Bool>("html ilike '%Paid for by%'"))
         .load::<Ad>(&conn)
         .expect("Couldn't get ads.");
     for ad in dbads {
