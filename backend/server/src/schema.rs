@@ -23,6 +23,6 @@ table! {
         lower_page -> Nullable<Text>,
         paid_for_by -> Nullable<Text>,
         targetings -> Nullable<Array<Text>>,
-
+        targetedness -> Nullable<Int4>,
     }
 }

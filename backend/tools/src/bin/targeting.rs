@@ -64,7 +64,7 @@ fn main() {
         // find any cases where the revised targeting parser removes an element
         if let Some(ref old_targets) = ad.targets {
             // println!("{:?}",ad.targeting);
-
+    
             if let Some(new_targets) = get_all_targets(ad.targetings.clone()) {
                 if old_targets.to_string().len() > new_targets.to_string().len() {
                     // println!("lost target --> {:?}", ad.id);
@@ -74,16 +74,13 @@ fn main() {
                     // println!("");
                     parse_got_worse += 1;
                 } else {
-                    let targetedness = get_targetedness_score(ad.targets.clone());
-                    if targetedness > 10 {
-                        println!("{:?} : {:?}", targetedness, ad.id );
-                    }
-
                     still_parses_correctly += 1;
                 }
             } else {
                 if old_targets.as_array().unwrap().len() == 0 {
                     still_doesnt_parse += 1;
+                    println!("failed: {:?}", ad.id);
+                    println!("targts: {:?}", ad.targetings.clone());
                 } else {
                     // println!("failed: {:?}", ad.id);
                     // println!("targts: {:?}", ad.targetings.clone());
@@ -107,13 +104,14 @@ fn main() {
             }
         }
 
-        // diesel::update(ads.find(ad.id))
-        //     .set((
-        //         targets.eq(get_all_targets(ad.targetings.clone())),
-        //         advertiser.eq(get_advertiser(&ad.targeting, &document)),
-        //     ))
-        //     .execute(&conn)
-        //     .unwrap();
+        diesel::update(ads.find(ad.id))
+            .set((
+                targets.eq(get_all_targets(ad.targetings.clone())),
+                advertiser.eq(get_advertiser(&ad.targeting, &document)),
+                targetedness.eq(get_targetedness_score(get_all_targets(ad.targetings.clone())))
+            ))
+            .execute(&conn)
+            .unwrap();
     }
     println!(
         "{:?}/{:?} parse successfully",

@@ -27,7 +27,7 @@ use schema::ads::BoxedQuery;
 use serde_json;
 use serde_json::Value;
 use server::AdPost;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::cmp;
 use targeting_parser::{collect_advertiser, collect_targeting, Targeting};
 use url::{ParseError, Url};
@@ -593,34 +593,46 @@ pub fn get_targetedness_score(targets: Option<Value>) -> Option<i32> {
         Some(targets_json) => {
             let mut targets_value = serde_json::to_value(targets_json).unwrap();
             let targs = targets_value.as_array_mut().unwrap();
-            let targetedness : i32 = targs.iter()
-                .filter(|elem| elem.as_str().unwrap_or_else(|| "") == "{\"target\": \"Region\", \"segment\": \"the United States\"}") // remove region: US
-                // .sort_unstable_by(|x, y| x.to_string().cmp(&y.to_string()) );
-                // .dedup();
-                .map(|elem| 
+            let mut keys_existant_so_far = HashSet::new();
+            let deduped_targs = targs.iter().
+                filter(|elem| {
+                    let target : &str = elem.as_object().unwrap().get("target").unwrap().as_str().unwrap();
+                    let already_present = keys_existant_so_far.contains(target);
+                    keys_existant_so_far.insert(target.clone());  
+                    !already_present
+                });
+            let targetedness : i32 = deduped_targs
+                .filter(|elem| elem.as_str().unwrap_or_else(|| "") != "{\"target\": \"Region\", \"segment\": \"the United States\"}") // remove region: US
+                .map(|elem| {
+                    // println!("{:?}", exlem.as_object().unwrap().get("target").unwrap().as_str().unwrap());
+                    let segment = elem.as_object().unwrap().get("segment").map(|s| s.as_str()).unwrap_or_else(|| None);
                     match elem.as_object().unwrap().get("target").unwrap().as_str().unwrap() {
-                        "Gender" => 3,
-                        "City" => 4,
-                        "State" => 1,
-                        "Region" => 1,
-                        "Age" => 0,    // this is a pickle that may require special treatment... since for this, we care about the size of the range
-                        "MinAge" => cmp::min((elem.as_object().unwrap().get("segment").unwrap().as_str().unwrap().parse::<i32>().unwrap() - 18 ) / 10, 1) ,
-                        "MaxAge" => cmp::min((65 - elem.as_object().unwrap().get("segment").unwrap().as_str().unwrap().parse::<i32>().unwrap() ) / 10, 1),
-                        "Interest" => 3,
-                        "Segment" => 3,
-                        "Retargeting" => 2, // actually "Near their business" and "Lookalike Audience"
-                        "Agency" => 3,      // Data Brokers
-                        "Website" => 1,
-                        "Language" => 0,
                         "Employer" => 4,
                         "School" => 4,
-                        "Like" => 2,
-                        "List" => 3, // Custom Audience
+                        "City" => 3,
+                        "Gender" => 3,
+                        "Agency" => 3,      // Data Brokers
+                        "Interest" => 3,
+                        "Segment" => 3,
+                        "List" => 3,       // Custom Audience
+                        "MinAge" => cmp::min((segment.unwrap().parse::<i32>().unwrap() - 18 ) / 10, 1) ,
+                        "MaxAge" => cmp::min((65 - segment.unwrap().parse::<i32>().unwrap() ) / 10, 1),
+                        "Retargeting" => match segment.unwrap() {
+                            "Near their business" => 3,
+                            "people who may be similar to their customers" => 2,   
+                            _ => 0
+                        }, 
+                        "Like" => 1,
+                        "State" => 1,
+                        "Region" => 1,
+                        "Website" => 1,
                         "EngagedWithContent" => 1,
                         "ActivityOnTheFacebookFamily" => 1,
+                        "Language" => 0,
+                        "Age" => 0,    // covered by minage/maxage
                         _ => 0
                     }
-                )
+                })
                 .sum();
             // TODO:  sort and uniqify target names (so we don't count two instances of City as more targeted than one)
             Some(targetedness)
@@ -710,48 +722,47 @@ impl<'a> NewAd<'a> {
 
     pub fn save(&self, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<Ad> {
         use schema::ads;
-        use schema::ads::columns::targets;
-        use schema::ads::dsl::*;
+        use schema::ads::dsl;
         let connection = pool.get()?;
         // increment impressions if this is a background save,
         // otherwise increment political counters
-        let existing_ad: Ad = diesel::insert_into(ads::table)
+        let saved_ad: Ad = diesel::insert_into(ads::table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(dsl::id)
             .do_update()
-            .set((
-                political.eq(political + self.political),
-                not_political.eq(not_political + self.not_political),
-                impressions.eq(impressions + self.impressions),
-                updated_at.eq(Utc::now()),
+            .set(( /* this is what we do if the ad already exists in the DB */
+                dsl::political.eq(dsl::political + self.political),
+                dsl::not_political.eq(dsl::not_political + self.not_political),
+                dsl::impressions.eq(dsl::impressions + self.impressions),
+                dsl::updated_at.eq(Utc::now()),
             ))
             .get_result(&*connection)?;
 
         // overwrite the old targeting/targets if the old one was empty.
-        if self.targeting.is_some() && !existing_ad.targeting.is_some() {
-            let new_targets = get_targets(&existing_ad.targeting);
-            diesel::update(ads.find(self.id))
+        if self.targeting.is_some() && !saved_ad.targeting.is_some() {
+            let new_targets = get_targets(&saved_ad.targeting.clone());
+            diesel::update(ads::table.find(self.id))
                 .set((
-                    targeting.eq(&self.targeting),
-                    targets.eq(new_targets.clone()),
-                    targetedness.eq(get_targetedness_score(new_targets))
+                    dsl::targeting.eq(&self.targeting),
+                    dsl::targets.eq(new_targets.clone()),
+                    dsl::targetedness.eq(get_targetedness_score(new_targets))
                 ))
                 .execute(&*connection)?;
         };
 
-        if self.targeting.is_some() && existing_ad.targeting.is_some() {
-            diesel::update(ads.find(self.id))
+        if self.targeting.is_some() && saved_ad.created_at != saved_ad.updated_at {
+            diesel::update(ads::table.find(self.id))
                 .set((
-                    targetings.eq(
+                    dsl::targetings.eq(
                         self.targeting.clone().map_or(None, |targ| {
-                            let mut tings = vec![targ];
-                            tings.extend(existing_ad.targetings.clone().unwrap());
-                            Some(tings)
+                            let mut targetings = saved_ad.targetings.clone().unwrap_or_else(|| vec![]);
+                            targetings.push(targ);
+                            Some(targetings)
                         })
                         
                         ),
-                    targets.eq(
-                        existing_ad.targets.clone().map(|old_targets_json| {
+                    dsl::targets.eq(
+                        saved_ad.targets.clone().map(|old_targets_json| {
                             let mut old_targets_val = serde_json::to_value(old_targets_json).unwrap();
                             let old_targets = old_targets_val.as_array_mut().unwrap();
                             let new_targets : Vec<Value> = collect_targeting(&self.targeting.clone().unwrap()).unwrap_or(vec![])
@@ -768,12 +779,9 @@ impl<'a> NewAd<'a> {
         };
         
 
-        Ok(existing_ad)
+        Ok(saved_ad)
     }
 }
-
-//            .map(|t| serde_json::to_value(t).unwrap())
-// .ok(),
 
 #[cfg(test)]
 mod tests {
