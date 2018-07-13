@@ -492,6 +492,9 @@ article {
 #sticky_nav.sticky {
   position: fixed;
   top:0px;
+  -webkit-box-shadow: 2px 1px 41px -5px rgba(158,158,158,1);
+  -moz-box-shadow: 2px 1px 41px -5px rgba(158,158,158,1);
+  box-shadow: 2px 1px 41px -5px rgba(158,158,158,1);
 }
 
 #sticky_nav p {
@@ -518,6 +521,22 @@ article {
 #sticky_nav.sticky p {
   font-size:.75em;
 }
+
+// -----------------------------------------------------------------------------
+// MEDIA QUERIES FOR STICKY NAV
+// -----------------------------------------------------------------------------
+@media (max-width: 800px) {
+  #sticky_nav.sticky p {
+    font-size: .7em;
+  }
+}
+@media (max-width: 480px) {
+  #sticky_nav.sticky {
+    position: absolute;
+    top:0px;
+  }
+}
+
 
 
 // -----------------------------------------------------------------------------
