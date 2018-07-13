@@ -14,7 +14,7 @@ export class SelectorsAndPersonae extends React.Component {
         el.classList.add("sticky");
       } else {
         el.classList.remove("sticky");
-    
+
       }
     };;
   }
@@ -46,8 +46,8 @@ export class SelectorsAndPersonae extends React.Component {
                   }}
               >
                   <option>any gender</option>
-                <option>woman</option>
-                  <option>man</option>
+                <option>a woman</option>
+                  <option>a man</option>
                 </select>, any race, in{" "}
               <select
                   value={
