@@ -425,9 +425,18 @@ article {
       margin: 12px 0;
     }
 
-    .generic-face {
+    .thinking-face, .wave {
       font-size: 5em;
-      margin-bottom: 0px;
+      margin-bottom: 14px;
+      height: 100px;
+    }
+
+    .thinking-face {
+      background-image: url("../images/thinking-face.svg");
+    }
+
+    .wave {
+      background-image: url("../images/wave.svg");
     }
 
     p {
