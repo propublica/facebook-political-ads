@@ -274,22 +274,22 @@ article {
 
 
 #man-65 {
-  background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/male-office-worker.png") top left no-repeat;
+  background: url("../images/worker.svg") top left no-repeat;
   background-size: 100%;
 }
 
 #woman-40 {
-   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/female-farmer.png") top left no-repeat;
+   background: url("../images/farmer.svg") top left no-repeat;
    background-size: 100%;
 }
 
 #man-20 {
-   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/male-teacher.png") top left no-repeat;
+   background: url("../images/teacher.svg") top left no-repeat;
    background-size: 100%;
 }
 
 #woman-32 {
-   background: url("https://propublica.s3.amazonaws.com/assets/images/emojis/female-health-worker.png") top left no-repeat;
+   background: url("../images/doctor.svg") top left no-repeat;
    background-size: 100%;
 }
 
@@ -436,9 +436,18 @@ article {
       margin: 12px 0;
     }
 
-    .generic-face {
+    .thinking-face, .wave {
       font-size: 5em;
-      margin-bottom: 0px;
+      margin-bottom: 14px;
+      height: 100px;
+    }
+
+    .thinking-face {
+      background-image: url("../images/thinking-face.svg");
+    }
+
+    .wave {
+      background-image: url("../images/wave.svg");
     }
 
     p {
@@ -503,6 +512,9 @@ article {
 #sticky_nav.sticky {
   position: fixed;
   top:0px;
+  -webkit-box-shadow: 2px 1px 41px -5px rgba(158,158,158,1);
+  -moz-box-shadow: 2px 1px 41px -5px rgba(158,158,158,1);
+  box-shadow: 2px 1px 41px -5px rgba(158,158,158,1);
 }
 
 #sticky_nav p {
@@ -529,6 +541,22 @@ article {
 #sticky_nav.sticky p {
   font-size:.75em;
 }
+
+// -----------------------------------------------------------------------------
+// MEDIA QUERIES FOR STICKY NAV
+// -----------------------------------------------------------------------------
+@media (max-width: 800px) {
+  #sticky_nav.sticky p {
+    font-size: .7em;
+  }
+}
+@media (max-width: 480px) {
+  #sticky_nav.sticky {
+    position: absolute;
+    top:0px;
+  }
+}
+
 
 
 // -----------------------------------------------------------------------------

@@ -40,8 +40,7 @@ const PleaseInstallUnconnected = ({ persona }) =>
   ].indexOf(persona.location[0]) > -1 ||
     persona.politics == "conservative") ? (
     <div className="glad-you-here">
-      <div><p className="generic-face">&#129300;</p>
-      </div>
+      <div className="thinking-face"></div>
       <div>
         <h2>Is this you? We need your help!</h2>
         <h4>
@@ -58,9 +57,7 @@ const PleaseInstallUnconnected = ({ persona }) =>
     </div>
   ) : (
     <div className="glad-you-here">
-      <div>
-        <p className="generic-face">&#128075;</p>
-      </div>
+    <div className="wave"></div>
         <div>
           <h2>Hey, we're glad you're here!</h2>
         <h4>You can help us make our ad database more representative.</h4>
