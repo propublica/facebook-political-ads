@@ -75,12 +75,12 @@ export class SelectorsAndPersonae extends React.Component {
                         ", " +
                         this.props.persona.location[0]
                       : this.props.persona.location[0]
-                    : "a city or any state"
+                    : null
                 }
                 noResultsText={
-                  "No matching cities were targeted with many political ads."
+                  "No matching cities were targeted with enough political ads."
                 }
-                placeholder={"a city or any state"}
+                placeholder={"any city in any state"}
                 searchPromptText={"State or city"}
                 style={{ width: "100%", container: { width: "100%" } }}
                 onChange={event => {
@@ -246,7 +246,6 @@ export default connect(
 )(SelectorsAndPersonae);
 
 const cities_to_show = [
-  "any state",
   "Alabama",
   "Alaska",
   "Arizona",

@@ -369,6 +369,10 @@ article {
   .Select-value-label, .Select-placeholder {
     color: black;
   }
+  .Select-option, .Select-noresults {
+    font-size: 0.8em;
+  }
+
 }
 .political-ratio svg text {
   font-weight: normal;
