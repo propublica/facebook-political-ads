@@ -56,7 +56,15 @@ export class SelectorsAndPersonae extends React.Component {
             </select>, any race, in <br />
             <div
               className="select-container"
-              style={{ display: "inline-block", maxWidth: 400, minWidth: 300 }}
+              style={{
+                display: "inline-block",
+                maxWidth: 400,
+                minWidth: 300,
+                maxHeight: "1.2em",
+                input: {
+                  height: "1em"
+                }
+              }}
             >
               <Select
                 name="city"
@@ -67,11 +75,12 @@ export class SelectorsAndPersonae extends React.Component {
                         ", " +
                         this.props.persona.location[0]
                       : this.props.persona.location[0]
-                    : "any state"
+                    : "a city or any state"
                 }
                 noResultsText={
                   "No matching cities were targeted with many political ads."
                 }
+                placeholder={"a city or any state"}
                 searchPromptText={"State or city"}
                 style={{ width: "100%", container: { width: "100%" } }}
                 onChange={event => {
@@ -85,7 +94,7 @@ export class SelectorsAndPersonae extends React.Component {
                   return { value: city, label: city };
                 })}
               />
-            </div>
+            </div>{" "}
             {/* <select
               value={
                 this.props.persona && this.props.persona.location

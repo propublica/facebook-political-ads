@@ -357,9 +357,17 @@ article {
     background-color: #CCE8F8;
     font-size: 1em;
     height: 1.5em;
-    padding: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
     border-radius: 6px;
     border: none;
+  }
+  select, input {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  .Select-value-label, .Select-placeholder {
+    color: black;
   }
 }
 .political-ratio svg text {
