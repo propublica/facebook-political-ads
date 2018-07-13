@@ -6,7 +6,12 @@ import PleaseInstall from "components/please_install.jsx";
 import KeywordSearch from "components/keyword_search.jsx";
 import Ad from "components/ad.jsx";
 import { connect } from "react-redux";
-import { getAds, getHomepageSummary, hideOldSearch, showOldSearch } from "actions.js";
+import {
+  getAds,
+  getHomepageSummary,
+  hideOldSearch,
+  showOldSearch
+} from "actions.js";
 import { withRouter } from "react-router-dom";
 import { deserialize } from "utils.js";
 
@@ -33,18 +38,36 @@ export class AdListUnconnected extends React.Component {
         <KeywordSearch />
 
         <div className="facebook-pac-ads">
-        <p className="why-these-ads">The following ads target one or more of the traits selected above. {" "}
-          <button id="toggle-topic-search" onClick={() => this.props.show_old_search ? this.props.hideOldSearch() : this.props.showOldSearch()}>{this.props.show_old_search ? "Hide Keyword Search" : "Search by Keyword"}</button>
-        </p>
+          <p className="why-these-ads">
+              {this.props.persona
+              ? "The following ads target one or more of the traits selected above."
+              : "The following ads target one or more of the traits available for selection above."}{" "}
+              <button
+              id="toggle-topic-search"
+              onClick={() =>
+                this.props.show_old_search
+                  ? this.props.hideOldSearch()
+                  : this.props.showOldSearch()
+              }
+            >
+              {this.props.show_old_search
+                ? "Hide Keyword Search"
+                : "Search by Keyword"}
+            </button>
+            </p>
           {this.props.ads.length > 0 ? (
             <Pagination />
           ) : (
-            <p className="no_ads">{this.props.search && this.props.search.length > 0 ? `No ads found for ${this.props.search}` : "No ads found" }.</p>
+            <p className="no_ads">
+              {this.props.search && this.props.search.length > 0
+                ? `No ads found for ${this.props.search}`
+                : "No ads found"}.
+            </p>
           )}
 
           <div id="ads">
-            {this.props.ads.slice(0,2).map(ad => <Ad ad={ad} key={ad.id} />)}
-            {this.props.ads.length > 0 ? <PleaseInstall /> : null }
+            {this.props.ads.slice(0, 2).map(ad => <Ad ad={ad} key={ad.id} />)}
+            {this.props.ads.length > 0 ? <PleaseInstall /> : null}
             {this.props.ads.slice(2).map(ad => <Ad ad={ad} key={ad.id} />)}
           </div>
           {this.props.ads.length > 0 ? <Pagination /> : ""}
@@ -55,7 +78,16 @@ export class AdListUnconnected extends React.Component {
 }
 
 export const AdListUnrouted = connect(
-  ({ ads, search, pagination, filters, entities, advertisers, targets, show_old_search }) => ({
+  ({
+    ads,
+    search,
+    pagination,
+    filters,
+    entities,
+    advertisers,
+    targets,
+    show_old_search
+  }) => ({
     ads,
     search,
     pagination,
@@ -71,8 +103,14 @@ export const AdListUnrouted = connect(
       dispatch(getAds());
       dispatch(getHomepageSummary());
     },
-    hideOldSearch: () => { window.location.hash = ""; dispatch(hideOldSearch())},
-    showOldSearch: () => { window.location.hash = "facebook-pac-browser";; dispatch(showOldSearch())}
+    hideOldSearch: () => {
+      window.location.hash = "";
+      dispatch(hideOldSearch());
+      },
+    showOldSearch: () => {
+      window.location.hash = "facebook-pac-browser";
+      dispatch(showOldSearch());
+      }
   })
 )(AdListUnconnected);
 const AdList = withRouter(AdListUnrouted);
