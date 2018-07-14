@@ -1,4 +1,4 @@
-{ mkDerivation, base, bytestring, errors, http-client, http-client-tls, HUnit, lrucaching
+{ mkDerivation, aeson, base, blaze-html, bytestring, errors, http-client, http-client-tls, HUnit, kdt, lrucaching
 , optparse-applicative, c-phash, hs-phash, pkgconfig, postgresql-simple, resourcet, stdenv
 , stm, streaming, streaming-concurrency
 , streaming-postgresql-simple, text, zeromq
@@ -11,7 +11,7 @@ mkDerivation {
   isLibrary = true;
   isExecutable = true;
   libraryHaskellDepends = [
-    base bytestring errors HUnit lrucaching optparse-applicative hs-phash http-client
+    aeson base blaze-html bytestring errors HUnit kdt lrucaching optparse-applicative hs-phash http-client
     http-client-tls postgresql-simple resourcet stm streaming streaming-concurrency
     streaming-postgresql-simple text
   ];

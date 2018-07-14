@@ -6,6 +6,7 @@ module CliOptions where
 import           Control.Monad
 import           Control.Exception
 import           Data.Maybe
+import           Data.List.NonEmpty  (NonEmpty(..))
 import           Data.Monoid
 import           Data.Text           (Text)
 import qualified Data.Text           as T
@@ -14,37 +15,74 @@ import           Options.Applicative
 import           System.Environment
 import           System.IO
 
+import           Search
+
 getCommand :: IO Command
-getCommand = execParser $ info (phashCommand <**> helper)
+getCommand = execParser $ info (pCommand <**> helper)
              ( fullDesc
              <> progDesc "Run commands for perceptual hashes against the ads database"
              )
 
-data Command =
-    DbTest           PG.ConnectInfo
-  | DbResetHashes    PG.ConnectInfo
-  | DbPopulateHashes PG.ConnectInfo
+data Command
+  = CmdDbTest         PG.ConnectInfo
+  | CmdResetHashes    PG.ConnectInfo
+  | CmdPopulateHashes PG.ConnectInfo
+  | CmdSearch         SearchOptions
   deriving (Show)
 
-phashCommand :: Parser Command
-phashCommand = hsubparser $
-     command "test-db"
-     (info (DbTest <$> dbConn)
-           (progDesc "Test connection to the ads database"))
-  <> command "reset-phashes"
-     (info (DbResetHashes <$> dbConn)
-           (progDesc "Clear the phash column in the ads database"))
-  <> command "populate-phashes"
-     (info (DbPopulateHashes <$> dbConn)
-           (progDesc "Compute phashes for images in the ads database"))
 
--- data DbConnCfg = DbConnCfg
---   { dbUser :: Text
---   , dbPass :: Text
---   , dbHost :: Text
---   , dbPort :: Int
---   , dbName :: Text
---   } deriving (Show)
+pCommand :: Parser Command
+pCommand =
+      (hsubparser $
+          command "test-db"
+          (info (CmdDbTest <$> dbConn)
+                (progDesc "Test connection to the ads database"))
+       <> command "reset-phashes"
+          (info (CmdResetHashes <$> dbConn)
+                (progDesc "Clear the phash column in the ads database"))
+       <> command "populate-phashes"
+          (info (CmdPopulateHashes <$> dbConn)
+                (progDesc "Compute phashes for images in the ads database"))
+       <> command "search"
+          (info (CmdSearch <$> searchParser)
+                (progDesc "Search for similar images"))
+      )
+
+
+searchParser :: Parser SearchOptions
+searchParser = SearchOptions
+  <$> some (
+            (fmap Left (strOption (long "filepath" <> help "Filepath to query"))
+             <|>
+             fmap (Right . URL) (strOption (long "url" <> help "URL to query"))
+            )
+           )
+  <*> searchTypeParser
+  <*> (fmap Just (option auto (long "cache-file"
+                               <> help "Cache filepath")
+                 )
+       <|> pure Nothing)
+  <*> (( flag' True (long "overwrite-cache") *>
+        ((\db thr -> OverwriteCache db thr) <$>
+         dbConn <*>
+         fmap IdentityGroupingThreshold (option auto (long "threshold"))
+        )
+      ) <|> pure UseCache)
+  <*> (fmap Just (strOption (long "out" <> help "Generate report in html (with .htm or .html suffix) or json")) <|> pure Nothing)
+
+
+searchTypeParser :: Parser SearchType
+searchTypeParser =
+     fmap SearchKNearest
+       (option auto (long "k-nearest" <> help "Get the k nearest results"))
+  <|> (SearchFirstInRanges
+       <$> option auto (long "range-bounds" <>
+                        help "List of boundaries for concentric ring search")
+       <*> option auto (long "n-examples" <>
+                        help "Number of examples per ring range")
+      )
+  <|> pure SearchNearest
+
 
 dbConn :: Parser PG.ConnectInfo
 dbConn =
@@ -69,6 +107,7 @@ dbConn =
                  <> short 'd'
                  <> help "Database Name"
                  <> value "facebook_ads")
+
 
 -- Extra Utilities for allowing CLI parser to sample env vars
 -- and dotenv files

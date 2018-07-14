@@ -9,15 +9,28 @@ module RunCli (
   , main
   ) where
 
+import Data.List (isSuffixOf)
+import System.IO (writeFile)
+
 import CliOptions
 import Queries
+import Search
+import Report
 
 -------------------------------------------------------------------------------
 -- | Passthrough from CLI inputs to queries
 runCommand :: Command -> IO ()
-runCommand (DbTest cfg)           = testDb          cfg
-runCommand (DbResetHashes cfg)    = resetPhashes    cfg
-runCommand (DbPopulateHashes cfg) = populatePhashes cfg
+-- runCommand = print
+runCommand (CmdDbTest cfg)         = testDb          cfg
+runCommand (CmdResetHashes cfg)    = resetPhashes    cfg
+runCommand (CmdPopulateHashes cfg) = populatePhashes cfg
+runCommand (CmdSearch opts)        =
+  runSearch opts >>= report (outputFile opts)
+
+  where report Nothing = print
+        report (Just fp) | ".html" `isSuffixOf` fp = writeFile fp . htmlReport
+                         | ".htm"  `isSuffixOf` fp = writeFile fp . htmlReport
+                         | otherwise                 = print
 
 -------------------------------------------------------------------------------
 -- | Convenience entrypoint for main

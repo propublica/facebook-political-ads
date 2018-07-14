@@ -18,8 +18,12 @@ cabal-version:       >=1.10
 library
   exposed-modules:     CliOptions     
                        Queries
+                       Report
                        RunCli
+                       Search
   build-depends:       base >=4.9 && <4.11
+                     , aeson
+                     , blaze-html
                      , bytestring
                      , directory
                      , errors
@@ -27,6 +31,7 @@ library
                      , http-client
                      , http-client-tls
                      , HUnit
+                     , kdt
                      , lrucaching
                      , optparse-applicative
                      , phash

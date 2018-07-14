@@ -13,6 +13,9 @@ module Queries (
     testDb
   , resetPhashes
   , populatePhashes
+  , fetchSortedPhashes
+  , downloadURLFile
+  , testConnectInfo -- TODO temporary
   )where
 
 --------------------------------------------------------------------------------
@@ -24,6 +27,7 @@ import           Control.Monad.Trans.Resource         (ResourceT, runResourceT)
 import           Control.Monad                        (unless)
 import qualified Data.ByteString.Lazy                 as BSL
 import           Data.Int                             (Int64)
+import           Data.Maybe                           (catMaybes)
 import           Data.PHash                           (PHash(..), imageHash)
 import qualified Data.Text                            as T
 import qualified Database.PostgreSQL.Simple           as PG
@@ -39,9 +43,11 @@ import           Streaming                            (Stream, Of, chunksOf,
 import qualified Streaming.Prelude                    as S
 import qualified Streaming.Concurrent                 as S
 import           System.Directory                     (getTemporaryDirectory,
+                                                       createDirectoryIfMissing,
                                                        removePathForcibly)
 import           System.Random                        (randomRIO)
 import           System.FilePath                      (pathSeparator)
+import           Text.Read                            (readMaybe)
 
 ------------------------------------------------------------------------------
 -- | Check several assumptions about the database
@@ -185,16 +191,17 @@ resolvePhash manager hashCacheTVar url = do
     Just hash -> return (hash)
     Nothing -> do
 
-      -- Get a filepath
-      -- TODO: Do this better. Temp filenames must be guaranteed unique and unixy
-      tmpPath <-
-        (\dir n -> concat [dir, [pathSeparator], "fbp-image-", show n])
-        <$> getTemporaryDirectory
-        <*> randomRIO @Int (1,100000)
+      -- -- Get a filepath
+      -- -- TODO: Do this better. Temp filenames must be guaranteed unique and unixy
+      -- tmpPath <-
+      --   (\dir n -> concat [dir, [pathSeparator], "fbp-image-", show n])
+      --   <$> getTemporaryDirectory
+      --   <*> randomRIO @Int (1,100000)
 
-      -- TODO: error handling
-      httpReq <- HTTP.parseRequest (T.unpack url)
-      liftIO $ BSL.writeFile tmpPath . HTTP.responseBody =<< HTTP.httpLbs httpReq manager
+      -- -- TODO: error handling
+      -- httpReq <- HTTP.parseRequest (T.unpack url)
+      -- liftIO $ BSL.writeFile tmpPath . HTTP.responseBody =<< HTTP.httpLbs httpReq manager
+      tmpPath <- downloadURLFile manager url
 
       hash <- maybe (Left "pHash failure") Right <$> imageHash tmpPath
       removePathForcibly tmpPath
@@ -202,3 +209,67 @@ resolvePhash manager hashCacheTVar url = do
       atomically $ modifyTVar hashCacheTVar (LRU.insert url hash)
 
       return $  hash
+
+downloadURLFile :: HTTP.Manager -> T.Text -> IO FilePath
+downloadURLFile manager url = do
+
+  dir <- getTemporaryDirectory
+  createDirectoryIfMissing True $ concat [dir, [pathSeparator], "fbp-images"]
+
+  -- Get a filepath
+  -- TODO: Do this better. Temp filenames must be guaranteed unique and unixy
+  tmpPath <-
+    (\n -> concat [dir, [pathSeparator], "fbp-images", [pathSeparator], show n])
+    <$> randomRIO @Int (1,100000)
+
+  -- TODO: error handling
+  httpReq <- HTTP.parseRequest (T.unpack url)
+  liftIO $ BSL.writeFile tmpPath . HTTP.responseBody =<< HTTP.httpLbs httpReq manager
+
+  return tmpPath
+
+-- phashURL :: HTTP.Manager -> T.Text -> IO (Either T.Text PHash)
+-- phashURL manager url = do
+--   imgFile <- downloadURLFile manager url
+--   maybe (Left "pHash failure") Right <$> imageHash imgFile
+
+
+-- For each ad, flatten the images and hashes
+-- returning the list sorted by phash, with 0's removed
+--
+-- For example, if we have ads:
+--
+-- id: 111
+-- images: { example.com/1.png, example.com/2.png }
+-- phash:  { 123,               234               }
+--
+-- id: 222
+-- images: { example.com/1.png, example.com/3.png }
+-- phash:  { 123,             , 012               }
+--
+-- Then the query returns:
+--
+-- phash               url
+-- 012                 example.com/3.png
+-- 123                 example.com/1.png
+-- 123                 example.com/1.png
+-- 234                 example.com/2.png
+fetchSortedPhashes :: PG.ConnectInfo -> IO [(PHash, T.Text)]
+fetchSortedPhashes cfg = do
+
+  conn <- PG.connect cfg
+  rs <- PG.query_ conn
+        [sql| SELECT ars.phash, ars.url
+              FROM   (SELECT unnest(phash)  as phash,
+                             unnest(images) as url
+                      FROM ads) ars
+              WHERE ars.phash != '0'
+              ORDER BY ars.phash
+            |]
+  let readRow (hash, url) = case readMaybe hash of
+        Nothing  -> Nothing
+        Just w64 -> Just (PHash w64, url)
+  return . catMaybes $ fmap readRow rs
+
+testConnectInfo :: PG.ConnectInfo
+testConnectInfo = PG.ConnectInfo "localhost" 5432 "fbpac" "password" "fbpac"
