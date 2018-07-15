@@ -373,7 +373,7 @@ named!(region(&str) -> Vec<Option<TargetingParsed>>,
 named!(city_state(&str) -> Vec<Option<TargetingParsed>>,
     do_parse!(
         ws!(alt!(
-            take_until_and_consume!("near") |
+            take_until_and_consume!("near ") |
             take_until_and_consume!("in") |
             take_until_and_consume!("af")
         )) >>
@@ -475,6 +475,8 @@ mod tests {
     use nom::ErrorKind::Complete;
     #[test]
     fn test_targeting() {
+
+
 
         assert_eq!(
             max_age_parser("and older"), 
@@ -662,6 +664,25 @@ mod tests {
                 )
             )
         );
+
+    assert_eq!(get_targeting("<div><div class=\"_4-i0 _26c5\"><div class=\"clearfix\"><div class=\"_51-u rfloat _ohf\"><a class=\"_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-\" href=\"nullblank\">Close</a></div><div><h3 id=\"u_19_0\" class=\"_52c9\">About this Facebook ad</h3></div></div></div><div class=\"_4-i2 _pig _4s3a _50f4\"><div class=\"_4uov\"><div class=\"_4uoz\"><div id=\"u_19_1\"></div><div class=\"_3-8x\"><span class=\"_4v6n\"><div id=\"u_19_2\">One reason why you\'re seeing this ad is that <b id=\"ad_prefs_advertiser\">Abdul El-Sayed</b> wants to reach people based on their activity on the Facebook family of apps and services. This includes sharing links to their website, interacting with their content (such as clicking ads, watching videos or saving content) or directly interacting (such as messaging) with them.</div></span><div class=\"_4hcd\"><span>There may be other reasons why you\'re seeing this ad, including that Abdul El-Sayed wants to reach <b>people aged 18 and older who live or have recently been in the United States</b>. This is information based on your Facebook profile and where you\'ve connected to the Internet.</span></div></div></div><div></div><div class=\"_4uor _52jw\"><div class=\"_5aj7\" id=\"u_19_3\"><div class=\"_4b").to_result(), Ok(vec![TargetingParsed::Advertiser("Abdul El-Sayed"), TargetingParsed::ActivityOnTheFacebookFamily, TargetingParsed::Advertiser("Abdul El-Sayed"), TargetingParsed::Age("18 and older"), TargetingParsed::MinAge("18"), TargetingParsed::Region("the United States")]));
+
+
+    assert_eq!(get_targeting("<div><div class=\"_4-i0 _26c5\"><div class=\"clearfix\"><div class=\"_51-u rfloat _ohf\"><a class=\"_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-\" href=\"nullblank\">Close</a></div><div><h3 id=\"u_56_0\" class=\"_52c9\">About This Facebook Ad</h3></div></div></div><div class=\"_4-i2 _pig _4s3a _50f4\"><div class=\"_4uov\"><div class=\"_4uoz\"><div id=\"u_56_1\"></div><div class=\"_3-8x\"><span class=\"_4v6n\"><div id=\"u_56_2\">One reason you\'re seeing this ad is that <b id=\"ad_prefs_advertiser\">Carri Hicks</b> wants to reach people who like their page.</div></span><div class=\"_4hcd\"><span>There may be other reasons you\'re seeing this ad, including that Carri Hicks wants to reach <b>people ages 18 and older who live in Oklahoma</b>. This is information based on your Facebook profile and where you\'ve connected to the internet.</span></div>").to_result(), Ok(vec![TargetingParsed::Advertiser("Carri Hicks"),TargetingParsed::Like, TargetingParsed::Advertiser("Carri Hicks"), TargetingParsed::Age("18 and older"), TargetingParsed::MinAge("18"), TargetingParsed::Region("Oklahoma")]));
+
+
+        // assert_eq!(advertiser_b("<div><div class=\"_4-i0 _26c5\"><div class=\"clearfix\"><div class=\"_51-u rfloat _ohf\"><a class=\"_42ft _5upp _50zy layerCancel _51-t _50-0 _50z-\" href=\"nullblank\">Close</a></div><div><h3 id=\"u_19_0\" class=\"_52c9\">About this Facebook ad</h3></div></div></div><div class=\"_4-i2 _pig _4s3a _50f4\"><div class=\"_4uov\"><div class=\"_4uoz\"><div id=\"u_19_1\"></div><div class=\"_3-8x\"><span class=\"_4v6n\"><div id=\"u_19_2\">One reason why you\'re seeing this ad is that <b id=\"ad_prefs_advertiser\">Abdul El-Sayed</b> wants to reach people based on their activity on the Facebook family of apps and services. This includes sharing links to their website, interacting with their content (such as clicking ads, watching videos or saving content) or directly interacting (such as messaging) with them.</div></span><div class=\"_4hcd\"><span>There may be other reasons why you\'re seeing this ad, including that Abdul El-Sayed wants to reach <b>people aged 18 and older who live or have recently been in the United States</b>. This is information based on your Facebook profile and where you\'ve connected to the Internet.</span></div></div></div><div></div><div class=\"_4uor _52jw\"><div class=\"_5aj7\" id=\"u_19_3\"><div class=\"_4b").to_result(), Ok(TargetingParsed::Advertiser("Abdul El-Sayed")));
+
+        // assert_eq!(activity_on_the_facebook_family("wants to reach people based on their activity on the Facebook family of apps and services. This includes sharing links to their website, interacting with their content (such as clicking ads, watching videos or saving content) or directly interacting (such as messaging) with them.</div></span><div class=\"_4hcd\"><span>There may be other reasons why you\'re seeing this ad, including that Abdul El-Sayed wants to reach <b>people aged 18 and older who live or have recently been in the United States</b>. This is information based on your Facebook profile and where you\'ve connected to the Internet.</span></div></div></div><div></div><div class=\"_4uor _52jw\"><div class=\"_5aj7\" id=\"u_19_3\"><div class=\"_4b").to_result(), Ok(TargetingParsed::ActivityOnTheFacebookFamily));
+
+
+        assert_eq!(age_and_location("aged 18 and older who live or have recently been in the United States</b>. This is information based on your Facebook profile and where you\'ve connected to the Internet.</span></div></div></div><div></div><div class=\"_4uor _52jw\"><div class=\"_5aj7\" id=\"u_19_3\"><div class=\"_4b").to_result(), Ok(vec![
+                    Some(TargetingParsed::Age("18 and older")),
+                    Some(TargetingParsed::MinAge("18")),
+                    Some(TargetingParsed::Region("the United States")),
+                ]));
+
+
         assert_eq!(
             age_and_location(
                 " ages 25 and older who live or were recently in the United States</b>",
