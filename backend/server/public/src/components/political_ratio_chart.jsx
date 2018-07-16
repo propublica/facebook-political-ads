@@ -38,7 +38,7 @@ export default class PoliticalRatioChart extends React.Component {
         enableDotLabel={true}
         theme={{
           axis: {
-            fontSize: "9px"
+            fontSize: "25px"
           }
         }}
         axisLeft={null}

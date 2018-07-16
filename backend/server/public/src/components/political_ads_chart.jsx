@@ -27,14 +27,14 @@ export default class PoliticalAdsChart extends React.Component {
                   "_" +
                   idx,
                 y: a[1],
-                key: idx == this.props.political_ads_per_day.length - 1 // oddly required for the dotLabel thing below.
+                key: idx == 0 || idx == this.props.political_ads_per_day.length - 1 // oddly required for the dotLabel thing below.
             };
           })
           }
         ]
       : [];
 
-    var margins = { left: 10, right: 10, top: 20, bottom: 30 };
+    var margins = { left: 0, right: 0, top: 20, bottom: 30 };
 
     var ads_today_chart_or_not = this.props.political_ads_per_day ? (
       <ResponsiveLine
@@ -44,7 +44,8 @@ export default class PoliticalAdsChart extends React.Component {
         height={150}
         isInteractive={false}
         animate={false}
-        colors={["#217ce3"]}
+        colors={["#49b3e7"]}
+        lineWidth={2}
         enableGridX={false}
         enableGridY={false}
         dotSize={2}
@@ -54,26 +55,14 @@ export default class PoliticalAdsChart extends React.Component {
           return val.x ? `${val.y} ads collected this week` : "";
         }}
         dotLabelYOffset={-12}
+        dotLabelXOffset={30}
         theme={{
           axis: {
             fontSize: "9px"
           }
         }}
         axisLeft={null}
-        axisBottom={{
-          orient: "bottom",
-          format: date_idx => {
-            var date, idx;
-            [date, idx] = date_idx.split("_", 2);
-            return parseInt(idx) == 0 ? date : "";
-          },
-          tickSize: 5,
-          tickPadding: 5,
-          tickRotation: 0,
-          // legend: "date",
-          legendOffset: 36,
-          legendPosition: "center"
-        }}
+        axisBottom={null}
       />
     ) : (
       <div />
