@@ -19,7 +19,6 @@ export class SelectorsAndPersonae extends React.Component {
     };
   }
 
-  // See ads targeted to people who are: [ ] year olds, [women|men|any gender], any race, living in [any place] and politically [liberal|conservative|neither liberal nor conservative].
   render() {
     return (
       <div className="selectorsAndPersonae">
@@ -95,74 +94,6 @@ export class SelectorsAndPersonae extends React.Component {
                 })}
               />
             </div>{" "}
-            {/* <select
-              value={
-                this.props.persona && this.props.persona.location
-                  ? this.props.persona.location[0]
-                  : "any state"
-              }
-              onChange={event => {
-                this.props.setPersonaFacet("location", [
-                  event.target.value,
-                  null
-                ]);
-                this.props.getAds();
-              }}
-            >
-              <option>any state</option>
-              <option>Alabama</option>
-              <option>Alaska</option>
-              <option>Arizona</option>
-              <option>Arkansas</option>
-              <option>California</option>
-              <option>Colorado</option>
-              <option>Connecticut</option>
-              <option>Delaware</option>
-              <option>District of Columbia</option>
-              <option>Florida</option>
-              <option>Georgia</option>
-              <option>Hawaii</option>
-              <option>Idaho</option>
-              <option>Illinois</option>
-              <option>Indiana</option>
-              <option>Iowa</option>
-              <option>Kansas</option>
-              <option>Kentucky</option>
-              <option>Louisiana</option>
-              <option>Maine</option>
-              <option>Maryland</option>
-              <option>Massachusetts</option>
-              <option>Michigan</option>
-              <option>Minnesota</option>
-              <option>Mississippi</option>
-              <option>Missouri</option>
-              <option>Montana</option>
-              <option>Nebraska</option>
-              <option>Nevada</option>
-              <option>New Hampshire</option>
-              <option>New Jersey</option>
-              <option>New Mexico</option>
-              <option>New York</option>
-              <option>North Carolina</option>
-              <option>North Dakota</option>
-              <option>Ohio</option>
-              <option>Oklahoma</option>
-              <option>Oregon</option>
-              <option>Pennsylvania</option>
-              <option>Puerto Rico</option>
-              <option>Rhode Island</option>
-              <option>South Carolina</option>
-              <option>South Dakota</option>
-              <option>Tennessee</option>
-              <option>Texas</option>
-              <option>Utah</option>
-              <option>Vermont</option>
-              <option>Virginia</option>
-              <option>Washington</option>
-              <option>West Virginia</option>
-              <option>Wisconsin</option>
-              <option>Wyoming</option>
-            </select>{" "} */}
             and politically{" "}
             <select
               value={
@@ -181,7 +112,7 @@ export class SelectorsAndPersonae extends React.Component {
         </div>
         <div className="race-note">
           <p>
-            Note: We don't let you filter by race because few political
+            Note: Filtering by race is disabled because too few political
             advertisers target using Facebook’s “multicultural affinity”
             category.
           </p>
@@ -193,7 +124,7 @@ export class SelectorsAndPersonae extends React.Component {
           <ul className="flexy">
             {[
               {
-                age: "72",
+                age: "65",
                 gender: "a man",
                 politics: "conservative",
                 location: ["District of Columbia", "Washington"],
@@ -201,7 +132,7 @@ export class SelectorsAndPersonae extends React.Component {
                 img: "man-65"
               },
               {
-                age: "40",
+                age: "45",
                 gender: "a woman",
                 politics: "liberal",
                 location: ["California"],
@@ -209,7 +140,7 @@ export class SelectorsAndPersonae extends React.Component {
                 img: "woman-40"
               },
               {
-                age: "20",
+                age: "18",
                 gender: "a man",
                 politics: "neither liberal nor conservative",
                 location: ["Wisconsin"],
@@ -217,7 +148,7 @@ export class SelectorsAndPersonae extends React.Component {
                 img: "man-20"
               },
               {
-                age: "32",
+                age: "30",
                 gender: "a woman",
                 politics: "conservative",
                 location: ["North Dakota"],

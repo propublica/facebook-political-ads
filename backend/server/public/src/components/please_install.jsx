@@ -40,33 +40,35 @@ const PleaseInstallUnconnected = ({ persona }) =>
   ].indexOf(persona.location[0]) > -1 ||
     persona.politics == "conservative") ? (
     <div className="glad-you-here">
-      <div className="thinking-face"></div>
+      <div className="thinking-face" />
       <div>
         <h2>Is this you? We need your help!</h2>
         <h4>
-          Not many people with the traits you selected are using our political
-          ad collector.
+          Not many people with the traits you selected are using our Political
+          Ad Collector browser plug-in.
         </h4>
         <p>
-          This means even though the ads are out there, we don't have them in
-          our database. Is this you? Help us help other people like you by using
-          the ad collector.
+          That means that even though ads targeting people like you are out
+          there, we don’t have them in our database. Is this you? If this
+          describes you, help us track more ads by using the ad collector.
         </p>
-        <a href="https://projects.propublica.org/political-ad-collector/">Use the ad collector</a>
+        <a href="https://projects.propublica.org/political-ad-collector/">
+          Use the ad collector
+          </a>
       </div>
     </div>
   ) : (
     <div className="glad-you-here">
-    <div className="wave"></div>
+        <div className="wave" />
         <div>
-          <h2>Hey, we're glad you're here!</h2>
+          <h2>Hey, we’re glad you’re here!</h2>
         <h4>You can help us make our ad database more representative.</h4>
           <p>
-          The political ad collector only receives Facebook ads from people
-          using the browser extension. Help us help other people like you by
-          using the ad collector.
+          The Political Ad Collector only receives Facebook ads from people using the browser plug-in. Help us track more ads by using the ad collector.
         </p>
-        <a href="https://projects.propublica.org/political-ad-collector/">Use the ad collector</a>
+        <a href="https://projects.propublica.org/political-ad-collector/">
+          Use the ad collector
+          </a>
         </div>
     </div>
   );
