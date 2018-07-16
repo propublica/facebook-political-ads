@@ -311,17 +311,18 @@ article {
   background-color: #F2F2F2;
   // border-radius: 5px;
   width: 100%;
+  //width: 86%; //turn on when showing static feltron
   font-family: "Graphik", sans-serif;
 
   @include breakpoint-min(lg) {
-    width: 80%;
+    // width: 80%;
   }
   .feltron-static {
-    // background: url("../images/feltrons.png") top left no-repeat;
+    // background: url("../images/feltrons.png") top left no-repeat; //turn on when showing static feltron
     background-size: 100%;
     display: inline-block;
     width: 100%;
-    // height: 100px;
+    // height: 128px; //turn on when showing static feltron
   }
   .feltron {
     font-size: 32px; /* we should incorporate the newsapps-styles stuff rather than faking it */
@@ -334,10 +335,14 @@ article {
   .top-feltrons-container {
     display: flex;
     justify-content: center;
+    // display: none; //turn on when showing static feltron
 
     .top-feltrons {
       padding: 20px;
-
+      border-right: solid 1px #6b6b6b;
+    }
+    .top-feltrons:last-child {
+      border-right: none;
     }
   }
   .stats-sentence {

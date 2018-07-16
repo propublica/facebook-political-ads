@@ -20,35 +20,34 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
         />
       </div>
       <div className="top-feltrons top-target">
-        <h3>Top targeted traits</h3>
+        <h3>Top targeted methods</h3>
         <div className="flexy">
           <div className="">
-            <p>Facebook users similar to the advertiser's current customers</p>
-            <p>and</p>
-            <p>Users on a particular Facebook list</p>
+            <p>location, age, custom audience,</p>
+            <p>politics, look-a-like audience</p>
           </div>
         </div>
       </div>
-    </div>
-    <div className="stats-sentence">
-      <p>
-        <strong>
-          {homepage_stats && homepage_stats.user_count
-            ? homepage_stats.user_count
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            : "--"}
-        </strong>{" "}
-        readers like you have helped collect{" "}
-        <strong>
-          {homepage_stats && homepage_stats.political_ads_total
-            ? homepage_stats.political_ads_total
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-            : "--"}
-        </strong>{" "}
-        political ads.
-      </p>
+      <div className="top-feltrons ads-collected">
+        <div className="flexy">
+          <div className="">
+            <p><strong>
+              {homepage_stats && homepage_stats.political_ads_total
+                ? homepage_stats.political_ads_total
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : "--"}
+            </strong>{" "} political ads collected by</p>
+            <p><strong>
+              {homepage_stats && homepage_stats.user_count
+                ? homepage_stats.user_count
+                    .toString()
+                    .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : "--"}
+            </strong>{" "}contributors</p>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 );
