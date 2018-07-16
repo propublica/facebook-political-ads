@@ -129,7 +129,8 @@ export class SelectorsAndPersonae extends React.Component {
             {[
               {
                 age: "65",
-                gender: "a man",
+                gender: "male",
+                gender_noun: "a man",
                 politics: "conservative",
                 location: ["District of Columbia", "Washington"],
                 pretty_location: "Washington, D.C.",
@@ -137,7 +138,8 @@ export class SelectorsAndPersonae extends React.Component {
               },
               {
                 age: "45",
-                gender: "a woman",
+                gender: "female",
+                gender_noun: "a woman",
                 politics: "liberal",
                 location: ["California"],
                 pretty_location: "California",
@@ -145,7 +147,8 @@ export class SelectorsAndPersonae extends React.Component {
               },
               {
                 age: "18",
-                gender: "a man",
+                gender: "male",
+                gender_noun: "a man",
                 politics: "neither liberal nor conservative",
                 location: ["Wisconsin"],
                 pretty_location: "Wisconsin",
@@ -153,7 +156,8 @@ export class SelectorsAndPersonae extends React.Component {
               },
               {
                 age: "30",
-                gender: "a woman",
+                gender: "female",
+                gender_noun: "a woman",
                 politics: "conservative",
                 location: ["North Dakota"],
                 pretty_location: "North Dakota",
