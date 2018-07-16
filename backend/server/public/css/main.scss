@@ -272,28 +272,29 @@ article {
 
 
 #man-65 {
-  background: url("../images/worker.svg") top left no-repeat;
+  background: url("../images/72-man.png") top left no-repeat;
   background-size: 100%;
 }
 
 #woman-40 {
-   background: url("../images/farmer.svg") top left no-repeat;
+   background: url("../images/40-woman.png") top left no-repeat;
    background-size: 100%;
+   width: 108px;
 }
 
 #man-20 {
-   background: url("../images/teacher.svg") top left no-repeat;
+   background: url("../images/20-man.png") top left no-repeat;
    background-size: 100%;
 }
 
 #woman-32 {
-   background: url("../images/doctor.svg") top left no-repeat;
+   background: url("../images/32-woman.png") top left no-repeat;
    background-size: 100%;
 }
 
 .persona .emoji {
   display:inline-block;
-  width:90px;
+  width:78px;
   height: 92px;
   max-width: 100%;
 }
@@ -314,11 +315,11 @@ article {
     width: 80%;
   }
   .feltron-static {
-    background: url("../images/feltron-static.svg") top left no-repeat;
+    // background: url("../images/feltrons.png") top left no-repeat;
     background-size: 100%;
     display: inline-block;
     width: 100%;
-    height: 100px;
+    // height: 100px;
   }
   .feltron {
     font-size: 32px; /* we should incorporate the newsapps-styles stuff rather than faking it */
@@ -331,7 +332,6 @@ article {
   .top-feltrons-container {
     display: flex;
     justify-content: center;
-    display: none;
 
     .top-feltrons {
       padding: 20px;
