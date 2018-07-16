@@ -41,7 +41,7 @@ export class AdListUnconnected extends React.Component {
           <p className="why-these-ads">
             {this.props.persona
               ? "The following ads target one or more of the traits selected above."
-              : "The following ads target one or more of the traits available for selection above."}{" "}
+              : "The following ads are the most recent ads submitted to our database. Select traits above to filter based on how they were targeted."}{" "}
             <button
               id="toggle-topic-search"
               onClick={() =>
