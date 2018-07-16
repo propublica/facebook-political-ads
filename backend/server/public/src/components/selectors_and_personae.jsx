@@ -24,90 +24,94 @@ export class SelectorsAndPersonae extends React.Component {
       <div className="selectorsAndPersonae">
         <div className="selectorsOnly">
           <div id="sticky_nav">
-            See ads targeted to people who are:{" "}
-            <input
-              type="number"
-              value={
-                this.props.persona === null || !this.props.persona.age
-                  ? "--"
-                  : this.props.persona.age
-              }
-              onChange={event => {
-                this.props.setPersonaFacet("age", event.target.value);
-                this.props.getAds();
-              }}
-            />{" "}
-            years old,{" "}
-            <select
-              value={
-                this.props.persona === null || !this.props.persona.gender
-                  ? ""
-                  : this.props.persona.gender
-              }
-              onChange={event => {
-                this.props.setPersonaFacet("gender", event.target.value);
-                this.props.getAds();
-              }}
-            >
-              <option>any gender</option>
-              <option>a woman</option>
-              <option>a man</option>
-            </select>, any race, in <br />
-            <div
-              className="select-container"
-              style={{
-                display: "inline-block",
-                maxWidth: 400,
-                minWidth: 300,
-                maxHeight: "1.2em",
-                input: {
-                  height: "1em"
-                }
-              }}
-            >
-              <Select
-                name="city"
+            <div id="sticky-first-line">
+              See ads targeted to people who are:{" "}
+              <input
+                type="number"
                 value={
-                  this.props.persona && this.props.persona.location
-                    ? this.props.persona.location.length === 2
-                      ? this.props.persona.location[1] +
-                        ", " +
-                        this.props.persona.location[0]
-                      : this.props.persona.location[0]
-                    : null
+                  this.props.persona === null || !this.props.persona.age
+                    ? "--"
+                    : this.props.persona.age
                 }
-                noResultsText={
-                  "No matching cities were targeted with enough political ads."
-                }
-                placeholder={"any city in any state"}
-                searchPromptText={"State or city"}
-                style={{ width: "100%", container: { width: "100%" } }}
                 onChange={event => {
-                  this.props.setPersonaFacet(
-                    "location",
-                    event ? event.value.split(", ", 2).reverse() : null
-                  );
+                  this.props.setPersonaFacet("age", event.target.value);
                   this.props.getAds();
                 }}
-                options={cities_to_show.map(city => {
-                  return { value: city, label: city };
-                })}
-              />
-            </div>{" "}
-            and politically{" "}
-            <select
-              value={
-                this.props.persona === null ? "" : this.props.persona.politics
-              }
-              onChange={event => {
-                this.props.setPersonaFacet("politics", event.target.value);
-                this.props.getAds();
-              }}
-            >
-              <option>neither liberal nor conservative</option>
-              <option>conservative</option>
-              <option>liberal</option>
-            </select>.
+              />{" "}
+              years old,{" "}
+              <select
+                value={
+                  this.props.persona === null || !this.props.persona.gender
+                    ? ""
+                    : this.props.persona.gender
+                }
+                onChange={event => {
+                  this.props.setPersonaFacet("gender", event.target.value);
+                  this.props.getAds();
+                }}
+              >
+                <option>any gender</option>
+                <option>a woman</option>
+                <option>a man</option>
+              </select>, any race, in
+            </div>
+            <div id="sticky-sec-line">
+              <div
+                className="select-container"
+                style={{
+                  display: "inline-block",
+                  maxWidth: 400,
+                  minWidth: 200,
+                  maxHeight: "1.2em",
+                  input: {
+                    height: "1em"
+                  }
+                }}
+              >
+                <Select
+                  name="city"
+                  value={
+                    this.props.persona && this.props.persona.location
+                      ? this.props.persona.location.length === 2
+                        ? this.props.persona.location[1] +
+                          ", " +
+                          this.props.persona.location[0]
+                        : this.props.persona.location[0]
+                      : null
+                  }
+                  noResultsText={
+                    "No matching cities were targeted with enough political ads."
+                  }
+                  placeholder={"any city in any state"}
+                  searchPromptText={"State or city"}
+                  style={{ width: "100%", container: { width: "100%" } }}
+                  onChange={event => {
+                    this.props.setPersonaFacet(
+                      "location",
+                      event ? event.value.split(", ", 2).reverse() : null
+                    );
+                    this.props.getAds();
+                  }}
+                  options={cities_to_show.map(city => {
+                    return { value: city, label: city };
+                  })}
+                />
+              </div>{" "}
+              and politically{" "}
+              <select
+                value={
+                  this.props.persona === null ? "" : this.props.persona.politics
+                }
+                onChange={event => {
+                  this.props.setPersonaFacet("politics", event.target.value);
+                  this.props.getAds();
+                }}
+              >
+                <option>neither liberal nor conservative</option>
+                <option>conservative</option>
+                <option>liberal</option>
+              </select>.
+            </div>
           </div>
         </div>
         <div className="race-note">
