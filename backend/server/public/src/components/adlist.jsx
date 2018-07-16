@@ -39,10 +39,10 @@ export class AdListUnconnected extends React.Component {
 
         <div className="facebook-pac-ads">
           <p className="why-these-ads">
-              {this.props.persona
+            {this.props.persona
               ? "The following ads target one or more of the traits selected above."
               : "The following ads target one or more of the traits available for selection above."}{" "}
-              <button
+            <button
               id="toggle-topic-search"
               onClick={() =>
                 this.props.show_old_search
@@ -54,7 +54,7 @@ export class AdListUnconnected extends React.Component {
                 ? "Hide Keyword Search"
                 : "Search by Keyword"}
             </button>
-            </p>
+          </p>
           {this.props.ads.length > 0 ? (
             <Pagination />
           ) : (
@@ -67,7 +67,9 @@ export class AdListUnconnected extends React.Component {
 
           <div id="ads">
             {this.props.ads.slice(0, 2).map(ad => <Ad ad={ad} key={ad.id} />)}
-            {this.props.ads.length > 0 ? <PleaseInstall /> : null}
+            {this.props.ads.length > 0 && this.props.persona ? (
+              <PleaseInstall />
+            ) : null}
             {this.props.ads.slice(2).map(ad => <Ad ad={ad} key={ad.id} />)}
           </div>
           {this.props.ads.length > 0 ? <Pagination /> : ""}
@@ -86,7 +88,8 @@ export const AdListUnrouted = connect(
     entities,
     advertisers,
     targets,
-    show_old_search
+    show_old_search,
+    persona
   }) => ({
     ads,
     search,
@@ -95,7 +98,8 @@ export const AdListUnrouted = connect(
     entities,
     advertisers,
     targets,
-    show_old_search
+    show_old_search,
+    persona
   }),
   dispatch => ({
     deserialize: () => {
@@ -106,11 +110,11 @@ export const AdListUnrouted = connect(
     hideOldSearch: () => {
       window.location.hash = "";
       dispatch(hideOldSearch());
-      },
+    },
     showOldSearch: () => {
       window.location.hash = "facebook-pac-browser";
       dispatch(showOldSearch());
-      }
+    }
   })
 )(AdListUnconnected);
 const AdList = withRouter(AdListUnrouted);
