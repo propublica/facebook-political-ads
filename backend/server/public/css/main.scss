@@ -371,11 +371,27 @@ article {
     padding-top: 5px;
     padding-bottom: 5px;
   }
-  .Select-value-label, .Select-placeholder {
+  .Select-value{
+    top: 1px;
+  }
+  .Select-value-label {
     color: black;
+    padding-left: 10px; 
+  }
+  
+  .Select-placeholder {
+    color: #999;
+    padding-left: 20px; // matching Select-input... but for some reason it starts from a different point, so it's gotta be 20, not 10.
   }
   .Select-option, .Select-noresults {
     font-size: 0.8em;
+  }
+  .Select-control .Select-input input {
+    min-width: 190px;
+    padding-top: 0px;
+  }
+  .Select-control {
+    text-align: left;
   }
 
 }
