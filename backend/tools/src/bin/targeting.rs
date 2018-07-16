@@ -98,9 +98,13 @@ fn main() {
                 // parsed_lines = lines.map{|line| JSON.parse(line)}
                 } else {
                     still_doesnt_parse += 1;
+
                 }
             } else {
                 still_doesnt_parse += 1;
+                println!("failed: {:?}", ad.id);
+                println!("targts: {:?}", ad.targeting.clone());
+                println!("targts: {:?}", ad.targetings.clone());
             }
         }
 
