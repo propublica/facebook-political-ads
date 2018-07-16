@@ -9,18 +9,21 @@ const Persona = ({ persona, setPersona, getAds }) => (
       setPersona(persona);
       getAds();
       dataLayer.push({
-       'event': 'Pageview',
-       'url': "https://projects.propublica.org/facebook-political-ads#"+persona["img"]
-       });
-
+        event: "Pageview",
+        url:
+          "https://projects.propublica.org/facebook-political-ads#" +
+          persona["img"]
+      });
     }}
   >
-
-<div className='emoji' id={persona.img}></div>
+    <div className="emoji" id={persona.img} />
 
     <div className="persona-info">
       <p>
-        <strong>{ persona.age }</strong>-year-old <strong>{ persona.gender }</strong> living in <strong>{ persona.pretty_location }</strong> who is <strong>{ persona.politics }</strong>
+        <strong>{persona.age}</strong>-year-old{" "}
+        <strong>{persona.gender.replace("a ", "")}</strong> living in{" "}
+        <strong>{persona.pretty_location}</strong> who is{" "}
+        <strong>{persona.politics}</strong>
       </p>
     </div>
   </div>

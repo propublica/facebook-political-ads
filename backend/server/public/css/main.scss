@@ -12,6 +12,8 @@
 
 @import "ads";
 
+@import "../node_modules/react-select/dist/react-select.css";
+
 $image-assets: "../images";
 $cachebuster: random(1000000);
 
@@ -347,18 +349,31 @@ article {
 
 
 
-#graphic input[type="number"] {
-  width: 3em;
-}
-#graphic select, #graphic input {
-  background-color: #CCE8F8;
-  font-size: 1em;
-  height: 1.5em;
-  padding: 5px;
-  border-radius: 6px;
-  border: none;
-}
+#graphic {
+  input[type="number"] {
+    width: 3em;
+  }
+  select, input, .Select-control {
+    background-color: #CCE8F8;
+    font-size: 1em;
+    height: 1.5em;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 6px;
+    border: none;
+  }
+  select, input {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+  .Select-value-label, .Select-placeholder {
+    color: black;
+  }
+  .Select-option, .Select-noresults {
+    font-size: 0.8em;
+  }
 
+}
 .political-ratio svg text {
   font-weight: normal;
 }
