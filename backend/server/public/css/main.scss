@@ -1051,3 +1051,52 @@ header[role="banner"] nav .donate-links {
     background-color: darken($light-red, 5%);
   }
 }
+
+/* for the signup icon */
+header[role="banner"] nav .social-links li a.nav-social-link {
+  overflow: visible;
+  width: auto;
+  text-indent: 0;
+  vertical-align: top;
+}
+.nav-social-link {
+    color: black;
+    display: block;
+    font-size: .8125rem;
+    font-weight: bold;
+    padding: .5rem;
+    padding-top: 3px;
+    text-transform: uppercase;
+    vertical-align: top;
+}
+
+.nav-social-link .icon-label {
+  margin-left:.5rem;
+  vertical-align: top;
+}
+.nav-email-item {
+  margin-left:.625rem;
+  position:relative;
+  padding-left:.625rem
+}
+.nav-email-item:after {
+  background:#333;
+  bottom:0.5em;
+  content:"";
+  left:0;
+  position:absolute;
+  top:0.35em;
+  width:1px
+}
+.mast-mini--dark .nav-email-item:after {
+  background-color:#fff
+}
+@supports (display: flex) 
+  {
+  .fixed-supported .mast-mini--light.is-scrolling .nav-email-item:after {
+    background:#333
+  }
+  .fixed-supported .mast-mini--dark.is-scrolling .nav-email-item:after{
+    background:#fff
+  }
+}
