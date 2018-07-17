@@ -438,6 +438,12 @@ article {
       height: 20px;
     }
   }
+  .Select-control, .Select-input {
+    height: 26px;
+  }
+  .Select-input {
+    line-height: 26px;
+  }
   .Select-value{
     padding: 5px;
     @include breakpoint-max(sm) {
@@ -1197,7 +1203,7 @@ header[role="banner"] nav .social-links li a.nav-social-link {
 .mast-mini--dark .nav-email-item:after {
   background-color:#fff
 }
-@supports (display: flex)
+@supports (display: flex) 
   {
   .fixed-supported .mast-mini--light.is-scrolling .nav-email-item:after {
     background:#333

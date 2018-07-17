@@ -3,7 +3,11 @@ import { debounce } from "lodash";
 import history from "./history.js";
 
 export const URL_ROOT =
-  window.location.href.indexOf("localhost") > -1 ? "http://localhost:3000" : "";
+  window.location.href.indexOf("localhost") > -1
+    ? "http://localhost:3000"
+    : window.location.host.indexOf("10.55.") > -1
+      ? "http://" + window.location.host.split(":")[0] + ":3000"
+      : "";
 
 export const NEW_ADS = "new_ads";
 export const newAds = ads => ({
