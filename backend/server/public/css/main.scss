@@ -377,7 +377,7 @@ article {
       border-right: solid 1px #d2d2d2;
       text-align: center;
       @include breakpoint-max(sm) {
-        border-bottom: solid 1px #6b6b6b;
+        border-bottom: solid 1px #d2d2d2;
         border-right: none;
         width: 100%;
         padding: 15px 5px;
@@ -389,6 +389,7 @@ article {
     .top-feltrons:last-child {
       border-right: none;
       border-bottom: none;
+      padding-right: 0px;
     }
     h3 {
       font-size: 0.8em;
@@ -398,14 +399,14 @@ article {
     .top-target p {
       font-weight: 600;
     }
-    @media screen and (max-width: 960px) {
-      h3 {
-        font-size: .9em;
-      }
-      p {
-        font-size: .8em;
-      }
-    }
+    // @media screen and (max-width: 960px) {
+    //   h3 {
+    //     font-size: .9em;
+    //   }
+    //   p {
+    //     font-size: .8em;
+    //   }
+    // }
   }
 }
 
