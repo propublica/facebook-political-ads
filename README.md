@@ -17,13 +17,13 @@ We're open sourcing this project because we'd love your help. Collecting these a
 
 The extension popup is a [preact](https://preactjs.com/) application and you can build a development version by running the following:
 
-    cd extension
-    npm install
-    npm run watch
+    $ cd extension
+    $ npm install
+    $ npm run watch
 
 If you are a Firefox user you can open a clean browser instance with:
 
-    npm run ff
+    $ npm run ff
 
 and any changes will automatically refresh the extension. (You'll need webpack installed globally.)
 
@@ -31,26 +31,38 @@ In Chrome you'll need to add an unpacked extension by following these [direction
 
 ### Backend
 
+First, make sure you have Rust [installed](https://doc.rust-lang.org/cargo/getting-started/installation.html):
+
+    $ curl -sSf https://static.rust-lang.org/rustup.sh | sh
+
+Be sure to add `~/.cargo/bin` (or wherever cargo is installed, `path/to/.cargo/bin`) to your PATH. You can do this by adding this line to your `.bash_rc` or `.zshrc` or whatever config file you typically use for your shell.
+```
+PATH=$PATH:~/.cargo/bin
+```
+
 The backend server is a rust application that runs on top of [diesel](https://diesel.rs) and [hyper](https://hyper.rs/). You'll need the diesel command line interface to get started and to create the database:
 
-    cargo install diesel_cli
-    diesel database setup
+    $ cargo install diesel_cli
+    $ diesel database setup
     
-You'll also need to clone the [fbpac-api](https://www.github.com/propublica/fbpac-api-public) app and run its migrations, to add a few other columns.
+You'll also need to clone the [fbpac-api](https://www.github.com/propublica/fbpac-api-public) app and run its migrations, to add a few other columns. In a separate directory:
 
-    rake db:migrate
+    $ git clone https://github.com/propublica/fbpac-api-public.git
+    $ cd fbpac-api-public
+    $ bundle install
+    $ rake db:migrate
 
 You can kick the tires by running:
 
-    cd backend/server
-    cargo build
-    cargo run
+    $ cd backend/server
+    $ cargo build
+    $ cargo run
 
 This will give a server running at `localhost:8080`. You will also need to build the backend's static resources. To do this, in another terminal tab:
 
-    cd backend/server/public
-    npm install
-    NODE_ENV=development npm run watchnpm run watch
+    $ cd backend/server/public
+    $ npm install
+    $ NODE_ENV=development npm run watch
 
 This will build the required static assets (javascript & css) to view the admin console at `localhost:8080/facebook-ads/`.
 
@@ -58,35 +70,42 @@ If you make any changes to the database, after you run the migration, you'll wan
 
 The backend has both unit and integration tests. You will need to set up a test database alongside your actual database in order to run the integration tests. To do this, you will need to the same as above, but substitute out the database test URL:
 
-    diesel database setup --database-url postgres://localhost/facebook_ads_test
+    $ diesel database setup --database-url postgres://localhost/facebook_ads_test
 
 Note that the value for `--database-url` came from the `TEST_DATABASE_URL` value set in the `.env` file. Make sure that the urls match before you run the tests!
 
 Additionally, because the integration tests use the database, we want to make sure that they aren't run in parallel, so to run the tests:
 
-    RUST_TEST_THREADS=1 cargo test
+    $ RUST_TEST_THREADS=1 cargo test
 
 This will run the tests in sequence, avoiding parallelism errors for tests that require the database.
 
 ### Classifier
 
-We train the classifier using python and scikit learn and the source is in `backend/classifier/`. We're using [pipenv](http://docs.pipenv.org/en/latest/) to track dependencies. To get started you can run:
+We train the classifier using python and scikit learn and the source is in `backend/classifier/`. We're using [pipenv](https://docs.pipenv.org/) to track dependencies. 
 
-    cd backend/classifier/
-    pipenv install
-    pipenv shell
+To download pipenv:
+```
+$ brew install pipenv
+```
+
+To get started you can run:
+
+    $ cd backend/classifier/
+    $ pipenv install
+    $ pipenv shell
 
 To download the seeds for the classifier, you'll need a Facebook app with the proper permissions and you'll run the seed command like this:
 
-    FACEBOOK_APP_ID=whatever FACEBOOK_APP_SECRET=whatever DATABASE_URL=postgres://whatever/facebook_ads ./classify seed en-US`
+    $ FACEBOOK_APP_ID=whatever FACEBOOK_APP_SECRET=whatever DATABASE_URL=postgres://whatever/facebook_ads ./classify seed en-US`
 
 Alternatively, you can build the model without seeds, relying instead just on votes in the extension and suppressions in the admin. And to build the classifier you'll want to run:
 
-    pipenv run ./classify build
+    $ pipenv run ./classify build
 
 To classify the ads you've collected you can run:
 
-    pipenv run ./classify classify
+    $ pipenv run ./classify classify
     
 You can download pre-trained models with `pipenv run ./classify get_models`.
 
