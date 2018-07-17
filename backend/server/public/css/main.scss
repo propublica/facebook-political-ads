@@ -288,33 +288,21 @@ article {
 #man-65 {
   background: url("../images/72-man.png") top left no-repeat;
   background-size: 100%;
-  @include breakpoint-max(sm) {
-    width: 5em;
-  }
 }
 
 #woman-40 {
    background: url("../images/40-woman.png") top left no-repeat;
    background-size: 100%;
-   @include breakpoint-max(sm) {
-     width: 5em;
-   }
 }
 
 #man-20 {
    background: url("../images/20-man.png") top left no-repeat;
    background-size: 100%;
-   @include breakpoint-max(sm) {
-     width: 5em;
-   }
 }
 
 #woman-32 {
    background: url("../images/32-woman.png") top left no-repeat;
    background-size: 100%;
-   @include breakpoint-max(sm) {
-     width: 5em;
-   }
 }
 
 .persona .emoji {
@@ -322,9 +310,6 @@ article {
   width:100px;
   height: 92px;
   max-width: 100%;
-  @include breakpoint-max(sm) {
-    height: 83px;
-  }
 }
 
 // media query for persona illustration sizing
@@ -335,8 +320,9 @@ article {
   }
 
   .persona .emoji {
-    min-width: 64px;
+    min-width: 73px;
     margin-left: 10px;
+    height: 63px;
   }
 
   .persona-info {
@@ -514,7 +500,7 @@ article {
         width:100%;
       }
       width:12%;
-      min-width: 100px;
+      min-width: 110px;
       margin-right:5px
 
     }
@@ -539,9 +525,8 @@ article {
     }
 
     .thinking-face, .wave {
-      font-size: 5em;
       margin-bottom: 14px;
-      height: 100px;
+      height: 110px;
     }
 
     .thinking-face {
@@ -549,7 +534,8 @@ article {
     }
 
     .wave {
-      background-image: url("../images/wave.svg");
+      background-image: url("../images/hand-wave.png");
+      background-size: 130px;
     }
 
     p {
