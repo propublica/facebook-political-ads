@@ -434,6 +434,9 @@ article {
     @include breakpoint-max(sm) {
       height: 1.7em;
     }
+    @media screen and (max-width: 990px) {
+      height: 20px;
+    }
   }
   .Select-value{
     padding: 5px;
@@ -447,11 +450,23 @@ article {
     font-weight: 300;
   }
 
+  .Select-multi-value-wrapper {
+    display: inline-block;
+    padding: 4px 5px;
+  }
+
   .Select-placeholder {
     color: #999;
-    padding: 5px;
+    padding: 8px;
     font-weight: 300;
   }
+
+  .Select-value-label{
+    padding: 8px;
+    position: relative;
+    top: 4px;
+  }
+
   .Select-option, .Select-noresults {
     font-size: 0.8em;
   }
@@ -461,6 +476,7 @@ article {
   }
   .Select-control {
     text-align: left;
+    line-height: 0px;
   }
 
 }
@@ -626,11 +642,11 @@ article {
   padding: 15px 0;
 }
 
-#sticky-first-line, #sticky-sec-line {
+#sticky-first-line {
   max-width: 75%;
   width:890px;
   margin:auto;
-  line-height: 1.2;
+  line-height: 2.2;
   font-weight: 500;
   padding: 5px 0px;
   font-size:.9em;
@@ -643,7 +659,7 @@ article {
   }
   @media screen and (max-width: 990px) {
     font-size:.7em;
-    line-height: 1.7em;
+    line-height: 2.4em;
   }
 }
 

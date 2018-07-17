@@ -54,8 +54,6 @@ export class SelectorsAndPersonae extends React.Component {
                 <option>a woman</option>
                 <option>a man</option>
               </select>, any race, in{" "}
-            </div>
-            <div id="sticky-sec-line">
               <div
                 className="select-container"
                 style={{
@@ -63,6 +61,8 @@ export class SelectorsAndPersonae extends React.Component {
                   maxWidth: 400,
                   minWidth: 150,
                   maxHeight: "1em",
+                  position: "relative",
+                  top: "-5px",
                   input: {
                     height: "26px"
                   }
@@ -107,10 +107,10 @@ export class SelectorsAndPersonae extends React.Component {
                   this.props.getAds();
                 }}
               >
-                <option>neither liberal nor conservative</option>
-                <option>conservative</option>
-                <option>liberal</option>
-              </select>{" "}.
+                <option>neither liberal nor conservative.</option>
+                <option>conservative.</option>
+                <option>liberal.</option>
+              </select>
             </div>
           </div>
         </div>
