@@ -106,6 +106,9 @@ article {
     @include breakpoint-min(lg) {
       width: colspan(8, 12);
     }
+    @media screen and (max-width: 1025px){
+        width: 100%;
+    }
   }
 }
 
@@ -252,6 +255,9 @@ article {
   @include breakpoint-max(sm) {
     margin-left: 20px;
   }
+  @media screen and (max-width: 800px){
+    font-size: 13px;
+  }
 
   p strong {
     font-weight: 500;
@@ -323,6 +329,7 @@ article {
     min-width: 73px;
     margin-left: 10px;
     height: 63px;
+    width: 73px;
   }
 
   .persona-info {
@@ -530,7 +537,8 @@ article {
     }
 
     .thinking-face {
-      background-image: url("../images/thinking-face.svg");
+      background-image: url("../images/hand-wave.png");
+      background-size: 130px;
     }
 
     .wave {
