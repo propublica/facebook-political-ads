@@ -1196,6 +1196,9 @@ header[role="banner"] nav .social-links {
     width: 26px;
     text-decoration: none;
   }
+  @media screen and (max-width: 37.5em){
+    display: none;
+  }
 }
 
 nav .facebook a {
