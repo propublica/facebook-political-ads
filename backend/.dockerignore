@@ -5,3 +5,5 @@ deploy.sh
 server/public/node_modules
 facebook-ads*.sql
 facebook_ads*.sql
+server/public/facebook-ads-20180716.sql
+.git

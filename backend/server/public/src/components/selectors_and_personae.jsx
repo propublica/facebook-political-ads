@@ -63,7 +63,6 @@ export class SelectorsAndPersonae extends React.Component {
                     minWidth: 150,
                     maxHeight: "1em",
                     position: "relative",
-                    top: "-5px",
                     input: {
                       height: "26px"
                     }
