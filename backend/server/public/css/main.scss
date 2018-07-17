@@ -1181,11 +1181,7 @@ header[role="banner"] nav .social-links li a.nav-social-link {
 .mast-mini--dark .nav-email-item:after {
   background-color:#fff
 }
-<<<<<<< HEAD
-@supports (display: flex)
-=======
 @supports (display: flex) 
->>>>>>> master
   {
   .fixed-supported .mast-mini--light.is-scrolling .nav-email-item:after {
     background:#333
@@ -1193,8 +1189,4 @@ header[role="banner"] nav .social-links li a.nav-social-link {
   .fixed-supported .mast-mini--dark.is-scrolling .nav-email-item:after{
     background:#fff
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> master
