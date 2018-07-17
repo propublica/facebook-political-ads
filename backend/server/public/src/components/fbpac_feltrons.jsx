@@ -20,8 +20,7 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
       </div>
       <div className="top-feltrons top-target">
         <h3>Top targeted methods</h3>
-          <p>location &#8226; age &#8226; custom audience</p>
-          <p>politics &#8226; look-a-like audience</p>
+        <p>location &#8226; politics &#8226; custom audience &#8226; age &#8226; look-a-like audience</p>
       </div>
       <div className="top-feltrons ads-collected">
         <h3>Total Political Ads</h3>

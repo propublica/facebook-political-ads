@@ -380,6 +380,7 @@ article {
     .top-feltrons {
       padding: 5px 20px;
       border-right: solid 1px #6b6b6b;
+      text-align: center;
       @include breakpoint-max(sm) {
         border-bottom: solid 1px #6b6b6b;
         border-right: none;
@@ -393,6 +394,14 @@ article {
     }
     h3 {
       font-weight: 500;
+    }
+    @media screen and (max-width: 960px) {
+      h3 {
+        font-size: .9em;
+      }
+      p {
+        font-size: .8em;
+      }
     }
   }
 }
@@ -416,12 +425,12 @@ article {
   select, input {
     padding-top: 5px;
     padding-bottom: 5px;
+    height: 26px;
     @include breakpoint-max(sm) {
       height: 1.7em;
     }
   }
   .Select-value{
-    top: 1px;
     padding: 5px;
     @include breakpoint-max(sm) {
       height: 1.7em;
@@ -458,8 +467,8 @@ article {
   border-right: solid 1px #6b6b6b;
   width: 30%;
   svg {
-    height: 80px;
-    margin-top: -12px;
+    height: 56px;
+    margin-top: -5px;
   }
 }
 
@@ -631,12 +640,18 @@ article {
 }
 
 #sticky-sec-line {
+  @media screen and (max-width: 756px) {
+    select {
+      margin-top: 20px;
+    }
+  }
   @include breakpoint-max(sm) {
     padding-top: 0px;
     select {
-      margin-top: 5px;
+      margin-top: 10px;
     }
   }
+
 }
 
 #sticky_nav.sticky p {
@@ -1158,7 +1173,7 @@ header[role="banner"] nav .social-links li a.nav-social-link {
 .mast-mini--dark .nav-email-item:after {
   background-color:#fff
 }
-@supports (display: flex) 
+@supports (display: flex)
   {
   .fixed-supported .mast-mini--light.is-scrolling .nav-email-item:after {
     background:#333

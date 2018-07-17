@@ -53,7 +53,7 @@ export class SelectorsAndPersonae extends React.Component {
                 <option>any gender</option>
                 <option>a woman</option>
                 <option>a man</option>
-              </select>, any race, in
+              </select>, any race, in{" "}
             </div>
             <div id="sticky-sec-line">
               <div
@@ -61,10 +61,10 @@ export class SelectorsAndPersonae extends React.Component {
                 style={{
                   display: "inline-block",
                   maxWidth: 400,
-                  minWidth: 200,
-                  maxHeight: "1.2em",
+                  minWidth: 150,
+                  maxHeight: "1em",
                   input: {
-                    height: "1em"
+                    height: "26px"
                   }
                 }}
               >
@@ -110,7 +110,7 @@ export class SelectorsAndPersonae extends React.Component {
                 <option>neither liberal nor conservative</option>
                 <option>conservative</option>
                 <option>liberal</option>
-              </select>.
+              </select>{" "}.
             </div>
           </div>
         </div>
