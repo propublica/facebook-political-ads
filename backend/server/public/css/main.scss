@@ -430,6 +430,7 @@ article {
     padding-top: 5px;
     padding-bottom: 5px;
     height: 26px;
+    box-sizing: content-box;
     @include breakpoint-max(sm) {
       height: 1.7em;
     }
