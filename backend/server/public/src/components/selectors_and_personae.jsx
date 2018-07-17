@@ -30,7 +30,9 @@ export class SelectorsAndPersonae extends React.Component {
                 {" "}
                 <input
                   type="number"
-                  min="1"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  min="13"
                   value={
                     this.props.persona === null || !this.props.persona.age
                       ? "--"

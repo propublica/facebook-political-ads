@@ -438,6 +438,7 @@ article {
     padding-bottom: 5px;
     height: 26px;
     box-sizing: content-box;
+    -webkit-appearance: none;
     @include breakpoint-max(sm) {
       height: 1.7em;
     }
@@ -1195,6 +1196,9 @@ header[role="banner"] nav .social-links {
     overflow: hidden;
     width: 26px;
     text-decoration: none;
+  }
+  @media screen and (max-width: 420px) {
+    display: none;
   }
 }
 
