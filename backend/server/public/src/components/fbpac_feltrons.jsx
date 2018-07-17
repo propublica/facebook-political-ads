@@ -6,24 +6,22 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
   <div className="feltrons">
     <div className="top-feltrons-container">
       <div className="top-feltrons political-ratio">
-        <h3>This Week</h3>
-        <PoliticalAdsChart
-          political_ads_per_day={
-            homepage_stats && homepage_stats.political_ads_per_day
-              ? homepage_stats.political_ads_per_day.slice(
-                0,
-                homepage_stats.political_ads_per_day.length - 1
-              )
-              : null
-          }
-        />
+        <h3>Today</h3>
+        <p><strong>
+          {homepage_stats && homepage_stats.political_ads_total
+            ? homepage_stats.political_ads_total
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            : "--"}
+        </strong></p>
+        <p>political ads collected</p>
       </div>
       <div className="top-feltrons top-target">
         <h3>Top Targeting Methods</h3>
         <p>location, political affiliation, custom&nbsp;audience</p>
       </div>
       <div className="top-feltrons ads-collected">
-        <h3>Political Ads Collected</h3>
+        <h3>All Political Ads</h3>
         <p><strong>
           {homepage_stats && homepage_stats.political_ads_total
             ? homepage_stats.political_ads_total
