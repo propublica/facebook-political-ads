@@ -1197,7 +1197,7 @@ header[role="banner"] nav .social-links li a.nav-social-link {
 .mast-mini--dark .nav-email-item:after {
   background-color:#fff
 }
-@supports (display: flex)
+@supports (display: flex) 
   {
   .fixed-supported .mast-mini--light.is-scrolling .nav-email-item:after {
     background:#333
