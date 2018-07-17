@@ -434,7 +434,7 @@ article {
     @include breakpoint-max(sm) {
       height: 1.7em;
     }
-    @media screen and (max-width: 990px) {
+    @media screen and (max-width: 1000px) {
       height: 20px;
     }
   }
@@ -654,28 +654,30 @@ article {
   -webkit-transition: all 0.20s ease-in-out;
   -moz-transition: all 0.20s ease-in-out;
   -o-transition: all 0.20s ease-in-out;
+
+  .mobile-break {
+    display: inline;
+
+    @include breakpoint-max(sm) {
+      display: block;
+    }
+  }
+
   @include breakpoint-max(lg) {
     font-size:.7em;
   }
-  @media screen and (max-width: 990px) {
+  @media screen and (max-width: 1000px) {
     font-size:.7em;
     line-height: 2.4em;
+    max-width: 100%;
+    padding: 0 15px;
   }
 }
 
-#sticky-sec-line {
-  @media screen and (max-width: 756px) {
-    select {
-      margin-top: 20px;
-    }
-  }
+.select-container, .Select-multi-value-wrapper {
   @include breakpoint-max(sm) {
-    padding-top: 0px;
-    select {
-      margin-top: 10px;
-    }
+    max-width: 150px !important;
   }
-
 }
 
 #sticky_nav.sticky p {
@@ -1197,7 +1199,7 @@ header[role="banner"] nav .social-links li a.nav-social-link {
 .mast-mini--dark .nav-email-item:after {
   background-color:#fff
 }
-@supports (display: flex) 
+@supports (display: flex)
   {
   .fixed-supported .mast-mini--light.is-scrolling .nav-email-item:after {
     background:#333
