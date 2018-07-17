@@ -599,7 +599,7 @@ article {
     }
     div:first-child {
       @include breakpoint-max(sm) {
-        width:100%;
+        width:110px;
       }
       width:12%;
       min-width: 110px;
@@ -607,18 +607,19 @@ article {
 
     }
     div:last-child {
+      margin-bottom:50px;
       @include breakpoint-max(sm) {
         width:100%;
-        text-align: center;
+        text-align: left;
+        margin-bottom: 0px;
       }
-      // width:78%; //taken out by AJL 7/12/18 to make same width as ads
-      margin-bottom:50px
     }
     h2 {
       font-family: $fonts-serif;
       font-size: 1.8em;
       font-weight: bold;
-      margin-bottom: 5px
+      margin-bottom: 5px;
+      line-height: 1.3em;
     }
     h4 {
       font-size: 1.1em;
