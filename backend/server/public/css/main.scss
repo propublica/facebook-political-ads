@@ -640,7 +640,7 @@ article {
   @include breakpoint-max(lg) {
     font-size:.7em;
   }
-  @include breakpoint-max(sm) {
+  @media screen and (max-width: 990px) {
     font-size:.7em;
     line-height: 1.7em;
   }
