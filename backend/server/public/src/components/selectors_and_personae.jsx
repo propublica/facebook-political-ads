@@ -26,7 +26,8 @@ export class SelectorsAndPersonae extends React.Component {
           <div id="sticky_nav">
             <div id="sticky-first-line">
               See ads targeted to people who are:
-              <div className="mobile-break">{" "}
+              <div className="mobile-break">
+                {" "}
                 <input
                   type="number"
                   value={
@@ -52,8 +53,8 @@ export class SelectorsAndPersonae extends React.Component {
                   }}
                 >
                   <option>any gender</option>
-                  <option>a woman</option>
-                  <option>a man</option>
+                  <option>female</option>
+                  <option>male</option>
                 </select>, any race, in{" "}
                 <div
                   className="select-container"
@@ -100,16 +101,20 @@ export class SelectorsAndPersonae extends React.Component {
                 and politically{" "}
                 <select
                   value={
-                    this.props.persona === null ? "" : this.props.persona.politics
+                    this.props.persona === null
+                      ? ""
+                      : this.props.persona.politics
                   }
                   onChange={event => {
                     this.props.setPersonaFacet("politics", event.target.value);
                     this.props.getAds();
                   }}
                 >
-                  <option>neither liberal nor conservative.</option>
-                  <option>conservative.</option>
-                  <option>liberal.</option>
+                  <option value="neither liberal nor conservative">
+                    neither liberal nor conservative.
+                  </option>
+                  <option value="conservative">conservative.</option>
+                  <option value="liberal">liberal.</option>
                 </select>
               </div>
             </div>
