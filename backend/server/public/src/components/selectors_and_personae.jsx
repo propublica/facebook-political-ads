@@ -105,18 +105,10 @@ export class SelectorsAndPersonae extends React.Component {
                   this.props.getAds();
                 }}
               >
-<<<<<<< Updated upstream
                 <option>neither liberal nor conservative.</option>
                 <option>conservative.</option>
                 <option>liberal.</option>
               </select>
-=======
-                <option>neither liberal nor conservative</option>
-                <option>conservative</option>
-                <option>liberal</option>
-              </select>{" "}
-              .
->>>>>>> Stashed changes
             </div>
           </div>
         </div>
