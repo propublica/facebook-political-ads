@@ -29,6 +29,7 @@ export class SelectorsAndPersonae extends React.Component {
               <div className="mobile-break">{" "}
                 <input
                   type="number"
+                  min="1"
                   value={
                     this.props.persona === null || !this.props.persona.age
                       ? "--"
