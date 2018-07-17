@@ -63,7 +63,7 @@ export class SelectorsAndPersonae extends React.Component {
                   maxHeight: "1em",
                   position: "relative",
                   top: "-5px",
-                  verticalAlign: "top"
+                  verticalAlign: "middle"
                 }}
               >
                 <Select

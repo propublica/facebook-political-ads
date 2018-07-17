@@ -438,12 +438,6 @@ article {
       height: 20px;
     }
   }
-  .Select-control, .Select-input {
-    height: 26px;
-  }
-  .Select-input {
-    line-height: 26px;
-  }
   .Select-value{
     padding: 5px;
     @include breakpoint-max(sm) {
@@ -483,6 +477,73 @@ article {
   .Select-control {
     text-align: left;
     line-height: 0px;
+  }
+
+  /* all-viewport resets on the react-select autocomplete */
+
+  .Select-control, .Select-input, .Select-input input {
+    padding-top: 0;
+    padding-bottom: 0;
+    top: 0;
+  }
+  .Select-value-label, .Select-value {
+    padding-top: 0;
+    padding-bottom: 0;
+    top: 0;
+  }
+  .Select-placeholder {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+
+  /* variable sizing */
+  .Select-control, .Select-input, .Select-input input {
+    height: calc(26px - 4px); /* 4px is the sum of hte Select-multi-value-wrapper top/bottom padding */
+    @include breakpoint-max(sm) {
+      height: calc(1.7em - 4px); /* 4px is the sum of hte Select-multi-value-wrapper top/bottom padding */
+    }
+    @media screen and (max-width: 990px) {
+      height: 20px;
+    }
+
+  }
+  .Select-value-label, .Select-value {
+    height: 26px;
+    line-height: 26px;
+    @include breakpoint-max(sm) {
+      height: 1.7em;
+      line-height: 1.7em;
+      }
+    @media screen and (max-width: 990px) {
+      height: 20px;
+      line-height: 20px;
+    }
+  }
+  .Select-placeholder {
+    line-height: calc(26px - 4px);
+    height: calc(26px - 4px);
+    @include breakpoint-max(sm) {
+      line-height: calc(1.7em - 2px);
+      height: calc(1.7em - 2px);
+
+    }
+    @media screen and (max-width: 990px) {
+      line-height: calc(20px - 2px);
+      height: calc(20px - 2px);
+      }
+  }
+  .Select-multi-value-wrapper {
+    padding-top: 2px;
+    padding-bottom: 2px;
+    @include breakpoint-max(sm) {
+      line-height: 1px;
+      height: 1px;
+
+    }
+    @media screen and (max-width: 990px) {
+      line-height: 1px;
+      height: 1px;
+      }
   }
 
 }
