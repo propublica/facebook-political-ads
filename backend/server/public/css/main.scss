@@ -211,6 +211,9 @@ article {
   display: flex;
   margin: auto;
   max-width: 590px;
+  @include breakpoint-max(sm) {
+    flex-direction: column;
+  }
 
   .third {
     // width: 33.3%;
@@ -231,6 +234,10 @@ article {
 
   .quarter {
     width: 25%;
+    @include breakpoint-max(sm) {
+      width: 80%;
+      margin: auto;
+    }
   }
 
   .half {
@@ -242,6 +249,9 @@ article {
 .persona-info {
   font-size: .59em;
   text-align: left;
+  @include breakpoint-max(sm) {
+    margin-left: 20px;
+  }
 
   p strong {
     font-weight: 500;
@@ -263,9 +273,11 @@ article {
     cursor:pointer;
     max-width:100%;
     @include breakpoint-max(sm) {
-      padding:5px;
+      padding: 10px;
+      height: 100%;
+      display: flex;
+      align-items: center;
     }
-
 }
 
 .persona:hover {
@@ -276,6 +288,9 @@ article {
 #man-65 {
   background: url("../images/72-man.png") top left no-repeat;
   background-size: 100%;
+  @include breakpoint-max(sm) {
+    width: 4em;
+  }
 }
 
 #woman-40 {
@@ -287,11 +302,17 @@ article {
 #man-20 {
    background: url("../images/20-man.png") top left no-repeat;
    background-size: 100%;
+   @include breakpoint-max(sm) {
+     width: 5em;
+   }
 }
 
 #woman-32 {
    background: url("../images/32-woman.png") top left no-repeat;
    background-size: 100%;
+   @include breakpoint-max(sm) {
+     width: 4em;
+   }
 }
 
 .persona .emoji {
@@ -299,6 +320,28 @@ article {
   width:78px;
   height: 92px;
   max-width: 100%;
+  @include breakpoint-max(sm) {
+    height: 83px;
+  }
+}
+
+// media query for persona illustration sizing
+@media screen and (max-width: 37.5em){
+
+  .persona {
+    margin-right: 0px;
+  }
+
+  .persona .emoji {
+    min-width: 64px;
+    margin-left: 10px;
+  }
+
+  .persona-info {
+    margin-left: 22px;
+    font-size: 14px;
+  }
+
 }
 
 .trait-category {
@@ -317,12 +360,8 @@ article {
   @include breakpoint-min(lg) {
     // width: 80%;
   }
-  .feltron-static {
-    // background: url("../images/feltrons.png") top left no-repeat; //turn on when showing static feltron
-    background-size: 100%;
-    display: inline-block;
-    width: 100%;
-    // height: 128px; //turn on when showing static feltron
+  @include breakpoint-max(sm) {
+    width: 80%;
   }
   .feltron {
     font-size: 32px; /* we should incorporate the newsapps-styles stuff rather than faking it */
@@ -335,14 +374,22 @@ article {
   .top-feltrons-container {
     display: flex;
     justify-content: center;
-    // display: none; //turn on when showing static feltron
-
+    @include breakpoint-max(sm) {
+      flex-direction: column;
+    }
     .top-feltrons {
       padding: 5px 20px;
       border-right: solid 1px #6b6b6b;
+      @include breakpoint-max(sm) {
+        border-bottom: solid 1px #6b6b6b;
+        border-right: none;
+        width: 100%;
+        padding: 15px 5px;
+      }
     }
     .top-feltrons:last-child {
       border-right: none;
+      border-bottom: none;
     }
     h3 {
       font-weight: 500;
@@ -359,27 +406,37 @@ article {
   select, input, .Select-control {
     background-color: #CCE8F8;
     font-size: 1em;
-    height: 35px;
+    // height: 35px;
     padding-left: 5px;
     padding-right: 5px;
     border-radius: 6px;
     border: none;
+
   }
   select, input {
     padding-top: 5px;
     padding-bottom: 5px;
+    @include breakpoint-max(sm) {
+      height: 1.7em;
+    }
   }
   .Select-value{
     top: 1px;
+    padding: 5px;
+    @include breakpoint-max(sm) {
+      height: 1.7em;
+      padding: 2px 5px;
+    }
   }
   .Select-value-label {
     color: black;
-    padding-left: 10px;
+    font-weight: 300;
   }
 
   .Select-placeholder {
     color: #999;
-    padding-left: 20px; // matching Select-input... but for some reason it starts from a different point, so it's gotta be 20, not 10.
+    padding: 5px;
+    font-weight: 300;
   }
   .Select-option, .Select-noresults {
     font-size: 0.8em;
@@ -408,6 +465,9 @@ article {
 
 .top-target {
   width: 35%;
+  @include breakpoint-max(sm) {
+    width: 100%;
+  }
 }
 
 .ads-collected {
@@ -506,13 +566,13 @@ article {
 
 
 .selectorsOnly {
-  margin: 2em 0 1em;
-  min-height: 120px;
+  margin: 2.5em 0 1em;
+  min-height: 95px;
   @include breakpoint-max(lg) {
-    min-height: 80px;
+    min-height: 110px;
   }
   @include breakpoint-max(sm) {
-    min-height: 80px;
+    min-height: 102px;
   }
 }
 
@@ -546,15 +606,16 @@ article {
   -webkit-box-shadow: 2px 1px 41px -5px rgba(158,158,158,1);
   -moz-box-shadow: 2px 1px 41px -5px rgba(158,158,158,1);
   box-shadow: 2px 1px 41px -5px rgba(158,158,158,1);
+  padding: 15px 0;
 }
 
-#sticky_nav p {
+#sticky-first-line, #sticky-sec-line {
   max-width: 75%;
   width:890px;
   margin:auto;
-  line-height: 2.3;
+  line-height: 1.2;
   font-weight: 500;
-  padding: 10px 0px;
+  padding: 5px 0px;
   font-size:.9em;
       transition: all 0.20s ease-in-out;
   -webkit-transition: all 0.20s ease-in-out;
@@ -566,6 +627,15 @@ article {
   @include breakpoint-max(sm) {
     font-size:.7em;
     line-height: 1.7em;
+  }
+}
+
+#sticky-sec-line {
+  @include breakpoint-max(sm) {
+    padding-top: 0px;
+    select {
+      margin-top: 5px;
+    }
   }
 }
 
@@ -584,12 +654,9 @@ article {
 @media (max-width: 480px) {
   #sticky_nav.sticky {
     position: absolute;
-    top:0px;
+    // top:0px;
   }
 }
-
-
-
 // -----------------------------------------------------------------------------
 // FACEBOOK AD BROWSER FORM STYLES
 // -----------------------------------------------------------------------------
