@@ -289,14 +289,16 @@ article {
   background: url("../images/72-man.png") top left no-repeat;
   background-size: 100%;
   @include breakpoint-max(sm) {
-    width: 4em;
+    width: 5em;
   }
 }
 
 #woman-40 {
    background: url("../images/40-woman.png") top left no-repeat;
    background-size: 100%;
-   width: 108px;
+   @include breakpoint-max(sm) {
+     width: 5em;
+   }
 }
 
 #man-20 {
@@ -311,13 +313,13 @@ article {
    background: url("../images/32-woman.png") top left no-repeat;
    background-size: 100%;
    @include breakpoint-max(sm) {
-     width: 4em;
+     width: 5em;
    }
 }
 
 .persona .emoji {
   display:inline-block;
-  width:78px;
+  width:100px;
   height: 92px;
   max-width: 100%;
   @include breakpoint-max(sm) {
