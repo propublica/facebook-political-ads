@@ -415,6 +415,13 @@ article {
 #graphic {
   input[type="number"] {
     width: 3em;
+    height: 17px;
+    @media screen and (max-width: 1000px) {
+      height: 12px;
+    }
+    @media screen and (max-width: 37.5em) {
+      height: 10px;
+    }
   }
   select, input, .Select-control {
     background-color: #CCE8F8;
