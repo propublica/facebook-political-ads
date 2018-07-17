@@ -345,7 +345,7 @@ article {
 
 .feltrons {
   margin: 2em auto;
-  padding: 1em;
+  padding: 0.7em 1em;
   background-color: #F2F2F2;
   // border-radius: 5px;
   width: 100%;
@@ -373,8 +373,8 @@ article {
       flex-direction: column;
     }
     .top-feltrons {
-      padding: 5px 20px;
-      border-right: solid 1px #6b6b6b;
+      padding: 5px 10px;
+      border-right: solid 1px #d2d2d2;
       text-align: center;
       @include breakpoint-max(sm) {
         border-bottom: solid 1px #6b6b6b;
@@ -382,13 +382,21 @@ article {
         width: 100%;
         padding: 15px 5px;
       }
+      #adstoday {
+        max-height: 50px;
+      }
     }
     .top-feltrons:last-child {
       border-right: none;
       border-bottom: none;
     }
     h3 {
-      font-weight: 500;
+      font-size: 0.8em;
+      margin-bottom: 3px;
+      // font-weight: 500;
+    }
+    .top-target p {
+      font-weight: 600;
     }
     @media screen and (max-width: 960px) {
       h3 {
@@ -468,14 +476,14 @@ article {
 }
 
 .top-target {
-  width: 35%;
+  width: 40%;
   @include breakpoint-max(sm) {
     width: 100%;
   }
 }
 
 .ads-collected {
-  width: 34%;
+  width: 30%;
 }
 
 #race-selector:focus {
