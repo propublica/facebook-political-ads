@@ -472,7 +472,7 @@ article {
   }
 
   .Select-placeholder {
-    color: #999;
+    color: #000;
     padding: 8px;
     font-weight: 300;
   }
@@ -1205,7 +1205,7 @@ header[role="banner"] nav .social-links {
     width: 26px;
     text-decoration: none;
   }
-  @media screen and (max-width: 37.5em){
+  @media screen and (max-width: 420px) {
     display: none;
   }
 }
