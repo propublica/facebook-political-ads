@@ -767,6 +767,14 @@ article {
     font-size: .7em;
   }
 }
+@media (max-width: 480px) {
+  #sticky_nav.sticky {
+    position: absolute;
+    top: inherit;
+    box-shadow: none;
+    padding: 0;
+  }
+}
 // -----------------------------------------------------------------------------
 // FACEBOOK AD BROWSER FORM STYLES
 // -----------------------------------------------------------------------------

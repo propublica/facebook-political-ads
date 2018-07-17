@@ -6,19 +6,17 @@ import Select from "react-select";
 
 export class SelectorsAndPersonae extends React.Component {
   componentDidUpdate() {
-    if (window.innerWidth > 480) {
-      var el = document.getElementById("sticky_nav");
-      var eloffset = el.offsetTop;
+    var el = document.getElementById("sticky_nav");
+    var eloffset = el.offsetTop;
 
-      window.onscroll = function() {
-        var windowTop = window.scrollY;
-        if (windowTop > eloffset) {
-          el.classList.add("sticky");
-        } else {
-          el.classList.remove("sticky");
-        }
-      };
-    }
+    window.onscroll = function() {
+      var windowTop = window.scrollY;
+      if (windowTop > eloffset) {
+        el.classList.add("sticky");
+      } else {
+        el.classList.remove("sticky");
+      }
+    };
   }
 
   render() {
