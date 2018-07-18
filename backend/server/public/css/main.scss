@@ -979,14 +979,14 @@ article {
     margin-bottom: 0.5em;
     &.current {
       color: white;
-      background-color: $pp-blue;
+      background-color: #0F3F63;
       padding: 0.5em 1em;
       border-radius: 0.25em;
     }
   }
   li a {
     display: block;
-    // color: $link-color;
+    color: #0F3F63;
     // background-color: white;
     padding: 0.5em 1em;
     border: $border;
@@ -994,8 +994,8 @@ article {
     &:hover,
     &:focus {
       color: white;
-      background-color: $link-color;
-      border: 1px solid $link-color;
+      background-color: #196AA7;
+      border: 1px solid #196AA7;
     }
   }
 }
