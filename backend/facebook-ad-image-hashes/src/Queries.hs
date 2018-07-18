@@ -15,6 +15,7 @@ module Queries (
   , populatePhashes
   , fetchSortedPhashes
   , downloadURLFile
+  , countImageHashMisalignment 
   , testConnectInfo -- TODO temporary
   )where
 
@@ -22,7 +23,9 @@ module Queries (
 import           Control.Concurrent.STM               (TVar, atomically,
                                                        modifyTVar, newTVarIO,
                                                        readTVar, writeTVar)
+import           Control.Exception                    (SomeException, try)
 import           Data.LruCache                        as LRU
+import           Data.Semigroup                       ((<>))
 import           Control.Monad.Trans.Resource         (ResourceT, runResourceT)
 import           Control.Monad                        (unless)
 import qualified Data.ByteString.Lazy                 as BSL
@@ -191,26 +194,19 @@ resolvePhash manager hashCacheTVar url = do
     Just hash -> return (hash)
     Nothing -> do
 
-      -- -- Get a filepath
-      -- -- TODO: Do this better. Temp filenames must be guaranteed unique and unixy
-      -- tmpPath <-
-      --   (\dir n -> concat [dir, [pathSeparator], "fbp-image-", show n])
-      --   <$> getTemporaryDirectory
-      --   <*> randomRIO @Int (1,100000)
+      dlPath <- downloadURLFile manager url
+      case dlPath of
+        Left  errMsg  -> return $ Left errMsg
+        Right tmpPath -> do
 
-      -- -- TODO: error handling
-      -- httpReq <- HTTP.parseRequest (T.unpack url)
-      -- liftIO $ BSL.writeFile tmpPath . HTTP.responseBody =<< HTTP.httpLbs httpReq manager
-      tmpPath <- downloadURLFile manager url
+          hash <- maybe (Left "pHash failure") Right <$> imageHash tmpPath
+          removePathForcibly tmpPath
 
-      hash <- maybe (Left "pHash failure") Right <$> imageHash tmpPath
-      removePathForcibly tmpPath
+          atomically $ modifyTVar hashCacheTVar (LRU.insert url hash)
 
-      atomically $ modifyTVar hashCacheTVar (LRU.insert url hash)
+          return $  hash
 
-      return $  hash
-
-downloadURLFile :: HTTP.Manager -> T.Text -> IO FilePath
+downloadURLFile :: HTTP.Manager -> T.Text -> IO (Either T.Text FilePath)
 downloadURLFile manager url = do
 
   dir <- getTemporaryDirectory
@@ -224,9 +220,12 @@ downloadURLFile manager url = do
 
   -- TODO: error handling
   httpReq <- HTTP.parseRequest (T.unpack url)
-  liftIO $ BSL.writeFile tmpPath . HTTP.responseBody =<< HTTP.httpLbs httpReq manager
+  dlResult <- try $ HTTP.httpLbs httpReq manager >>=
+                    BSL.writeFile tmpPath . HTTP.responseBody
 
-  return tmpPath
+  return $ case dlResult of
+    Left  (e :: SomeException) -> Left $ "Download Failure on: " <> url
+    Right _                    -> Right tmpPath
 
 -- phashURL :: HTTP.Manager -> T.Text -> IO (Either T.Text PHash)
 -- phashURL manager url = do
@@ -270,6 +269,18 @@ fetchSortedPhashes cfg = do
         Nothing  -> Nothing
         Just w64 -> Just (PHash w64, url)
   return . catMaybes $ fmap readRow rs
+
+countImageHashMisalignment :: PG.ConnectInfo -> IO Int64
+countImageHashMisalignment cfg = do
+  conn <- PG.connect cfg
+  [r] <- PG.query_ conn
+        [sql| SELECT COUNT(*)
+              FROM   (SELECT array_length(images,1) as i,
+                             array_length(phash,1)  as p
+                      FROM ads) lengths
+              WHERE lengths.i != lengths.p
+         |]
+  return $ PG.fromOnly r
 
 testConnectInfo :: PG.ConnectInfo
 testConnectInfo = PG.ConnectInfo "localhost" 5432 "fbpac" "password" "fbpac"

@@ -6,6 +6,9 @@
 
 module Search where
 
+import           Control.Error                   (ExceptT(..), MaybeT(..),
+                                                  runExceptT, noteT)
+import           Control.Monad                   (when)
 import           Data.Bifunctor                  (first)
 import           Data.Bits
 import           Data.Ord                        (comparing)
@@ -111,7 +114,13 @@ generateCache :: PG.ConnectInfo
               -> IO ()
 generateCache cfg (IdentityGroupingThreshold thr) fp = do
 
+  nMisaligned <- countImageHashMisalignment cfg
+  when (nMisaligned > 0) $
+    error "Database error: Some hash array did not match image array in size"
+
   rs <- fetchSortedPhashes cfg
+  when (null rs) $
+    error "No valid phashes found in database"
 
   -- Helper function defines how to collapse query rows with identical-enough
   -- phash into a list of URLs under a single phash
@@ -233,15 +242,22 @@ runSearch (SearchOptions queries sType fp overwrite _) = do
   SearchTree kdt <- loadCache cacheFilePath
 
   -- Iterate over all images requested
-  for queries $ \q -> do
+  for queries $ \(q :: Either FilePath URL) -> runExceptT $ do
 
     -- Compute requested image's phash
-    imgFile :: FilePath <- either return (\(URL url) -> downloadURLFile manager url) q
-    hashResult <- imageHash imgFile
+    imgFile :: FilePath <- either
+      return
+      (\(URL url) -> ExceptT $ downloadURLFile manager url)
+      q
 
-    return $ case hashResult of
-      Nothing   -> Left $ "pHash error for " <> T.pack imgFile
-      Just hash -> Right $ case sType of
+    -- imgFile <- either return (\(URL url) -> downloadURLFile manager url) q
+    hash <- noteT "phash error" $ MaybeT $ imageHash imgFile
+
+    return $ case sType of
+
+    -- return $ case hashResult of
+    --   Nothing   -> Left $ "pHash error for " <> T.pack imgFile
+    --   Just hash -> case sType of
 
         -- @SearchNearest@ is handled by a simple call to the kd-tree library
         SearchNearest    -> NearestResult  (q, hash) (KD.nearest kdt hash)
