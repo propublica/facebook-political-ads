@@ -1122,6 +1122,30 @@ header[role="banner"] > h2 a {
   color: black;
 }
 
+header[role="banner"] > h4 {
+  float: left;
+  font-family: "Graphik", sans-serif;
+}
+
+header[role="banner"] > h4.project-name a {
+  text-decoration: none;
+  color: black;
+  font-size: .8125rem;
+  padding: .35rem .5rem .25rem;
+  margin-left: 7px;
+  position: relative;
+  text-transform: uppercase;
+  border-left: solid 1px;
+  top: 0.4rem;
+  vertical-align: bottom;
+  @media screen and (max-width: 767px) {
+    top: 0.5rem;
+  }
+  @media screen and (max-width: 560px) {
+    display: none;
+  }
+}
+
 header[role="banner"] nav {
   position: absolute;
   top: 0;
@@ -1180,6 +1204,9 @@ header[role="banner"] nav .social-links {
     overflow: hidden;
     width: 26px;
     text-decoration: none;
+  }
+  @media screen and (max-width: 440px) {
+    display: none;
   }
 }
 
@@ -1269,6 +1296,7 @@ header[role="banner"] nav .social-links li a.nav-social-link {
 .mast-mini--dark .nav-email-item:after {
   background-color:#fff
 }
+
 @supports (display: flex)
   {
   .fixed-supported .mast-mini--light.is-scrolling .nav-email-item:after {
