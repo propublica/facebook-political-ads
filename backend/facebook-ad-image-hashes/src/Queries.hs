@@ -78,7 +78,7 @@ testDb cfg = do
 resetPhashes :: PG.ConnectInfo -> IO ()
 resetPhashes cfg = do
   conn <- PG.connect cfg
-  r    <- PG.execute_ conn "UPDATE ads SET phash = '{}'"
+  r    <- PG.execute_ conn "UPDATE ads SET phash = null"
   print $ "Updated " ++ show (r :: Int64) ++ " records in ads database"
 
 
@@ -116,7 +116,7 @@ populatePhashes cfg = do
 
     -- Serial stream of incomig ads
     (S.writeStreamBasket $
-     PGStream.stream_ conn "SELECT id, images FROM ads WHERE phash = '{}';")
+     PGStream.stream_ conn "SELECT id, images FROM ads WHERE phash is null;")
 
     -- Serial chunked stream of db updates
     -- Chunking prevents us from doing a DB query
@@ -263,6 +263,7 @@ fetchSortedPhashes cfg = do
                              unnest(images) as url
                       FROM ads) ars
               WHERE ars.phash != '0'
+              AND   ars.phash IS NOT NULL
               ORDER BY ars.phash
             |]
   let readRow (hash, url) = case readMaybe hash of
@@ -270,17 +271,19 @@ fetchSortedPhashes cfg = do
         Just w64 -> Just (PHash w64, url)
   return . catMaybes $ fmap readRow rs
 
-countImageHashMisalignment :: PG.ConnectInfo -> IO Int64
+countImageHashMisalignment :: PG.ConnectInfo -> IO [T.Text]
 countImageHashMisalignment cfg = do
   conn <- PG.connect cfg
-  [r] <- PG.query_ conn
-        [sql| SELECT COUNT(*)
-              FROM   (SELECT array_length(images,1) as i,
-                             array_length(phash,1)  as p
-                      FROM ads) lengths
+  r <- PG.query_ conn
+        [sql| SELECT id
+              FROM   (SELECT id,
+                             coalesce(array_length(images,1), 0) as i,
+                             coalesce(array_length(phash,1) , 0) as p
+                      FROM ads
+                      WHERE phash IS NOT NULL) lengths
               WHERE lengths.i != lengths.p
          |]
-  return $ PG.fromOnly r
+  return $ PG.fromOnly <$> r
 
 testConnectInfo :: PG.ConnectInfo
 testConnectInfo = PG.ConnectInfo "localhost" 5432 "fbpac" "password" "fbpac"

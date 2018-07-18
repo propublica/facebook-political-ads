@@ -114,9 +114,11 @@ generateCache :: PG.ConnectInfo
               -> IO ()
 generateCache cfg (IdentityGroupingThreshold thr) fp = do
 
-  nMisaligned <- countImageHashMisalignment cfg
-  when (nMisaligned > 0) $
-    error "Database error: Some hash array did not match image array in size"
+  misaligned <- countImageHashMisalignment cfg
+  when (not $ null misaligned) $
+    error $
+      "Database error: Some hash array did not match image array in size: "
+      ++ show misaligned
 
   rs <- fetchSortedPhashes cfg
   when (null rs) $
