@@ -25,25 +25,27 @@ export class SelectorsAndPersonae extends React.Component {
         <div className="selectorsOnly">
           <div id="sticky_nav">
             <div id="sticky-first-line">
-              See ads targeted to people who are:
+              See ads targeted to people who are:{" "}
               <div className="mobile-break">
-                {" "}
-                <input
-                  type="number"
-                  inputmode="numeric"
-                  pattern="[0-9]*"
-                  min="13"
-                  value={
-                    this.props.persona === null || !this.props.persona.age
-                      ? "--"
-                      : this.props.persona.age
-                  }
-                  onChange={event => {
-                    this.props.setPersonaFacet("age", event.target.value);
-                    this.props.getAds();
-                  }}
-                />{" "}
-                years old,{" "}
+                <div id="age-field">
+                  <input
+                    type="number"
+                    inputmode="numeric"
+                    pattern="[0-9]*"
+                    min="13"
+                    value={
+                      this.props.persona === null || !this.props.persona.age
+                        ? "--"
+                        : this.props.persona.age
+                    }
+                    onChange={event => {
+                      this.props.setPersonaFacet("age", event.target.value);
+                      this.props.getAds();
+                    }}
+                  />{" "}
+                  years old
+                </div>
+                <span className="mobile-selectors">,{" "}</span>
                 <select
                   value={
                     this.props.persona === null || !this.props.persona.gender
@@ -58,7 +60,8 @@ export class SelectorsAndPersonae extends React.Component {
                   <option>any gender</option>
                   <option>female</option>
                   <option>male</option>
-                </select>, any race, in{" "}
+                </select>
+                <span className="mobile-selectors">, any race, in{" "}</span>
                 <div
                   className="select-container"
                   style={{
@@ -100,8 +103,8 @@ export class SelectorsAndPersonae extends React.Component {
                       return { value: city, label: city };
                     })}
                   />
-                </div>{" "}
-                and politically{" "}
+                </div>
+                <span className="mobile-selectors">{" "}and politically{" "}</span>
                 <select
                   value={
                     this.props.persona === null
