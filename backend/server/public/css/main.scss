@@ -59,7 +59,7 @@ body {
 article {
   a {
     transition: 0.2s;
-    color: $link-color;
+    color: #0964a9;
     text-decoration: none;
     border-bottom: 1px solid rgba($link-color, 0);
 
@@ -366,6 +366,15 @@ article {
     // color: #999;
     font-weight: normal;
   }
+  .ads-today-count {
+    p {
+      font-size: 0.6em;
+    }
+    p strong {
+      font-size: 2em;
+    }
+  }
+
   .top-feltrons-container {
     display: flex;
     justify-content: center;
@@ -415,6 +424,13 @@ article {
 #graphic {
   input[type="number"] {
     width: 3em;
+    height: 17px;
+    @media screen and (max-width: 1000px) {
+      height: 12px;
+    }
+    @media screen and (max-width: 37.5em) {
+      height: 10px;
+    }
   }
   select, input, .Select-control {
     background-color: #CCE8F8;
@@ -456,7 +472,7 @@ article {
   }
 
   .Select-placeholder {
-    color: #999;
+    color: #000;
     padding: 8px;
     font-weight: 300;
   }
@@ -765,6 +781,14 @@ article {
 @media (max-width: 800px) {
   #sticky_nav.sticky p {
     font-size: .7em;
+  }
+}
+@media (max-width: 480px) {
+  #sticky_nav.sticky {
+    position: absolute;
+    top: inherit;
+    box-shadow: none;
+    padding: 0;
   }
 }
 // -----------------------------------------------------------------------------
