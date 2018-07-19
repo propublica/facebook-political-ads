@@ -118,7 +118,7 @@ export class SelectorsAndPersonae extends React.Component {
                     this.props.setPersonaFacet("politics", event.target.value);
                     this.props.getAds();
                     smoothscroll.polyfill();
-                    document.getElementById('sticky_nav').scrollIntoView({inline: 'start', behavior: 'smooth'});
+                    document.getElementById('sticky_nav').scrollIntoView({block: 'start', behavior: 'smooth'});
                   }}
                 >
                   <option value="neither liberal nor conservative">
