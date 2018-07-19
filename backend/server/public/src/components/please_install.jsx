@@ -53,7 +53,7 @@ const PleaseInstallUnconnected = ({ persona }) =>
           describes you, help us track more ads by using the ad collector.
         </p>
         <a href="https://projects.propublica.org/political-ad-collector/">
-          Use the ad collector
+          Install the ad collector
           </a>
       </div>
     </div>
@@ -67,7 +67,7 @@ const PleaseInstallUnconnected = ({ persona }) =>
           The Political Ad Collector only receives Facebook ads from people using the browser plug-in. Help us track more ads by using the ad collector.
         </p>
         <a href="https://projects.propublica.org/political-ad-collector/">
-          Use the ad collector
+          Install the ad collector
           </a>
         </div>
     </div>

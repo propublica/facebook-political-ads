@@ -221,7 +221,7 @@ article {
   .third {
     // width: 33.3%;
     padding: 0.25em 0.9em;
-    font-family: "Graphik", sans-serif;
+    font-family: $fonts-sans;
     font-weight: 600;
     border-right: solid 1px;
     text-align: center;
@@ -240,6 +240,9 @@ article {
     @include breakpoint-max(sm) {
       width: 80%;
       margin: auto;
+    }
+    @media screen and (max-width: 480px) {
+      width: 100%;
     }
   }
 
@@ -350,7 +353,7 @@ article {
   // border-radius: 5px;
   width: 100%;
   //width: 86%; //turn on when showing static feltron
-  font-family: "Graphik", sans-serif;
+  font-family: $fonts-sans;
 
   @include breakpoint-min(lg) {
     // width: 80%;
@@ -599,7 +602,7 @@ article {
 
 .selectorsAndPersonae {
   margin: 1em 0;
-  font-family: "Graphik", sans-serif;
+  font-family: $fonts-sans;
 
   text-align: center;
   font-size: 1.2em;
@@ -615,14 +618,17 @@ article {
       border-radius: 4px;
       background: white;
       margin: 12px 20px;
-      // border-top: 2px solid #444;
+      @media screen and (max-width: 320px) {
+        margin: 0;
+        padding: 20px
+      }
 
     > div {
       // float:left;
     }
     div:first-child {
       @include breakpoint-max(sm) {
-        width:110px;
+        width:130px;
       }
       width:32%;
       min-width: 110px;
@@ -646,7 +652,7 @@ article {
     }
     h4 {
       font-size: 1.1em;
-      font-family: "Graphik", sans-serif;
+      font-family: $fonts-sans;
       margin: 12px 0;
     }
 
@@ -662,20 +668,23 @@ article {
       font-size: 1.1em;
       margin-bottom: 35px;
       line-height: 1.4;
+      @media screen and (max-width: 320px) {
+        margin-bottom: 25px;
+      }
     }
     img {
       max-width: 100px;
       margin: auto;
     }
     a {
-      font-family: $fonts-serif;
-      padding:5px 10px;
+      font-family: $fonts-sans;
+      padding:6px 10px 4px;
       background: #196aa7;
       color:white;
       border-radius: 5px;
       font-size:1em;
       margin-top:10px;
-      font-weight: 600
+      // font-weight: 600
     }
   }
 }
@@ -752,7 +761,6 @@ article {
     @include breakpoint-max(sm) {
       display: flex;
       flex-direction: column;
-      width: 60%;
       margin: auto;
       select {
         margin-bottom: 10px;
@@ -767,7 +775,6 @@ article {
       }
     }
   }
-
   @include breakpoint-max(lg) {
     font-size:.7em;
   }
@@ -776,6 +783,13 @@ article {
     line-height: 2.4em;
     max-width: 100%;
     padding: 0 45px;
+  }
+  @include breakpoint-max(sm) {
+    width: 70%;
+    padding: 0;
+  }
+  @media screen and (max-width: 480px) {
+    width: 80%;
   }
 }
 
@@ -997,6 +1011,18 @@ article {
   text-align: center;
   margin-bottom: 30px;
   color: #6d6d6d;
+  font-family: $fonts-sans;
+}
+
+#toggle-topic-search {
+  -webkit-appearance: none;
+  appearance: none;
+  padding: 6px 10px 5px;
+  color: #196aa7;
+  border-radius: 5px;
+  border: none;
+  margin-left: 5px;
+  font-family: $fonts-sans;
 }
 
 // -----------------------------------------------------------------------------
@@ -1162,7 +1188,7 @@ header[role="banner"] > h2 a {
 
 header[role="banner"] > h4 {
   float: left;
-  font-family: "Graphik", sans-serif;
+  font-family: $fonts-sans;
 }
 
 header[role="banner"] > h4.project-name a {
