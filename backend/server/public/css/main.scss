@@ -624,7 +624,7 @@ article {
       @include breakpoint-max(sm) {
         width:110px;
       }
-      width:12%;
+      width:32%;
       min-width: 110px;
       margin-right:5px
 
@@ -650,19 +650,11 @@ article {
       margin: 12px 0;
     }
 
-    .thinking-face, .wave {
-      margin-bottom: 19px;
-      height: 110px;
-    }
-
-    .thinking-face {
-      background-image: url("../images/hand-wave.png");
-      background-size: 130px;
-    }
-
     .wave {
+      margin-bottom: 15px;
+      height: 127px;
       background-image: url("../images/hand-wave.png");
-      background-size: 130px;
+      background-size: 145px;
     }
 
     p {
