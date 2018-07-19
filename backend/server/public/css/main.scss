@@ -606,8 +606,11 @@ article {
       // max-width: 600px; // removed by JBM 7/6/2018 in order to make this take up full width when mixed in with the ads.
       // margin: 40px auto; // removed by AJL 7/12/2018 to format inline with ads.
       max-width: 500px;
-      margin: 20px;
-      padding: 12px;
+      border: solid 1px rgb(221, 223, 226);
+      padding: 40px;
+      border-radius: 4px;
+      background: white;
+      margin: 12px 20px;
       // border-top: 2px solid #444;
 
     > div {
@@ -644,7 +647,7 @@ article {
     }
 
     .thinking-face, .wave {
-      margin-bottom: 14px;
+      margin-bottom: 19px;
       height: 110px;
     }
 
@@ -661,7 +664,7 @@ article {
     p {
       font-family: $fonts-serif;
       font-size: 1.1em;
-      margin-bottom: 15px;
+      margin-bottom: 35px;
       line-height: 1.4;
     }
     img {
