@@ -70,7 +70,7 @@ export class SelectorsAndPersonae extends React.Component {
                   style={{
                     display: "inline-block",
                     maxWidth: 400,
-                    minWidth: 150,
+                    minWidth: 100,
                     maxHeight: "1em",
                     position: "relative",
                     input: {

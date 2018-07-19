@@ -358,6 +358,9 @@ article {
   @include breakpoint-max(sm) {
     width: 80%;
   }
+  @media screen and (max-width: 350px) {
+    width: 90%;
+  }
   .feltron {
     font-size: 32px; /* we should incorporate the newsapps-styles stuff rather than faking it */
   }
@@ -480,7 +483,6 @@ article {
   .Select-value-label{
     padding: 8px;
     position: relative;
-    top: 4px;
   }
 
   .Select-option, .Select-noresults {
@@ -498,11 +500,6 @@ article {
   /* all-viewport resets on the react-select autocomplete */
 
   .Select-control, .Select-input, .Select-input input {
-    padding-top: 0;
-    padding-bottom: 0;
-    top: 0;
-  }
-  .Select-value-label, .Select-value {
     padding-top: 0;
     padding-bottom: 0;
     top: 0;
@@ -526,6 +523,9 @@ article {
   .Select-value-label, .Select-value {
     height: 26px;
     line-height: 26px;
+    padding-top: 0;
+    padding-bottom: 0;
+    top: 1px;
     @include breakpoint-max(sm) {
       height: 1.7em;
       line-height: 1.7em;
@@ -551,15 +551,19 @@ article {
   .Select-multi-value-wrapper {
     padding-top: 2px;
     padding-bottom: 2px;
-    @include breakpoint-max(sm) {
-      line-height: 1px;
-      height: 1px;
-
-    }
     @media screen and (max-width: 990px) {
       line-height: 1px;
       height: 1px;
+      width: 20vw;
       }
+    @include breakpoint-max(sm) {
+      line-height: 1px;
+      height: 1px;
+    }
+    @media screen and (max-width: 600px) {
+      width: 47vw;
+    }
+
   }
 
 }
@@ -779,7 +783,7 @@ article {
     font-size:.7em;
     line-height: 2.4em;
     max-width: 100%;
-    padding: 0 15px;
+    padding: 0 45px;
   }
 }
 
