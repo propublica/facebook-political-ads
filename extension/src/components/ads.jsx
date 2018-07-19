@@ -43,18 +43,29 @@ export const Rating = withI18n(({ getMessage, rating, action, question }) => (
   </div>
 ));
 
-const Ratings = ({ onRatingClick, ratings }) => (
-  <div id="ratings">
-    {ratings.map(rating => (
-      <Rating
-        key={rating.id}
-        rating={rating}
-        action={onRatingClick}
-        question="rating_question"
-      />
-    ))}
-  </div>
-);
+export class Ratings extends React.Component {
+  componentDidMount() {
+    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+      .filter(t => t.textContent.length == 1)
+      .forEach(t => t.remove());
+  }
+
+  render() {
+    return (
+      <div id="ratings">
+        {this.props.ratings.map(rating => (
+          <Rating
+            key={rating.id}
+            rating={rating}
+            action={this.props.onRatingClick}
+            question="rating_question"
+          />
+        ))}
+      </div>
+    );
+  }
+}
+
 const ratingsStateToProps = state => ({
   ratings: getUnratedRatings(state.ratings)
 });
@@ -69,18 +80,28 @@ export const UnratedRatings = connect(
 )(Ratings);
 
 // Ads from the server to show
-const AdsUnconnected = ({ ads, onAdClick }) => (
-  <div id="ads">
-    {ads.map(ad => (
-      <Rating
-        key={ad.id}
-        rating={ad}
-        action={onAdClick}
-        question="verify_question"
-      />
-    ))}
-  </div>
-);
+export class AdsUnconnected extends React.Component {
+  componentDidMount() {
+    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+      .filter(t => t.textContent.length == 1)
+      .forEach(t => t.remove());
+  }
+
+  render() {
+    return (
+      <div id="ads">
+        {this.props.ads.map(ad => (
+          <Rating
+            key={ad.id}
+            rating={ad}
+            action={this.props.onAdClick}
+            question="verify_question"
+          />
+        ))}
+      </div>
+    );
+  }
+}
 const adStateToProps = state => ({
   ads: getUnratedRatings(state.ads)
 });
