@@ -311,7 +311,7 @@ export class Parser extends StateMachine {
         try {
           const targeting = cleanAd(
             JSON.parse(req.response.replace("for (;;);", ""))["jsmods"][
-                "markup"
+              "markup"
             ][0][1]["__html"]
           );
           if (!targeting) return this.promote(states.DONE);
@@ -465,7 +465,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  'a[href=""]',
+  "a[href=\"\"]",
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -482,7 +482,6 @@ const cleanAd = html => {
   // We're not saving video ads for now, we don't need buttons, hidden forms,
   // or like links
   Array.from(node.querySelectorAll(selectors)).forEach(i => i.remove());
-
   // remove attributes
   const killAttrs = node => {
     Array.from(node.attributes).forEach(attr => {
@@ -494,9 +493,13 @@ const cleanAd = html => {
         attr.name !== "data-hovercard"
       )
         node.removeAttribute(attr.name);
+
       // remove tracking get variables from links and l.facebook.com
       if (attr.name === "href") {
         try {
+          if (attr.value == "#") {
+            return;
+          }
           let url = new URL(attr.value);
           if (url.host === "l.facebook.com")
             url = new URL(new URLSearchParams(url.search).get("u"));
@@ -511,7 +514,7 @@ const cleanAd = html => {
       } else if (attr.name === "data-hovercard") {
         try {
           let url = new URL(attr.value, window.location); // it's a relative URL, so we have to give it a base or it errors out.
-          if (DEBUG) console.log("hovercard", url, url.searchParams.get("id"));
+          // if (DEBUG) console.log("hovercard", url, url.searchParams.get("id"));
           if (url.pathname.indexOf("/ajax/hovercard/page.php") === 0) {
             // for links with a href="#" and data-hovercard="/ajax/hovercard/page.php?id=1234567890"
             // keep the data-hovercard attr.
@@ -580,7 +583,7 @@ export const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    'localStorage.setItem("pageVariable", (' +
+    "localStorage.setItem(\"pageVariable\", (" +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
