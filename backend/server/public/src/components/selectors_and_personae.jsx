@@ -3,8 +3,11 @@ import Persona from "components/persona.jsx";
 import { connect } from "react-redux";
 import { getAds, setPersonaFacet } from "actions.js";
 import Select from "react-select";
+import smoothscroll from 'smoothscroll-polyfill';
+
 
 export class SelectorsAndPersonae extends React.Component {
+
   componentDidUpdate() {
     var el = document.getElementById("sticky_nav");
     var eloffset = el.offsetTop;
@@ -114,6 +117,8 @@ export class SelectorsAndPersonae extends React.Component {
                   onChange={event => {
                     this.props.setPersonaFacet("politics", event.target.value);
                     this.props.getAds();
+                    smoothscroll.polyfill();
+                    document.getElementById('sticky_nav').scrollIntoView({block: 'start', behavior: 'smooth'});
                   }}
                 >
                   <option value="neither liberal nor conservative">
