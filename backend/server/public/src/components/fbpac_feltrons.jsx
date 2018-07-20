@@ -23,7 +23,7 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
       <div className="top-feltrons top-target">
         <h3>How Political Ads Target You</h3>
         <p>
-          city or state, age, custom&nbsp;or&nbsp;“lookalike”&nbsp;audiences
+          city or state, age, custom&nbsp;or “lookalike”&nbsp;audiences
         </p>
       </div>
       <div className="top-feltrons ads-collected">
