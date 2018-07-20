@@ -864,10 +864,10 @@ article {
     width: 100%;
     font-size: $scale-7;
     background-color: $bg-low-contrast;
-    padding: 0.5em;
+    padding: 0.9em;
     margin: colspan(g, 4) 0;
     border: $border;
-    // border: 2px solid $pp-blue;
+    box-sizing: inherit;
     @include breakpoint-min(md) {
       margin: colspan(g, 6) 0;
     }
