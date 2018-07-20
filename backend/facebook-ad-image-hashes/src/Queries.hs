@@ -160,11 +160,12 @@ doInsert dbConn phashes = do
   let formatEntry hashOrError = case  hashOrError of
         Left err        -> err
         Right (PHash h) -> T.pack (show h)
+      inserts :: [(AdId, PG.PGArray T.Text)]
       inserts = fmap (\(k,v) -> (k, fmap formatEntry v)) $ phashes
 
   n <- liftIO $ PG.executeMany dbConn
     [sql| UPDATE ads
-          SET phash = upd.phash
+          SET phash = ARRAY[upd.phash]
           FROM (VALUES (?,?)) as upd(id,phash)
           WHERE ads.id = upd.id
     |] inserts
