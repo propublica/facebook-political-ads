@@ -20,6 +20,7 @@ deploy.sh
 /extension/web-ext-artifacts/*
 classifier.json
 Dockerfile
+Dockerfile.*
 .sass-cache
 __pycache__
 *.code-workspace
