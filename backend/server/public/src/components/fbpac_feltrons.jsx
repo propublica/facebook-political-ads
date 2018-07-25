@@ -6,7 +6,7 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
   <div className="feltrons">
     <div className="top-feltrons-container">
       <div className="top-feltrons political-ratio ads-today-count">
-        <h3>Political Ads This Month</h3>
+        <h3>Political Ads Collected By Week</h3>
         {/* <p>
           <strong>
             {homepage_stats && homepage_stats.political_ads_per_day
