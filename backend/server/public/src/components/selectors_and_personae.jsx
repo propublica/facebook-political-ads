@@ -3,11 +3,10 @@ import Persona from "components/persona.jsx";
 import { connect } from "react-redux";
 import { getAds, setPersonaFacet } from "actions.js";
 import Select from "react-select";
-import smoothscroll from 'smoothscroll-polyfill';
+import smoothscroll from "smoothscroll-polyfill";
 
 
 export class SelectorsAndPersonae extends React.Component {
-
   componentDidUpdate() {
     var el = document.getElementById("sticky_nav");
     var eloffset = el.offsetTop;
@@ -33,7 +32,7 @@ export class SelectorsAndPersonae extends React.Component {
                 <div id="age-field">
                   <input
                     type="number"
-                    inputmode="numeric"
+                    inputMode="numeric"
                     pattern="[0-9]*"
                     min="13"
                     value={
@@ -48,7 +47,7 @@ export class SelectorsAndPersonae extends React.Component {
                   />{" "}
                   years old
                 </div>
-                <span className="mobile-selectors">,{" "}</span>
+                <span className="mobile-selectors">, </span>
                 <select
                   value={
                     this.props.persona === null || !this.props.persona.gender
@@ -64,7 +63,7 @@ export class SelectorsAndPersonae extends React.Component {
                   <option>female</option>
                   <option>male</option>
                 </select>
-                <span className="mobile-selectors">, any race, in{" "}</span>
+                <span className="mobile-selectors">, any race, in </span>
                 <div
                   className="select-container"
                   style={{
@@ -107,7 +106,7 @@ export class SelectorsAndPersonae extends React.Component {
                     })}
                   />
                 </div>
-                <span className="mobile-selectors">{" "}and politically{" "}</span>
+                <span className="mobile-selectors"> and politically </span>
                 <select
                   value={
                     this.props.persona === null
@@ -118,7 +117,9 @@ export class SelectorsAndPersonae extends React.Component {
                     this.props.setPersonaFacet("politics", event.target.value);
                     this.props.getAds();
                     smoothscroll.polyfill();
-                    document.getElementById('sticky_nav').scrollIntoView({block: 'start', behavior: 'smooth'});
+                    document
+                      .getElementById("sticky_nav")
+                      .scrollIntoView({ block: "start", behavior: "smooth"  });
                   }}
                 >
                   <option value="neither liberal nor conservative">

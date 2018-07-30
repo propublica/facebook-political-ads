@@ -12,7 +12,7 @@ import i18next from "i18next";
 // maps groupingType to a URL function
 const groupedAttrUrl = {
   target: ({ target }) => `targets=%5B%7B"target"%3A"${target}"%7D%5D`,
-  advertiser: ({ advertiser }) => `advertisers=%5B"${advertiser}"%5D`,
+  advertiser: ({ advertiser }) => `advertisers=${JSON.stringify([advertiser])}`,
   segment: ({ segment }) => {
     if (segment === "List → " || segment === "Like  → ") {
       return `targets=%5B%7B"target"%3A"${segment.slice(0, 4)}"%7D%5D`;
