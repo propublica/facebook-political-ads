@@ -826,23 +826,25 @@ article {
 #facebook-pac-browser {
   font-family: $fonts-sans;
   font-size: $scale-5;
-  margin: colspan(g, 4) 0;
+  margin: colspan(g, 4) auto;
   display:inline-block;
+  width: 100%;
   @include clearfix;
   @include breakpoint-min(sm) {
-    width: colspan(4, 6);
-    margin: colspan(g, 6) auto;
+    // width: colspan(4, 6);
+    // margin: colspan(g, 6) auto;
   }
   @include breakpoint-min(md) {
-    width: 100%;
-    margin: colspan(g, 8) 0;
+    // width: colspan(6, 8);
+    // margin: colspan(g, 8) auto;
   }
   @include breakpoint-min(lg) {
     text-align: center;
-    width: colspan(12, 8);
-    margin-left: -(colspan(2, 8) + colspan(g, 8));
+    width: colspan(8, 8);
+    // margin-left: -(colspan(2, 8) + colspan(g, 8)); //removed to fix overflow
   }
   .prefabs {
+    text-align: center;
     @include breakpoint-min(lg) {
       width: colspan(8, 12);
       margin-left: colspan(2, 12) + colspan(g, 12);
@@ -868,8 +870,20 @@ article {
     margin: colspan(g, 4) 0;
     border: $border;
     box-sizing: inherit;
+    display: flex;
+    justify-content: center;
+    @include breakpoint-max(lg) {
+      margin: 1.5em auto;
+      width: 80%;
+    }
     @include breakpoint-min(md) {
-      margin: colspan(g, 6) 0;
+      // margin: colspan(g, 6) 0;
+    }
+    @include breakpoint-max(md) {
+      margin: 1.5em auto;
+      max-width: 600px;
+
+
     }
     @include breakpoint-min(lg) {
       display: block;
@@ -909,10 +923,15 @@ article {
     position: relative;
     text-align: left;
     color: $pp-blue;
-    margin-bottom: 1em;
+    margin: 0 auto 1em;
     cursor: pointer;
     z-index: 0;
-
+    @media screen and (max-width: 960px){
+      width: 80%;
+    }
+    @media screen and (max-width: 37.5em){
+      width: 80%;
+    }
     @include breakpoint-min(lg) {
       float: left;
       width: colspan(4, 12);
@@ -922,6 +941,7 @@ article {
         margin-right: 0;
       }
     }
+
     &.active {
       display: block;
       .filter-title {
