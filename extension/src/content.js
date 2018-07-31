@@ -11,9 +11,18 @@ const sendAds = function() {
 
   let results = [];
   let scraper = posts.reduce(
-    (p, i) =>
+    // `p`, the "memo" here is a promise.
+    // `nextNode` is a Node
+    (p, nextNode, idx) =>
       p.then(() =>
-        parser(i).then(
+        // .userContentWrapper can match two "kinds" of nodes in an ad
+        // one of which is contained in the other.
+        // both parse to the same thing.
+        // this just skips parsing any node contained within another of the nodes in `posts`
+        (idx > 0 && posts[idx - 1].contains(nextNode)
+          ? Promise.reject("ad within an ad, rejected")
+          : parser(nextNode)
+        ).then(
           it => {
             results.push(it);
           },
