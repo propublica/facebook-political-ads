@@ -56,6 +56,7 @@
     "i18next-xhr-backend": "^1.5.1",
     "lodash": "^4.17.5",
     "nivo": "^0.31.0",
+    "no-case": "^2.3.2",
     "prop-types": "^15.6.1",
     "rc-slider": "^8.6.1",
     "react": "^16.2.0",
