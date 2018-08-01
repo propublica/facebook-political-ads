@@ -399,6 +399,8 @@ article {
       }
       #adstoday {
         max-height: 50px;
+        position: relative; 
+        left: -11px;
       }
     }
     .top-feltrons:last-child {
@@ -414,14 +416,13 @@ article {
     .top-target p {
       font-weight: 600;
     }
-    // @media screen and (max-width: 960px) {
-    //   h3 {
-    //     font-size: .9em;
-    //   }
-    //   p {
-    //     font-size: .8em;
-    //   }
-    // }
+    
+    @media screen and (max-width: 37.5em) {
+      .top-feltrons #adstoday {
+        position: relative; 
+        left: 0;
+      }
+    }
   }
 }
 
