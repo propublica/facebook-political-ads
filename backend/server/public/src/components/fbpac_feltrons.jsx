@@ -32,24 +32,13 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
         <p>city or state, age, custom&nbsp;or “lookalike”&nbsp;audiences</p>
       </div>
       <div className="top-feltrons ads-collected">
-        <h3>How We're Doing</h3>
+        <h3>Who's Helping?</h3>
         <p>
-          <strong>
-            {homepage_stats && homepage_stats.political_ads_today
-              ? homepage_stats.political_ads_today
-                  .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-              : "--"}
-          </strong>{" "}
-          political ads received today
-        </p>
-        <p>
-          from{" "}
           <strong>
             {homepage_stats && homepage_stats.user_count
               ? homepage_stats.user_count
-                  .toString()
-                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                .toString()
+                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "--"}
           </strong>{" "}
           contributors

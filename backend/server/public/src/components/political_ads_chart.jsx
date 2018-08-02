@@ -31,11 +31,11 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
     /* I am gonna make it ... */ var this_year /* if it kills me */ = new Date().getFullYear();
     var political_ads_per_day_chart_data = this.props.political_ads_per_day
       ? this.props.political_ads_per_day.slice(1).map(a => {
-        return {
-            date: new Date(this_year, 0, (a[0] - 2) * 7 + 1),
-            cnt: a[1]
-          };
-        })
+          return {
+          date: new Date(this_year, 0, (a[0] - 2) * 7 + 1),
+          cnt: a[1]
+        };
+      })
       : [];
     // var dotLabel;
     // if (idx == 0) {
@@ -79,6 +79,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
     //       .tickSizeOuter(0)
     //       .ticks(d3.timeWeek.every(1))
     //   );
+
     var area = d3
       .area()
       .x(function(d) {
@@ -88,7 +89,6 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       .y1(function(d) {
         return y(d.cnt);
       });
-
     g
       .append("path")
       .datum(political_ads_per_day_chart_data)
@@ -130,10 +130,10 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       political_ads_per_day_chart_data.length == 0
         ? []
         : [
-          political_ads_per_day_chart_data[
-            political_ads_per_day_chart_data.length - 1
-          ]
-        ];
+            political_ads_per_day_chart_data[
+              political_ads_per_day_chart_data.length - 1
+            ]
+          ];
     let first_data_point =
       political_ads_per_day_chart_data.length == 0
         ? []
@@ -146,13 +146,14 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       .append("text")
       .attr("class", "annotation-count")
       .attr("x", function(d) {
-        return x(d.date);
+        return width / 2; // was x(d.date)
       })
-      .attr("y", 36)
-      .attr("dx", "-28px")
+      .attr("y", 10) // was 36
+      // .attr("dx", "-28px") // was -28
       .attr("font-size", 16)
-      .attr("text-anchor", "end")
-      .text(d => d.cnt);
+      .attr("text-anchor", "middle")
+      .attr("font-weight", "bold")
+      .text(d => d.cnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 
     /* jan 1 */
     g
@@ -177,31 +178,33 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
             : idx == 0 ? `${d3.timeFormat("%b. %-d")(d.date)}` : ""
       );
 
-    /* "total" */
-    g
-      .selectAll(".annotation-total")
-      .data(last_data_point)
-      .enter()
-      .append("text")
-      .attr("class", "annotation-total")
-      .attr("x", function(d) {
-        return x(d.date);
-      })
-      .attr("y", 36)
-      .attr("dx", "-3px")
-      .attr("font-size", 10)
-      .attr("text-anchor", "end")
-      .text("total");
+    // /* "total" */
+    // g
+    //   .selectAll(".annotation-total")
+    //   .data(last_data_point)
+    //   .enter()
+    //   .append("text")
+    //   .attr("class", "annotation-total")
+    //   .attr("x", function(d) {
+    //     return x(d.date);
+    //   })
+    //   .attr("y", 36)
+    //   .attr("dx", "-3px")
+    //   .attr("font-size", 10)
+    //   .attr("text-anchor", "end")
+    //   .text("total");
 
-    // // y axis label
-    // g.append("g").call(
-    //   d3
-    //     .axisLeft(y)
-    //     .ticks(0)
-    //     .tickSizeInner(3)
-    //     .tickSizeOuter(0)
-    // );
-    // this.props.animateFauxDOM(800);
+    // if (last_data_point.length > 0) {
+    //   g
+    //     .append("line")
+    //     .attr("class", "annotation-line")
+    //     .attr("stroke", "gray")
+    //     .attr("stroke-width", 1)
+    //     .attr("x1", x(last_data_point[0].date))
+    //     .attr("x2", x(last_data_point[0].date))
+    //     .attr("y1", y(24000))
+    //     .attr("y2", y(last_data_point[0].cnt));
+    // }
   }
 
   render() {

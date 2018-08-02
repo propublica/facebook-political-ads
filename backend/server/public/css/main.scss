@@ -574,6 +574,9 @@ article {
 .political-ratio svg text {
   font-weight: normal;
 }
+.political-ratio svg text.annotation-count {
+  font-weight: bold;
+}
 
 .political-ratio {
   border-right: solid 1px #6b6b6b;
