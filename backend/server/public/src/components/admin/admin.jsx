@@ -42,6 +42,7 @@ export const LoggedInApp = () => {
       <Route path="/facebook-ads/admin/help" component={AdminHelp} />
       <Route path="/facebook-ads/admin/summary" component={Summary} />
       <Route path="/facebook-ads/admin/states" component={StatesDistricts} />
+      <Route path="/facebook-ads/admin/by_state" component={Ads} />
     </div>
   );
 };

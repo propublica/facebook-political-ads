@@ -36,7 +36,24 @@ export class StatesAndDistrictsUnrouted extends React.Component {
           </div>
         </div>
 
-        <h1>State</h1>
+        <h1>Ads Targeting A State Or Mentioning a Candidate</h1>
+        <div id="states" className="breakdown">
+          {this.props.statesAndDistricts.states ? (
+            this.props.statesAndDistricts.states.map(state => (
+              <div key={state.abbrev} className="state">
+                <Link to={`/facebook-ads/admin/ads?by_state=${state.abbrev}`}>
+                  {state.abbrev}
+                </Link>
+              </div>
+            ))
+          ) : (
+            <div>
+              <h2>Loading...</h2>
+            </div>
+          )}
+        </div>
+
+        <h1>Candidate Ads By State</h1>
         <div id="states" className="breakdown">
           {this.props.statesAndDistricts.states ? (
             this.props.statesAndDistricts.states.map(state => (
@@ -47,10 +64,10 @@ export class StatesAndDistrictsUnrouted extends React.Component {
               </div>
             ))
           ) : (
-              <div>
-                <h2>Loading...</h2>
-              </div>
-            )}
+            <div>
+              <h2>Loading...</h2>
+            </div>
+          )}
         </div>
 
         <h1>House Districts</h1>
@@ -75,7 +92,7 @@ export class StatesAndDistrictsUnrouted extends React.Component {
                           <Link
                             to={`/facebook-ads/admin/ads?districts=${
                               district["state"]
-                              }-${district["name"]}`}
+                            }-${district["name"]}`}
                           >
                             {district["state"]}-{district["name"]}
                           </Link>
@@ -85,10 +102,10 @@ export class StatesAndDistrictsUnrouted extends React.Component {
                 </div>
               ))
           ) : (
-              <div>
-                <h2>Loading...</h2>
-              </div>
-            )}
+            <div>
+              <h2>Loading...</h2>
+            </div>
+          )}
         </div>
 
         <h1>State Races</h1>
@@ -113,7 +130,7 @@ export class StatesAndDistrictsUnrouted extends React.Component {
                           <Link
                             to={`/facebook-ads/admin/ads?districts=${
                               district["state"]
-                              }-${district["name"]}`}
+                            }-${district["name"]}`}
                           >
                             {district["state"]} {district["name"]}
                           </Link>
@@ -123,10 +140,10 @@ export class StatesAndDistrictsUnrouted extends React.Component {
                 </div>
               ))
           ) : (
-              <div>
-                <h2>Loading...</h2>
-              </div>
-            )}
+            <div>
+              <h2>Loading...</h2>
+            </div>
+          )}
         </div>
       </div>
     );

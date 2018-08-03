@@ -28,7 +28,8 @@ import {
   SET_PERSONA,
   SET_PERSONA_FACET,
   SHOW_OLD_SEARCH,
-HIDE_OLD_SEARCH
+  HIDE_OLD_SEARCH,
+  NEW_BY_STATE
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -61,7 +62,7 @@ export const search = (state = null, action) => {
   }
 };
 
-export const show_old_search = (state=false, action) => {
+export const show_old_search = (state = false, action) => {
   switch (action.type) {
     case SHOW_OLD_SEARCH:
       return true;
@@ -70,7 +71,7 @@ export const show_old_search = (state=false, action) => {
     default:
       return state;
   }
-}
+};
 
 export const persona = (state = null, action) => {
   switch (action.type) {
@@ -82,6 +83,15 @@ export const persona = (state = null, action) => {
       return state ? { ...state, ...action.value } : action.value;
     case NEW_SEARCH:
       return null;
+    default:
+      return state;
+  }
+};
+
+export const by_state = (state = null, action) => {
+  switch (action.type) {
+    case NEW_BY_STATE:
+      return action.value;
     default:
       return state;
   }

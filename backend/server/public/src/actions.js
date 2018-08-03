@@ -137,12 +137,14 @@ export const NEW_TARGETS = "new_targets";
 export const NEW_STATES = "new_states";
 export const NEW_PARTIES = "new_parties";
 export const NEW_DISTRICTS = "new_districts";
+export const NEW_BY_STATE = "new_by_state"; // this is for the combined state page: ads targeted TO the state, ads mentioning or by candidates in the state
 export const newEntities = a(NEW_ENTITIES);
 export const newAdvertisers = a(NEW_ADVERTISERS);
 export const newTargets = a(NEW_TARGETS);
 export const newStates = a(NEW_STATES);
 export const newParties = a(NEW_PARTIES);
 export const newDistricts = a(NEW_DISTRICTS);
+export const newByState = a(NEW_BY_STATE);
 
 // resets advertisers, targets, entities, states, districts, parties
 export const CLEAR_ALL_FILTERS = "clear_all_filters";
@@ -154,12 +156,15 @@ export const FILTER_ENTITY = "filter_entity";
 export const FILTER_ADVERTISER = "filter_advertiser";
 export const FILTER_TARGET = "filter_target";
 export const FILTER_STATE = "filter_states";
+export const FILTER_BY_BY_STATE = "filter_by_by_state"; // this is for the combined state page: ads targeted TO the state, ads mentioning or by candidates in the state
 export const FILTER_PARTY = "filter_parties";
 export const FILTER_DISTRICT = "filter_districts";
 export const filterEntity = a(FILTER_ENTITY);
 export const filterAdvertiser = a(FILTER_ADVERTISER);
 export const filterTarget = a(FILTER_TARGET);
 export const filterState = a(FILTER_STATE);
+export const filterByByState = a(FILTER_BY_BY_STATE); // this is for the combined state page: ads targeted TO the state, ads mentioning or by candidates in the state
+
 export const filterParty = a(FILTER_PARTY);
 export const filterDistrict = a(FILTER_DISTRICT);
 export const fetchEntity = e => asyncResetPage(filterEntity(e));
@@ -199,6 +204,9 @@ export const fetchPrevPage = () => async(prevPage());
 export const setPage = page => ({ type: SET_PAGE, value: page });
 export const fetchPage = page => async(setPage(page));
 export const setTotal = total => ({ type: SET_TOTAL, value: total });
+
+// export const SET_BY_STATE = "set_by_state";
+// export const setByState = a_state => ({ type: SET_BY_STATE, value: a_state });
 
 export const getOneAd = (ad_id, url = `${URL_ROOT}/fbpac-api/ads`) => {
   if (!ad_id) return () => null;
@@ -345,6 +353,9 @@ export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
       if (state.pagination && state.pagination.page) {
         params.set("page", state.pagination.page);
       }
+    } else if (state.by_state) {
+      url = `${URL_ROOT}/fbpac-api/ads/by_state`;
+      params.set("state", state.by_state);
     } else {
       params = serialize(state);
     }

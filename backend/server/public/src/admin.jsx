@@ -24,7 +24,8 @@ import {
   statesAndDistricts,
   states,
   parties,
-  districts
+  districts,
+  by_state
 } from "reducers.js";
 import { go } from "i18n.js";
 import Admin from "components/admin/admin.jsx";
@@ -46,7 +47,8 @@ const reducer = enableBatching(
     statesAndDistricts,
     states,
     parties,
-    districts
+    districts,
+    by_state
   })
 );
 

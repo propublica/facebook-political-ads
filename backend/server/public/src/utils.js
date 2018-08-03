@@ -20,7 +20,9 @@ import {
   filterDistrict,
   changePoliticalProbability,
   setPersona,
-  showOldSearch
+  showOldSearch,
+  newByState,
+  filterByByState
 } from "actions.js";
 
 const headers = lang => Object.assign({}, language(lang));
@@ -99,7 +101,7 @@ const serialize = state => {
     params.set("lang", state.lang);
   }
 
-  if (state.show_old_search){
+  if (state.show_old_search) {
     params.set("showOldSearch", "1");
   }
 
@@ -121,8 +123,8 @@ const deserialize = (dispatch, allowedLangs) => {
   ) {
     actions.push(newSearch(null)); // this resets the search in `state` if you click on a link from the Tools grouping pages.
   }
-  
-  if (params.has("showOldSearch")){
+
+  if (params.has("showOldSearch")) {
     actions.push(showOldSearch());
   }
 
@@ -175,6 +177,13 @@ const deserialize = (dispatch, allowedLangs) => {
       actions.push(filterState(it));
     });
   }
+
+  if (params.has("by_state")) {
+    const by_state = params.get("by_state").split(",")[0];
+    actions.push(newByState(by_state));
+    actions.push(filterByByState(by_state));
+  }
+
   if (params.has("parties")) {
     const parties = params.get("parties").split(",");
     actions.push(newParties(parties));
