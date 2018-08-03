@@ -31,9 +31,14 @@ export const getAds = (language, cb) =>
     headers: headers(language)
   })
     .then(res => res.json())
+    .then(ads => {
+      ads.ads.forEach(ad => delete ad.targetings);
+      return ads;
+    })
     .then(ads => cb(ads.ads || ads));
 
 export const mergeAds = (ads, newAds) => {
+  ads.forEach(ad => delete ad.targetings);
   let ids = new Map(ads.map(ad => [ad.id, ad]));
   newAds.forEach(ad => {
     if (ids.has(ad.id)) {

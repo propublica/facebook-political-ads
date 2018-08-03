@@ -305,12 +305,12 @@ export const getAdminSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
 
 export const getHomepageSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
   let path = `${root_url}/homepage_stats`;
-  return dispatch => {
+  return (dispatch, getState) => {
     // only support English
-    // let state = getState();
-    // if (state.lang) {
-    //   path = path + `?lang=${state.lang}`;
-    // }
+    let state = getState();
+    if (state.lang) {
+      path = path + "?lang=en-US";
+    }
     dispatch(requestingHomepageSummary());
     return fetch(path)
       .then(resp => resp.json())
