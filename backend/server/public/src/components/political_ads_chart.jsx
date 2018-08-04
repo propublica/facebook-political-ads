@@ -17,7 +17,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
     svg.attr("viewBox", "0 0 " + containerWidth + " " + containerHeight);
     svg.attr("preserveAspectRatio", "xMinYMin");
 
-    let margin = { left: 35, right: 3, top: 10, bottom: 0 };
+    let margin = { left: 35, right: 25, top: 10, bottom: 0 };
     let width = containerWidth - margin.left - margin.right;
     let height = containerHeight - margin.top - margin.bottom;
     let g = svg
@@ -67,35 +67,22 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
         return y(d.cnt);
       });
 
-    // // x axis
+    // var area = d3
+    //   .area()
+    //   .x(function(d) {
+    //     return x(d.date);
+    //   })
+    //   .y0(height)
+    //   .y1(function(d) {
+    //     return y(d.cnt);
+    //   });
     // g
-    //   .append("g")
-    //   .attr("transform", "translate(0," + height + ")")
-    //   .call(
-    //     d3
-    //       .axisBottom(x)
-    //       .tickFormat(d3.timeFormat("%-m/%-d"))
-    //       .tickSizeInner(3)
-    //       .tickSizeOuter(0)
-    //       .ticks(d3.timeWeek.every(1))
-    //   );
-
-    var area = d3
-      .area()
-      .x(function(d) {
-        return x(d.date);
-      })
-      .y0(height)
-      .y1(function(d) {
-        return y(d.cnt);
-      });
-    g
-      .append("path")
-      .datum(political_ads_per_day_chart_data)
-      .attr("fill", "#CCE8F8")
-      .attr("stroke", "none")
-      .attr("class", "area")
-      .attr("d", area);
+    //   .append("path")
+    //   .datum(political_ads_per_day_chart_data)
+    //   .attr("fill", "#CCE8F8")
+    //   .attr("stroke", "none")
+    //   .attr("class", "area")
+    //   .attr("d", area);
 
     g
       .append("path")
@@ -146,10 +133,10 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       .append("text")
       .attr("class", "annotation-count")
       .attr("x", function(d) {
-        return width / 2; // was x(d.date)
+        return x(d.date);
       })
-      .attr("y", 10) // was 36
-      // .attr("dx", "-28px") // was -28
+      .attr("y", 36) // was 36
+      .attr("dx", "-28px") // was -28
       .attr("font-size", 16)
       .attr("text-anchor", "middle")
       .attr("font-weight", "bold")
@@ -178,21 +165,44 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
             : idx == 0 ? `${d3.timeFormat("%b. %-d")(d.date)}` : ""
       );
 
-    // /* "total" */
-    // g
-    //   .selectAll(".annotation-total")
-    //   .data(last_data_point)
-    //   .enter()
-    //   .append("text")
-    //   .attr("class", "annotation-total")
-    //   .attr("x", function(d) {
-    //     return x(d.date);
-    //   })
-    //   .attr("y", 36)
-    //   .attr("dx", "-3px")
-    //   .attr("font-size", 10)
-    //   .attr("text-anchor", "end")
-    //   .text("total");
+    // todays date
+    g
+      .selectAll(".annotation-enddate")
+      .data(last_data_point)
+      .enter()
+      .append("text")
+      .attr("class", "annotation-enddate")
+      .attr("x", function(d) {
+        return x(d.date);
+      })
+      .attr("y", function(d) {
+        return y(d.cnt);
+      })
+      .attr("dy", "12px")
+      .attr("font-size", 10)
+      .attr("text-anchor", "middle")
+      .text(
+        (d, idx) =>
+          idx == political_ads_per_day_chart_data.length - 1
+            ? "total"
+            : idx == 0 ? `${d3.timeFormat("%b. %-d")(d.date)}` : ""
+      );
+
+    /* "total" */
+    g
+      .selectAll(".annotation-total")
+      .data(last_data_point)
+      .enter()
+      .append("text")
+      .attr("class", "annotation-total")
+      .attr("x", function(d) {
+        return x(d.date);
+      })
+      .attr("y", 36)
+      .attr("dx", "-60px")
+      .attr("font-size", 10)
+      .attr("text-anchor", "end")
+      .text("total");
 
     // if (last_data_point.length > 0) {
     //   g

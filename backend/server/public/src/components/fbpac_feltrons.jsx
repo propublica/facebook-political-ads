@@ -6,7 +6,7 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
   <div className="feltrons">
     <div className="top-feltrons-container">
       <div className="top-feltrons political-ratio ads-today-count">
-        <h3>Political Ads Collected So Far</h3>
+        <h3>Total Political Ads Collected</h3>
         {/* <p>
           <strong>
             {homepage_stats && homepage_stats.political_ads_per_day
@@ -37,8 +37,8 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
           <strong>
             {homepage_stats && homepage_stats.user_count
               ? homepage_stats.user_count
-                .toString()
-                .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  .toString()
+                  .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "--"}
           </strong>{" "}
           contributors
