@@ -136,7 +136,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
         return x(d.date);
       })
       .attr("y", 36) // was 36
-      .attr("dx", "-28px") // was -28
+      .attr("dx", "-55px") // was -28
       .attr("font-size", 16)
       .attr("text-anchor", "middle")
       .attr("font-weight", "bold")
@@ -158,12 +158,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       .attr("dx", "-5px")
       .attr("font-size", 10)
       .attr("text-anchor", "end")
-      .text(
-        (d, idx) =>
-          idx == political_ads_per_day_chart_data.length - 1
-            ? "total"
-            : idx == 0 ? `${d3.timeFormat("%b. %-d")(d.date)}` : ""
-      );
+      .text(d => `${d3.timeFormat("%b. %-d")(d.date)}`);
 
     // todays date
     g
@@ -199,7 +194,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
         return x(d.date);
       })
       .attr("y", 36)
-      .attr("dx", "-60px")
+      .attr("dx", "-0px")
       .attr("font-size", 10)
       .attr("text-anchor", "end")
       .text("total");
