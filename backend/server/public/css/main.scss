@@ -1131,13 +1131,13 @@ article {
 
 #graphic {
   margin-bottom: 50px;
-  #which-ads{
-    padding-top: colspan(g, 8);
-    padding-bottom: colspan(g, 8);
+  .bottom-guff {
+    padding-top: colspan(g, 16);
+    padding-bottom: colspan(g, 16);
     h3 {
-      font-size: 1.25em;
+      cursor: pointer;
+      font-size: 1em;
       font-weight: bold;
-      text-align: center;
     }
   }
 }
