@@ -41,8 +41,8 @@ const FbpacFeltronsUnconnected = ({ homepage_stats }) => (
                   .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
               : "--"}
           </strong>{" "}
-          contributors
         </p>
+        <p style={{fontSize: "0.6em"}}>contributors</p>
       </div>
     </div>
   </div>

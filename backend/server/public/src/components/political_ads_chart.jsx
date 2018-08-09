@@ -17,7 +17,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
     svg.attr("viewBox", "0 0 " + containerWidth + " " + containerHeight);
     svg.attr("preserveAspectRatio", "xMinYMin");
 
-    let margin = { left: 35, right: 25, top: 10, bottom: 0 };
+    let margin = { left: 25, right: 25, top: 10, bottom: 10 };
     let width = containerWidth - margin.left - margin.right;
     let height = containerHeight - margin.top - margin.bottom;
     let g = svg
@@ -136,9 +136,9 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
         return x(d.date);
       })
       .attr("y", 36) // was 36
-      .attr("dx", "-38px") // was -28
+      .attr("dx", "-10px") // was -28
       .attr("font-size", 16)
-      .attr("text-anchor", "middle")
+      .attr("text-anchor", "end")
       .attr("font-weight", "bold")
       .text(d => d.cnt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 
@@ -153,11 +153,10 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
         return x(d.date);
       })
       .attr("y", function(d) {
-        return 36;
+        return 33;
       })
-      .attr("dx", "-5px")
       .attr("font-size", 10)
-      .attr("text-anchor", "end")
+      .attr("text-anchor", "middle")
       .text(d => `${d3.timeFormat("%b. %-d")(d.date)}`);
 
     // todays date
