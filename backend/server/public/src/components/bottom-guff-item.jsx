@@ -13,7 +13,11 @@ class BottomGuffItem extends React.Component {
       <div className="bottom-guff">
         <h3
           dangerouslySetInnerHTML={{
-            __html: this.props.titleHtml + (this.state.shown ? " -" : " +")
+            __html:
+              this.props.titleHtml +
+              (this.state.shown
+                ? " <span class=\"collapse-handle\">&ndash;</span>"
+                : " <span class=\"collapse-handle\">+</span>")
           }}
           onClick={() => this.setState({ shown: !this.state.shown })}
         />
