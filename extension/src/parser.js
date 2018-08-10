@@ -465,7 +465,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  "a[href=\"\"]",
+  'a[href=""]',
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -570,6 +570,8 @@ export const checkSponsor = node => {
         "Sponsorisé", // fr-FR
         "Patrocinado", // pt-BR
         "Apmaksāta", // lv-LV (cuts off reklāma as part of the thing that gets rid of the U.S. disclaimer)
+        "რეკლამა", // ka-GE
+        "Реклама", // ru
         "Publicidad" // es
       ].some(sponsor => {
         if (text === sponsor || style === `"${sponsor}"`) return true;
@@ -583,7 +585,7 @@ export const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    "localStorage.setItem(\"pageVariable\", (" +
+    'localStorage.setItem("pageVariable", (' +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +

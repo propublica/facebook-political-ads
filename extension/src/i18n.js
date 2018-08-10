@@ -20,7 +20,8 @@ export const activeCountries = [
   "SV",
   "BR",
   "ES",
-  "MX"
+  "MX",
+  "GE" // georgia (but like tblisi, not like atlanta)
 ];
 // ISO 639-1 (2 characters, lower case)
 export const activeLanguages = [
@@ -33,7 +34,8 @@ export const activeLanguages = [
   "fr",
   "sv",
   "pt",
-  "es"
+  "es",
+  "ka" // georgian
 ];
 
 // load country names in our languages

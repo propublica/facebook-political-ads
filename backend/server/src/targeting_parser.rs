@@ -87,6 +87,14 @@ pub enum TargetingParsed<'a> {
 
 named!(until_b(&str) -> &str, take_until!("</b>"));
 
+// variations.
+// you're in a customer list
+// you're on a customer list
+// your email address and phone number are on a customer list
+// your email address is on a customer list
+// your phone number and email address are on a customer list
+// your phone number is in a customer list
+// your phone number is on a customer list
 named!(list(&str) -> TargetingParsed,
    do_parse!(
        take_until!("added you to a list of people they want to reach on Facebook.") >>

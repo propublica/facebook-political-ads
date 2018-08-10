@@ -48,8 +48,8 @@
     "source-map-loader": "^0.2.3",
     "style-loader": "^0.20.3",
     "uglifyjs-webpack-plugin": "^1.2.4",
-    "web-ext": "^2.5.0",
-    "webpack": "^4.2.0",
+    "web-ext": "^2.8.0",
+    "webpack": "^4.16.5",
     "webpack-cli": "^2.0.12"
   },
   "dependencies": {
