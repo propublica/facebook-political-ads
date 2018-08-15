@@ -1,0 +1,5 @@
+{
+  "language": "ka-GE",
+  "n_features": 500000,
+  "classifier_type": "MultinomialNB"
+}
