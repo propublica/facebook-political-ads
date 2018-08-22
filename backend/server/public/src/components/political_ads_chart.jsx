@@ -155,7 +155,8 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       .attr("y", function(d) {
         return 33;
       })
-      .attr("font-size", 10)
+      .attr("dy", "2px")
+      .attr("font-size", 9)
       .attr("text-anchor", "middle")
       .text(d => `${d3.timeFormat("%b. %-d")(d.date)}`);
 
@@ -172,8 +173,8 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       .attr("y", function(d) {
         return y(d.cnt);
       })
-      .attr("dy", "12px")
-      .attr("font-size", 10)
+      .attr("dy", "14px")
+      .attr("font-size", 9)
       .attr("text-anchor", "middle")
       .text(
         (d, idx) =>
