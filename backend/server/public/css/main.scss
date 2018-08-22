@@ -398,7 +398,8 @@ article {
         padding: 15px 5px;
       }
       #adstoday {
-        max-height: 50px;
+        max-height: 55px;
+        position: relative; 
       }
     }
     .top-feltrons:last-child {
@@ -414,14 +415,13 @@ article {
     .top-target p {
       font-weight: 600;
     }
-    // @media screen and (max-width: 960px) {
-    //   h3 {
-    //     font-size: .9em;
-    //   }
-    //   p {
-    //     font-size: .8em;
-    //   }
-    // }
+    
+    @media screen and (max-width: 37.5em) {
+      .top-feltrons #adstoday {
+        position: relative; 
+        left: 0;
+      }
+    }
   }
 }
 
@@ -572,6 +572,9 @@ article {
 }
 .political-ratio svg text {
   font-weight: normal;
+}
+.political-ratio svg text.annotation-count {
+  font-weight: bold;
 }
 
 .political-ratio {
