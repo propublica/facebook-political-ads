@@ -17,7 +17,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
     svg.attr("viewBox", "0 0 " + containerWidth + " " + containerHeight);
     svg.attr("preserveAspectRatio", "xMinYMin");
 
-    let margin = { left: 25, right: 25, top: 10, bottom: 10 };
+    let margin = { left: 25, right: 25, top: 10, bottom: 5 };
     let width = containerWidth - margin.left - margin.right;
     let height = containerHeight - margin.top - margin.bottom;
     let g = svg
@@ -135,8 +135,8 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       .attr("x", function(d) {
         return x(d.date);
       })
-      .attr("y", 36) // was 36
-      .attr("dx", "-10px") // was -28
+      .attr("y", 40)
+      .attr("dx", "-10px")
       .attr("font-size", 16)
       .attr("text-anchor", "end")
       .attr("font-weight", "bold")
@@ -155,7 +155,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       .attr("y", function(d) {
         return 33;
       })
-      .attr("dy", "2px")
+      .attr("dy", "7px")
       .attr("font-size", 9)
       .attr("text-anchor", "middle")
       .text(d => `${d3.timeFormat("%b. %-d")(d.date)}`);
@@ -174,8 +174,9 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
         return y(d.cnt);
       })
       .attr("dy", "14px")
+      .attr("dx", "15px")
       .attr("font-size", 9)
-      .attr("text-anchor", "middle")
+      .attr("text-anchor", "end")
       .text(
         (d, idx) =>
           idx == political_ads_per_day_chart_data.length - 1
@@ -193,7 +194,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       .attr("x", function(d) {
         return x(d.date);
       })
-      .attr("y", 36)
+      .attr("y", 40)
       .attr("dx", "15px")
       .attr("font-size", 10)
       .attr("text-anchor", "end")
