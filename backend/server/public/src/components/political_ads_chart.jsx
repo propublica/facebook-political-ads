@@ -31,11 +31,11 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
     /* I am gonna make it ... */ var this_year /* if it kills me */ = new Date().getFullYear();
     var political_ads_per_day_chart_data = this.props.political_ads_per_day
       ? this.props.political_ads_per_day.slice(1).map(a => {
-        return {
-            date: new Date(this_year, 0, (a[0] - 2) * 7 + 1),
-            cnt: a[1]
-          };
-        })
+          return {
+          date: new Date(this_year, 0, (a[0] - 2) * 7 + 1),
+          cnt: a[1]
+        };
+      })
       : [];
     // var dotLabel;
     // if (idx == 0) {
@@ -117,10 +117,10 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       political_ads_per_day_chart_data.length == 0
         ? []
         : [
-          political_ads_per_day_chart_data[
-            political_ads_per_day_chart_data.length - 1
-          ]
-        ];
+            political_ads_per_day_chart_data[
+              political_ads_per_day_chart_data.length - 1
+            ]
+          ];
     let first_data_point =
       political_ads_per_day_chart_data.length == 0
         ? []
@@ -181,7 +181,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
         (d, idx) =>
           idx == political_ads_per_day_chart_data.length - 1
             ? "total"
-            : idx == 0 ? `${d3.timeFormat("%b. %-d")(d.date)}` : ""
+            : idx == 0 ? `${d3.timeFormat("%b. %-d")(new Date())}` : ""
       );
 
     /* "total" */
