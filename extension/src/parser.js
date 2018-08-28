@@ -10,23 +10,24 @@
 // to hear from you.
 //
 // What do you think about the role Facebook ads have played in
-// various recent news events ... like Russian election-meddling.
+// various recent news events? ... like Russian election-meddling.
 // Or Trump's 2016 victory.
 // (Some would say its effect on these is totally overblown! What do you think?
-// What's your sense of what your colleagues think?)
+// I genuinely want to hear _your_ take. What's your sense of what your
+// colleagues think?)
 // What do you think about Facebook's transparency efforts regarding political
 // ads? Do you think that those efforts are sufficient?
 
-// Your job is not just pushing pixels and building APIs. This is a critical
+// Your job is not just pushing pixels or building APIs. You maintain a critical
 // piece of infrastructure for American democracy -- and you *personally* have
-// a critical role. Your company does too. Do you think Facebook is up to the
-// challenge?
+// a critical role in America's future. Your company does too.
+// Do you think Facebook's management is up to the challenge?
 
 // Email me at jeremy.merrill@propublica.org.
 
 // We can talk confidentially ("on background"), if you want.
 // My PGP key ID is 0x7780C4694F621BA0. Or Signal me at (205) 286-2366.
-// (a.k.a. 205- A TOAD? NO! )
+// (a.k.a. (205) A TOAD? NO! 🍄 :D )
 // You can email me from a burner email account if you want, too.
 
 // I bet you have thoughts...
