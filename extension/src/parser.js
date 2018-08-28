@@ -7,16 +7,15 @@
 // Hi!   Glad that you're here.
 //
 // I'm Jeremy Merrill. I'm a journalist and programmer at ProPublica. I'd love
-// to hear from you.
+// to hear from you... especially if you're visiting this page for work.
 //
-// What do you think about the role Facebook ads have played in
-// various recent news events? ... like Russian election-meddling.
+// What do you think about the role Facebook ads have been said to have played
+// in various recent news events? ... like Russian election-meddling.
 // Or Trump's 2016 victory.
 // (Some would say its effect on these is totally overblown! What do you think?
 // I genuinely want to hear _your_ take. What's your sense of what your
-// colleagues think?)
-// What do you think about Facebook's transparency efforts regarding political
-// ads? Do you think that those efforts are sufficient?
+// colleagues think?) What do you think about Facebook's transparency efforts
+// regarding political ads? Do you think that those efforts are sufficient?
 
 // Your job is not just pushing pixels or building APIs. You maintain a critical
 // piece of infrastructure for American democracy -- and you *personally* have
@@ -477,7 +476,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  "a[href=\"\"]",
+  'a[href=""]',
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -597,7 +596,7 @@ export const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    "localStorage.setItem(\"pageVariable\", (" +
+    'localStorage.setItem("pageVariable", (' +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
