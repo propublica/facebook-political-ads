@@ -60,6 +60,8 @@ export class FacebookVM {
        ${readFileSync(__dirname + "/fixtures/timeline-ad.html")}
        ${readFileSync(__dirname + "/fixtures/timeline.html")}
        ${readFileSync(__dirname + "/fixtures/paid-for-timeline-ad.html")}
+       ${readFileSync(__dirname + "/fixtures/civil.html")}
+       ${readFileSync(__dirname + "/fixtures/thirdangle.html")}
       </body>
     </html>
     `;
@@ -68,7 +70,9 @@ export class FacebookVM {
 
     const selectors = [
       ["#hyperfeed_story_id_5ac2bbb055fd90225091584", "u_jsonp_2_1d"],
-      ["#hyperfeed_story_id_5b073958c2f8d1e41312928", "u_fetchstream_4_v"]
+      ["#hyperfeed_story_id_5b073958c2f8d1e41312928", "u_fetchstream_4_v"],
+      ["#hyperfeed_story_id_5b85e6d0214c28e69102300", "u_jsonp_10_1o"],
+      ["#hyperfeed_story_id_5b85e63fe58744340330528", "u_jsonp_8_1v"]
     ];
     selectors.forEach(([sel, owner_id]) => {
       this.timelineAd = document.querySelector(sel + " .uiPopover");
@@ -78,8 +82,12 @@ export class FacebookVM {
 
   _click(owner_id_should_be) {
     const node = (this.popup = document.createElement("div"));
-    node.innerHTML = readFileSync(__dirname + "/fixtures/timeline-popup.html");
-    node.innerHTML = node.innerHTML.replace("u_jsonp_2_1d", owner_id_should_be);
+    // node.innerHTML = readFileSync(__dirname + "/fixtures/timeline-popup.html");
+    // node.innerHTML = node.innerHTML.replace("u_jsonp_2_1d", owner_id_should_be);
+    node.innerHTML = readFileSync(
+      __dirname + "/fixtures/freelancers-menu.html"
+    );
+    node.innerHTML = node.innerHTML.replace("u_jsonp_7_1j", owner_id_should_be);
     document.body.appendChild(node);
   }
 

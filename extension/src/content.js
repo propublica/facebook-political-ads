@@ -1,6 +1,9 @@
 import { parser, TIMELINE_SELECTOR, SIDEBAR_SELECTOR, DEBUG } from "parser";
 
 let running = false;
+let nodeCache = new Set();
+const ONCE_PER_NODE = true;
+
 const sendAds = function() {
   if (running) return;
   if (DEBUG) console.log("sending Ads");
@@ -8,6 +11,11 @@ const sendAds = function() {
   let posts = Array.from(document.querySelectorAll(SIDEBAR_SELECTOR)).concat(
     Array.from(document.querySelectorAll(TIMELINE_SELECTOR))
   );
+
+  if (ONCE_PER_NODE) {
+    posts = posts.filter(node => !nodeCache.has(node));
+    console.log();
+  }
 
   let results = [];
   let scraper = posts.reduce(
@@ -24,10 +32,12 @@ const sendAds = function() {
           : parser(nextNode)
         ).then(
           it => {
+            if (ONCE_PER_NODE) nodeCache.add(nextNode);
             results.push(it);
           },
           e => {
-            if (DEBUG) console.log(e);
+            if (DEBUG && e != "Not an ad") console.log("error:", e);
+            if (ONCE_PER_NODE && e == "Not an ad") nodeCache.add(nextNode);
           }
         )
       ),

@@ -320,11 +320,11 @@ export class Parser extends StateMachine {
     req.onreadystatechange = () => {
       if (req.readyState === 4) {
         try {
-          const targeting = cleanAd(
-            JSON.parse(req.response.replace("for (;;);", ""))["jsmods"][
-              "markup"
-            ][0][1]["__html"]
-          );
+          let markup = (JSON.parse(req.response.replace("for (;;);", ""))[
+            "jsmods"
+          ] || {})["markup"];
+          let markup_html = markup ? markup[0][1]["__html"] : null;
+          const targeting = cleanAd(markup_html);
           if (!targeting) return this.promote(states.DONE);
           targetingCache.set(this.targetingUrl, targeting);
           this.ad.targeting = targeting;
@@ -350,7 +350,7 @@ export class Parser extends StateMachine {
 
   done() {
     if (DEBUG) {
-      console.log(this.states);
+      this.node.style.color = "#ff0000";
     }
     adCache.set(this.toggleId, this.ad);
     this.stop();
