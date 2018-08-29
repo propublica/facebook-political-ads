@@ -11,7 +11,7 @@ use hyper::{Body, Chunk, Client, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
 use hyper::header::{AcceptLanguage, AccessControlAllowOrigin, Authorization, Bearer, CacheControl,
-                    CacheDirective, Connection as HttpConnection, ContentLength, ContentType, Vary};
+                    CacheDirective, Connection as HttpConnection, Location, ContentLength, ContentType, Vary};
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
@@ -149,12 +149,17 @@ impl Service for AdServer {
                     self.segments(req, lang, Some(String::from("1 Month")))
                 }))
             }
+            (&Method::Get, "/facebook-ads") => {
+                // redirect no-slash to slash
+                let mut response = Response::new().with_header(Location::new("/facebook-ads/"));
+                Either::A(future::ok(response.with_status(StatusCode::Found)))
+            }
             // Restful-ish routing.
             (&Method::Get, _) => {
                 let restful = RegexSet::new(&[
                     // rudimentary routing. ORDER MATTERS. And we're using the index of these as
                     // the key for match below.
-                    r"^/facebook-ads/?$",
+                    r"^/facebook-ads/$",
                     r"^/facebook-ads/admin/?(.*)?$",
                     r"^/facebook-ads/ads/?(\d+)?$",
                     r"^/facebook-ads/ad/?(\d+)?$",
