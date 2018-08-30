@@ -552,13 +552,15 @@ export const checkSponsor = node => {
   return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
     a => {
       a = a.cloneNode(true);
-      const canary = Array.from(a.querySelectorAll("div"));
+      const canary = Array.from(a.querySelectorAll("span")).concat(
+        Array.from(a.querySelectorAll("div"))
+      );
 
       Array.from(canary)
         .filter(
-          div =>
-            div.className.split(" ").length === 2 &&
-            div.textContent.length === 1
+          elem =>
+            elem.className.split(" ").length === 2 &&
+            elem.textContent.length === 1
         )
         .forEach(canary => canary.remove());
 
