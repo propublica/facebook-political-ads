@@ -64,4 +64,90 @@ describe("parser", () => {
     expect(parse.message).toEqual(errors.NOT_AN_AD);
     vm.detach();
   });
+
+  it("should find and collect a paid for by ad", async () => {
+    const resolve = jest.fn();
+    const reject = jest.fn();
+    const vm = new FacebookVM();
+    const ad = document.querySelector(
+      "#hyperfeed_story_id_5b073958c2f8d1e41312928 .userContentWrapper"
+    );
+    const parse = new Parser(ad, resolve, reject);
+    parse.tick();
+    expect(parse.state).toEqual(states.TIMELINE);
+    parse.tick();
+    expect(parse.state).toEqual(states.TIMELINE_ID);
+    parse.tick();
+    expect(parse.state).toEqual(states.MENU);
+    expect(parse.toggleId).toEqual("u_fetchstream_4_v");
+    parse.tick();
+    expect(parse.idFinder.state).toEqual(states.MENU);
+    parse.tick();
+    expect(parse.state).toEqual(states.TARGETING);
+    parse.tick();
+    expect(parse.state).toEqual(states.DONE);
+    expect(parse.ad.id).toEqual("23842758929270352");
+    expect(parse.ad.targeting).toEqual("targeting");
+    parse.tick();
+    expect(parse.state).toEqual(states.DONE);
+    expect(resolve).toHaveBeenCalled();
+    expect(reject).not.toHaveBeenCalled();
+    expect(parse.states).toEqual([
+      states.TIMELINE,
+      states.TIMELINE_ID,
+      states.MENU,
+      [states.INITIAL, states.MENU, states.DONE],
+      states.TARGETING,
+      // states.WAIT_TARGETING,
+      states.DONE
+    ]);
+    const promise = parser(ad);
+    const res = await promise;
+    expect(res.id).toEqual("23842758929270352");
+    expect(res.targeting).toEqual("targeting");
+    vm.detach();
+  });
+
+  it("should find and collect a Sisi's ad", async () => {
+    const resolve = jest.fn();
+    const reject = jest.fn();
+    const vm = new FacebookVM();
+    const ad = document.querySelector(
+      "#hyperfeed_story_id_5b880d5373d714746163772 .userContentWrapper"
+    );
+    const parse = new Parser(ad, resolve, reject);
+    parse.tick();
+    expect(parse.state).toEqual(states.TIMELINE);
+    parse.tick();
+    expect(parse.state).toEqual(states.TIMELINE_ID);
+    parse.tick();
+    expect(parse.state).toEqual(states.MENU);
+    expect(parse.toggleId).toEqual("u_fetchstream_3_7");
+    parse.tick();
+    expect(parse.idFinder.state).toEqual(states.MENU);
+    parse.tick();
+    expect(parse.state).toEqual(states.TARGETING);
+    parse.tick();
+    expect(parse.state).toEqual(states.DONE);
+    expect(parse.ad.id).toEqual("23842758929270352");
+    expect(parse.ad.targeting).toEqual("targeting");
+    parse.tick();
+    expect(parse.state).toEqual(states.DONE);
+    expect(resolve).toHaveBeenCalled();
+    expect(reject).not.toHaveBeenCalled();
+    expect(parse.states).toEqual([
+      states.TIMELINE,
+      states.TIMELINE_ID,
+      states.MENU,
+      [states.INITIAL, states.MENU, states.DONE],
+      states.TARGETING,
+      // states.WAIT_TARGETING,
+      states.DONE
+    ]);
+    const promise = parser(ad);
+    const res = await promise;
+    expect(res.id).toEqual("23842758929270352");
+    expect(res.targeting).toEqual("targeting");
+    vm.detach();
+  });
 });

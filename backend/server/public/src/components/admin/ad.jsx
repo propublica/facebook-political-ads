@@ -10,7 +10,7 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
         <tr>
           <td>id</td>
           <td>
-            <Link to={`/facebook-ads/admin/ads/${ad.id}`}>{ad.id}</Link>
+            <Link to={`/facebook-ads/admin/ads/${ad.id}`}>{ad.id}</Link> ({ad.lang})
           </td>
         </tr>
         <tr>

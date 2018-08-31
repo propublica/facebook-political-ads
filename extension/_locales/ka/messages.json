@@ -1,0 +1,103 @@
+{
+  "name": {
+    "message": "ფეისბუქზე პოლიტიკური რეკლამის ანალიზატორი",
+    "description": "Extension name"
+  },
+  "short_name": {
+    "message": "ფეისბუქ პრა",
+    "description": "Extension short name"
+  },
+  "description": {
+    "message": "ეს ჩანართი თავს უყრის ფეისბუქზე განთავსებულ პოლიტიკურ რეკლამას.",
+    "description": "Description of the extension"
+  },
+  "rate_ads": {
+    "message": "რეკლამები, რომლებსაც მე ვხედავ",
+    "description": "Text for the 'Ads I'm Seeing' button in the extension."
+  },
+  "see_ads": {
+    "message": "რეკლამები, რომლებსაც სხვები ხედავენ",
+    "description":
+      "Text for the 'Ads Others are Seeing' button in the extension."
+  },
+  "political": {
+    "message": "პოლიტიკური რეკლამა",
+    "description": "Label for political radio button"
+  },
+  "normal": {
+    "message": "ჩვეულებრივი რეკლამა",
+    "description": "Label for normal radio button"
+  },
+  "rating_question": {
+    "message": "რა სახის რეკლამაა ეს?",
+    "description": "Question to ask for rating an ad"
+  },
+  "verify_question": {
+    "message": "ეს რეკლამა პოლიტიკურია?",
+    "description": "Question to ask for rating an ad"
+  },
+  "language_settings": {
+    "message": "ენის პარამეტრები",
+    "description": "Your Language Settings"
+  },
+  "you_speak": {
+    "message": "თქვენი ვებ-ბრაუზერი ფიქრობს, რომ თქვენ იცით <b>$language$<b> ენა და ცხოვრობთ <b>$country$<b>-ში.",
+    "description": "Your language and country",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      },
+      "country": {
+        "content": "$2"
+      }
+    }
+  },
+  "language_instructions": {
+    "message":
+      "თუ პარამეტრები არასწორია, შეცვალეთ ჩამოსაშლელი მენიუდან.",
+    "description": "Instructions to adapt if needed."
+  },
+  "language": {
+    "message": "ენა: ",
+    "description": "Language"
+  },
+  "country": {
+    "message": "ენა: ",
+    "description": "Country: "
+  },
+  "terms_of_service": {
+    "message":
+      "<h2>ჯერ გაეცანით და დაეთანხმეთ, თუ შეიძლება? </h2> <p> პროპუბლიკას ღირებულებაა გამჭვირვალობა ყველაფერში, რასაც ვაკეთებთ. ამდენად, სანამ ამ ჩანართს გამოიყენებთ, თუ შეიძლება გაეცანით რას აკეთებს იგი. /p> <h2>როგორ მუშაობს ჩანართი?</h2> <p> ჩანართის პროგრამა აანალიზებს ფეისბუქის ყველა გვერდს რომელზეც შედიხართ, იგი ეძებს რეკლამებს, რომელსაც შემდეგ ინახავს თქვენს კომპიუტერზე </p> <h2>როგორ შეგიძლიათ დახმარება?</h2> <p> როცა დრო გაქვთ და გინდათ ჩვენი მხარდაჭერა, შეგიძლიათ თქვენს ვებ-ბრაუზერში დააწკაპუნოთ პროპუბლიკას ღილაკზე და ცალკე ფანჯარა გამოჩნდება, რომელიც შეიცავს ყველა რეკლამას რაც თქვენს კომპიუტერზეა დამახსოვრებული. ამ რეკლამების პოლიტიკურ თუ არაპოლიტიკურ კატეგორიებში კლასიფიცირებით თქვენ შეგიძლიათ ჩანართს 'ასწავლოთ' რეკლამების ცნობა. </p> <h2>რა ინფორმაციას ვაგროვებთ ჩვენ?</h2> <p> ჩვენი სერვერი აგროვებს ინფორმაციას რეკლამის შესახებ. მათ შორის, გასუფთავებულ და არაიდენტიფიცირებად HTML მონაცემს, ფეისბუქზე რეკლამის საიდენტიფიკაციო ნომერს, და რეკლამის სამიზნე აუდიტორიის დემოგრაფიული პარამეტრებს (მაგ. 18 წელს ზევით აშშ-ს მცხოვრებლები), რეკლამის კლასიფიკაციას (პოლიტიკური თუ არაპოლიტიკური), და თქვენი ვებ-ბრაუზერის ენის პარამეტრებს. ჩანართი არ შეაგროვებს ისეთ მონაცემებს, რომელთა მეშვეობით პირადად თქვენი იდენტიფიცირება იქნება შესაძლებელი. </p> <h2> რას ვუზამთ ამ ინფორმაციას?</h2> <p> ამ ინფორმაციას დაამუშავებს ჩვენი ალგორითმი, რათა მან ისწავლოს პოლიტიკური რეკლამის ამოცნობა. ჩვენ ასევე გამოგიგზავნით პოლიტიკურ რეკლამას, რომელიც თქვენ ჯერ არ გინახავთ, მაგრამ სხვებმა დაარეპორტეს. როდესაც გსურთ გაიგოთ თუ რა რეკლამებს ხედავენ სხვები შეგიძლიათ თქვენს ბრაუზერში დააწკაპუნოთ  ღილაკზე 'რეკლამები, რომლებსაც სხვები ხედავენ' და თქვენ მიიღებთ რეკლამების დასტას ჩვენი სერვერიდან. ამ რეკლამებს ჩანართი შეადარებს თქვენს კომპიუტერზე შენახულ რეკლამებს და გაჩვენებთ მხოლოდ ისეთ რეკლამებს, რომლებიც თქვენ არ გინახავთ. ჩვენ არასდროს მივიღებთ ინფორმაციას იმაზე, თუ პირადად თქვენ რომელი რეკლამა ნახეთ ან არ გინახავთ. </p><h2>როგორ უნდა ვთქვა უარი ჩანართის გამოყენებაზე?</h2><p> ჩანართის დაინსტალებით, თანხმობას ვაცხადებ, რომ ზემოთ მოცემული ინფორმაცია, ასევე ჩემ მიერ რეკლამების კატეგორისაცია, როგორც პოლიტიკური რეკლამა, შეიძლება გამოყენებული იქნას ამ პროექტისთვის. </p><p> შეგიძლიათ პროექტში მონაწილეობა ნებისმიერ დროს შეწყვიტოთ ჩანართის პროგრამულად წაშლით (იხილეთ ინსტრუქცია, თუ როგორ უნდა გამორთოთ ჩანართი <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=en\">Chrome-სა</a> და <a href=\"https://support.mozilla.org/en-US/kb/disable-or-remove-add-ons\">Firefox-ში.</a>) ჩანართის დეაქტივაციის ან წაშლის მომენტიდან მონაცემების შეგროვება შეწყდება. </p><p><b>დაგვეკონტაქტეთ: <a href=\"politicalads@propublica.org\">politicalads@propublica.org</a>",
+    "description": "The terms of service"
+  },
+  "terms_of_service_accept": {
+    "message": "ვეთანხმები",
+    "description": "The terms of service accept button"
+  },
+
+  "thanks1": {
+    "message": "მადლობა! :) ",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks2": {
+    "message": "ასე გააგრძელე!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks3": {
+    "message": "უშენოდ ამას ვერ შევძლებდით!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks4": {
+    "message": "მადლობა დახმარებისთვის!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks5": {
+    "message": "მაგარია! შენ უკვე $count$ რეკლამა აღრიცხე.",
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  }
+}

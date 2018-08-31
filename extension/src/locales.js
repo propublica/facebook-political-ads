@@ -8,5 +8,6 @@ import * as sv from "../_locales/sv/messages.json";
 import * as fr from "../_locales/fr/messages.json";
 import * as pt from "../_locales/pt/messages.json";
 import * as es from "../_locales/es/messages.json";
+import * as ka from "../_locales/ka/messages.json";
 
-export { da, de, de_CH, en, it, nl, sv, fr, pt, es };
+export { da, de, de_CH, en, it, nl, sv, fr, pt, es, ka };

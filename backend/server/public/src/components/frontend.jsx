@@ -3,6 +3,7 @@ import { Route, Switch } from "react-router-dom";
 import AdDetail from "components/addetail.jsx";
 import AdList from "components/adlist.jsx";
 import { t } from "i18n.js";
+import BottomGuffItem from "./bottom-guff-item";
 
 export const FrontEnd = () => (
   <div id="app">
@@ -13,9 +14,25 @@ export const FrontEnd = () => (
       </Route>
       <Route path="/facebook-ads/ad/:ad_id" component={AdDetail} />
     </Switch>
-    <div id="which-ads" dangerouslySetInnerHTML={{ __html: t("whichads") }} />
-    <div id="contrib" dangerouslySetInnerHTML={{ __html: t("contrib") }} />
 
+    <div id="bottom-guff">
+      <BottomGuffItem
+        titleHtml={t("whichads-title")}
+        shown={false}
+        bodyHtml={t("whichads")}
+      />
+      <BottomGuffItem
+        titleHtml={t("buckets-title")}
+        shown={false}
+        bodyHtml={t("buckets")}
+      />
+      <BottomGuffItem
+        titleHtml={t("sorting-title")}
+        shown={false}
+        bodyHtml={t("sorting")}
+      />
+    </div>
+    <div id="contrib" dangerouslySetInnerHTML={{ __html: t("contrib") }} />
   </div>
 );
 
