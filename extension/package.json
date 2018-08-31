@@ -55,6 +55,7 @@
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.40",
     "base64url": "^2.0.0",
+    "dompurify": "^1.0.7",
     "i18n-iso-countries": "^3.6.1",
     "langs": "^2.0.0",
     "lodash": "^4.17.5",

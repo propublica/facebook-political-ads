@@ -351,6 +351,7 @@ export class Parser extends StateMachine {
   done() {
     if (DEBUG) {
       console.log(this.states);
+      this.node.style.color = "#ff0000";
     }
     adCache.set(this.toggleId, this.ad);
     this.stop();

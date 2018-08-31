@@ -4,10 +4,11 @@ import { RatingType } from "constants.js";
 import { rateAd, updateAd, updateRating } from "actions.js";
 import { getUnratedRatings } from "utils.js";
 import { connect } from "react-redux";
+import DOMPurify from "dompurify"
 
 export const Ad = ({ id, html }) => (
   <div className="ad" id={id}>
-    <div className="ad-display" dangerouslySetInnerHTML={{ __html: html }} />
+    <div className="ad-display" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />
   </div>
 );
 
