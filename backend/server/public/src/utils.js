@@ -20,9 +20,7 @@ import {
   filterDistrict,
   changePoliticalProbability,
   setPersona,
-  showOldSearch,
-  newByState,
-  filterByByState
+  showOldSearch
 } from "actions.js";
 
 const headers = lang => Object.assign({}, language(lang));
@@ -176,12 +174,6 @@ const deserialize = (dispatch, allowedLangs) => {
     states.map(it => {
       actions.push(filterState(it));
     });
-  }
-
-  if (params.has("by_state")) {
-    const by_state = params.get("by_state").split(",")[0];
-    actions.push(newByState(by_state));
-    actions.push(filterByByState(by_state));
   }
 
   if (params.has("parties")) {

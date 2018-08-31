@@ -41,7 +41,7 @@ export class StatesAndDistrictsUnrouted extends React.Component {
           {this.props.statesAndDistricts.states ? (
             this.props.statesAndDistricts.states.map(state => (
               <div key={state.abbrev} className="state">
-                <Link to={`/facebook-ads/admin/ads?by_state=${state.abbrev}`}>
+                <Link to={`/facebook-ads/admin/by_state/${state.abbrev}`}>
                   {state.abbrev}
                 </Link>
               </div>

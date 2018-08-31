@@ -8,14 +8,25 @@ import {
   getAds,
   changePoliticalProbability,
   throttledDispatchAny,
-  clearAllFilters
+  clearAllFilters,
+  filterByByState,
+  getAdsByState
 } from "actions.js";
 import { deserialize } from "utils.js";
 import Range from "rc-slider/lib/Range";
 
 export class AdsUnconnected extends React.Component {
   componentDidMount() {
-    this.props.deserialize(); // gets params from the URL, dispatches actions.
+    let by_state = null;
+    if (this.props.match) {
+      // `match` is from React Router -- it's the bit of the URL that matches.
+      by_state = this.props.match.params.state;
+    }
+    if (by_state) {
+      this.props.getAdsByState(by_state);
+    } else {
+      this.props.deserialize(); // gets params from the URL, dispatches actions.
+    }
   }
   componentDidUpdate() {
     Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
@@ -152,6 +163,10 @@ export const AdsUnrouted = connect(
     deserialize: () => {
       deserialize(dispatch);
       dispatch(getAds());
+    },
+    getAdsByState: by_state => {
+      dispatch(filterByByState(by_state));
+      dispatch(getAdsByState());
     },
     onKeyUp: e => {
       e.preventDefault();

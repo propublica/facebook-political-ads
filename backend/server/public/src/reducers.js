@@ -29,7 +29,8 @@ import {
   SET_PERSONA_FACET,
   SHOW_OLD_SEARCH,
   HIDE_OLD_SEARCH,
-  NEW_BY_STATE
+  NEW_BY_STATE,
+  FILTER_BY_BY_STATE
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -83,15 +84,6 @@ export const persona = (state = null, action) => {
       return state ? { ...state, ...action.value } : action.value;
     case NEW_SEARCH:
       return null;
-    default:
-      return state;
-  }
-};
-
-export const by_state = (state = null, action) => {
-  switch (action.type) {
-    case NEW_BY_STATE:
-      return action.value;
     default:
       return state;
   }
@@ -197,16 +189,16 @@ const makeObjectReducer = (plural, singular) => {
           );
           return singular !== "target" || !oldFilter
             ? {
-                ...filter,
-                key: filter[singular],
-                active: lookup.has(filter[singular])
-              }
+              ...filter,
+              key: filter[singular],
+              active: lookup.has(filter[singular])
+            }
             : {
-                ...filter,
-                key: filter[singular],
-                active: lookup.has(filter[singular]),
-                segment: oldFilter.segment
-              };
+              ...filter,
+              key: filter[singular],
+              active: lookup.has(filter[singular]),
+              segment: oldFilter.segment
+            };
         });
       }
       case `filter_${singular}`:
@@ -250,6 +242,17 @@ export const targets = makeObjectReducer("targets", "target");
 export const states = makeArrayReducer("states");
 export const parties = makeArrayReducer("parties");
 export const districts = makeArrayReducer("districts");
+
+export const by_state = (state = null, action) => {
+  switch (action.type) {
+    case NEW_BY_STATE:
+      return action.value;
+    case FILTER_BY_BY_STATE:
+      return action.value;
+    default:
+      return state;
+  }
+};
 
 const PER_PAGE = 20;
 const min = state => Math.min(state.page, state.total);

@@ -327,6 +327,33 @@ export const getHomepageSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
       });
   };
 };
+
+export const getAdsByState = (url = `${URL_ROOT}/fbpac-api/ads/by_state`) => {
+  return (dispatch, getState) => {
+    let state = getState();
+
+    let params = new URLSearchParams();
+    url = `${URL_ROOT}/fbpac-api/ads/by_state`;
+    params.set("state", state.by_state);
+
+    let path = `${url}?${params.toString()}`;
+
+    return fetch(path, { method: "GET", credentials: "include" })
+      .then(res => res.json())
+      .then(ads => {
+        dispatch(
+          batch(
+            newAds(ads.ads),
+            // newEntities(ads.entities),
+            // newAdvertisers(ads.advertisers),
+            // newTargets(ads.targets),
+            setTotal(ads.total),
+            setPage(parseInt(params.get("page"), 0) || 0)
+          )
+        );
+      });
+  };
+};
 export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
   return (dispatch, getState) => {
     let state = getState();
@@ -353,9 +380,6 @@ export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
       if (state.pagination && state.pagination.page) {
         params.set("page", state.pagination.page);
       }
-    } else if (state.by_state) {
-      url = `${URL_ROOT}/fbpac-api/ads/by_state`;
-      params.set("state", state.by_state);
     } else {
       params = serialize(state);
     }
