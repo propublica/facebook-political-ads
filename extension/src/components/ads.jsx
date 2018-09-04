@@ -4,11 +4,14 @@ import { RatingType } from "constants.js";
 import { rateAd, updateAd, updateRating } from "actions.js";
 import { getUnratedRatings } from "utils.js";
 import { connect } from "react-redux";
-import DOMPurify from "dompurify"
+import DOMPurify from "dompurify";
 
 export const Ad = ({ id, html }) => (
   <div className="ad" id={id}>
-    <div className="ad-display" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }} />
+    <div
+      className="ad-display"
+      dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
+    />
   </div>
 );
 
@@ -46,7 +49,10 @@ export const Rating = withI18n(({ getMessage, rating, action, question }) => (
 
 export class Ratings extends React.Component {
   componentDidMount() {
-    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span span"))
+      .concat(
+        Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+      )
       .filter(t => t.textContent.length == 1)
       .forEach(t => t.remove());
   }
@@ -83,7 +89,10 @@ export const UnratedRatings = connect(
 // Ads from the server to show
 export class AdsUnconnected extends React.Component {
   componentDidMount() {
-    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span span"))
+      .concat(
+        Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+      )
       .filter(t => t.textContent.length == 1)
       .forEach(t => t.remove());
   }
