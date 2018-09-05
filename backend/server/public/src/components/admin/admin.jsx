@@ -54,7 +54,7 @@ export const AdminUnconnected = () => {
         <ul>
           <li>
             <Link to="/facebook-ads/admin">
-              <h1>FBPAC Admin</h1>
+              <h1>FBPAC Partner Dashboard</h1>
             </Link>
           </li>
           <li>
