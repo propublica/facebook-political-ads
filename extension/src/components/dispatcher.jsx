@@ -5,7 +5,12 @@ import { Onboarding } from "components/onboarding.jsx";
 import { acceptTerms, newAds } from "actions.js";
 import { getAds } from "utils.js";
 
-export const DispatcherUnconnected = ({ terms, language, onAcceptClick }) => {
+export const DispatcherUnconnected = ({
+  terms,
+  language,
+  onAcceptClick,
+  ygid
+}) => {
   return (
     <div
       id="popup"
@@ -13,7 +18,11 @@ export const DispatcherUnconnected = ({ terms, language, onAcceptClick }) => {
       data-locale={`${language.language}_${language.country}`}
     >
       {terms ? (
-        <Thanks />
+        ygid ? (
+          <Thanks />
+        ) : (
+          <div>You need to go to the YouGov page so we can get your ID!</div>
+        )
       ) : (
         <Onboarding onAcceptClick={onAcceptClick(language)} />
       )}

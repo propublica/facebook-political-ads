@@ -3,7 +3,7 @@
   "name": "__MSG_name__",
   "short_name": "__MSG_short_name__",
   "description": "__MSG_description__",
-  "version": "1.6.12",
+  "version": "1.7.0",
   "default_locale": "en",
   "permissions": [
     "https://projects.propublica.org/facebook-ads/*",
@@ -30,6 +30,14 @@
       ],
       "exclude_globs": [
         "*://*.facebook.com/ads/archive/*"
+      ]
+    },
+    {
+      "js": [
+        "yg.js"
+      ],
+      "matches": [
+        "*://*.yougov.com/*"
       ]
     }
   ]

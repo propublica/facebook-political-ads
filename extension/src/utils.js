@@ -7,6 +7,8 @@ export const adForRequest = ad => ({
   targeting: ad.targeting
 });
 
+export const addYgidToAd = ygid => ad => Object.assign({ ygid: ygid }, ad);
+
 const endpoint =
   process.env.NODE_ENV === "production"
     ? "https://projects.propublica.org/facebook-ads/ads"

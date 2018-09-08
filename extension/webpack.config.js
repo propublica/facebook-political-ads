@@ -32,6 +32,28 @@ module.exports = [
     devtool: "source-map"
   },
   {
+    entry: "yg.js",
+    context: path.resolve(__dirname, "src"),
+    output: {
+      filename: "yg.js",
+      path: outdir
+    },
+    resolve: {
+      modules: ["src", "node_modules"]
+    },
+    module: {
+      rules: [
+        {
+          test: /\.jsx?$/,
+          exclude: /node_modules/,
+          use: "babel-loader"
+        }
+      ]
+    },
+    devtool: "source-map"
+  },
+
+  {
     entry: "background.js",
     context: path.resolve(__dirname, "src"),
     output: {

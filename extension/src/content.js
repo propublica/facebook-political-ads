@@ -36,7 +36,7 @@ const sendAds = function() {
 
   scraper.then(() => {
     if (DEBUG) console.log("sending these: ", results);
-    chrome.runtime.sendMessage(results);
+    chrome.runtime.sendMessage({ type: "ads", ads: results });
     if (DEBUG) console.log("done sending Ads, sent", results.length);
     running = false;
   });
