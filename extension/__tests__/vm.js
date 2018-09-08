@@ -61,6 +61,7 @@ export class FacebookVM {
        ${readFileSync(__dirname + "/fixtures/sisi-timeline-ad.html")}
        ${readFileSync(__dirname + "/fixtures/timeline.html")}
        ${readFileSync(__dirname + "/fixtures/paid-for-timeline-ad.html")}
+       ${readFileSync(__dirname + "/fixtures/lkw-timeline-ad.html")}
       </body>
     </html>
     `;
@@ -70,7 +71,8 @@ export class FacebookVM {
     const selectors = [
       ["#hyperfeed_story_id_5ac2bbb055fd90225091584", "u_jsonp_2_1d"],
       ["#hyperfeed_story_id_5b073958c2f8d1e41312928", "u_fetchstream_4_v"],
-      ["#hyperfeed_story_id_5b880d5373d714746163772", "u_fetchstream_3_7"]
+      ["#hyperfeed_story_id_5b880d5373d714746163772", "u_fetchstream_3_7"],
+      ["#hyperfeed_story_id_5b85b34ce73376c62775420", "u_fetchstream_2_t"]
     ];
     selectors.forEach(([sel, owner_id]) => {
       this.timelineAd = document.querySelector(sel + " .uiPopover");
