@@ -8,7 +8,7 @@
     "description": "Extension short name"
   },
   "description": {
-    "message": "This extension collects political ads on facebook.",
+    "message": "This extension collects ads on Facebook.",
     "description": "Description of the extension"
   },
   "rate_ads": {
