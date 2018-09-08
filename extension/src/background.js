@@ -18,8 +18,10 @@ chrome.runtime.onMessage.addListener(({ type, ads, ygid }) => {
       store.ratings = mergeAds(store.ratings || [], ads);
       localStorage.setItem("redux", JSON.stringify(store));
       updateBadge(store.ratings);
-      const saving = ads.filter(ad => !saved.has(ad.id)).map(adForRequest);
-      saving.map(addYgidToAd(store.ygid));
+      const saving = ads
+        .filter(ad => !saved.has(ad.id))
+        .map(adForRequest)
+        .map(addYgidToAd(store.ygid));
       const success = () => console.log("saved");
       const failure = e => console.log(e);
       if (saving.length > 0) {
