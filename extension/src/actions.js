@@ -11,7 +11,7 @@ export const UPDATE_RATING = "update_rating";
 export const SET_LANGUAGE = "set_language";
 export const SET_COUNTRY = "set_country";
 export const SAY_THANKS = "say_thanks";
-
+export const FOUND_YGID = "found_ygid";
 // Actions
 export const setLanguage = language => ({ type: SET_LANGUAGE, language });
 export const setCountry = country => ({ type: SET_COUNTRY, country });

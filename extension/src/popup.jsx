@@ -14,7 +14,8 @@ import {
   terms,
   thanks,
   language,
-  ratings_count
+  ratings_count,
+  ygid
 } from "reducers.js";
 import { Dispatcher } from "./components/dispatcher.jsx";
 // styles
@@ -28,7 +29,8 @@ const reducer = combineReducers({
   terms,
   thanks,
   language,
-  ratings_count
+  ratings_count,
+  ygid
 });
 
 let middleware = [thunkMiddleware];

@@ -4,7 +4,8 @@ import {
   TOGGLE_TAB,
   UPDATE_RATING,
   SET_LANGUAGE,
-  SET_COUNTRY
+  SET_COUNTRY,
+  FOUND_YGID
 } from "actions.js";
 import { ToggleType } from "constants.js";
 import { getBrowserLocale } from "i18n.js";
@@ -46,6 +47,15 @@ export const terms = (state = false, action) => {
   switch (action.type) {
     case ACCEPT_TERMS:
       return true;
+    default:
+      return state;
+  }
+};
+
+export const ygid = (state = null, action) => {
+  switch (action.type) {
+    case FOUND_YGID:
+      return action.value;
     default:
       return state;
   }
