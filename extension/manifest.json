@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "__MSG_name__",
-  "short_name": "__MSG_short_name__",
-  "description": "__MSG_description__",
+  "name": "Facebook Political Ad Collector for YouGov Panel Participants",
+  "short_name": "Facebook PAC",
+  "description": "This extension collects ads on Facebook and is only for panel participants.",
   "version": "1.7.0",
   "default_locale": "en",
   "permissions": [
@@ -17,7 +17,7 @@
   },
   "browser_action": {
     "default_icon": "assets/icon128.png",
-    "default_title": "__MSG_name__",
+    "default_title": "Facebook Political Ad Collector for YouGov Panel Participants",
     "default_popup": "index.html"
   },
   "content_scripts": [
