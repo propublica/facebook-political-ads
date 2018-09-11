@@ -178,7 +178,7 @@ body {
 
 #tabs {
   background-color: #fff;
-  position: sticky;
+  position: fixed;
   width: 100%;
   display: flex;
   top: 0;
@@ -187,6 +187,7 @@ body {
 
 #container {
   min-height: 1000px;
+  margin-top: 38.2px; /* matches height of #tabs, which I switched from sticky to fixed befcause of a bug. */
   overflow-y: scroll;
 }
 
