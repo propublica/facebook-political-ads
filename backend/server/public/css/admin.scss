@@ -357,6 +357,12 @@ p {
     line-spacing: 1.2em;
     margin-top: 1.3em;
   }
+
+  ol {
+    list-style-type: lower-alpha;
+    margin-left: 0;
+    padding-left: 20px;
+  }
 }
 
 #statesAndDistricts {
