@@ -40,7 +40,10 @@ const AdminHelp = () => (
         <li>target that state specifically</li>
       </ol>
       You can also find just ads by candidates in a given party, or in a given
-      state. You can also see ads from candidates in a specific races.
+      state. You can also see ads from candidates in a specific races. You can
+      see the list of candidates we know about{" "}
+      <a href="/fbpac-api/candidates">here</a>; you can edit them, delete or add
+      new ones there too. Email Jeremy if you want to add a bunch.
     </p>
 
     <p>
