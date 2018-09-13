@@ -10,7 +10,8 @@ import {
   throttledDispatchAny,
   clearAllFilters,
   filterByByState,
-  getAdsByState
+  getAdsByState,
+  setPage
 } from "actions.js";
 import { deserialize } from "utils.js";
 import Range from "rc-slider/lib/Range";
@@ -22,6 +23,14 @@ export class AdsUnconnected extends React.Component {
       // `match` is from React Router -- it's the bit of the URL that matches.
       by_state = this.props.match.params.state;
     }
+    if (by_state) {
+      const params = new URLSearchParams(location.search);
+      this.methodForPagination = () =>
+        this.props.getAdsByState(by_state, parseInt(params.get("page"), 10));
+    } else {
+      this.methodForPagination = () => this.props.deserialize(); // gets params from the URL, dispatches actions.
+    }
+
     if (by_state) {
       this.props.getAdsByState(by_state);
     } else {
@@ -119,7 +128,11 @@ export class AdsUnconnected extends React.Component {
           />
         </div>
 
-        {this.props.pagination ? <Pagination /> : ""}
+        {this.props.pagination ? (
+          <Pagination methodForPagination={this.methodForPagination} />
+        ) : (
+          ""
+        )}
         {this.props.ads.length > 0 ? (
           this.props.ads.map(ad => (
             <Ad
@@ -131,7 +144,11 @@ export class AdsUnconnected extends React.Component {
         ) : (
           <div>No ads found (or they&apos;re still loading).</div>
         )}
-        {this.props.pagination ? <Pagination /> : ""}
+        {this.props.pagination ? (
+          <Pagination methodForPagination={this.methodForPagination} />
+        ) : (
+          ""
+        )}
       </div>
     );
   }
@@ -167,7 +184,8 @@ export const AdsUnrouted = connect(
       deserialize(dispatch);
       dispatch(getAds());
     },
-    getAdsByState: by_state => {
+    getAdsByState: (by_state, page) => {
+      if (page) dispatch(setPage(page));
       dispatch(filterByByState(by_state));
       dispatch(getAdsByState());
     },

@@ -107,10 +107,10 @@ const asyncResetPage = action => {
   };
 };
 
-const async = action => {
+const async = (action, cb) => {
   return (dispatch, getState) => {
     dispatch(action);
-    return getAds()(dispatch, getState);
+    return cb ? cb(dispatch, getState) : getAds()(dispatch, getState);
   };
 };
 export const fetchSearch = query => asyncResetPage(newSearch(query));
@@ -198,11 +198,11 @@ export const PREV_PAGE = "prev_page";
 export const SET_PAGE = "set_page";
 export const SET_TOTAL = "set_total";
 export const nextPage = () => ({ type: NEXT_PAGE });
-export const fetchNextPage = () => async(nextPage());
+export const fetchNextPage = cb => async(nextPage(), cb);
 export const prevPage = () => ({ type: PREV_PAGE });
-export const fetchPrevPage = () => async(prevPage());
+export const fetchPrevPage = cb => async(prevPage(), cb);
 export const setPage = page => ({ type: SET_PAGE, value: page });
-export const fetchPage = page => async(setPage(page));
+export const fetchPage = (page, cb) => async(setPage(page), cb);
 export const setTotal = total => ({ type: SET_TOTAL, value: total });
 
 // export const SET_BY_STATE = "set_by_state";
@@ -334,8 +334,24 @@ export const getAdsByState = (url = `${URL_ROOT}/fbpac-api/ads/by_state`) => {
 
     let params = new URLSearchParams();
     url = `${URL_ROOT}/fbpac-api/ads/by_state`;
-    params.set("state", state.by_state);
 
+    if (state.pagination && state.pagination.page) {
+      params.set("page", state.pagination.page);
+    }
+
+    let query = params.toString().length > 0 ? `?${params.toString()}` : "";
+    let new_url = `${location.pathname}${query}`;
+    if (location.search !== query) {
+      // this history.push is just for when the state got changed  via dropdowns/searches
+      // and then we got ads back
+      // and then we changed the URL to match
+      // we skip the history.push if location.search === query
+      // which is true when we got here via a <Link>
+      // mutating history OUTSIDE of react-router gets things very confused and you end up with dumb URLs.
+      history.push({ search: query }, "", new_url);
+    }
+
+    params.set("state", state.by_state); // this is after the history.push because we have states not in the search params but in the path.
     let path = `${url}?${params.toString()}`;
 
     return fetch(path, { method: "GET", credentials: "include" })
