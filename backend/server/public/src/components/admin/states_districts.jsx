@@ -22,6 +22,11 @@ export class StatesAndDistrictsUnrouted extends React.Component {
   render() {
     return (
       <div id="statesAndDistricts">
+        <p>
+          You can see the list of candidates we know about{" "}
+          <a href="/fbpac-api/candidates">here</a>; you can edit them, delete or{" "}
+          add add new ones there too. Email Jeremy if you want to add a bunch.{" "}
+        </p>
         <h1>Party</h1>
         <div id="parties" className="breakdown">
           <div key="dem" className="state">
