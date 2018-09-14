@@ -28,7 +28,9 @@ export class AdsUnconnected extends React.Component {
       this.methodForPagination = () =>
         this.props.getAdsByState(by_state, parseInt(params.get("page"), 10));
     } else {
-      this.methodForPagination = () => this.props.deserialize(); // gets params from the URL, dispatches actions.
+      // this breaks paging, so it's commented out. What was it ever for?
+      // it braeks by pulling the page number from the URL, so it never changes the page number.
+      // this.methodForPagination = () => this.props.deserialize(); // gets params from the URL, dispatches actions.
     }
 
     if (by_state) {
