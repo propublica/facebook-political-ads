@@ -4,28 +4,18 @@ import { Thanks } from "components/thanks.jsx";
 import { Onboarding } from "components/onboarding.jsx";
 import { acceptTerms, newAds } from "actions.js";
 import { getAds } from "utils.js";
-import { Yougov } from "components/yougov.jsx";
 
-export const DispatcherUnconnected = ({
-  terms,
-  language,
-  onAcceptClick,
-  ygid
-}) => {
+export const DispatcherUnconnected = ({ terms, language, onAcceptClick }) => {
   return (
     <div
       id="popup"
       lang={language.language}
       data-locale={`${language.language}_${language.country}`}
     >
-      {ygid ? (
-        terms ? (
+      {terms ? (
           <Thanks />
-        ) : (
-          <Onboarding onAcceptClick={onAcceptClick(language)} />
-        )
       ) : (
-        <Yougov />
+          <Onboarding onAcceptClick={onAcceptClick(language)} />
       )}
     </div>
   );

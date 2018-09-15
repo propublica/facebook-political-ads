@@ -1,10 +1,12 @@
 import React from "react";
 import { withI18n } from "i18n.js";
 import { Language } from "components/language.jsx";
+import { Yougov } from "components/yougov.jsx";
 
 export const Onboarding = withI18n(({ getMessage, onAcceptClick }) => (
   <div id="tos">
     <div id="main">
+      <Yougov />
       <Language />
       <div
         id="terms"

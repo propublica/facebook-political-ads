@@ -56,7 +56,13 @@ setTimeout(
 
 // connect to the ratings channel
 chrome.runtime.onMessage.addListener(ads => store.dispatch(newRatings(ads)));
-store.subscribe(() => updateBadge(store.getState().ratings || []));
+store.subscribe(() =>
+  updateBadge(
+    store.getState().ratings || [],
+    store.getState().ygid,
+    store.getState().terms
+  )
+);
 
 // Refresh our ads by first filtering out ones the user has seen, and then merging like with
 // ratings.

@@ -58,7 +58,14 @@ export const mergeAds = (ads, newAds) => {
   return sortBy(idSort, a => a.rating === "political").slice(0, 100);
 };
 
-export const updateBadge = ratings => {
+export const updateBadge = (ratings, ygid, terms) => {
+  if (!ygid || !terms) {
+    chrome.browserAction.setBadgeText({ text: "!" });
+    chrome.browserAction.setBadgeBackgroundColor({ color: "#ff0000" });
+    return;
+  }
+  chrome.browserAction.setBadgeBackgroundColor({ color: "#0099E6" });
+
   const num = ratings.filter(rating => !("rating" in rating)).length;
   if (num > 0) {
     chrome.browserAction.setBadgeText({ text: num > 100 ? "100+" : "" + num });

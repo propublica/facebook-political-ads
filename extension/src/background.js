@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener(({ type, ads, ygid }) => {
       store.ratings.map(ad => saved.add(ad.id));
       store.ratings = mergeAds(store.ratings || [], ads);
       localStorage.setItem("redux", JSON.stringify(store));
-      updateBadge(store.ratings);
+      updateBadge(store.ratings, store.ygid, store.terms);
       const saving = ads
         .filter(ad => !saved.has(ad.id))
         .map(adForRequest)
@@ -37,7 +37,7 @@ chrome.runtime.onMessage.addListener(({ type, ads, ygid }) => {
     const store = JSON.parse(localStorage.getItem("redux")) || {};
     store.ygid = ygid;
     localStorage.setItem("redux", JSON.stringify(store));
-    updateBadgeForYougovId(store);
+    updateBadge(store.ratings || [], store.ygid, store.terms);
   } else {
     console.log("got unknown msg of type ", type);
   }
@@ -52,17 +52,7 @@ chrome.tabs.query({ url: "*://*.yougov.com/*" }, yg_tabs => {
   });
 });
 
-function updateBadgeForYougovId(store) {
-  if (store && store.ygid && store.terms) {
-    chrome.browserAction.setBadgeText({ text: "" });
-    chrome.browserAction.setBadgeBackgroundColor({ color: "#0099E6" });
-  } else {
-    chrome.browserAction.setBadgeText({ text: "!" });
-    chrome.browserAction.setBadgeBackgroundColor({ color: "#ff0000" });
-  }
-}
-
 setTimeout(() => {
-  let store = JSON.parse(localStorage.getItem("redux"));
-  updateBadgeForYougovId(store);
+  let store = JSON.parse(localStorage.getItem("redux")) || {};
+  updateBadge(store.ratings || [], store.ygid, store.terms);
 }, 10);
