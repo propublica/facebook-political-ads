@@ -388,6 +388,18 @@ b.political {
   margin: 0.4rem 0;
 }
 
+#yougov-alert {
+  padding: 10px;
+  background-color: white;
+  border-bottom: 2px solid black;
+}
+
+#ygidbar {
+  padding: 5px;
+  background-color: whitesmoke;
+  border-bottom: 2px solid black;
+}
+
 /* -----------------------------------------------------------------------------
 /* FACEBOOK AD STYLES
 /* -----------------------------------------------------------------------------*/

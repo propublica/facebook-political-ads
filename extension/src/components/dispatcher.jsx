@@ -4,6 +4,7 @@ import { Thanks } from "components/thanks.jsx";
 import { Onboarding } from "components/onboarding.jsx";
 import { acceptTerms, newAds } from "actions.js";
 import { getAds } from "utils.js";
+import { Yougov } from "components/yougov.jsx";
 
 export const DispatcherUnconnected = ({
   terms,
@@ -17,14 +18,14 @@ export const DispatcherUnconnected = ({
       lang={language.language}
       data-locale={`${language.language}_${language.country}`}
     >
-      {terms ? (
-        ygid ? (
+      {ygid ? (
+        terms ? (
           <Thanks />
         ) : (
-          <div>You need to go to the YouGov page so we can get your ID!</div>
+          <Onboarding onAcceptClick={onAcceptClick(language)} />
         )
       ) : (
-        <Onboarding onAcceptClick={onAcceptClick(language)} />
+        <Yougov />
       )}
     </div>
   );
