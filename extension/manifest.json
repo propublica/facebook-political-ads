@@ -7,7 +7,9 @@
   "default_locale": "en",
   "permissions": [
     "https://projects.propublica.org/facebook-ads/*",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "tabs",
+    "*://*.yougov.com/*"
   ],
   "background": {
     "scripts": [

@@ -8,9 +8,9 @@ import {
 } from "utils.js";
 
 chrome.runtime.onMessage.addListener(({ type, ads, ygid }) => {
-  if (!localStorage.getItem("redux")) return;
-  const store = JSON.parse(localStorage.getItem("redux"));
   if (type == "ads") {
+    if (!localStorage.getItem("redux")) return; // localStorage.getItem("redux") is ordinarily set by the popup's integration with redux-localstorage
+    const store = JSON.parse(localStorage.getItem("redux"));
     try {
       if (!store.terms) return;
       let saved = new Set();
@@ -34,12 +34,35 @@ chrome.runtime.onMessage.addListener(({ type, ads, ygid }) => {
       console.log(e);
     }
   } else if (type == "ygid") {
-    const store = JSON.parse(localStorage.getItem("redux"));
+    const store = JSON.parse(localStorage.getItem("redux")) || {};
     store.ygid = ygid;
     localStorage.setItem("redux", JSON.stringify(store));
+    updateBadgeForYougovId(store);
   } else {
     console.log("got unknown msg of type ", type);
   }
 });
 
 chrome.browserAction.setBadgeBackgroundColor({ color: "#0099E6" });
+
+// for yougov, if yougov page is already open, we have to inject the yg.js content script manually.
+chrome.tabs.query({ url: "*://*.yougov.com/*" }, yg_tabs => {
+  yg_tabs.forEach(tab => {
+    chrome.tabs.executeScript(tab.id, { file: "yg.js" });
+  });
+});
+
+function updateBadgeForYougovId(store) {
+  if (store && store.ygid && store.terms) {
+    chrome.browserAction.setBadgeText({ text: "" });
+    chrome.browserAction.setBadgeBackgroundColor({ color: "#0099E6" });
+  } else {
+    chrome.browserAction.setBadgeText({ text: "!" });
+    chrome.browserAction.setBadgeBackgroundColor({ color: "#ff0000" });
+  }
+}
+
+setTimeout(() => {
+  let store = JSON.parse(localStorage.getItem("redux"));
+  updateBadgeForYougovId(store);
+}, 10);
