@@ -399,6 +399,7 @@ b.political {
   font-size: 12px;
   background-color: whitesmoke;
   border-bottom: 2px solid black;
+  text-align: center;
 }
 
 /* -----------------------------------------------------------------------------
