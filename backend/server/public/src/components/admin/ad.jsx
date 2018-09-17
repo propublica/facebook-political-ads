@@ -39,12 +39,12 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
         <tr>
           <td>parsed targets</td>
           <td>
-            {ad.targets
+            {ad.targets.length > 0
               ? ad.targets
                 .map(
                     ({ target, segment }) =>
                       segment ? (
-                        <span>
+                        <span key={`${target}${segment}`}>
                           <a
                             href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
                         >
@@ -58,6 +58,7 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
                         </span>
                       ) : (
                         <a
+                        key={target}
                           href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
                       >
                           {target}
