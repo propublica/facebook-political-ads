@@ -10,7 +10,9 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
         <tr>
           <td>id</td>
           <td>
-            <Link to={`/facebook-ads/admin/ads/${ad.id}`}>{ad.id}</Link> ({ad.lang})
+            <Link to={`/facebook-ads/admin/ads/${ad.id}`}>{ad.id}</Link> ({
+              ad.lang
+            })
           </td>
         </tr>
         <tr>
@@ -39,11 +41,30 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>
             {ad.targets
               ? ad.targets
-                  .map(
+                .map(
                     ({ target, segment }) =>
-                      segment ? `${target}: ${segment}` : target
+                      segment ? (
+                        <span>
+                          <a
+                            href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
+                        >
+                            {target}
+                          </a>:{" "}
+                          <a
+                            href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%2C%22segment%22%3A%22${segment}%22%7D%5D`}
+                          >
+                            {segment}
+                          </a>
+                        </span>
+                      ) : (
+                        <a
+                          href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
+                      >
+                          {target}
+                        </a>
+                      )
                   )
-                  .join(", ")
+                .reduce((prev, curr) => [prev, ", ", curr])
               : "NONE"}
           </td>
         </tr>
@@ -64,14 +85,22 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
 
         {ad.lang == "en-US" ? (
           <tr>
-            <td>Facebook database link</td>
+            <td>More ads by this advertiser</td>
             <td>
               <a
                 href={`https://www.facebook.com/politicalcontentads/?active_status=all&q=${
                   ad.advertiser
                 }`}
               >
-                {ad.advertiser}
+                Facebook Political Ad Archive for {ad.advertiser}
+              </a>{" "}
+              |{" "}
+              <a
+                href={`/facebook-ads/admin?advertisers=%5B%22${
+                  ad.advertiser
+                }%22%5D`}
+              >
+                FBPAC ads by {ad.advertiser}
               </a>
             </td>
           </tr>
