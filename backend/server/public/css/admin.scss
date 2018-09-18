@@ -366,19 +366,45 @@ p {
 }
 
 #statesAndDistricts {
-  #states {
+
+  h1 {
+    font-size: 1.5em;
+    margin-top: 0.7em;
+  }
+
+  table#states {
     width: 100%;
-    .state {
-      float: left;
-      margin: 20px 10px;
-      font-size: 18px;
+
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid black;
+
+    td, th {
+      border: 1px solid black;
+      text-align: center;
+
+      a {
+        margin: 3px;
+      }
     }
   }
-  h1 {
-    font-weight: bold;
-    clear: both;
-  }
-  li {
-    margin-left: 1em;
-  }
+
+  // #states {
+  //   width: 100%;
+
+  
+  //   .state {
+  //     float: left;
+  //     margin: 20px 10px;
+  //     font-size: 18px;
+  //   }
+  // }
+  // h1 {
+  //   font-weight: bold;
+  //   clear: both;
+  // }
+  // li {
+  //   margin-left: 1em;
+  // }
 }
