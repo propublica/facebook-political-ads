@@ -95,6 +95,12 @@ impl Service for AdServer {
             (&Method::Get, "/facebook-ads/admin/styles.css") => {
                 Either::B(self.file("public/dist/admin.css", ContentType(mime::TEXT_CSS)))
             }
+            (&Method::Get, "/facebook-ads/images/share-fb.png") => {
+                Either::B(self.file_bytes("public/images/share-fb.png", ContentType(mime::IMAGE_PNG)))
+            }
+            (&Method::Get, "/facebook-ads/images/share-twitter.png") => {
+                Either::B(self.file_bytes("public/images/share-twitter.png", ContentType(mime::IMAGE_PNG)))
+            }
             (&Method::Post, "/facebook-ads/admin/ads") => {
                 Either::B(self.auth(req, |request| self.mark(request)))
             }
@@ -284,6 +290,25 @@ impl AdServer {
             bad
         }
     }
+
+    fn file_bytes(&self, path: &str, content_type: ContentType) -> ResponseFuture {
+        let pool = self.pool.clone();
+        let path = path.to_string();
+        let future = pool.spawn_fn(move || {
+            if let Ok(mut file) = File::open(path) {
+                let mut buf = Vec::new();
+                if let Ok(size) = file.read_to_end(&mut buf) {
+                    return Ok(Response::new()
+                        .with_header(ContentLength(size as u64))
+                        .with_header(content_type)
+                        .with_body(buf));
+                }
+            }
+            Ok(Response::new().with_status(StatusCode::NotFound))
+        });
+        Box::new(future)
+    }
+
 
     // Responders
     fn file(&self, path: &str, content_type: ContentType) -> ResponseFuture {
