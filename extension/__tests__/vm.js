@@ -40,7 +40,7 @@ Object.assign(global.window, { require: () => () => {} });
 class XMLHttpRequest {
   constructor() {
     this.response =
-      "for (;;);{\"jsmods\":{\"markup\":[[\"\",{\"__html\":\"targeting\"}]]}}";
+      'for (;;);{"jsmods":{"markup":[["",{"__html":"targeting"}]]}}';
   }
   open() {}
   send() {
@@ -62,6 +62,7 @@ export class FacebookVM {
        ${readFileSync(__dirname + "/fixtures/timeline.html")}
        ${readFileSync(__dirname + "/fixtures/paid-for-timeline-ad.html")}
        ${readFileSync(__dirname + "/fixtures/lkw-timeline-ad.html")}
+       ${readFileSync(__dirname + "/fixtures/sidebar-ad.html")}
       </body>
     </html>
     `;

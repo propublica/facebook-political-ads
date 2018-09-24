@@ -250,23 +250,35 @@ export class Parser extends StateMachine {
   // Similar to the above -- while we could just use the data-ego-fbid from before, it makes sense
   // to use the one in the encoded url in case that the dom one goes away.
   sidebarId() {
-    const control = this.parent.querySelector(".uiSelector");
+    const control = this.node.querySelector(".uiSelector");
     if (!control) return this.promote(states.ERROR, errors.NO_TOGGLE);
     // Since the sidebar DOM structure is slightly different we need to pull out
     // the toggle Id from the data-gt attribute.
     const toggle = control.querySelector("a");
     if (!toggle) return this.promote(states.ERROR, errors.NO_TOGGLE);
 
-    const toggleData = JSON.parse(toggle.getAttribute("data-gt"));
-    if (!toggleData["data_to_log"])
-      return this.promote(states.ERROR, errors.NO_TOGGLE);
+    // Twitter ad IDs are too big to store as JavaScript integers
+    //   const toggleData = JSON.parse(toggle.getAttribute("data-gt"));
+    //   if (!toggleData["data_to_log"])
+    //     return this.promote(states.ERROR, errors.NO_TOGGLE);
+    //   const toggleId = toggleData["data_to_log"]["ad_id"];
+    // what's below is the same as above, but via string manipulation
+    // so the integer doesn't get truncated.
+    const ad_id_start =
+      toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") > -1
+        ? toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") + 18
+        : toggle.getAttribute("data-gt").indexOf("\"ad_id\":") + 8;
+    const toggleIdPlus = toggle.getAttribute("data-gt").slice(ad_id_start);
+    const ad_id_end = Math.min(
+      toggleIdPlus.indexOf(","),
+      toggleIdPlus.indexOf("}")
+    );
 
-    const toggleId = toggleData["data_to_log"]["ad_id"];
-    this.toggleId = toggleId;
-    if (!toggleId) return this.promote(states.ERROR, errors.NO_TOGGLE);
+    this.toggleId = toggleIdPlus.slice(0, ad_id_end);
+    if (!this.toggleId) return this.promote(states.ERROR, errors.NO_TOGGLE);
 
-    if (adCache.has(toggleId)) return this.promote(states.CACHED);
-    this.idFinder = new SidebarFinder(toggleId, toggle, control);
+    if (adCache.has(this.toggleId)) return this.promote(states.CACHED);
+    this.idFinder = new SidebarFinder(this.toggleId, toggle, control);
     this.promote(states.MENU);
   }
 
@@ -477,7 +489,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  'a[href=""]',
+  "a[href=\"\"]",
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -599,7 +611,7 @@ export const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    'localStorage.setItem("pageVariable", (' +
+    "localStorage.setItem(\"pageVariable\", (" +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
