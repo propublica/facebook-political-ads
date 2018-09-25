@@ -22,6 +22,11 @@ export class StatesAndDistrictsUnrouted extends React.Component {
   render() {
     return (
       <div id="statesAndDistricts">
+        <p>
+          You can see the list of candidates we know about{" "}
+          <a href="/fbpac-api/candidates">here</a>; you can edit them, delete or{" "}
+          add add new ones there too. Email Jeremy if you want to add a bunch.{" "}
+        </p>
         <h1>Party</h1>
         <div id="parties" className="breakdown">
           <div key="dem" className="state">
@@ -36,115 +41,75 @@ export class StatesAndDistrictsUnrouted extends React.Component {
           </div>
         </div>
 
-        <h1>Ads Targeting A State Or Mentioning a Candidate</h1>
-        <div id="states" className="breakdown">
-          {this.props.statesAndDistricts.states ? (
-            this.props.statesAndDistricts.states.map(state => (
-              <div key={state.abbrev} className="state">
-                <Link to={`/facebook-ads/admin/by_state/${state.abbrev}`}>
-                  {state.abbrev}
-                </Link>
-              </div>
-            ))
-          ) : (
-            <div>
-              <h2>Loading...</h2>
-            </div>
-          )}
-        </div>
+        <h1>Ads by State and Race</h1>
 
-        <h1>Candidate Ads By State</h1>
-        <div id="states" className="breakdown">
-          {this.props.statesAndDistricts.states ? (
-            this.props.statesAndDistricts.states.map(state => (
-              <div key={state.abbrev} className="state">
-                <Link to={`/facebook-ads/admin/ads?states=${state.abbrev}`}>
-                  {state.abbrev}
-                </Link>
-              </div>
-            ))
-          ) : (
-            <div>
-              <h2>Loading...</h2>
-            </div>
-          )}
-        </div>
-
-        <h1>House Districts</h1>
-        <div id="districts" className="breakdown">
-          {this.props.statesAndDistricts.districts ? (
-            Object.entries(this.props.statesAndDistricts.districts)
-              .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
-              .map(state_districts => (
-                <div key={state_districts[0]} className="districts">
-                  <h3>{state_districts[0]}</h3>
-                  <ul>
-                    {state_districts[1]
-                      .filter(({ office }) => office === "H")
-                      .sort(
-                        (a, b) =>
-                          a["name"] < b["name"]
-                            ? -1
-                            : a["name"] > b["name"] ? 1 : 0
-                      )
-                      .map(district => (
-                        <li key={district.id}>
-                          <Link
-                            to={`/facebook-ads/admin/ads?districts=${
-                              district["state"]
-                            }-${district["name"]}`}
-                          >
-                            {district["state"]}-{district["name"]}
-                          </Link>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
+        <table id="states">
+          <thead>
+            <tr>
+              <th>State</th>
+              <th>Ads Targeting A State Or Mentioning a Candidate</th>
+              <th>Ads Bought by Candidates</th>
+              <th>Ads in Specific Races</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.props.statesAndDistricts.states ? (
+              this.props.statesAndDistricts.states.map(state => (
+                <tr key={state.abbrev} className="state">
+                  <th>{state.name}</th>
+                  <td>
+                    <Link to={`/facebook-ads/admin/by_state/${state.abbrev}`}>
+                      {state.abbrev}
+                    </Link>
+                  </td>
+                  <td>
+                    <Link to={`/facebook-ads/admin/ads?states=${state.abbrev}`}>
+                      {state.abbrev}
+                    </Link>
+                  </td>
+                  <td>
+                    {this.props.statesAndDistricts.districts &&
+                    this.props.statesAndDistricts.districts[state.abbrev] ? (
+                      this.props.statesAndDistricts.districts[state.abbrev]
+                        .concat(
+                          this.props.statesAndDistricts.state_races[
+                            state.abbrev
+                          ] || []
+                        )
+                          .sort(
+                          (a, b) =>
+                            a["name"] < b["name"]
+                              ? -1
+                              : a["name"] > b["name"] ? 1 : 0
+                        )
+                        .map(district => (
+                            <span key={district.id}>
+                            {" "}
+                            <Link
+                                to={`/facebook-ads/admin/ads?districts=${
+                                district["state"]
+                              }-${district["name"]}`}
+                            >
+                              {district.office == "H"
+                                ? `${district["state"]}-${district["name"] ||
+                                    "at large"}`
+                                : district["name"]}
+                            </Link>{" "}
+                            </span>
+                        ))
+                    ) : (
+                        <span>(none)</span>
+                    )}
+                  </td>
+                </tr>
               ))
-          ) : (
-            <div>
-              <h2>Loading...</h2>
-            </div>
-          )}
-        </div>
-
-        <h1>State Races</h1>
-        <div id="state_races" className="breakdown">
-          {this.props.statesAndDistricts.state_races ? (
-            Object.entries(this.props.statesAndDistricts.state_races)
-              .sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0))
-              .map(state_districts => (
-                <div key={state_districts[0]} className="districts">
-                  <h3>{state_districts[0]}</h3>
-                  <ul>
-                    {state_districts[1]
-                      .filter(({ office }) => office !== "H")
-                      .sort(
-                        (a, b) =>
-                          a["name"] < b["name"]
-                            ? -1
-                            : a["name"] > b["name"] ? 1 : 0
-                      )
-                      .map(district => (
-                        <li key={district.id}>
-                          <Link
-                            to={`/facebook-ads/admin/ads?districts=${
-                              district["state"]
-                            }-${district["name"]}`}
-                          >
-                            {district["state"]} {district["name"]}
-                          </Link>
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              ))
-          ) : (
-            <div>
-              <h2>Loading...</h2>
-            </div>
-          )}
-        </div>
+            ) : (
+              <tr>
+                <td>Loading...</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     );
   }

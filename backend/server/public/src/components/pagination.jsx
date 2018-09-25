@@ -3,12 +3,19 @@ import { connect } from "react-redux";
 import { range } from "lodash";
 import { fetchPrevPage, fetchNextPage, fetchPage } from "actions.js";
 
-export const PaginationUnconnected = ({ page, prev, next, set, total }) => (
+export const PaginationUnconnected = ({
+  page,
+  prev,
+  next,
+  set,
+  total,
+  methodForPagination
+}) => (
   <nav className="pagination">
     <ul>
       {page > 0 ? (
         <li>
-          <a href="" onClick={prev}>
+          <a href="" onClick={e => prev(e, methodForPagination)}>
             ←
           </a>
         </li>
@@ -22,7 +29,7 @@ export const PaginationUnconnected = ({ page, prev, next, set, total }) => (
           </li>
         ) : (
           <li key={i}>
-            <a href="" onClick={e => set(e, i)}>
+            <a href="" onClick={e => set(e, i, methodForPagination)}>
               {i + 1}
             </a>
           </li>
@@ -30,7 +37,7 @@ export const PaginationUnconnected = ({ page, prev, next, set, total }) => (
       })}
       {page + 1 < total ? (
         <li>
-          <a href="" onClick={next}>
+          <a href="" onClick={e => next(e, methodForPagination)}>
             →
           </a>
         </li>
@@ -43,17 +50,17 @@ export const PaginationUnconnected = ({ page, prev, next, set, total }) => (
 const Pagination = connect(
   ({ pagination }) => pagination,
   dispatch => ({
-    prev: e => {
+    prev: (e, methodForPagination) => {
       e.preventDefault();
-      dispatch(fetchPrevPage());
+      dispatch(fetchPrevPage(methodForPagination));
     },
-    next: e => {
+    next: (e, methodForPagination) => {
       e.preventDefault();
-      dispatch(fetchNextPage());
+      dispatch(fetchNextPage(methodForPagination));
     },
-    set: (e, i) => {
+    set: (e, i, methodForPagination) => {
       e.preventDefault();
-      dispatch(fetchPage(i));
+      dispatch(fetchPage(i, methodForPagination));
     }
   })
 )(PaginationUnconnected);

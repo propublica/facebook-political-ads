@@ -193,4 +193,78 @@ describe("parser", () => {
     expect(res.targeting).toEqual("targeting");
     vm.detach();
   });
+
+  it("should find and collect a sidebar ad", async () => {
+    const resolve = jest.fn();
+    const reject = jest.fn();
+    const vm = new FacebookVM();
+    const ad = document.querySelector("#u_ps_jsonp_12_7_0");
+    const parse = new Parser(ad, resolve, reject);
+    parse.tick();
+    expect(parse.state).toEqual(states.SIDEBAR);
+    parse.tick();
+    expect(parse.state).toEqual(states.SIDEBAR_ID);
+    parse.tick();
+    expect(parse.state).toEqual(states.MENU);
+    expect(parse.toggleId).toEqual("23843142413060458");
+    parse.tick();
+    expect(parse.idFinder.state).toEqual(states.MENU);
+    parse.tick();
+    expect(parse.state).toEqual(states.TARGETING);
+    parse.tick();
+    expect(parse.state).toEqual(states.DONE);
+    expect(parse.ad.id).toEqual("23843142413060458");
+    expect(parse.ad.targeting).toEqual("targeting");
+    parse.tick();
+    expect(parse.state).toEqual(states.DONE);
+    expect(resolve).toHaveBeenCalled();
+    expect(reject).not.toHaveBeenCalled();
+    expect(parse.states).toEqual([
+      states.SIDEBAR,
+      states.SIDEBAR_ID,
+      states.MENU,
+      [states.INITIAL, states.MENU, states.DONE],
+      states.TARGETING,
+      states.WAIT_TARGETING,
+      states.DONE
+    ]);
+    vm.detach();
+  });
+
+  it("should find and collect a second sidebar ad", async () => {
+    const resolve = jest.fn();
+    const reject = jest.fn();
+    const vm = new FacebookVM();
+    const ad = document.querySelector("#u_ps_jsonp_12_7_1");
+    const parse = new Parser(ad, resolve, reject);
+    parse.tick();
+    expect(parse.state).toEqual(states.SIDEBAR);
+    parse.tick();
+    expect(parse.state).toEqual(states.SIDEBAR_ID);
+    parse.tick();
+    expect(parse.state).toEqual(states.MENU);
+    expect(parse.toggleId).toEqual("23842851023170087");
+    parse.tick();
+    expect(parse.idFinder.state).toEqual(states.MENU);
+    parse.tick();
+    expect(parse.state).toEqual(states.TARGETING);
+    parse.tick();
+    expect(parse.state).toEqual(states.DONE);
+    expect(parse.ad.id).toEqual("23842851023170087");
+    expect(parse.ad.targeting).toEqual("targeting");
+    parse.tick();
+    expect(parse.state).toEqual(states.DONE);
+    expect(resolve).toHaveBeenCalled();
+    expect(reject).not.toHaveBeenCalled();
+    expect(parse.states).toEqual([
+      states.SIDEBAR,
+      states.SIDEBAR_ID,
+      states.MENU,
+      [states.INITIAL, states.MENU, states.DONE],
+      states.TARGETING,
+      states.WAIT_TARGETING,
+      states.DONE
+    ]);
+    vm.detach();
+  });
 });
