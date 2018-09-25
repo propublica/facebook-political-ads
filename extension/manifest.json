@@ -3,7 +3,7 @@
   "name": "Facebook Political Ad Collector (YouGov)",
   "short_name": "Facebook PAC",
   "description": "This extension collects ads on Facebook and is only for panel participants.",
-  "version": "1.7.0",
+  "version": "1.7.1",
   "default_locale": "en",
   "permissions": [
     "https://projects.propublica.org/facebook-ads/*",
@@ -42,5 +42,11 @@
         "*://*.yougov.com/*"
       ]
     }
-  ]
+  ],
+  "applications": {
+    "gecko": {
+      "id": "fbpac-yg@propublica.org",
+      "update_url": "https://pp-projects-static.s3.amazonaws.com/fbpac/updates.json"
+    }
+  } 
 }
