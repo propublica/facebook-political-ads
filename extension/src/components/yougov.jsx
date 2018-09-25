@@ -6,13 +6,14 @@ const YougovUnconnected = withI18n(
   ({ ygid }) =>
     ygid ? (
       <div id="ygidbar" style={{ padding: "3px" }}>
-        Connected to YouGov. ID: {ygid}. <a href="">Help</a>
+        Connected to YouGov. ID: {ygid}.{" "}
+        <a href="https://projects.propublica.org/facebook-ads/yghelp">Help</a>
       </div>
     ) : (
       <div id="yougov-alert">
-        You <span style={{ backgroundColor: "yellow" }}>need</span> to go to the
-        YouGov page so we can get your ID, so you get your incentive for
-        participation! You'll find the link in your email.
+        Please go to the YouGov page for this project. It will let our systems
+        pull in your ID to make sure you are compensated for your participation.
+        You'll find the link in your email.
       </div>
     )
 );
