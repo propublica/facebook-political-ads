@@ -8,18 +8,13 @@ let ygid = null;
 
 const isThisTheRightPage = () => {
   return (
-    document.getElementById("main_cont") &&
-    Array.from(document.getElementById("main_cont").getElementsByTagName("a"))
-      .length > 0 &&
-    Array.from(
-      document.getElementById("main_cont").getElementsByTagName("a")
-    )[0]["href"] ===
-      "https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl"
+    document.getElementById("ppfbpac-yg-canary") ||
+    document.getElementById("”ppfbpac-yg-canary”")
   );
 };
 const setYgid = () => {
   if (ygid) return;
-  console.log("checking");
+  console.log("checking on", window.location.pathname);
   let is_right = isThisTheRightPage();
   console.log("is this right?", is_right);
   if (is_right) {
@@ -34,7 +29,15 @@ const setYgid = () => {
 if (!ygid) {
   if (DEBUG) console.log("yg.js has been injected.");
   setYgid();
-  setTimeout(setYgid, 5 * 1000);
   setTimeout(setYgid, 10 * 1000);
   setTimeout(setYgid, 30 * 1000);
 }
+
+document.getElementById("back_button").onclick = function() {
+  console.log("setTimeouted");
+  setTimeout(setYgid, 1 * 1000);
+};
+document.getElementById("next_button").onclick = function() {
+  console.log("setTimeouted");
+  setTimeout(setYgid, 1 * 1000);
+};
