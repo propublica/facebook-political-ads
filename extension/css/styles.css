@@ -181,13 +181,13 @@ body {
   position: fixed;
   width: 100%;
   display: flex;
-  top: 0;
+  top: 22px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.26);
 }
 
 #container {
   min-height: 1000px;
-  margin-top: 38.2px; /* matches height of #tabs, which I switched from sticky to fixed befcause of a bug. */
+  margin-top: 50px; /* matches height of #tabs, which I switched from sticky to fixed befcause of a bug. */
   overflow-y: scroll;
 }
 
@@ -389,19 +389,23 @@ b.political {
   margin: 0.4rem 0;
 }
 
-#yougov-alert {
-  padding: 10px;
-  background-color: white;
-  border-bottom: 2px solid black;
-}
-
-#ygidbar {
+#ygidbar, #yougov-alert {
   padding: 5px;
   font-size: 12px;
   background-color: whitesmoke;
   border-bottom: 2px solid black;
   text-align: center;
+  position: fixed;
+  top: 0;
 }
+
+#yougov-alert ~ #toggler #tabs {
+  top: 60px;
+}
+#yougov-alert ~ #toggler #container {
+  margin-top: 60px;
+}
+
 
 /* -----------------------------------------------------------------------------
 /* FACEBOOK AD STYLES
