@@ -99,6 +99,10 @@ const serialize = state => {
     params.set("lang", state.lang);
   }
 
+  if (state.no_list_fund || true) {
+    params.set("no_list_fund", "1");
+  }
+
   if (state.show_old_search) {
     params.set("showOldSearch", "1");
   }

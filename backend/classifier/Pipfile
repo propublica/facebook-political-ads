@@ -17,4 +17,5 @@ click = "*"
 records = "*"
 spacy = "*"
 en-core-web-sm = {file = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz"}
-boto3 = "*"
+"boto3" = "*"
+"db46556" = {path = "/Users/jm-admin/code/fbpac-prodigy/packagedmodels/en_fbpac4label-2.0.0.tar.gz"}
