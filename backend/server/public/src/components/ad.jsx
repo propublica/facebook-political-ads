@@ -1,11 +1,15 @@
 import React from "react";
 import Targeting from "./targeting.jsx";
 import { Link } from "react-router-dom";
+import DOMPurify from "dompurify";
+
 const Ad = ({ ad }) =>
   ad ? (
     <div className="ad">
       <div className="message">
-        <div dangerouslySetInnerHTML={{ __html: ad.html }} />
+        <div
+          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ad.html) }}
+        />
       </div>
       <div className="ad-metadata">
         <Link className="permalink" to={`/facebook-ads/ad/${ad.id}`}>

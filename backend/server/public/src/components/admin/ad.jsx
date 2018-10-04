@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { suppressAd } from "actions.js";
 import { Link } from "react-router-dom";
+import DOMPurify from "dompurify";
 
 export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
   <div className="ad">
@@ -29,12 +30,16 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>ad</td>
           <td
             className="message"
-            dangerouslySetInnerHTML={{ __html: ad.html }}
+            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ad.html) }}
           />
         </tr>
         <tr>
           <td>targeting</td>
-          <td dangerouslySetInnerHTML={{ __html: ad.targeting }} />
+          <td
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(ad.targeting)
+            }}
+          />
         </tr>
         <tr>
           <td>parsed targets</td>
