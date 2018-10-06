@@ -202,6 +202,7 @@ body {
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   font-weight: normal;
+  min-width: 120px;
 }
 
 [lang="de"] .toggle {
@@ -387,6 +388,31 @@ b.political {
 
 #language p {
   margin: 0.4rem 0;
+}
+
+#stories {
+  background-color: white;
+  padding: 10px;
+  margin-top: 20px;
+  height: 100%;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#stories .precis, #stories .postcis{
+  font-size: 0.9rem;
+  margin: 10px 0;
+}
+
+#stories ul {
+  font-size: 0.9rem;
+  list-style-type: disc; 
+  list-style-position: outside; 
+  padding-left: 20px;
+}
+#stories ul li {
+
 }
 
 /* -----------------------------------------------------------------------------

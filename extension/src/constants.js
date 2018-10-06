@@ -1,7 +1,8 @@
 // Constants
 export const ToggleType = {
   ADS: "ads",
-  RATER: "rater"
+  RATER: "rater",
+  STORIES: "stories"
 };
 
 export const RatingType = {

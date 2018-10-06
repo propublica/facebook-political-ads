@@ -31,3 +31,14 @@ chrome.runtime.onMessage.addListener(ads => {
 });
 
 chrome.browserAction.setBadgeBackgroundColor({ color: "#0099E6" });
+
+// if the popup hasn't been opened yet
+// then do this stuff.
+// otherwise, just don't.
+
+function notifyAboutStories() {
+  chrome.browserAction.setBadgeText({ text: "♥" });
+  chrome.browserAction.setBadgeBackgroundColor({ color: "#f00" });
+}
+
+notifyAboutStories();
