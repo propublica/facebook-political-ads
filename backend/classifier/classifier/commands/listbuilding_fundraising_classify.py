@@ -8,6 +8,8 @@ from classifier.utilities import (classifier_path, get_vectorizer,
 
 import spacy
 
+# DATABASE_URL="postgres:///facebook_ads" pipenv run ./classify listbuilding_fundraising_classify --every
+
 @click.command("listbuilding_fundraising_classify")
 @click.option("--newest/--every",
               default=True,
@@ -19,19 +21,19 @@ def listbuilding_fundraising_classify(ctx, newest):
     """
     lang = "en-US" # hard coded
     try:
-        nlp = spacy.load('en_fbpac4label') # hard coded
+        nlp = spacy.load('en_fbpac3label') # hard coded
     except OSError as e: 
-        print("you need to do `pipenv install ~/code/fbpac-prodigy/packagedmodels/en_fbpac4label-2.0.0.tar.gz`")
+        print("you need to do `pipenv install ~/code/fbpac-prodigy/packagedmodels/en_fbpac3label-2.0.0.tar.gz`")
         raise e
 
     if newest:
         print("Running newest")
-        query = "select * from ads where political_probability > 0.70 and created_at > '2018-07-01 and listbuilding_fundraising_proba is null'"
+        query = "select * from ads where political_probability > 0.70 and created_at > '2018-08-01' and listbuilding_fundraising_proba is null"
         if lang:
             query = query + " and lang = '{}'".format(lang)
     else:
         print("Running every")
-        query = "select * from ads where political_probability > 0.70 and created_at > '2018-07-01'"
+        query = "select * from ads where political_probability > 0.70 and created_at > '2018-08-01'"
         if lang:
             query = query + " and lang = '{}'".format(lang)
 

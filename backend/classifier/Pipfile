@@ -19,3 +19,4 @@ spacy = "*"
 en-core-web-sm = {file = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-2.0.0/en_core_web_sm-2.0.0.tar.gz"}
 "boto3" = "*"
 "db46556" = {path = "/Users/jm-admin/code/fbpac-prodigy/packagedmodels/en_fbpac4label-2.0.0.tar.gz"}
+"0dc4f03" = {path = "/Users/jm-admin/code/fbpac-prodigy/packagedmodels/en_fbpac3label-2.0.0.tar.gz"}
