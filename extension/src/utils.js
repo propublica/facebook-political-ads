@@ -1,5 +1,5 @@
 import { sortBy } from "lodash";
-import { RatingType } from "constants.js";
+import { RatingType, MOST_RECENT_STORIES_UPDATE } from "constants.js";
 
 export const adForRequest = ad => ({
   id: ad.id,
@@ -56,12 +56,20 @@ export const mergeAds = (ads, newAds) => {
   return sortBy(idSort, a => a.rating === "political").slice(0, 100);
 };
 
-export const updateBadge = ratings => {
-  const num = ratings.filter(rating => !("rating" in rating)).length;
-  if (num > 0) {
-    chrome.browserAction.setBadgeText({ text: num > 100 ? "100+" : "" + num });
+export const updateBadge = (ratings, stories_seen) => {
+  if (!stories_seen || MOST_RECENT_STORIES_UPDATE > stories_seen) {
+    chrome.browserAction.setBadgeText({ text: "♥" });
+    chrome.browserAction.setBadgeBackgroundColor({ color: "#f00" });
   } else {
-    chrome.browserAction.setBadgeText({ text: "" });
+    const num = ratings.filter(rating => !("rating" in rating)).length;
+    chrome.browserAction.setBadgeBackgroundColor({ color: "#0099E6" });
+    if (num > 0) {
+      chrome.browserAction.setBadgeText({
+        text: num > 100 ? "100+" : "" + num
+      });
+    } else {
+      chrome.browserAction.setBadgeText({ text: "" });
+    }
   }
 };
 

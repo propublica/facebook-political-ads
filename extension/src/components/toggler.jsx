@@ -11,7 +11,7 @@ export const Toggle = withI18n(
   ({ getMessage, type, message, active, amount, dispatch }) => (
     <div
       className={"toggle" + (active === type ? " active" : "")}
-      onClick={() => dispatch(toggle(type))}
+      onClick={() => dispatch(toggle(type, active))}
     >
       {getMessage(message)}
       {amount ? <b>{100 > amount ? amount : "100+"}</b> : ""}
@@ -20,13 +20,7 @@ export const Toggle = withI18n(
 );
 
 // Our Main container.
-const TogglerUnconnected = ({
-  ads,
-  ratings,
-  active,
-  onToggleClick,
-  language
-}) => (
+const TogglerUnconnected = ({ ads, ratings, active, language }) => (
   <div id="toggler">
     <div id="tabs">
       <Toggle
@@ -41,7 +35,7 @@ const TogglerUnconnected = ({
         message="see_ads"
         type={ToggleType.ADS}
       />
-      {(language && language.language == "en-US") || true ? (
+      {(language && language.language === "en-US") || true ? (
         <Toggle
           amount={3}
           active={active}
@@ -53,7 +47,7 @@ const TogglerUnconnected = ({
     <div id="container">
       {active === ToggleType.ADS ? (
         <Ads ads={ads} />
-      ) : active == ToggleType.STORIES ? (
+      ) : active === ToggleType.STORIES ? (
         <Stories />
       ) : (
         <UnratedRatings ratings={ratings} />

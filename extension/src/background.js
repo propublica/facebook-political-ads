@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener(ads => {
     store.ratings.map(ad => saved.add(ad.id));
     store.ratings = mergeAds(store.ratings || [], ads);
     localStorage.setItem("redux", JSON.stringify(store));
-    updateBadge(store.ratings);
+    updateBadge(store.ratings, store.stories_seen);
     const saving = ads.filter(ad => !saved.has(ad.id)).map(adForRequest);
     const success = () => console.log("saved");
     const failure = e => console.log(e);
@@ -31,14 +31,3 @@ chrome.runtime.onMessage.addListener(ads => {
 });
 
 chrome.browserAction.setBadgeBackgroundColor({ color: "#0099E6" });
-
-// if the popup hasn't been opened yet
-// then do this stuff.
-// otherwise, just don't.
-
-function notifyAboutStories() {
-  chrome.browserAction.setBadgeText({ text: "♥" });
-  chrome.browserAction.setBadgeBackgroundColor({ color: "#f00" });
-}
-
-notifyAboutStories();

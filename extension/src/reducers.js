@@ -6,7 +6,7 @@ import {
   SET_LANGUAGE,
   SET_COUNTRY
 } from "actions.js";
-import { ToggleType } from "constants.js";
+import { ToggleType, MOST_RECENT_STORIES_UPDATE } from "constants.js";
 import { getBrowserLocale } from "i18n.js";
 import { mergeAds } from "utils.js";
 
@@ -15,6 +15,18 @@ export const active = (state = ToggleType.RATER, action) => {
   switch (action.type) {
     case TOGGLE_TAB:
       return action.value;
+    default:
+      return state;
+  }
+};
+
+export const stories_seen = (state = 0, action) => {
+  // if the user switches away from the Stories tab, then they've seen the stories so far.
+  switch (action.type) {
+    case TOGGLE_TAB:
+      return action.oldTab === ToggleType.STORIES
+        ? MOST_RECENT_STORIES_UPDATE
+        : state;
     default:
       return state;
   }
