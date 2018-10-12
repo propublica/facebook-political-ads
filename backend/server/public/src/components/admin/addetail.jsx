@@ -14,7 +14,10 @@ export class AdDetailUnconnected extends React.Component {
     }
   }
   componentDidUpdate() {
-    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+    Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span span"))
+      .concat(
+        Array.from(document.querySelectorAll(".clearfix._42ef ._5u5j span div"))
+      )
       .filter(t => t.textContent.length == 1)
       .forEach(t => t.remove());
   }
