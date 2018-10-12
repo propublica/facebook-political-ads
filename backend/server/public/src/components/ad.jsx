@@ -3,31 +3,62 @@ import Targeting from "./targeting.jsx";
 import { Link } from "react-router-dom";
 import DOMPurify from "dompurify";
 
-const Ad = ({ ad }) =>
-  ad ? (
-    <div className="ad">
-      <div className="message">
-        <div
-          dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(ad.html) }}
-        />
+export class Ad extends React.Component {
+  constructor(props) {
+    super(props);
+    this.adRef = React.createRef();
+  }
+  componentDidMount() {
+    if (!this.adRef || !this.adRef.current) return;
+    const link = this.adRef.current.querySelector(".see_more_link");
+    if (!link) return;
+    link.addEventListener("click", () => {
+      this.adRef.current.querySelector(".text_exposed_hide").style.display =
+        "none";
+      this.adRef.current.querySelector(".see_more_link").style.display = "none";
+      this.adRef.current.querySelector(".text_exposed_show").style.display =
+        "inline";
+    });
+  }
+
+  render() {
+    return this.props.ad ? (
+      <div className="ad" ref={this.adRef}>
+        <div className="message">
+          <div
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(this.props.ad.html)
+            }}
+          />
+        </div>
+        <div className="ad-metadata">
+          <Link
+            className="permalink"
+            to={`/facebook-ads/ad/${this.props.ad.id}`}
+          >
+            Permalink to this ad
+          </Link>
+          <p>
+            First seen:{" "}
+            <time dateTime="{this.props.ad.created_at}">
+              {new Date(
+                Date.parse(this.props.ad.created_at)
+              ).toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+              })}
+            </time>
+          </p>
+        </div>
+        {this.props.ad.targeting !== null ? (
+          <Targeting targeting={this.props.ad.targeting} />
+        ) : (
+          ""
+        )}
       </div>
-      <div className="ad-metadata">
-        <Link className="permalink" to={`/facebook-ads/ad/${ad.id}`}>
-          Permalink to this ad
-        </Link>
-        <p>
-          First seen:{" "}
-          <time dateTime="{ad.created_at}">
-            {new Date(Date.parse(ad.created_at)).toLocaleDateString("en-US", {
-              day: "numeric",
-              month: "long",
-              year: "numeric"
-            })}
-          </time>
-        </p>
-      </div>
-      {ad.targeting !== null ? <Targeting targeting={ad.targeting} /> : ""}
-    </div>
-  ) : null;
+    ) : null;
+  }
+}
 
 export default Ad;
