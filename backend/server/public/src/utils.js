@@ -20,7 +20,9 @@ import {
   filterDistrict,
   changePoliticalProbability,
   setPersona,
-  showOldSearch
+  showOldSearch,
+  toggleYouGovOnly,
+  toggleNoListfund
 } from "actions.js";
 
 const headers = lang => Object.assign({}, language(lang));
@@ -99,8 +101,12 @@ const serialize = state => {
     params.set("lang", state.lang);
   }
 
-  if (state.no_list_fund || true) {
-    params.set("no_list_fund", "1");
+  if (state.no_listfund) {
+    params.set("no_listfund", "1");
+  }
+
+  if (state.yougov_only) {
+    params.set("yougov_only", "1");
   }
 
   if (state.show_old_search) {
@@ -128,6 +134,13 @@ const deserialize = (dispatch, allowedLangs) => {
 
   if (params.has("showOldSearch")) {
     actions.push(showOldSearch());
+  }
+
+  if (params.has("no_listfund")) {
+    actions.push(toggleNoListfund(true));
+  }
+  if (params.has("yougov_only")) {
+    actions.push(toggleYouGovOnly(true));
   }
 
   if (params.has("entities")) {

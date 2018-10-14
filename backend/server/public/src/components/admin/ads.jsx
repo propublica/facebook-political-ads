@@ -11,7 +11,9 @@ import {
   clearAllFilters,
   filterByByState,
   getAdsByState,
-  setPage
+  setPage,
+  toggleYouGovOnly,
+  toggleNoListfund
 } from "actions.js";
 import { deserialize } from "utils.js";
 import Range from "rc-slider/lib/Range";
@@ -129,6 +131,25 @@ export class AdsUnconnected extends React.Component {
             onChange={this.props.onSliderChange}
           />
         </div>
+        <div className="more-selectors">
+          <label htmlFor="only-yougov">Only YouGov ads?</label>
+          <input
+            type="checkbox"
+            id="only-yougov"
+            checked={!!this.props.yougov_only}
+            onChange={() => this.props.yougovOnly(!this.props.yougov_only)}
+          />{" "}
+          |{" "}
+          <label htmlFor="no-listfund">
+            Exclude Fundraising/Listbuilding ads?
+          </label>
+          <input
+            type="checkbox"
+            id="no-listfund"
+            checked={this.props.no_listfund}
+            onChange={() => this.props.noListfund(!this.props.no_listfund)}
+          />
+        </div>
 
         {this.props.pagination ? (
           <Pagination methodForPagination={this.methodForPagination} />
@@ -167,7 +188,9 @@ export const AdsUnrouted = connect(
     parties,
     targets,
     entities,
-    advertisers
+    advertisers,
+    no_listfund,
+    yougov_only
   }) => ({
     ads: ads.filter(ad => !ad.suppressed),
     search,
@@ -179,11 +202,21 @@ export const AdsUnrouted = connect(
     parties,
     targets: (targets || []).filter(it => it.active),
     entities: (entities || []).filter(it => it.active),
-    advertisers: (advertisers || []).filter(it => it.active)
+    advertisers: (advertisers || []).filter(it => it.active),
+    no_listfund,
+    yougov_only
   }),
   dispatch => ({
     deserialize: () => {
       deserialize(dispatch);
+      dispatch(getAds());
+    },
+    yougovOnly: a => {
+      dispatch(toggleYouGovOnly(a));
+      dispatch(getAds());
+    },
+    noListfund: a => {
+      dispatch(toggleNoListfund(a));
       dispatch(getAds());
     },
     getAdsByState: (by_state, page) => {

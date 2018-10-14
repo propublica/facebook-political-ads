@@ -41,31 +41,31 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>
             {ad.targets && ad.targets.length > 0
               ? ad.targets
-                .map(
-                    ({ target, segment }) =>
-                      segment ? (
-                        <span key={`${target}${segment}`}>
-                          <a
-                            href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
-                        >
-                            {target}
-                          </a>:{" "}
-                          <a
-                            href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%2C%22segment%22%3A%22${segment}%22%7D%5D`}
-                          >
-                            {segment}
-                          </a>
-                        </span>
-                      ) : (
+                  .map(
+                  ({ target, segment }) =>
+                    segment ? (
+                      <span key={`${target}${segment}`}>
                         <a
-                        key={target}
                           href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
-                      >
+                          >
                           {target}
+                        </a>:{" "}
+                        <a
+                          href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%2C%22segment%22%3A%22${segment}%22%7D%5D`}
+                        >
+                          {segment}
                         </a>
-                      )
-                  )
-                .reduce((prev, curr) => [prev, ", ", curr])
+                      </span>
+                    ) : (
+                      <a
+                          key={target}
+                        href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
+                        >
+                        {target}
+                      </a>
+                    )
+                )
+                  .reduce((prev, curr) => [prev, ", ", curr])
               : "NONE"}
           </td>
         </tr>
@@ -84,7 +84,7 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>{ad.impressions}</td>
         </tr>
         <tr>
-          <td>listbuilding / fundraising</td>
+          <td>listbuilding / fundraising probability</td>
           <td>{ad.listbuilding_fundraising_proba}</td>
         </tr>
         {ad.lang == "en-US" ? (

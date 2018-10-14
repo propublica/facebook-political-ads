@@ -205,6 +205,17 @@ export const setPage = page => ({ type: SET_PAGE, value: page });
 export const fetchPage = (page, cb) => async(setPage(page), cb);
 export const setTotal = total => ({ type: SET_TOTAL, value: total });
 
+export const TOGGLE_YOUGOV_ONLY = "yougov_only";
+export const TOGGLE_NO_LISTFUND = "no_listfund";
+export const toggleYouGovOnly = on_or_off => ({
+  type: TOGGLE_YOUGOV_ONLY,
+  value: on_or_off
+});
+export const toggleNoListfund = on_or_off => ({
+  type: TOGGLE_NO_LISTFUND,
+  value: on_or_off
+});
+
 // export const SET_BY_STATE = "set_by_state";
 // export const setByState = a_state => ({ type: SET_BY_STATE, value: a_state });
 
