@@ -12,7 +12,7 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>
             <Link to={`/facebook-ads/admin/ads/${ad.id}`}>{ad.id}</Link> ({
               ad.lang
-            })
+            }) {ad.is_yougov ? "(YouGov ad)" : ""}
           </td>
         </tr>
         <tr>
@@ -41,31 +41,31 @@ export const AdminAdUnconnected = ({ ad, onSuppressClick }) => (
           <td>
             {ad.targets && ad.targets.length > 0
               ? ad.targets
-                  .map(
-                  ({ target, segment }) =>
-                    segment ? (
-                      <span key={`${target}${segment}`}>
-                        <a
-                          href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
+                .map(
+                    ({ target, segment }) =>
+                      segment ? (
+                        <span key={`${target}${segment}`}>
+                          <a
+                            href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
+                        >
+                            {target}
+                          </a>:{" "}
+                          <a
+                            href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%2C%22segment%22%3A%22${segment}%22%7D%5D`}
                           >
-                          {target}
-                        </a>:{" "}
+                            {segment}
+                          </a>
+                        </span>
+                      ) : (
                         <a
-                          href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%2C%22segment%22%3A%22${segment}%22%7D%5D`}
-                        >
-                          {segment}
+                        key={target}
+                          href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
+                      >
+                          {target}
                         </a>
-                      </span>
-                    ) : (
-                      <a
-                          key={target}
-                        href={`/facebook-ads/admin/ads?targets=%5B%7B%22target%22%3A%22${target}%22%7D%5D`}
-                        >
-                        {target}
-                      </a>
-                    )
-                )
-                  .reduce((prev, curr) => [prev, ", ", curr])
+                      )
+                  )
+                .reduce((prev, curr) => [prev, ", ", curr])
               : "NONE"}
           </td>
         </tr>
