@@ -131,7 +131,7 @@ export class AdsUnconnected extends React.Component {
             onChange={this.props.onSliderChange}
           />
         </div>
-        <div className="more-selectors">
+        <div className="more-selectors" style={{ display: "none" }}>
           <label htmlFor="only-yougov">Only YouGov ads?</label>
           <input
             type="checkbox"
