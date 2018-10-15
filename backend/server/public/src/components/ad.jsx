@@ -16,8 +16,9 @@ export class Ad extends React.Component {
       this.adRef.current.querySelector(".text_exposed_hide").style.display =
         "none";
       this.adRef.current.querySelector(".see_more_link").style.display = "none";
-      this.adRef.current.querySelector(".text_exposed_show").style.display =
-        "inline";
+      this.adRef.current
+        .querySelectorAll(".text_exposed_show")
+        .forEach(node => (node.style.display = "inline"));
     });
   }
 
