@@ -146,9 +146,7 @@ export class AdminAdUnconnected extends React.Component {
                   "Suppressed"
                 ) : (
                   <button
-                    onClick={function() {
-                      return this.props.onSuppressClick(ad);
-                    }}
+                    onClick={() => this.props.onSuppressClick(this.props.ad)}
                   >
                     Suppress (Is this ad not political?)
                   </button>
