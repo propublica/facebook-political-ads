@@ -179,7 +179,7 @@ body {
 #tabs {
   background-color: #fff;
   position: fixed;
-  width: 100%;
+  width: 96%;
   display: flex;
   top: 22px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.26);
@@ -397,15 +397,24 @@ b.political {
   text-align: center;
   position: fixed;
   top: 0;
+  width: 95%;
+  left: 0;
 }
+
 
 #yougov-alert ~ #toggler #tabs {
   top: 60px;
 }
 #yougov-alert ~ #toggler #container {
-  margin-top: 60px;
+  margin-top: calc(60px + 3em);
 }
 
+#ygidbar ~ #toggler #tabs {
+  top: 60px;
+}
+#ygidbar ~ #toggler #container {
+  margin-top: calc(60px + 1em);
+}
 
 /* -----------------------------------------------------------------------------
 /* FACEBOOK AD STYLES
