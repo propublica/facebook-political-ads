@@ -18,7 +18,7 @@ import {
   filterParty,
   newDistricts,
   filterDistrict,
-  changePoliticalProbability,
+  filterbyPoliticalProbability,
   setPersona,
   showOldSearch,
   toggleYouGovOnly,
@@ -178,9 +178,9 @@ const deserialize = (dispatch, allowedLangs) => {
 
   if (params.has("poliprob") || params.has("maxpoliprob")) {
     actions.push(
-      changePoliticalProbability(
+      filterbyPoliticalProbability([
         parseInt(params.get("poliprob") || "70", 10),
-        parseInt(params.get("maxpoliprob") || "100", 10)
+        parseInt(params.get("maxpoliprob") || "100", 10)]
       )
     );
   }

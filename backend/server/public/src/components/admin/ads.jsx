@@ -226,7 +226,7 @@ export const AdsUnrouted = connect(
     },
     onKeyUp: e => {
       e.preventDefault();
-      dispatch(clearAllFilters());
+      // dispatch(clearAllFilters());
       throttledDispatch(
         dispatch,
         e.target.value.length ? e.target.value : null
