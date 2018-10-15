@@ -28,12 +28,12 @@ def listbuilding_fundraising_classify(ctx, newest):
 
     if newest:
         print("Running newest")
-        query = "select * from ads where political_probability > 0.70 and created_at > '2018-08-01' and listbuilding_fundraising_proba is null"
+        query = "select * from ads where political_probability > 0.70 and listbuilding_fundraising_proba is null"
         if lang:
             query = query + " and lang = '{}'".format(lang)
     else:
         print("Running every")
-        query = "select * from ads where political_probability > 0.70 and created_at > '2018-08-01'"
+        query = "select * from ads where political_probability > 0.70"
         if lang:
             query = query + " and lang = '{}'".format(lang)
 
