@@ -33,7 +33,8 @@ export class AdminAdUnconnected extends React.Component {
                 <Link to={`/facebook-ads/admin/ads/${this.props.ad.id}`}>
                   {this.props.ad.id}
                 </Link>{" "}
-                ({this.props.ad.lang})
+                ({this.props.ad.lang}){" "}
+                {this.props.ad.is_yougov ? "(YouGov ad)" : ""}
               </td>
             </tr>
             <tr>
