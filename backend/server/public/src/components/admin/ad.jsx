@@ -126,7 +126,7 @@ export class AdminAdUnconnected extends React.Component {
                       this.props.ad.advertiser
                     }`}
                   >
-                    Facebook Political Ad Archive for {this.props.ad.advertiser}
+                    Facebook Political Ad Archive
                   </a>{" "}
                   |{" "}
                   <a
@@ -134,7 +134,15 @@ export class AdminAdUnconnected extends React.Component {
                       this.props.ad.advertiser
                     }%22%5D`}
                   >
-                    FBPAC ads by {this.props.ad.advertiser}
+                    FBPAC ads
+                  </a>{" "}
+                  |{" "}
+                  <a
+                    href={`/fbpac-api/ads/advertiser?advertiser=${
+                      this.props.ad.advertiser
+                    }`}
+                  >
+                    Breakdown of Targeting Choices
                   </a>
                 </td>
               </tr>
