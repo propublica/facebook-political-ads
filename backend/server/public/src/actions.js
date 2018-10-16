@@ -344,14 +344,13 @@ export const getAdsByState = (url = `${URL_ROOT}/fbpac-api/ads/by_state`) => {
     let state = getState();
 
     let params = new URLSearchParams();
-    url = `${URL_ROOT}/fbpac-api/ads/by_state`;
 
     if (state.pagination && state.pagination.page) {
       params.set("page", state.pagination.page);
     }
 
     let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-    let new_url = `${location.pathname}${query}`;
+    let new_url = `${"/facebook-ads/admin/by_state/" + state.by_state}${query}`;
     if (location.search !== query) {
       // this history.push is just for when the state got changed  via dropdowns/searches
       // and then we got ads back
@@ -414,7 +413,12 @@ export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
     let path = `${url}?${params.toString()}`;
 
     let query = params.toString().length > 0 ? `?${params.toString()}` : "";
-    let new_url = `${location.pathname}${query}`;
+    let new_url = `${
+      /* in admin, fix the URL if we've gotten somewhere weird */
+      location.pathname.indexOf("/admin/")
+        ? "/facebook-ads/admin/"
+        : location.pathname
+    }${query}`;
     if (location.search !== query) {
       // this history.push is just for when the state got changed  via dropdowns/searches
       // and then we got ads back

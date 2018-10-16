@@ -109,6 +109,11 @@ export class AdsUnconnected extends React.Component {
               </strong>
             </span>
           ) : null}
+          {this.props.by_state ? (
+            <span>
+              State Ads: <strong>{this.props.by_state} </strong>
+            </span>
+          ) : null}
           <a href="#" onClick={this.props.clearAllFilters}>
             Clear All
           </a>
@@ -190,7 +195,8 @@ export const AdsUnrouted = connect(
     entities,
     advertisers,
     no_listfund,
-    yougov_only
+    yougov_only,
+    by_state
   }) => ({
     ads: ads.filter(ad => !ad.suppressed),
     search,
@@ -204,7 +210,8 @@ export const AdsUnrouted = connect(
     entities: (entities || []).filter(it => it.active),
     advertisers: (advertisers || []).filter(it => it.active),
     no_listfund,
-    yougov_only
+    yougov_only,
+    by_state
   }),
   dispatch => ({
     deserialize: () => {
