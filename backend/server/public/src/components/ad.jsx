@@ -2,6 +2,7 @@ import React from "react";
 import Targeting from "./targeting.jsx";
 import { Link } from "react-router-dom";
 import DOMPurify from "dompurify";
+import { connect } from "react-redux";
 
 export class Ad extends React.Component {
   constructor(props) {
@@ -61,5 +62,9 @@ export class Ad extends React.Component {
     ) : null;
   }
 }
+
+const Ad = connect(({ ad }) => {
+  ad;
+})(AdUnconnected);
 
 export default Ad;
