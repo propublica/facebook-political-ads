@@ -375,7 +375,7 @@ b.political {
 
 #language select,
 #language option {
-  height: 1rem;
+  height: 1.2rem;
 }
 #language select {
   width: 100%;
