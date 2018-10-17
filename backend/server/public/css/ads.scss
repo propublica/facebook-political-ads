@@ -207,6 +207,12 @@
   // Truncated post text
   display: none;
 }
+.text_exposed_hide {
+  display: inline;
+}
+.see_more_link{
+  cursor: pointer;
+}
 
 .mtm,
 ._dcs {

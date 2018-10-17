@@ -30,7 +30,9 @@ import {
   SHOW_OLD_SEARCH,
   HIDE_OLD_SEARCH,
   NEW_BY_STATE,
-  FILTER_BY_BY_STATE
+  FILTER_BY_BY_STATE,
+  TOGGLE_YOUGOV_ONLY,
+  TOGGLE_NO_LISTFUND
 } from "./actions.js";
 
 // https://github.com/reactjs/redux/issues/911#issuecomment-149192251
@@ -242,6 +244,18 @@ export const targets = makeObjectReducer("targets", "target");
 export const states = makeArrayReducer("states");
 export const parties = makeArrayReducer("parties");
 export const districts = makeArrayReducer("districts");
+
+const makeBooleanReducer = action_name => (state = null, action) => {
+  switch (action.type) {
+    case action_name:
+      return action.value;
+    default:
+      return state;
+  }
+};
+
+export const yougov_only = makeBooleanReducer(TOGGLE_YOUGOV_ONLY);
+export const no_listfund = makeBooleanReducer(TOGGLE_NO_LISTFUND);
 
 export const by_state = (state = null, action) => {
   switch (action.type) {

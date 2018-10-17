@@ -25,7 +25,9 @@ import {
   states,
   parties,
   districts,
-  by_state
+  by_state,
+  yougov_only,
+  no_listfund
 } from "reducers.js";
 import { go } from "i18n.js";
 import Admin from "components/admin/admin.jsx";
@@ -48,7 +50,9 @@ const reducer = enableBatching(
     states,
     parties,
     districts,
-    by_state
+    by_state,
+    yougov_only,
+    no_listfund
   })
 );
 

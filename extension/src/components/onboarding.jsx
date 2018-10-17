@@ -12,6 +12,11 @@ export const Onboarding = withI18n(({ getMessage, onAcceptClick }) => (
         id="terms"
         dangerouslySetInnerHTML={{ __html: getMessage("terms_of_service") }}
       />
+      <div id="accept-box">
+        <button id="accept" onClick={onAcceptClick}>
+          {getMessage("terms_of_service_accept")}
+        </button>
+      </div>
     </div>
     <div id="accept-box">
       <button id="accept" onClick={onAcceptClick}>

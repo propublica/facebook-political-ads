@@ -11,7 +11,9 @@ import {
   clearAllFilters,
   filterByByState,
   getAdsByState,
-  setPage
+  setPage,
+  toggleYouGovOnly,
+  toggleNoListfund
 } from "actions.js";
 import { deserialize } from "utils.js";
 import Range from "rc-slider/lib/Range";
@@ -107,6 +109,11 @@ export class AdsUnconnected extends React.Component {
               </strong>
             </span>
           ) : null}
+          {this.props.by_state ? (
+            <span>
+              State Ads: <strong>{this.props.by_state} </strong>
+            </span>
+          ) : null}
           <a href="#" onClick={this.props.clearAllFilters}>
             Clear All
           </a>
@@ -114,7 +121,18 @@ export class AdsUnconnected extends React.Component {
         <div className="rangeslider">
           <label htmlFor="range-1a">Political Likelihood:</label>
           <Range
-            defaultValue={[70, 100]}
+            defaultValue={
+              this.props.politicalProbability.length
+                ? this.props.politicalProbability
+                : [70, 100]
+            }
+            value={
+              this.props.politicalProbability &&
+              this.props.politicalProbability.length
+                ? this.props.politicalProbability
+                : [70, 100]
+            }
+            min={30}
             marks={{
               10: "10%",
               20: "20%",
@@ -127,6 +145,25 @@ export class AdsUnconnected extends React.Component {
               90: "90%"
             }}
             onChange={this.props.onSliderChange}
+          />
+        </div>
+        <div className="more-selectors" style={{ display: "none" }}>
+          <label htmlFor="only-yougov">Only YouGov ads?</label>
+          <input
+            type="checkbox"
+            id="only-yougov"
+            checked={!!this.props.yougov_only}
+            onChange={() => this.props.yougovOnly(!this.props.yougov_only)}
+          />{" "}
+          |{" "}
+          <label htmlFor="no-listfund">
+            Exclude Fundraising/Listbuilding ads?
+          </label>
+          <input
+            type="checkbox"
+            id="no-listfund"
+            checked={this.props.no_listfund}
+            onChange={() => this.props.noListfund(!this.props.no_listfund)}
           />
         </div>
 
@@ -167,7 +204,11 @@ export const AdsUnrouted = connect(
     parties,
     targets,
     entities,
-    advertisers
+    advertisers,
+    no_listfund,
+    yougov_only,
+    by_state,
+    politicalProbability
   }) => ({
     ads: ads.filter(ad => !ad.suppressed),
     search,
@@ -179,11 +220,23 @@ export const AdsUnrouted = connect(
     parties,
     targets: (targets || []).filter(it => it.active),
     entities: (entities || []).filter(it => it.active),
-    advertisers: (advertisers || []).filter(it => it.active)
+    advertisers: (advertisers || []).filter(it => it.active),
+    no_listfund,
+    yougov_only,
+    by_state,
+    politicalProbability
   }),
   dispatch => ({
     deserialize: () => {
       deserialize(dispatch);
+      dispatch(getAds());
+    },
+    yougovOnly: a => {
+      dispatch(toggleYouGovOnly(a));
+      dispatch(getAds());
+    },
+    noListfund: a => {
+      dispatch(toggleNoListfund(a));
       dispatch(getAds());
     },
     getAdsByState: (by_state, page) => {
@@ -193,7 +246,7 @@ export const AdsUnrouted = connect(
     },
     onKeyUp: e => {
       e.preventDefault();
-      dispatch(clearAllFilters());
+      // dispatch(clearAllFilters());
       throttledDispatch(
         dispatch,
         e.target.value.length ? e.target.value : null
