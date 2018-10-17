@@ -17,7 +17,6 @@
     ],
     "persistent": false
   },
-  "incognito": "not_allowed",
   "browser_action": {
     "default_icon": "assets/icon128bg.png",
     "default_title": "Facebook Political Ad Collector for YouGov Panel Participants",
