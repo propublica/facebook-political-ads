@@ -121,7 +121,18 @@ export class AdsUnconnected extends React.Component {
         <div className="rangeslider">
           <label htmlFor="range-1a">Political Likelihood:</label>
           <Range
-            defaultValue={[70, 100]}
+            defaultValue={
+              this.props.politicalProbability.length
+                ? this.props.politicalProbability
+                : [70, 100]
+            }
+            value={
+              this.props.politicalProbability &&
+              this.props.politicalProbability.length
+                ? this.props.politicalProbability
+                : [70, 100]
+            }
+            min={30}
             marks={{
               10: "10%",
               20: "20%",
@@ -196,7 +207,8 @@ export const AdsUnrouted = connect(
     advertisers,
     no_listfund,
     yougov_only,
-    by_state
+    by_state,
+    politicalProbability
   }) => ({
     ads: ads.filter(ad => !ad.suppressed),
     search,
@@ -211,7 +223,8 @@ export const AdsUnrouted = connect(
     advertisers: (advertisers || []).filter(it => it.active),
     no_listfund,
     yougov_only,
-    by_state
+    by_state,
+    politicalProbability
   }),
   dispatch => ({
     deserialize: () => {
