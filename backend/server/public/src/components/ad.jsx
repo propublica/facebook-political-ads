@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { connect } from "react-redux";
 
-export class Ad extends React.Component {
+export class AdUnconnected extends React.Component {
   constructor(props) {
     super(props);
     this.adRef = React.createRef();
@@ -63,8 +63,6 @@ export class Ad extends React.Component {
   }
 }
 
-const Ad = connect(({ ad }) => {
-  ad;
-})(AdUnconnected);
+const Ad = connect(({ ad }) => ad)(AdUnconnected);
 
 export default Ad;
