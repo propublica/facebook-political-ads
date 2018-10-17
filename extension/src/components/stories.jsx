@@ -26,6 +26,11 @@ export const Stories = () => (
           Politicians
         </a>
       </li>
+      <li>
+        <a href="https://www.propublica.org/article/facebook-political-ads-malware-scams-misleading">
+          Facebook Allowed Political Ads That Were Actually Scams and Malware
+        </a>
+      </li>
     </ul>
     <p className="postcis">
       If you’d like to keep in touch with this project, please sign up for our
@@ -33,7 +38,8 @@ export const Stories = () => (
     </p>
     <p className="postcis">
       You can look through all the ads collected in this project{" "}
-      <a href="https://projects.propublica.org/facebook-ads">here</a>.
+      <a href="https://projects.propublica.org/facebook-ads">here</a>. And
+      please share with your friends.
     </p>
   </div>
 );
