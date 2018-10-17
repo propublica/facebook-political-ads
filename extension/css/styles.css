@@ -349,6 +349,11 @@ b.political {
   grid-area: main;
 }
 
+#tos #main #accept-box { /* disgusting ugly hack for making sure the accept button is visible for people with tiny viewports */
+  grid-area: unset;
+  margin-bottom: 200px;
+}
+
 #tos #accept-box {
   grid-area: footer;
 }
