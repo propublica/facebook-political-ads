@@ -33,8 +33,12 @@ export const Stories = () => (
       </li>
     </ul>
     <p className="postcis">
-      If you’d like to keep in touch with this project, please sign up for our
-      occasional newsletter here LINKTK. And please share with your friends.
+      If you’d like to stay in touch with ProPublica,{" "}
+      <a href="https://go.propublica.org/FBPAC">
+        sign up for our Big Story newsletter
+      </a>{" "}
+      — we’ll also let you know about future updates to this project. And please
+      share with your friends.
     </p>
     <p className="postcis">
       You can look through all the ads collected in this project{" "}
