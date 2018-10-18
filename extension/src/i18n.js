@@ -76,8 +76,8 @@ export const withI18n = connect(({ language }) => ({
 }));
 
 export const getBrowserLocale = () => {
-  const lang = browser.i18n.getUILanguage()
-    ? browser.i18n.getUILanguage()
+  const lang = chrome.i18n.getUILanguage()
+    ? chrome.i18n.getUILanguage()
     : navigator.languages && navigator.languages.length
       ? navigator.languages[0]
       : navigator.language;
