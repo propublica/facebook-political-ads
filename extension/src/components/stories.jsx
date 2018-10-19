@@ -27,6 +27,11 @@ export const Stories = () => (
           Politicians
         </a>
       </li>
+      <li>
+        <a href="https://www.propublica.org/article/facebook-political-ads-malware-scams-misleading">
+          Facebook Allowed Political Ads That Were Actually Scams and Malware
+        </a>
+      </li>
     </ul>
     <div className="postcis">
       If you’d like to keep in touch with this project, please sign up for our
