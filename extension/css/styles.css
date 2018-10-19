@@ -431,7 +431,15 @@ font-weight: 400;
 #stories ul li a {
   color: #000000;
 }
-
+#stories ul li a:hover {
+  text-decoration: underline;
+}
+#stories .postcis a {
+  color: #217ce3;
+}
+#stories .postcis a:hover {
+  text-decoration: underline;
+}
 /* -----------------------------------------------------------------------------
 /* FACEBOOK AD STYLES
 /* -----------------------------------------------------------------------------*/

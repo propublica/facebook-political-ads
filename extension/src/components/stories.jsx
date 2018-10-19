@@ -12,24 +12,24 @@ export const Stories = () => (
     <ul>
       <li>
         <a href="https://www.propublica.org/article/facebook-is-letting-job-advertisers-target-only-men">
-          Facebook Is Letting Job Advertisers Target Only Men{" "}
+          Facebook Is Letting Job Advertisers Target Only Men →{" "}
         </a>
       </li>
 
       <li>
         <a href="https://www.propublica.org/article/why-am-i-seeing-this-interesting-facebook-ads-from-our-political-ad-collector">
-          Why Am I Seeing This? Interesting Ads We've Found So Far
+          Why Am I Seeing This? Interesting Ads We've Found So Far →
         </a>
       </li>
       <li>
         <a href="https://www.propublica.org/article/facebook-new-screening-system-flags-the-wrong-ads-as-political">
           Facebook’s Screening for Political Ads Nabs News Sites Instead of
-          Politicians
+          Politicians →
         </a>
       </li>
       <li>
         <a href="https://www.propublica.org/article/facebook-political-ads-malware-scams-misleading">
-          Facebook Allowed Political Ads That Were Actually Scams and Malware
+          Facebook Allowed Political Ads That Were Actually Scams and Malware →
         </a>
       </li>
     </ul>
