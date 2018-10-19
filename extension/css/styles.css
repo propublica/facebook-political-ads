@@ -408,17 +408,17 @@ b.political {
 
 
 #yougov-alert ~ #toggler #tabs {
-  top: 60px;
+  top: 60px; /* should be the height of the YG alert */
 }
 #yougov-alert ~ #toggler #container {
-  margin-top: calc(60px + 3em);
+  margin-top: calc(60px + 3.3em);
 }
 
 #ygidbar ~ #toggler #tabs {
-  top: 60px;
+  top: 26px; /* should be the height of the YG bar */
 }
 #ygidbar ~ #toggler #container {
-  margin-top: calc(60px + 1em);
+  margin-top: calc(26px + 3.3em); /* 26px is the height of the YG bar; 3.3em is the height of tabs */
 }
 
 /* -----------------------------------------------------------------------------
