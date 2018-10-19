@@ -403,16 +403,33 @@ b.political {
 #stories .precis, #stories .postcis{
   font-size: 0.9rem;
   margin: 10px 0;
+  font-family: "Graphik", sans-serif;
+font-weight: 400;
+}
+
+#stories #intro-thankyou {
+  font-size: 1.3em;
+  font-weight: 500;
+  color: #304154;
+  margin-bottom: 10px;
 }
 
 #stories ul {
   font-size: 0.9rem;
-  list-style-type: disc; 
-  list-style-position: outside; 
-  padding-left: 20px;
+  list-style-type: none;
+  list-style-position: outside;
+  font-family: "Tiempos Text";
+  font-weight: 700;
 }
 #stories ul li {
+  background-color: #efefef;
+  margin: 10px 0px;
+  border-radius: 2px;
+  padding: 10px;
+}
 
+#stories ul li a {
+  color: #000000;
 }
 
 /* -----------------------------------------------------------------------------

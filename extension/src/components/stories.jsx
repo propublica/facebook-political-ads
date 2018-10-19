@@ -2,12 +2,13 @@ import React from "react";
 
 export const Stories = () => (
   <div id="stories">
-    <p className="precis">
-      Thank you for participating in ProPublica’s Facebook Political Ad
-      Collector project. We’re still going strong, but wanted to highlight some
+    <div className="precis">
+      <h2 id="intro-thankyou">Thank you for participating in ProPublica’s Facebook Political Ad
+      Collector project!</h2>
+      <p>We’re still going strong, but wanted to highlight some
       of the articles we’ve written so far using the data contributed by
-      participants like you.
-    </p>
+      participants like you.</p>
+    </div>
     <ul>
       <li>
         <a href="https://www.propublica.org/article/facebook-is-letting-job-advertisers-target-only-men">
@@ -27,13 +28,13 @@ export const Stories = () => (
         </a>
       </li>
     </ul>
-    <p className="postcis">
+    <div className="postcis">
       If you’d like to keep in touch with this project, please sign up for our
       occasional newsletter here LINKTK. And please share with your friends.
-    </p>
-    <p className="postcis">
+    </div>
+    <div className="postcis">
       You can look through all the ads collected in this project{" "}
       <a href="https://projects.propublica.org/facebook-ads">here</a>.
-    </p>
+    </div>
   </div>
 );
