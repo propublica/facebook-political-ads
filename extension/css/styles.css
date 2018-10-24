@@ -404,22 +404,23 @@ b.political {
   font-size: 0.9rem;
   margin: 10px 0;
   font-family: "Graphik", sans-serif;
-font-weight: 400;
+  font-weight: 400;
 }
 
 #stories #intro-thankyou {
-  font-size: 1.3em;
-  font-weight: 500;
+  font-size: 1.2em;
+  font-weight: 600;
   color: #304154;
   margin-bottom: 10px;
 }
 
 #stories ul {
-  font-size: 0.9rem;
+  font-size: 1rem;
   list-style-type: none;
   list-style-position: outside;
-  font-family: "Tiempos Text";
+  font-family: "Tiempos Text", sans-serif;
   font-weight: 700;
+  margin: 30px auto;
 }
 #stories ul li {
   background-color: #efefef;
