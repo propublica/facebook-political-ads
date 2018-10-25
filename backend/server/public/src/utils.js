@@ -18,9 +18,11 @@ import {
   filterParty,
   newDistricts,
   filterDistrict,
-  changePoliticalProbability,
+  filterbyPoliticalProbability,
   setPersona,
-  showOldSearch
+  showOldSearch,
+  toggleYouGovOnly,
+  toggleNoListfund
 } from "actions.js";
 
 const headers = lang => Object.assign({}, language(lang));
@@ -99,6 +101,14 @@ const serialize = state => {
     params.set("lang", state.lang);
   }
 
+  if (state.no_listfund) {
+    params.set("no_listfund", "1");
+  }
+
+  if (state.yougov_only) {
+    params.set("yougov_only", "1");
+  }
+
   if (state.show_old_search) {
     params.set("showOldSearch", "1");
   }
@@ -124,6 +134,13 @@ const deserialize = (dispatch, allowedLangs) => {
 
   if (params.has("showOldSearch")) {
     actions.push(showOldSearch());
+  }
+
+  if (params.has("no_listfund")) {
+    actions.push(toggleNoListfund(true));
+  }
+  if (params.has("yougov_only")) {
+    actions.push(toggleYouGovOnly(true));
   }
 
   if (params.has("entities")) {
@@ -161,9 +178,9 @@ const deserialize = (dispatch, allowedLangs) => {
 
   if (params.has("poliprob") || params.has("maxpoliprob")) {
     actions.push(
-      changePoliticalProbability(
+      filterbyPoliticalProbability([
         parseInt(params.get("poliprob") || "70", 10),
-        parseInt(params.get("maxpoliprob") || "100", 10)
+        parseInt(params.get("maxpoliprob") || "100", 10)]
       )
     );
   }
