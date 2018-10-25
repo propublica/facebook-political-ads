@@ -20,6 +20,10 @@
     "default_title": "__MSG_name__",
     "default_popup": "index.html"
   },
+  "icons": {
+    "48": "assets/icon128.png",
+    "96": "assets/icon128.png"
+  },
   "content_scripts": [
     {
       "js": [
