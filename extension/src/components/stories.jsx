@@ -50,12 +50,12 @@ export const Stories = () => (
       </li>
     </ul>
     <div className="postcis">
-      If you’d like to keep in touch with this project,{" "}
+      If you’d like to stay in touch with ProPublica,{" "}
       <a target="_blank" href="https://go.propublica.org/FBPAC">
         sign up for our Big Story newsletter
       </a>{" "}
-      — we’ll also let you know about future updates to this project. And please
-      share with your friends.
+      — we’ll also let you know about new stories about ads submitted through
+      the ad collector. And please share with your friends.
     </div>
     <div className="postcis">
       You can look through all the ads collected in this project{" "}
