@@ -203,6 +203,7 @@ body {
   letter-spacing: 0.1em;
   font-weight: normal;
   min-width: 120px;
+  min-height: 54px;
 }
 
 [lang="de"] .toggle {
