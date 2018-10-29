@@ -142,7 +142,13 @@ export class AdminAdUnconnected extends React.Component {
                       .advertiser || this.props.ad.title}`}
                   >
                     Breakdown of Targeting Choices
-                  </a>
+                  </a>{" "}
+                  |{" "}
+                  {this.props.ad.political_probability > 0.7 ? (
+                    <a href={`/facebook-ads/ad/${this.props.ad.id}`}>
+                      Public Permalink
+                    </a>
+                  ) : null}
                 </td>
               </tr>
             ) : null}
