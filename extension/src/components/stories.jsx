@@ -17,9 +17,26 @@ export const Stories = () => (
       <li>
         <a
           target="_blank"
+          href="https://www.propublica.org/article/how-big-oil-dodges-facebooks-new-ad-transparency-rules"
+        >
+          How Big Oil Dodges Facebook’s New Ad Transparency Rules&nbsp;→
+        </a>
+      </li>
+      <li>
+        <a
+          target="_blank"
+          href="https://www.propublica.org/article/groups-mask-partisan-attacks-behind-neutral-sounding-names-in-facebook-ads"
+        >
+          Groups Mask Partisan Attacks Behind Neutral-Sounding Names in Facebook
+          Ads&nbsp;→
+        </a>
+      </li>
+      <li>
+        <a
+          target="_blank"
           href="https://www.propublica.org/article/facebook-is-letting-job-advertisers-target-only-men"
         >
-          Facebook Is Letting Job Advertisers Target Only Men →{" "}
+          Facebook Is Letting Job Advertisers Target Only Men&nbsp;→{" "}
         </a>
       </li>
 
@@ -28,24 +45,7 @@ export const Stories = () => (
           target="_blank"
           href="https://www.propublica.org/article/why-am-i-seeing-this-interesting-facebook-ads-from-our-political-ad-collector"
         >
-          Why Am I Seeing This? Interesting Ads We've Found So Far →
-        </a>
-      </li>
-      <li>
-        <a
-          target="_blank"
-          href="https://www.propublica.org/article/facebook-new-screening-system-flags-the-wrong-ads-as-political"
-        >
-          Facebook’s Screening for Political Ads Nabs News Sites Instead of
-          Politicians →
-        </a>
-      </li>
-      <li>
-        <a
-          target="_blank"
-          href="https://www.propublica.org/article/facebook-political-ads-malware-scams-misleading"
-        >
-          Facebook Allowed Political Ads That Were Actually Scams and Malware →
+          Why Am I Seeing This? Interesting Ads We've Found So Far&nbsp;→
         </a>
       </li>
     </ul>
