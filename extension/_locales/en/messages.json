@@ -53,6 +53,10 @@
       }
     }
   },
+  "stories": {
+    "message": "Stories",
+    "description": "Shown in US English locale only"
+  },
   "language_instructions": {
     "message":
       "If these settings are not correct, please change them via the pulldowns.",

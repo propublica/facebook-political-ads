@@ -6,7 +6,9 @@ import { Toggler } from "components/toggler.jsx";
 const ThanksUnconnected = withI18n(({ getMessage, thanks, ratings_count }) => (
   <div id="thankscontainer">
     <div id="thanksbar">
-      {thanks ? getMessage(thanks, { count: ratings_count || 0 }) : null}
+      {thanks && ratings_count
+        ? getMessage(thanks, { count: ratings_count || 0 })
+        : null}
     </div>
     <Toggler />
   </div>

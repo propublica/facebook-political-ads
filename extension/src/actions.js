@@ -16,7 +16,11 @@ export const SAY_THANKS = "say_thanks";
 export const setLanguage = language => ({ type: SET_LANGUAGE, language });
 export const setCountry = country => ({ type: SET_COUNTRY, country });
 export const acceptTerms = () => ({ type: ACCEPT_TERMS });
-export const toggle = value => ({ type: TOGGLE_TAB, value });
+export const toggle = (newActiveTab, oldActiveTab) => ({
+  type: TOGGLE_TAB,
+  value: newActiveTab,
+  oldTab: oldActiveTab
+});
 
 export const newAds = ads => ({
   type: NEW_ADS,

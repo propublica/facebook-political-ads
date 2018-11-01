@@ -187,7 +187,7 @@ body {
 
 #container {
   min-height: 1000px;
-  margin-top: 38.2px; /* matches height of #tabs, which I switched from sticky to fixed befcause of a bug. */
+  margin-top: 55px; /* matches height of #tabs, which I switched from sticky to fixed befcause of a bug. */
   overflow-y: scroll;
 }
 
@@ -202,6 +202,8 @@ body {
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   font-weight: normal;
+  min-width: 120px;
+  min-height: 54px;
 }
 
 [lang="de"] .toggle {
@@ -394,6 +396,57 @@ b.political {
   margin: 0.4rem 0;
 }
 
+#stories {
+  background-color: white;
+  padding: 10px;
+  margin-top: 20px;
+  height: 100%;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#stories .precis, #stories .postcis{
+  font-size: 0.9rem;
+  margin: 10px 0;
+  font-family: "Graphik", sans-serif;
+  font-weight: 400;
+}
+
+#stories #intro-thankyou {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #304154;
+  margin-bottom: 10px;
+}
+
+#stories ul {
+  font-size: 1rem;
+  list-style-type: none;
+  list-style-position: outside;
+  font-family: "Tiempos Text", sans-serif;
+  font-weight: 700;
+  margin: 30px auto;
+}
+#stories ul li {
+  background-color: #efefef;
+  margin: 10px 0px;
+  border-radius: 2px;
+  padding: 10px;
+}
+
+#stories ul li a {
+  color: #000000;
+}
+#stories ul li a:hover {
+  text-decoration: underline;
+}
+#stories .postcis a {
+  color: #217ce3;
+}
+#stories .postcis a:hover {
+  text-decoration: underline;
+}
 /* -----------------------------------------------------------------------------
 /* FACEBOOK AD STYLES
 /* -----------------------------------------------------------------------------*/

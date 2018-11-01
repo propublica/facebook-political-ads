@@ -40,12 +40,12 @@ const AdminTools = () => (
         </li>
         <li>
           <Link to="/facebook-ads/admin/grouped/segment/this_month">
-            first submitted this month
+            submitted this month
           </Link>
         </li>
         <li>
           <Link to="/facebook-ads/admin/grouped/segment/this_week">
-            first submitted this week
+            submitted this week
           </Link>
         </li>
       </ul>
@@ -60,12 +60,12 @@ const AdminTools = () => (
         </li>
         <li>
           <Link to="/facebook-ads/admin/grouped/target/this_month">
-            first submitted this month
+            submitted this month
           </Link>
         </li>
         <li>
           <Link to="/facebook-ads/admin/grouped/target/this_week">
-            first submitted this week
+            submitted this week
           </Link>
         </li>
       </ul>

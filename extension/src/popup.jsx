@@ -5,7 +5,8 @@ import { applyMiddleware, compose, combineReducers, createStore } from "redux";
 import { Provider } from "react-redux";
 import persistState from "redux-localstorage";
 import { createLogger } from "redux-logger";
-import { newRatings, newAds } from "actions.js";
+import { newRatings, newAds, toggle } from "actions.js";
+import { MOST_RECENT_STORIES_UPDATE } from "constants.js";
 import { getAds, updateBadge, getUnratedRatings } from "utils.js";
 import {
   active,
@@ -14,11 +15,13 @@ import {
   terms,
   thanks,
   language,
-  ratings_count
+  ratings_count,
+  stories_seen
 } from "reducers.js";
 import { Dispatcher } from "./components/dispatcher.jsx";
 // styles
 import "../css/styles.css";
+import { ToggleType } from "./constants.js";
 
 // The main reducer!
 const reducer = combineReducers({
@@ -28,7 +31,8 @@ const reducer = combineReducers({
   terms,
   thanks,
   language,
-  ratings_count
+  ratings_count,
+  stories_seen
 });
 
 let middleware = [thunkMiddleware];
@@ -54,7 +58,15 @@ setTimeout(
 
 // connect to the ratings channel
 chrome.runtime.onMessage.addListener(ads => store.dispatch(newRatings(ads)));
-store.subscribe(() => updateBadge(store.getState().ratings || []));
+store.subscribe(() => {
+  updateBadge(store.getState().ratings || [], store.getState().stories_seen);
+});
+
+// if an extension update has incremented MOST_RECENT_STORIES_UPDATE
+// then switch the tab to the stories tab.
+if (store.getState().stories_seen < MOST_RECENT_STORIES_UPDATE) {
+  store.dispatch(toggle(ToggleType.STORIES, null));
+}
 
 // Refresh our ads by first filtering out ones the user has seen, and then merging like with
 // ratings.
