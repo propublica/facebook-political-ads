@@ -9,7 +9,7 @@
     "coverage": "jest --coverage",
     "build": "webpack --progress --mode development",
     "watch": "webpack -w --progress --mode development",
-    "dist": "NODE_ENV=production webpack --progress --mode production && web-ext build -s dist",
+    "dist": "rm -rf dist/ && NODE_ENV=production webpack --progress --mode production && web-ext build -s dist",
     "ff": "web-ext run -s build",
     "ffde": "web-ext run -s build --pref intl.locale.requested=de-DE --pref intl.locale.matchOS=false --pref intl.accept_languages=de-DE,de"
   },
