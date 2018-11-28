@@ -1,0 +1,45 @@
+version: '3'
+services:
+  web:
+    build: 
+      context: ../backend
+      dockerfile: Dockerfile.public
+    ports:
+     - "8080:8080"
+    environment:
+     - DATABASE_URL=postgres://postgres:fbpacpgpassword@postgres/facebook_ads
+     # - AWS_ACCESS_KEY_ID
+     # - AWS_SECRET_ACCESS_KEY
+    restart: always
+    depends_on: 
+      - postgres
+  postgres:
+    image: "postgres"
+    environment: 
+      - POSTGRES_PASSWORD=fbpacpgpassword
+      - POSTGRES_DB=facebook_ads
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+      - ./schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      # pg_dump --no-owner --schema-only -t ads -t partners facebook_ads > docker-compose/schema.sql && pg_dump --no-owner -t schema_migrations -t __diesel_schema_migrations facebook_ads >> docker-compose/schema.sql
+  api: 
+    build: ../../fbpac-api-public
+    ports: 
+     - "3000:3000"
+    environment:
+     - SECRET_KEY_BASE=534b6aa76ea7965f09b9dc24234bcb66b1d447c9
+     - DB_NAME=facebook_ads
+     - DB_USER=postgres
+     - DB_PASS=fbpacpgpassword
+     - DB_HOST=postgres
+     - RAILS_ENV=production
+     - DOCKERCOMPOSE=true
+    command: "bash create_db_and_serve.sh"
+    depends_on: 
+      - postgres
+  classifier:
+    build: 
+      context: ../backend/classifier
+      dockerfile: Dockerfile.public
+    environment:
+     - DATABASE_URL=postgres://postgres:fbpacpgpassword@postgres/facebook_ads

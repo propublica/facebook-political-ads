@@ -31,3 +31,4 @@ facebook_ads_*.sql
 facebook_ads-*.sql
 classifier.dill
 facebook-ads-*.sql
+docker-compose/pgdata
