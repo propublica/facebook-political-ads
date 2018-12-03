@@ -3,7 +3,7 @@ Architecture
 
 The Facebook Political Ad Collector has several pieces. This document describes the various services required to run a version of FBPAC on your own, and how those services map to bits of code.
 
-INSTALLATION.md 
+[INSTALLATION.md](INSTALLATION.md) discusses how to actually install this (locally or in production); this document provides the overview of what you'll eventually have running.
 
 Repos
 -----
