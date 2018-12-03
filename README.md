@@ -11,128 +11,11 @@ We're open sourcing this project because we'd love your help. Collecting these a
 * Download the [Facebook Political Ad Collector for Firefox](https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/)
 * Download the [Facebook Political Ad Collector for Chrome](https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl?hl=en)
 
-## Build and Develop Locally
+## Run it on your own
 
-### Extension
+You can find instructions on how to set up your own full-fledged version of the Facebook Political Ad Collector in [INSTALLATION.md](INSTALLATION.md)
 
-The extension popup is a [preact](https://preactjs.com/) application and you can build a development version by running the following:
-
-    $ cd extension
-    $ npm install
-    $ npm run watch
-
-If you are a Firefox user you can open a clean browser instance with:
-
-    $ npm run ff
-
-and any changes will automatically refresh the extension. (You'll need webpack installed globally.)
-
-In Chrome you'll need to add an unpacked extension by following these [directions](https://developer.chrome.com/extensions/getstarted).
-
-### Backend
-
-First, make sure you have Rust [installed](https://doc.rust-lang.org/cargo/getting-started/installation.html):
-
-    $ curl -sSf https://static.rust-lang.org/rustup.sh | sh
-
-Be sure to add `~/.cargo/bin` (or wherever cargo is installed, `path/to/.cargo/bin`) to your PATH. You can do this by adding this line to your `.bash_rc` or `.zshrc` or whatever config file you typically use for your shell.
-```
-PATH=$PATH:~/.cargo/bin
-```
-
-The backend server is a rust application that runs on top of [diesel](https://diesel.rs) and [hyper](https://hyper.rs/). You'll need the diesel command line interface to get started and to create the database:
-
-    $ cargo install diesel_cli
-    $ diesel database setup
-    
-You'll also need to clone the [fbpac-api](https://www.github.com/propublica/fbpac-api-public) app and run its migrations, to add a few other columns. In a separate directory:
-
-    $ git clone https://github.com/propublica/fbpac-api-public.git
-    $ cd fbpac-api-public
-    $ bundle install
-    $ rake db:migrate
-
-You can kick the tires by running:
-
-    $ cd backend/server
-    $ cargo build
-    $ cargo run
-
-This will give a server running at `localhost:8080`. You will also need to build the backend's static resources. To do this, in another terminal tab:
-
-    $ cd backend/server/public
-    $ npm install
-    $ NODE_ENV=development npm run watch
-
-This will build the required static assets (javascript & css) to view the admin console at `localhost:8080/facebook-ads/`.
-
-If you make any changes to the database, after you run the migration, you'll want to update `the schema with diesel print-schema > src/schema.rs`. You'll need to do this even if you make changes via a Rails migration.
-
-The backend has both unit and integration tests. You will need to set up a test database alongside your actual database in order to run the integration tests. To do this, you will need to the same as above, but substitute out the database test URL:
-
-    $ diesel database setup --database-url postgres://localhost/facebook_ads_test
-
-Note that the value for `--database-url` came from the `TEST_DATABASE_URL` value set in the `.env` file. Make sure that the urls match before you run the tests!
-
-Additionally, because the integration tests use the database, we want to make sure that they aren't run in parallel, so to run the tests:
-
-    $ RUST_TEST_THREADS=1 cargo test
-
-This will run the tests in sequence, avoiding parallelism errors for tests that require the database.
-
-### Classifier
-
-We train the classifier using python and scikit learn and the source is in `backend/classifier/`. We're using [pipenv](https://docs.pipenv.org/) to track dependencies. 
-
-To download pipenv:
-```
-$ brew install pipenv
-```
-
-To get started you can run:
-
-    $ cd backend/classifier/
-    $ pipenv install
-    $ pipenv shell
-
-To download the seeds for the classifier, you'll need a Facebook app with the proper permissions and you'll run the seed command like this:
-
-    $ FACEBOOK_APP_ID=whatever FACEBOOK_APP_SECRET=whatever DATABASE_URL=postgres://whatever/facebook_ads ./classify seed en-US`
-
-Alternatively, you can build the model without seeds, relying instead just on votes in the extension and suppressions in the admin. And to build the classifier you'll want to run:
-
-    $ pipenv run ./classify build
-
-To classify the ads you've collected you can run:
-
-    $ pipenv run ./classify classify
-    
-You can download pre-trained models with `pipenv run ./classify get_models`.
-
-### Internationalization and Localization
-
-Translations for the extension are stored in `extension/_locales/${locale}/messages.json`.
-
-A `locale` is a ISO 639-1 language code (e.g. `en`, `de`) with an optional ISO 3166-1 Alpha-2 country suffix (e.g. `de_CH`).
-
-Users can select from all known languages and countries while onboarding. The UI then uses the first available translation in following order: `${langauge}_${country}`, `${langauge}`, `en`.
-
-#### Active Languages and Countries
-
-In `extension/src/i18n.js` a list of active language and country codes can be defined. Active ones get prioritised in the UI.
-
-#### Locale Specific Styles in Popup
-
-You can customize, for example font sizes, with `[lang]` and `[data-locale]` CSS selectors:
-
-```css
-[lang=de] .toggle {
-  font-size: 0.78rem;
-}
-[data-locale=de_CH] .toggle {
-  font-size: 0.78rem;
-}
-```
+There is an explanation of all the moving parts in [ARCHITECTURE.md](ARCHITECTURE.md)
 
 ## Stories
 
@@ -161,3 +44,18 @@ You can customize, for example font sizes, with `[lang]` and `[data-locale]` CSS
 In general, the project needs more tests. We've written a couple of tests for parsing the Facebook timeline in the extension directory, and a few for the tricky bits in the server, but any help here would be great!
 
 Also, the rust backend needs a bit of love and care, and there is a bit of a mess in `backend/server/src/server.rs` that could use cleaning up.
+
+
+### Types of ads the collector doesn't collect
+
+ - mobile ads
+ - pre-roll, midstream video ads
+ - video from ads in the stream
+ - Instagram-only ads (Note that many ads are set to run on Facebook and Instagram with the same creative)
+
+### TODOs to Consider:
+
+ - considering triggering the ad parsing routine only on scroll, to mitigate the clicking-off problems.
+ - consider retaining utm params (i.e. a whitelisted set of parameters in links that are added by advertisers, not by FB and ipso facto are not personally identifiable, e.g. `utm_content`, etc., since those sometimes include useful metadata about the ad.)
+ - consider turning off the panelist_ads table, etc. 
+ - consider seeding the partisanship model in new languages with political tweets. 
