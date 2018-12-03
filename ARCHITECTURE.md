@@ -19,22 +19,22 @@ Services
 
 ### Web servers
 
-- Rust app from `facebook-ads/backend/server`.
-- Rails apps from `fbpac-api-public`.
-- politicaladcollector.org
+- Rust app from `facebook-ads/backend/server`. This runs on Amazon ECS.
+- Rails apps from `fbpac-api-public`. This runs on Amazon ECS.
+- politicaladcollector.org: simple site showing how to install the ad collector. This is a website run by Github Pages.
 
 ### Databases
 
 - a Postgres database. We use an Amazon RDS db.r4.large, but that may be beefier than necessary. However, to my knowledge, it hasn't gotten overloaded.
 
 ### Crons
-- archiver: data store uploader (English only; daily, ecsRunTask -> Dockerfile)
-- political classifier, hourly (ecsRunTask -> Dockerfile fbpac-classifier). Also classifies ads by probability of listbuilding/fundraising.
-- political model re-builder, weekly (separate Lambda). Trains the political classifier based on votes that have come in.
+- archiver: data store uploader (English only; This runs daily, with a CloudWatch Event kicking off a the "ecsRunTask" Lambda task that runs an ECS task, as defined in a Dockerfile)
+- political classifier, This runs hourly, with a CloudWatch Event kicking off a the "ecsRunTask" Lambda task that runs an ECS task, as defined in a Dockerfile). Also classifies ads by probability of listbuilding/fundraising.
+- political model re-builder, This runs daily, with a CloudWatch Event kicking off a the "ecsRunTask" Lambda task that runs a EC2 Spot Instance request, using a custom AMI (with pre-installed dependencies) and a custom UserData script, [train_and_upload_models.sh](backend/classifier/train_and_upload_models.sh)). Trains the political classifier based on votes that have come in.
 - fbpac-cache-warmer for recalculating the homepage stats every hour.
 
 ### Other infrastructure
- - Amazon S3 for storing ad images.
+ - Amazon S3 folder for storing ad images; the Rust app has to have credentials to write to this bucket.
 
 Portions of the app in need of internationalization:
 ----------------------------------------------------
