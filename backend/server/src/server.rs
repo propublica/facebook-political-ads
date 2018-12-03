@@ -15,7 +15,7 @@ use hyper::header::{AcceptLanguage, AccessControlAllowOrigin, Authorization, Bea
 use hyper::mime;
 use hyper_tls::HttpsConnector;
 use jsonwebtoken::{decode, Validation};
-use models::{Ad, Advertisers, Aggregate, Entities, NewAd, NewPanelistAd, Segments, Targets};
+use models::{Ad, Advertisers, Aggregate, Entities, NewAd, Segments, Targets};
 use r2d2::Pool;
 use regex::Regex;
 use regex::RegexSet;
@@ -53,7 +53,6 @@ pub struct AdPost {
     pub html: String,
     pub political: Option<bool>,
     pub targeting: Option<String>,
-    pub ygid: Option<String>
 }
 
 #[derive(Deserialize, Debug)]
@@ -492,11 +491,6 @@ impl AdServer {
         let posts: Vec<AdPost> = serde_json::from_str(&string)?;
         let ads = posts.iter().map(move |post| {
             let ad = NewAd::new(post, &lang)?.save(db_pool)?;
-            println!("post ygid {:?}", post.ygid);
-            match post.ygid {
-                Some(_) => Some(NewPanelistAd::new(post)?.save(db_pool)?),
-                None => None
-            };
             Ok(ad)
         });
         ads.collect::<Result<Vec<Ad>>>()

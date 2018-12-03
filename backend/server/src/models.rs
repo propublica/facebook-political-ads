@@ -23,7 +23,6 @@ use r2d2::Pool;
 use rusoto_core::Region;
 use rusoto_s3::{PutObjectRequest, S3, S3Client};
 use schema::ads;
-use schema::panelist_ads;
 use schema::ads::BoxedQuery;
 use serde_json;
 use serde_json::Value;
@@ -658,42 +657,6 @@ pub fn get_advertiser(targeting: &Option<String>, document: &kuchiki::NodeRef) -
     }
 }
 
-
-#[derive(Serialize, Queryable, Debug, Clone)]
-pub struct PanelistAd {
-    pub ad_id: String,
-    pub panelist_id: String,
-    pub created_at: DateTime<Utc>
-}
-
-// ad_id and panelist_id do not combine to be unique;
-// one panelist can see the same ad multiple times
-#[derive(Insertable, Debug)]
-#[table_name = "panelist_ads"]
-pub struct NewPanelistAd<'a> {
-    pub ad_id: &'a str,
-    pub panelist_id: &'a str,
-}
-
-impl<'a> NewPanelistAd<'a> {
-    pub fn new(ad: &'a AdPost) -> Result<NewPanelistAd<'a>> {
-        let panelist_id = &ad.ygid.as_ref().unwrap();
-        println!( "panelist_id: {:?}", panelist_id);
-        Ok(NewPanelistAd{
-            ad_id: &ad.id,
-            panelist_id: &panelist_id
-        })
-    }
-    pub fn save(&self, pool: &Pool<ConnectionManager<PgConnection>>) -> Result<PanelistAd> {
-        use schema::panelist_ads;
-        let connection = pool.get()?;
-        let saved_panelist_ad: PanelistAd = diesel::insert_into(panelist_ads::table)
-            .values(self)
-            .get_result(&*connection)?;
-        Ok(saved_panelist_ad)
-    }
-}
-
 #[derive(Insertable, Debug)]
 #[table_name = "ads"]
 pub struct NewAd<'a> {
@@ -831,8 +794,7 @@ mod tests {
             id: "test".to_string(),
             html: ad.to_string(),
             political: None,
-            targeting: None,
-            ygid: None
+            targeting: None
         };
         let new_ad = NewAd::new(&post, "en-US").unwrap();
         assert!(new_ad.thumbnail.len() > 0);
@@ -852,8 +814,7 @@ mod tests {
             id: "test".to_string(),
             html: ad.to_string(),
             political: None,
-            targeting: None,
-            ygid: None
+            targeting: None
         };
         let new_ad = NewAd::new(&post, "en-US").unwrap();
         assert!(new_ad.thumbnail.len() > 0);

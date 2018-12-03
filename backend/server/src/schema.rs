@@ -26,10 +26,3 @@ table! {
         targetedness -> Nullable<Int4>,
     }
 }
-table! {
-    panelist_ads (ad_id, panelist_id, created_at) {
-        ad_id -> Text,
-        panelist_id -> Text,
-        created_at -> Timestamptz,
-    }
-}
