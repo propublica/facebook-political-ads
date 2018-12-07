@@ -43,7 +43,6 @@ pub struct AdServer {
     pool: CpuPool,
     handle: Handle,
     client: Client<HttpsConnector<HttpConnector>>,
-    password: String,
     database_url: String,
 }
 
@@ -81,9 +80,6 @@ impl Service for AdServer {
     // someone will make a hyper router that's nice.
     fn call(&self, req: Request) -> Self::Future {
         match (req.method(), req.path()) {
-            (&Method::Post, "/facebook-ads/login") => Either::B(self.auth(req, |_| {
-                Box::new(future::ok(Response::new().with_status(StatusCode::Ok)))
-            })),
             // Admin
             (&Method::Get, "/facebook-ads/admin.js") => {
                 Either::B(self.file("public/dist/admin.js", ContentType(mime::TEXT_JAVASCRIPT)))
@@ -99,9 +95,6 @@ impl Service for AdServer {
             }
             (&Method::Get, "/facebook-ads/images/share-twitter.png") => {
                 Either::B(self.file_bytes("public/images/share-twitter.png", ContentType(mime::IMAGE_PNG)))
-            }
-            (&Method::Post, "/facebook-ads/admin/ads") => {
-                Either::B(self.auth(req, |request| self.mark(request)))
             }
             (&Method::Get, "/facebook-ads/index.js") => {
                 Either::B(self.file("public/dist/index.js", ContentType(mime::TEXT_JAVASCRIPT)))
@@ -241,28 +234,6 @@ fn json<T: Serialize + Debug>(thing: &T) -> Response {
 
 type ResponseFuture = Box<Future<Item = Response, Error = hyper::Error>>;
 impl AdServer {
-    // Middleware
-    fn auth<F>(&self, req: Request, callback: F) -> ResponseFuture
-    where
-        F: Fn(Request) -> ResponseFuture,
-    {
-        let auth = req.headers()
-            .get::<Authorization<Bearer>>()
-            .and_then(|token| {
-                decode::<Admin>(&token.token, self.password.as_ref(), &Validation::default()).ok()
-            });
-
-        if auth.is_some() {
-            info!("Login {:?}", auth);
-            callback(req)
-        } else {
-            warn!("Bad Login {:?}", auth);
-            Box::new(future::ok(
-                Response::new().with_status(StatusCode::Unauthorized),
-            ))
-        }
-    }
-
     fn lang<F>(&self, req: Request, callback: F) -> ResponseFuture
     where
         F: Fn(Request, String) -> ResponseFuture,
@@ -523,7 +494,6 @@ impl AdServer {
 
     pub fn new(handle: Handle, database_url: String) -> AdServer {
         dotenv().ok();
-        let admin_password = env::var("ADMIN_PASSWORD").expect("ADMIN_PASSWORD must be set.");
         let manager = ConnectionManager::<PgConnection>::new(database_url.clone());
         let db_pool = Pool::builder()
             .build(manager)
@@ -538,7 +508,6 @@ impl AdServer {
             db_pool: db_pool,
             handle: handle,
             client: client,
-            password: admin_password,
             database_url: database_url,
         }
     }
