@@ -32,7 +32,8 @@ use std::cmp;
 use targeting_parser::{collect_advertiser, collect_targeting, Targeting};
 use url::{ParseError, Url};
 
-const ENDPOINT: &str = "https://pp-facebook-ads.s3.amazonaws.com/";
+const DEFAULT_S3_BUCKET_NAME : &'static str = "pp-facebook-ads";
+const S3_BUCKET_NAME: Option<&'static str> = option_env!("S3_BUCKET_NAME");
 
 pub fn document_select(
     document: &kuchiki::NodeRef,
@@ -147,10 +148,11 @@ pub struct Images {
 }
 impl Images {
     fn from_ad(ad: &Ad, images: &[Uri]) -> Result<Images> {
+        let s3_endpoint : &str = &("https://".to_owned() + S3_BUCKET_NAME.unwrap_or(DEFAULT_S3_BUCKET_NAME) + &".s3.amazonaws.com/".to_owned());
         let thumb = images
             .iter()
             .filter(|i| ad.thumbnail.contains(i.path()))
-            .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches('/'))
+            .map(|i| s3_endpoint.to_string() + i.path().trim_left_matches('/'))
             .nth(0);
         let mut rest = images.to_owned();
         if let Some(thumb) = thumb.clone() {
@@ -159,7 +161,7 @@ impl Images {
 
         let collection = rest.iter()
             .filter(|i| ad.images.iter().any(|a| a.contains(i.path())))
-            .map(|i| ENDPOINT.to_string() + i.path().trim_left_matches('/'))
+            .map(|i| s3_endpoint.to_string() + i.path().trim_left_matches('/'))
             .collect::<Vec<String>>();
         let document = kuchiki::parse_html().one(ad.html.clone());
         for a in document_select(&document, "img")? {
@@ -169,7 +171,7 @@ impl Images {
                         .iter()
                         .find(|i| i.path() == get_real_image_uri(u.clone()).path())
                     {
-                        *x = ENDPOINT.to_string() + i.path().trim_left_matches('/');
+                        *x = s3_endpoint.to_string() + i.path().trim_left_matches('/');
                     } else {
                         *x = "".to_string();
                     }
@@ -392,14 +394,16 @@ impl Ad {
         let ad = self.clone();
         let pool_db = pool.clone();
         let db = db.clone();
+        let s3hostname = S3_BUCKET_NAME.unwrap_or(DEFAULT_S3_BUCKET_NAME).to_owned() + &(".s3.amazonaws.com".to_owned());
+        let s3hostname2 = s3hostname.clone(); // to circumvent some lifecycle thing I don't have time to fix right now.
         let future = stream::iter_ok(self.image_urls())
             // filter ones we already have in the db and ones we can verify as
             // coming from fb, we don't want to become a malware vector :)
             // currently we redownload images we already have, but ok.
-            .filter(|u| {
+            .filter(move |u| {
                 info!("testing {:?}", u.host());
                 match u.host() {
-                    Some(h) => (h == "pp-facebook-ads.s3.amazonaws.com" || h.ends_with("fbcdn.net")),
+                    Some(h) => (h == s3hostname2 || h.ends_with("fbcdn.net")),
                     None => false
                 }
             })
@@ -416,10 +420,10 @@ impl Ad {
             })
             // upload them to s3
             .and_then(move |tuple| {
-                    if tuple.1.host().unwrap_or_default() != "pp-facebook-ads.s3.amazonaws.com" {
+                    if tuple.1.host().unwrap_or_default() != s3hostname {
                         let client = S3Client::simple(Region::UsEast1);
                         let req = PutObjectRequest {
-                            bucket: "pp-facebook-ads".to_string(),
+                            bucket: S3_BUCKET_NAME.unwrap_or(DEFAULT_S3_BUCKET_NAME).to_string(),
                             key: tuple.1.path().trim_left_matches('/').to_string(),
                             acl: Some("public-read".to_string()),
                             body: Some(tuple.0.to_vec()),
