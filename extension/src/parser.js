@@ -218,6 +218,7 @@ export class Parser extends StateMachine {
     }
     // and we have childnodes
     if (!this.node.children.length === 0) return this.notAnAd();
+    if (DEBUG) parent.style.color = "#f442c8";
     this.ad = ad(this.node);
     this.parent = parent;
     // Move onto the next step
@@ -267,7 +268,7 @@ export class Parser extends StateMachine {
     const ad_id_start =
       toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") > -1
         ? toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") + 18
-        : toggle.getAttribute("data-gt").indexOf("\"ad_id\":") + 8;
+        : toggle.getAttribute("data-gt").indexOf('"ad_id":') + 8;
     const toggleIdPlus = toggle.getAttribute("data-gt").slice(ad_id_start);
     const ad_id_end = Math.min(
       toggleIdPlus.indexOf(","),
@@ -489,7 +490,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  "a[href=\"\"]",
+  'a[href=""]',
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -563,8 +564,8 @@ const cleanAd = html => {
 
 export const checkSponsor = node => {
   return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
-    a => {
-      a = a.cloneNode(true);
+    realNode => {
+      let a = realNode.cloneNode(true);
       const canary = Array.from(a.querySelectorAll("span")).concat(
         Array.from(a.querySelectorAll("div"))
       );
@@ -581,7 +582,7 @@ export const checkSponsor = node => {
       const style = window
         .getComputedStyle(a, ":after")
         .getPropertyValue("content");
-      return [
+      const is_sponsored = [
         "Gesponsord",
         "Sponsored", // en-US
         "Gesponsert",
@@ -603,6 +604,20 @@ export const checkSponsor = node => {
         if (text === sponsor || style === `"${sponsor}"`) return true;
         return false;
       });
+      if (!is_sponsored) return false;
+      console.log(
+        "checkSponsor",
+        realNode.children[0].offsetHeight,
+        realNode.children[0].offsetWidth,
+        realNode.textContent.replace(/^\s+|\s+$/g, "").split(" ")[0],
+        realNode
+      );
+      if (
+        realNode.children[0].offsetHeight == 0 &&
+        realNode.children[0].offsetWidth == 0
+      )
+        return false;
+      return is_sponsored;
     }
   );
 };
@@ -611,7 +626,7 @@ export const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    "localStorage.setItem(\"pageVariable\", (" +
+    'localStorage.setItem("pageVariable", (' +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
