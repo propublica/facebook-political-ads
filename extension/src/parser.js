@@ -268,7 +268,7 @@ export class Parser extends StateMachine {
     const ad_id_start =
       toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") > -1
         ? toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") + 18
-        : toggle.getAttribute("data-gt").indexOf('"ad_id":') + 8;
+        : toggle.getAttribute("data-gt").indexOf("\"ad_id\":") + 8;
     const toggleIdPlus = toggle.getAttribute("data-gt").slice(ad_id_start);
     const ad_id_end = Math.min(
       toggleIdPlus.indexOf(","),
@@ -490,7 +490,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  'a[href=""]',
+  "a[href=\"\"]",
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -604,20 +604,26 @@ export const checkSponsor = node => {
         if (text === sponsor || style === `"${sponsor}"`) return true;
         return false;
       });
-      if (!is_sponsored) return false;
-      console.log(
-        "checkSponsor",
-        realNode.children[0].offsetHeight,
-        realNode.children[0].offsetWidth,
-        realNode.textContent.replace(/^\s+|\s+$/g, "").split(" ")[0],
-        realNode
-      );
+      if (!is_sponsored) return false; // early return if this doesn't contain "Sponsored"
+      if (DEBUG)
+        console.log(
+          "checkSponsor",
+          realNode.children[0].offsetHeight,
+          realNode.children[0].offsetWidth,
+          realNode.textContent.replace(/^\s+|\s+$/g, "").split(" ")[0],
+          realNode
+        );
+      /* for some users, all posts (both ads and friends' vacation pictures) contain the "Sponsored" markup but,
+       * that markup is only visible in actual ads. So we check the height/width of the Sponsored div is non-zero
+       * if it is, we identify it as an ad, otherwise, it's a sneaky sneaky red herring.
+       * (are you the FB engineer who came up with this? Clever! but... signal me (205) 286-2366 )
+       */
       if (
-        realNode.children[0].offsetHeight == 0 &&
-        realNode.children[0].offsetWidth == 0
+        realNode.children[0].offsetHeight === 0 &&
+        realNode.children[0].offsetWidth === 0
       )
         return false;
-      return is_sponsored;
+      return true;
     }
   );
 };
@@ -626,7 +632,7 @@ export const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    'localStorage.setItem("pageVariable", (' +
+    "localStorage.setItem(\"pageVariable\", (" +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
