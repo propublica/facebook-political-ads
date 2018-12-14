@@ -657,7 +657,7 @@ pub fn get_advertiser(targeting: &Option<String>, document: &kuchiki::NodeRef) -
     match *targeting {
         Some(ref targeting) => collect_advertiser(targeting)
             .or_else(|| get_author_link(document).map(|a| a.text_contents()).ok()),
-        None => None,
+        None => get_author_link(document).map(|a| a.text_contents()).ok(),
     }
 }
 
