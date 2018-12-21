@@ -1,37 +1,3 @@
-//  ******************************  //
-//                                  //
-//  Are you a Facebook engineer?    //
-//                                  //
-//  ******************************  //
-
-// Hi!   Glad that you're here.
-//
-// I'm Jeremy Merrill. I'm a journalist and programmer at ProPublica. I'd love
-// to hear from you... especially if you're visiting this page for work.
-//
-// What do you think about the role Facebook ads have been said to have played
-// in various recent news events? ... like Russian election-meddling.
-// Or Trump's 2016 victory.
-// (Some would say its effect on these is totally overblown! What do you think?
-// I genuinely want to hear _your_ take. What's your sense of what your
-// colleagues think?) What do you think about Facebook's transparency efforts
-// regarding political ads? Do you think that those efforts are sufficient?
-
-// Your job is not just pushing pixels or building APIs. You maintain a critical
-// piece of infrastructure for American democracy -- and you *personally* have
-// a critical role in America's future. Your company does too.
-// Do you think Facebook's management is up to the challenge?
-
-// Email me at jeremy.merrill@propublica.org.
-
-// We can talk confidentially ("on background"), if you want.
-// My PGP key ID is 0x7780C4694F621BA0. Or Signal me at (205) 286-2366.
-// (a.k.a. (205) A TOAD? NO! 🍄 :D )
-// You can email me from a burner email account if you want, too.
-
-// I bet you have thoughts...
-// Let's talk.
-
 export const TIMELINE_SELECTOR = ".userContentWrapper";
 export const SIDEBAR_SELECTOR = ".ego_unit";
 export const DEBUG =
@@ -268,7 +234,7 @@ export class Parser extends StateMachine {
     const ad_id_start =
       toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") > -1
         ? toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") + 18
-        : toggle.getAttribute("data-gt").indexOf("\"ad_id\":") + 8;
+        : toggle.getAttribute("data-gt").indexOf('"ad_id":') + 8;
     const toggleIdPlus = toggle.getAttribute("data-gt").slice(ad_id_start);
     const ad_id_end = Math.min(
       toggleIdPlus.indexOf(","),
@@ -490,7 +456,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  "a[href=\"\"]",
+  'a[href=""]',
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -632,7 +598,7 @@ export const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    "localStorage.setItem(\"pageVariable\", (" +
+    'localStorage.setItem("pageVariable", (' +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
