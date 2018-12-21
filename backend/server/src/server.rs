@@ -10,11 +10,10 @@ use hyper;
 use hyper::{Body, Chunk, Client, Method, StatusCode};
 use hyper::client::HttpConnector;
 use hyper::server::{Http, Request, Response, Service};
-use hyper::header::{AcceptLanguage, AccessControlAllowOrigin, Authorization, Bearer, CacheControl,
+use hyper::header::{AcceptLanguage, AccessControlAllowOrigin, CacheControl,
                     CacheDirective, Connection as HttpConnection, Location, ContentLength, ContentType, Vary};
 use hyper::mime;
 use hyper_tls::HttpsConnector;
-use jsonwebtoken::{decode, Validation};
 use models::{Ad, Advertisers, Aggregate, Entities, NewAd, Segments, Targets};
 use r2d2::Pool;
 use regex::Regex;
@@ -179,7 +178,7 @@ impl Service for AdServer {
                     None => not_found,
                     // these indices match to the indices of `restful` above.
                     Some(&0) => Either::B(self.file("public/index.html", ContentType::html())),
-                    Some(&1) => Either::B(self.file("public/admin.html", ContentType::html())),
+                    Some(&1) => Either::A(future::ok(Response::new().with_header(Location::new("https://www.rust-lang.org/")).with_status(StatusCode::MovedPermanently))),
                     Some(&2) => {
                         // api
                         match collection.captures(&my_path) {
