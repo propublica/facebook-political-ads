@@ -12,9 +12,10 @@ def flatten(l):
     return [a for b in l for a in b]
 
 def permute_text(text):
-    words = ' '.join(text.split()).split()
+    words = ' '.join(re.sub(r'[^A-Za-z0-9]', ' ', text).split()).split()
     bigrams = list(zip(words[:-1], words[1:]))
-    return [(word, ' '.join(words[:i] + words[i+1:]) ) for i, word in enumerate(words)] + [(bigram, ' '.join(flatten(bigrams[:i-1] + bigrams[i+2:]) )) for i, bigram in enumerate(bigrams)]
+    trigrams = list(zip(bigrams[:-2], words[2:]))
+    return [(word, ' '.join(words[:i] + words[i+1:]) ) for i, word in enumerate(words)] + [(bigram, ' '.join(words[:i] + words[i+2:]) ) for i, bigram in enumerate(bigrams)] + [(trigram, ' '.join(words[:i] + words[i+3:]) ) for i, trigram in enumerate(trigrams)]
 
 def probability_difference(classifier, permuted_text, baseline):
     vectorized_text = classifier["vectorizer"].transform([permuted_text])
@@ -22,6 +23,11 @@ def probability_difference(classifier, permuted_text, baseline):
     # print("{}: {}".format(baseline - probability, deleted_word))
     return baseline - probability
 
+
+def text_probability(classifier, text):
+    vectorized_baseline_text = classifier["vectorizer"].transform([text])
+    baseline = classifier["classifier"].predict_proba(vectorized_baseline_text)[0][1]
+    return baseline
 
 def clean_text(text, advertiser):
     clean_text = text.replace(advertiser, "ADVERTISER") if advertiser else text
@@ -52,11 +58,10 @@ def analyze(ctx, id):
         if record_lang in classifiers:
             classifier = classifiers[record_lang]
             text = clean_text(get_text(record), record["advertiser"])
+            baseline = text_probability(classifier, text)
             permuted_texts = permute_text(text)
-            vectorized_baseline_text = classifier["vectorizer"].transform([text])
-            baseline = classifier["classifier"].predict_proba(vectorized_baseline_text)[0][1]
 
-            diffs = [(deleted_word, probability_difference(classifier, permuted_text, baseline)) for (deleted_word, permuted_text)  in permuted_texts]
+            diffs = [(deleted_word, baseline - text_probability(classifier, permuted_text)) for (deleted_word, permuted_text)  in permuted_texts]
 
             print("text: {}".format(text))
             print("original probability: {}".format(baseline))
