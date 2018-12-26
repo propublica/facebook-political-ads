@@ -234,7 +234,7 @@ export class Parser extends StateMachine {
     const ad_id_start =
       toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") > -1
         ? toggle.getAttribute("data-gt").indexOf("&quot;ad_id&quot;:") + 18
-        : toggle.getAttribute("data-gt").indexOf('"ad_id":') + 8;
+        : toggle.getAttribute("data-gt").indexOf("\"ad_id\":") + 8;
     const toggleIdPlus = toggle.getAttribute("data-gt").slice(ad_id_start);
     const ad_id_end = Math.min(
       toggleIdPlus.indexOf(","),
@@ -456,7 +456,7 @@ const selectors = [
   "input",
   "button",
   "iframe",
-  'a[href=""]',
+  "a[href=\"\"]",
   ".accessible_elem",
   ".uiLikePagebutton",
   ".uiPopOver",
@@ -528,68 +528,72 @@ const cleanAd = html => {
   return node.innerHTML.replace(/&amp;/g, "&");
 };
 
+/* 
+        Facebook's "Sponsored" markup is actually "SpSonSsoSredSSS".
+        All the extra "S" are hidden with CSS. In other languages, that intrusive letter is not "S",
+        but rather the first letter of the word for "Sponsored", e.g. "C" for fr-CA's "Commandité".
+        The intrusive letters and the real letters are all in spans. Both have two classes, but those
+        classes differ per-person. 
+        Until 12/21/2018ish, we could distinguish the intrusive letter from real letters by removing any single-letter spans.
+        
+        Additionally, for some users, all posts (both ads and friends' vacation pictures) contain the "Sponsored" markup but,
+        that markup is only visible in actual ads. So we check the height/width of the Sponsored div is non-zero
+        if it is, we identify it as an ad, otherwise, it's a sneaky sneaky red herring.
+        (are you the FB engineer who came up with this? Clever! but... signal me (205) 286-2366 )
+
+        But then Facebook added an extra span at the end that says "SS". So that doesn't work anymore. 
+        So now we filter each by whether it's visible.
+        FYI if you're an FB engineer reading this, please reflect on whether interfering with political ad transparency
+        efforts is something you'll be proud of! And/or Signal or call me 205-286-2366... or PGP at jeremy at jeremybmerrill dot com
+      */
+
+const sponsored_translations = [
+  "Gesponsord",
+  "Sponsored", // en-US
+  "SponsoredSS", // en-US, testing
+  "Gesponsert",
+  "Sponsrad", // sv
+  "Sponsorlu", // turkish?
+  "Sponsoroitu", // fn?
+  "مُموَّل", // ar
+  "Sponsoreret", // dk
+  "Sponsorizzata", //it
+  "Chartered", // en-PIRATE :)
+  "Commandité", // fr-CA
+  "Sponsorisé", // fr-FR
+  "Patrocinado", // pt-BR
+  "Apmaksāta", // lv-LV (cuts off reklāma as part of the thing that gets rid of the U.S. disclaimer)
+  "რეკლამა", // ka-GE
+  "Реклама", // ru
+  "Publicidad" // es
+];
 export const checkSponsor = node => {
   return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
     realNode => {
-      let a = realNode.cloneNode(true);
-      const canary = Array.from(a.querySelectorAll("span")).concat(
-        Array.from(a.querySelectorAll("div"))
-      );
+      //let a = realNode.cloneNode(true);
+      const canary = Array.from(realNode.querySelectorAll("span,div"));
 
-      Array.from(canary)
-        .filter(
-          elem =>
-            elem.className.split(" ").length === 2 &&
-            elem.textContent.length === 1
-        )
-        .forEach(canary => canary.remove());
+      const visibleCanaryText = Array.from(canary).reduce((acc, elem) => {
+        if (elem.offsetHeight > 0 && elem.offsetWidth)
+          return (
+            acc +
+            (elem.offsetHeight > 0 &&
+            elem.offsetWidth > 0 &&
+            elem.children.length === 0
+              ? elem.textContent
+              : "")
+          );
+      }, "");
 
-      const text = a.textContent.replace(/^\s+|\s+$/g, "").split(" ")[0];
-      const style = window
-        .getComputedStyle(a, ":after")
-        .getPropertyValue("content");
-      const is_sponsored = [
-        "Gesponsord",
-        "Sponsored", // en-US
-        "Gesponsert",
-        "Sponsrad", // sv
-        "Sponsorlu", // turkish?
-        "Sponsoroitu", // fn?
-        "مُموَّل", // ar
-        "Sponsoreret", // dk
-        "Sponsorizzata", //it
-        "Chartered", // en-PIRATE :)
-        "Commandité", // fr-CA
-        "Sponsorisé", // fr-FR
-        "Patrocinado", // pt-BR
-        "Apmaksāta", // lv-LV (cuts off reklāma as part of the thing that gets rid of the U.S. disclaimer)
-        "რეკლამა", // ka-GE
-        "Реклама", // ru
-        "Publicidad" // es
-      ].some(sponsor => {
-        if (text === sponsor || style === `"${sponsor}"`) return true;
+      const text = visibleCanaryText.replace(/^\s+|\s+$/g, "").split(" ")[0];
+
+      // N.B. Facebook has previously experimented with putting the word "Sponsored" in the CSS content rule
+      // if that shows up again, see bbe70267b8d3d375d451f2bbff219f89ca5c7d23 for ways to detect it
+      const is_sponsored = sponsored_translations.some(sponsor => {
+        if (text.indexOf(sponsor) === 0) return true;
         return false;
       });
-      if (!is_sponsored) return false; // early return if this doesn't contain "Sponsored"
-      if (DEBUG)
-        console.log(
-          "checkSponsor",
-          realNode.children[0].offsetHeight,
-          realNode.children[0].offsetWidth,
-          realNode.textContent.replace(/^\s+|\s+$/g, "").split(" ")[0],
-          realNode
-        );
-      /* for some users, all posts (both ads and friends' vacation pictures) contain the "Sponsored" markup but,
-       * that markup is only visible in actual ads. So we check the height/width of the Sponsored div is non-zero
-       * if it is, we identify it as an ad, otherwise, it's a sneaky sneaky red herring.
-       * (are you the FB engineer who came up with this? Clever! but... signal me (205) 286-2366 )
-       */
-      if (
-        realNode.children[0].offsetHeight === 0 &&
-        realNode.children[0].offsetWidth === 0
-      )
-        return false;
-      return true;
+      return is_sponsored;
     }
   );
 };
@@ -598,7 +602,7 @@ export const checkSponsor = node => {
 const grabVariable = (fn, args) => {
   let script = document.createElement("script");
   script.textContent =
-    'localStorage.setItem("pageVariable", (' +
+    "localStorage.setItem(\"pageVariable\", (" +
     fn +
     ").apply(this, " +
     JSON.stringify(args) +
