@@ -574,15 +574,16 @@ export const checkSponsor = node => {
       const canary = Array.from(realNode.querySelectorAll("span,div"));
 
       const visibleCanaryText = Array.from(canary).reduce((acc, elem) => {
-        if (elem.offsetHeight > 0 && elem.offsetWidth)
-          return (
-            acc +
-            (elem.offsetHeight > 0 &&
-            elem.offsetWidth > 0 &&
-            elem.children.length === 0
-              ? elem.textContent
-              : "")
-          );
+        return (
+          acc +
+          (elem &&
+          elem.offsetHeight > 0 &&
+          elem.offsetWidth > 0 &&
+          elem.children &&
+          elem.children.length === 0
+            ? elem.textContent
+            : "")
+        );
       }, "");
 
       const text = visibleCanaryText.replace(/^\s+|\s+$/g, "").split(" ")[0];
