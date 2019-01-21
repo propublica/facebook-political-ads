@@ -328,6 +328,9 @@ export class Parser extends StateMachine {
   }
 
   done() {
+    if (this.ad.id == "1234"){
+      this.ad.id = this.node.closest(".sponsored_ad").id;
+    }
     if (DEBUG) {
       console.log(this.states);
       this.node.style.color = "#ff0000";
@@ -375,7 +378,15 @@ class IdFinder extends StateMachine {
 
   click() {
     refocus(() => this.toggle.click());
-    this.promote(states.MENU);
+    // 2018/01/21: 
+    // this is just a hotfix, skipping this whole routine,
+    // since you (suspiciously) can't .click() the `...` button anymore    
+    this.promote(states.DONE);
+    targetingBlocked = true;
+    this.url = 'fake';
+    this.id = "1234";
+    // uncomment this after the hotfix is no longer necessary
+    //this.promote(states.MENU);
   }
 
   close() {
