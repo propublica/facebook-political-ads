@@ -565,7 +565,8 @@ const sponsored_translations = [
   "Apmaksāta", // lv-LV (cuts off reklāma as part of the thing that gets rid of the U.S. disclaimer)
   "რეკლამა", // ka-GE
   "Реклама", // ru
-  "Publicidad" // es
+  "Publicidad", // es
+  "ממומן" //he
 ];
 export const checkSponsor = node => {
   return Array.from(node.querySelectorAll(".clearfix a, .ego_section a")).some(
