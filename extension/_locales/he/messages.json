@@ -1,0 +1,108 @@
+{
+  "name": {
+    "message": "תוסף מודעות פוליטיות ממומנות בפייסבוק",
+    "description": "Extension name"
+  },
+  "short_name": {
+    "message": "פייסבוק PAC",
+    "description": "Extension short name"
+  },
+  "description": {
+    "message": "התוסף הזה אוסף מודעות ממומנות בפייסבוק",
+    "description": "Description of the extension"
+  },
+  "rate_ads": {
+    "message": "מודעות שראיתי",
+    "description": "Text for the 'Ads I'm Seeing' button in the extension."
+  },
+  "see_ads": {
+    "message": "מודעות שאחרים ראו",
+    "description":
+      "Text for the 'Ads Others are Seeing' button in the extension."
+  },
+  "political": {
+    "message": "מודעה פוליטית",
+    "description": "Label for political radio button"
+  },
+  "normal": {
+    "message": "מודעה רגילה",
+    "description": "Label for normal radio button"
+  },
+  "rating_question": {
+    "message": "איזה סוג מודעה, המודעה הזאת?",
+    "description": "Question to ask for rating an ad"
+  },
+  "verify_question": {
+    "message": "האם זה פוליטי?",
+    "description": "Question to ask for rating an ad"
+  },
+  "language_settings": {
+    "message": "הגדרת השפה שלך",
+    "description": "Your Language Settings"
+  },
+  "you_speak": {
+    "message":
+      "<div style=\"direction:rtl;\">הדפדפן חושב שאתה קורא בשפה <b>$language$</b> וגר ב <b>$country$</b>.</div>",
+    "description": "Your language and country",
+    "placeholders": {
+      "language": {
+        "content": "$1"
+      },
+      "country": {
+        "content": "$2"
+      }
+    }
+  },
+  "stories": {
+    "message": "מודעות",
+    "description": "Shown in US English locale only"
+  },
+  "language_instructions": {
+    "message":
+      "במידה וההגדרות לא נכונות, אנא הגדר בתפריט",
+    "description": "Instructions to adapt if needed."
+  },
+  "language": {
+    "message": "שפה: ",
+    "description": "Language"
+  },
+  "country": {
+    "message": "מדינה: ",
+    "description": "Country: "
+  },
+  "terms_of_service": {
+    "message":
+     "<div style=\"direction:rtl;\"><h2> האם אנו מקבלים את הסכמתך? </ h2> <p> ProPublica אנו מאמינים במתן שקיפות לגבי מה שאנחנו עושים, אז לפני שתתקין את התוסף, הקדש רגע כדי להבין מה עושה התוסף. </ p> <h2> מה עושה התוסף </ h2> <p> התוסף מבצע פעולה אוטומטית שאוספת תוכן בכל דף פייסבוק שאתה מבקר. הפעולה הזאת סורקת את המודעות, ולאחר מכן שומרת אותן במחשב שלך. מודעות אלה נשלחות גם ל- ProPublica לתמיכה מחקר ועיתונאות </ p> <h2> איך אתה יכול לעזור </ h2> <p> בכל פעם שאתה רוצה לסייע לנו, אתה יכול ללחוץ על הסמל ProPublica בסרגל הדפדפן שלך ואז יופיע חלון מוקפץ, שיכיל את כל המודעות שנשמרו במחשב שלך. אתה יכול לסייע על ידי סיווג המודעות ככמודעות רגילות או פוליטיות. </ p> <h2> איזה מידע נאסוף </ h2> <p> השרת שלנו יקבל מידע נקי, מידע לא מזוהה ברמת המשתמש, מספר מזהה של המודעות ומשתנים של מיקוד המודעה (טירגוט) (לדוגמה, אנשים בגילאי 18 ומעלה שמתגוררים בסמוך לתל אביב), הסיווג שלהם (פוליטי או לא פוליטי), וכן הגדרת השפה של הדפדפן שלך. עשינו כל מאמץ כדי להבטיח שהתוסף לא יאסוף נתונים שיכולים לזהות אותך באופן אישי. </ p> <h2> מה נעשה עם המידע? </ h2> <p> אנו נזין את המידע לאלגוריתם שלנו כדי לעזור לו ללמוד לזהות מודעות פוליטיות. כמו כן נשלח אליך מודעות פוליטיות שטרם ראית, אך אחרים דיווחו לנו. כאשר אתה רוצה לדעת אילו מודעות אחרים רואים, תוכל ללחוץ על הסמל \"מודעות שאחרים ראו\" בדפדפן שלך כדי לקבל מודעות מהשרת שלנו. התוסף ישווה את המודעות האלו למודעות שצפית בהן בעצמך ויציג לך רק את המודעות שטרם ראית. לעולם לא נקבל מידע על אילו מודעות יש או לא נראו על ידך באופן אישי. </ P> <h2> מה אם ברצוני לבטל את הסכמתי? </ H2> <p> על ידי התקנת התוסף, אתה מאשר כי הנתונים שהוזכרו לעיל, כמו גם הסיווג שעשית של פרסומות פוליטית, יהיה מאושר לשימוש במסגרת הפרויקט. </ p> <p> אתה יכול להפסיק להשתתף בפרויקט זה בכל עת על ידי הסרת ההתקנה, ומרגע השבתת התוסף או הסרתו לא יישלחו נתונים נוספים (להלן הוראות להשבית תוספים בדפדפן כרום: <a href=\"https://support.google.com/chrome_webstore/answer/2664769?hl=iw\"> Chrome </a> ו- <a href=\"https://support.mozilla.org/en-US/kb/ disable-or-remove-add-ons\"> Firefox. </a>) . </ p > <p> <b> שאלות, חששות או הצעות? אנא צור עמנו קשר בכתובת: <a href=\"mailto:politicalads@propublica.org\"> polymads@propublica.org </a> </ p> <p> התוסף פותח ע\"י ProPublica, ולא על ידי מוזילה (מפתחת דפדפן Firefox), וזו מדיניות הפרטיות החלה על תוסף זה ProPublica Facebook <a href=\"https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/privacy/\"> . </ p> </div>",
+    "description": "The terms of service"
+  },
+  "terms_of_service_accept": {
+    "message": "מסכים",
+    "description": "The terms of service accept button"
+  },
+
+  "thanks1": {
+    "message": "תודה! 🙂",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks2": {
+    "message": "המשך כך!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks3": {
+    "message": "לא יכולנו לעשות את זה בלעדיך!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks4": {
+    "message": "תודה שעזרת לנו!",
+    "description": "a randomly-chosen Thanks! message"
+  },
+  "thanks5": {
+    "message": "נכון לעכשיו! קטלגת $count$ מודעות.",
+    "description": "a randomly-chosen Thanks! message",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  }
+}
