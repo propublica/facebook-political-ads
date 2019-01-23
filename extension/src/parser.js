@@ -592,6 +592,12 @@ export const checkSponsor = node => {
           elem.offsetHeight > 0 &&
           elem.offsetWidth > 0 &&
           elem.children &&
+          window.getComputedStyle(elem).getPropertyValue('opacity') !== "0" && 
+          // ^^
+          // Clever, Facebook engineer! You've got an INCREDIBLE sense of JavaScript
+          // and CSS's nooks and crannies. I feel like I'm playing chess with a grandmaster.
+          // Let's talk. jeremybmerrill@jeremybmerrill.com PGP: 0x7780C4694F621BA0
+          // - Jeremy, 1/22/2019
           elem.children.length === 0
             ? elem.textContent
             : "")
