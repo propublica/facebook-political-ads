@@ -1,4 +1,6 @@
 .DS_Store
+appspec.yml
+deploy/
 .tern-port
 node_modules
 dist
@@ -32,3 +34,4 @@ facebook_ads-*.sql
 classifier.dill
 facebook-ads-*.sql
 docker-compose/pgdata
+secrets.env

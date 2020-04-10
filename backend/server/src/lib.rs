@@ -10,7 +10,6 @@ extern crate futures;
 extern crate futures_cpupool;
 extern crate hyper;
 extern crate hyper_tls;
-extern crate jsonwebtoken;
 extern crate kuchiki;
 extern crate log4rs;
 #[macro_use]

@@ -14,7 +14,6 @@ use hyper::header::{AcceptLanguage, AccessControlAllowOrigin, Authorization, Bea
                     CacheDirective, Connection as HttpConnection, Location, ContentLength, ContentType, Vary};
 use hyper::mime;
 use hyper_tls::HttpsConnector;
-use jsonwebtoken::{decode, Validation};
 use models::{Ad, Advertisers, Aggregate, Entities, NewAd, Segments, Targets};
 use r2d2::Pool;
 use regex::Regex;
