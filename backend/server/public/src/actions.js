@@ -219,7 +219,8 @@ export const toggleNoListfund = on_or_off => ({
 // export const SET_BY_STATE = "set_by_state";
 // export const setByState = a_state => ({ type: SET_BY_STATE, value: a_state });
 
-export const getOneAd = (ad_id, url = `${URL_ROOT}/fbpac-api/ads`) => {
+export const getOneAd = (ad_id, url = `dashboard-backend.qz.ai/pp/ads`) => {
+
   if (!ad_id) return () => null;
 
   let path = `${url}/${ad_id}`;
@@ -263,7 +264,7 @@ export const getStatesAndDistricts = () => {
 export const getGroupedAttrs = (
   groupingKind = "advertiser",
   recent = "by",
-  root_url = `${URL_ROOT}/fbpac-api/ads`
+  root_url = `dashboard-backend.qz.ai/pp/ads`
 ) => {
   let path = `${root_url}/${recent}_${groupingKind + "s"}`;
   return (dispatch, getState) => {
@@ -293,7 +294,7 @@ export const getGroupedAttrs = (
   };
 };
 
-export const getAdminSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
+export const getAdminSummary = (root_url = `dashboard-backend.qz.ai/pp/ads`) => {
   let path = `${root_url}/summarize`;
   return (dispatch, getState) => {
     let state = getState();
@@ -322,7 +323,7 @@ export const getAdminSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
   };
 };
 
-export const getHomepageSummary = (root_url = `${URL_ROOT}/fbpac-api/ads`) => {
+export const getHomepageSummary = (root_url = `dashboard-backend.qz.ai/pp/ads`) => {
   let path = `${root_url}/homepage_stats`;
   return (dispatch, getState) => {
     // only support English
@@ -380,14 +381,14 @@ export const getAdsByState = (url = `${URL_ROOT}/fbpac-api/ads/by_state`) => {
       });
   };
 };
-export const getAds = (url = `${URL_ROOT}/fbpac-api/ads`) => {
+export const getAds = (url = `dashboard-backend.qz.ai/pp/ads`) => {
   return (dispatch, getState) => {
     let state = getState();
 
     let params = new URLSearchParams();
     if (state.persona) {
       /* this fork here is the equivalent of serialize() in utils.js */
-      url = `${URL_ROOT}/fbpac-api/ads/persona`;
+      url = `dashboard-backend.qz.ai/pp/persona`;
       if (state.persona.age) {
         params.set("age_bucket", state.persona.age);
       }
