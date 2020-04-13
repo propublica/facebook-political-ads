@@ -54,7 +54,8 @@ export class AdUnconnected extends React.Component {
           </p>
         </div>
         {this.props.ad.targeting !== null ? (
-          <Targeting targeting={this.props.ad.targeting} />
+          // <Targeting targeting={this.props.ad.targeting} />
+          <Targeting targeting={this.props.ad.targeting} targets={this.props.ad.targets} />
         ) : (
           ""
         )}

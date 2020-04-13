@@ -4,6 +4,7 @@ import { withFauxDOM } from "react-faux-dom";
 
 export class PoliticalAdsChartUnfauxed extends React.Component {
   componentDidMount() {
+
     const faux = this.props.connectFauxDOM("div", "chart");
     const $faux = d3.select(faux);
     const svg = $faux.append("svg");
@@ -32,7 +33,8 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
     var political_ads_per_day_chart_data = this.props.political_ads_per_day
       ? this.props.political_ads_per_day.slice(1).map(a => {
           return {
-          date: new Date(this_year, 0, (a[0] - 2) * 7 + 1),
+          // date: new Date(this_year, 0, (a[0] - 2) * 7 + 1),
+          date: new Date(a[0]),
           cnt: a[1]
         };
       })
