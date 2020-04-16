@@ -47,6 +47,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
     // } else {
     //   dotLabel = 0;
     // }
+    // console.log(this.props.political_ads_per_day)
 
     x.domain(
       d3.extent(political_ads_per_day_chart_data, function(d) {
@@ -54,7 +55,7 @@ export class PoliticalAdsChartUnfauxed extends React.Component {
       })
     );
     y.domain([
-      0,
+      150000,
       d3.max(political_ads_per_day_chart_data, function(d) {
         return d.cnt;
       })

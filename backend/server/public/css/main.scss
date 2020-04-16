@@ -451,7 +451,7 @@ article {
   select, input {
     padding-top: 5px;
     padding-bottom: 5px;
-    height: 26px;
+    height: 27px;
     box-sizing: content-box;
     @include breakpoint-max(sm) {
       height: 1.7em;
@@ -462,14 +462,31 @@ article {
   }
   .Select-value{
     padding: 5px;
+    color: #000;
+    max-width: 80%;
     @include breakpoint-max(sm) {
       height: 1.7em;
       padding: 2px 5px;
     }
   }
+  .Select-clear-zone {
+    color: #000;
+  }
+  .Select-arrow {
+    border-color: #000 transparent transparent;
+  }
+  .Select.is-open > .Select-arrow {
+    border-top-color: #000
+  }
+  .Select.is-open > .Select-control .Select-arrow {
+    border-color: transparent transparent #000;
+  }
   .Select-value-label {
     color: black;
     font-weight: 300;
+  }
+  .Select-arrow-zone:hover > .Select-arrow {
+    border-color: #000 transparent transparent;
   }
 
   .Select-multi-value-wrapper {
@@ -1134,9 +1151,16 @@ article {
 
 #graphic {
   margin-bottom: 50px;
+  #bottom-guff {
+    margin-top: 50px;
+  }
+  .extra-top {
+    margin-top:20px;
+  }
   .bottom-guff {
     padding-top: colspan(g, 16);
     padding-bottom: colspan(g, 16);
+
     h3 {
       cursor: pointer;
       font-size: 1em;
@@ -1227,13 +1251,14 @@ header[role="banner"] > h4.project-name a {
   text-decoration: none;
   color: black;
   font-size: .8125rem;
-  padding: .35rem .5rem .25rem;
-  margin-left: 7px;
+  padding: .35rem .75rem .25rem 15px;
+  margin-left: 20px;
   position: relative;
   text-transform: uppercase;
   border-left: solid 1px;
-  top: 0.4rem;
   vertical-align: bottom;
+  top: 0.35rem;
+
   @media screen and (max-width: 767px) {
     top: 0.5rem;
   }
@@ -1241,6 +1266,21 @@ header[role="banner"] > h4.project-name a {
     display: none;
   }
 }
+
+header[role="banner"] > h4.project-name a.quartz-logo {
+    background: url(http://propublica.s3.amazonaws.com/projects/graphics/etc/Quartz_Black.png) no-repeat right 32%;
+    background-size: 100%;
+    padding: 10px 54px;
+    margin-left: 20px;
+    border-left: 0px;
+    top: 0.4rem;
+    @media screen and (max-width: 767px) {
+      top: 0.4rem;
+    }
+    @media screen and (max-width: 560px) {
+      display: inline;
+    }
+  }
 
 header[role="banner"] nav {
   position: absolute;

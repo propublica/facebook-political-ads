@@ -76,24 +76,53 @@
 .targeting_info {
   max-width: 500px;
   margin: 0 auto 12px;
+  padding: 0 12px;
+  
   h3 {
     font-weight: bold;
-    padding-left: 12px;
-    margin-top: 6px;
+    margin: 10px 0px 5px;
   }
 
   .targeting {
     b {
       font-weight: bold;
     }
+    
+    li {
+      text-transform: uppercase;
+      font-size: .9em;
+      padding: 2px 0px;
+      
+      span:first-child {
+        background: #909bb1;
+        padding: 2px 5px;
+        border-radius: 4px;
+        display: inline;
+        color: #fff;
+        margin-right: 5px;
+      }
+      
+      
+    }
   }
 }
 
+#contrib {
+  margin-top: 50px;
+  font-size: .9em;
+}
+
+.sfx_expander {
+    display: none;
+}
+
+
 .ad-metadata {
-  max-width: 500px;
-  margin: 0 auto 1em;
-  padding: 0 12px;
-  display: block;
+    max-width: 500px;
+    margin: .5em auto 1em;
+    padding: 0px 12px;
+    display: block;
+    font-size: .9em;
 
   .permalink {
     float: right;
