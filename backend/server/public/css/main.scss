@@ -1259,13 +1259,15 @@ header[role="banner"] > h4.project-name a {
   vertical-align: bottom;
   top: 0.35rem;
 
-  @media screen and (max-width: 767px) {
-    top: 0.5rem;
-  }
+  // @media screen and (max-width: 767px) {
+  //   top: 0.5rem;
+  // }
   @media screen and (max-width: 560px) {
     display: none;
   }
 }
+
+
 
 header[role="banner"] > h4.project-name a.quartz-logo {
     background: url(http://propublica.s3.amazonaws.com/projects/graphics/etc/Quartz_Black.png) no-repeat right 32%;
@@ -1341,7 +1343,7 @@ header[role="banner"] nav .social-links {
     width: 26px;
     text-decoration: none;
   }
-  @media screen and (max-width: 440px) {
+  @media screen and (max-width: 700px) {
     display: none;
   }
 }
