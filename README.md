@@ -1,15 +1,17 @@
 # Facebook Political Ad Collector
 
-This is the source code behind our project to collect political ads on Facebook. Built versions are available for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/) and [Chrome](https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl). You can browse the American ads we've collected at [ProPublica](http://projects.propublica.org/facebook-ads/), and the Australian ads over on the [Guardian's website](https://www.theguardian.com/technology/ng-interactive/2017/oct/25/revealed-how-australians-are-targeted-with-political-advertising-on-facebook).
+This repository is no longer maintained and exists for archival purposes only.
+
+For a more recent project on this topic, see
+[Ad Observer](https://adobserver.org).
+
+<details><summary>See archival README information.</summary>
+
+This is the source code behind our project to collect political ads on Facebook. You can browse the American ads we've collected at [ProPublica](http://projects.propublica.org/facebook-ads/), and the Australian ads over on the [Guardian's website](https://www.theguardian.com/technology/ng-interactive/2017/oct/25/revealed-how-australians-are-targeted-with-political-advertising-on-facebook).
 
 We're asking our readers to use this extension when they are browsing Facebook. While they are on Facebook a background script runs to collect ads they see. The extension shows those ads to users and asks them to decide whether or not a particular ad is political. Serverside, we use those ratings to train a naive bayes classifier that then automatically rates the other ads we've collected. The extension also asks the server for the most recent ads that the classifier thinks are political so that users can see political ads they haven't seen. We're careful to protect our user's privacy by not sending identifying information to our backend server.
 
 We're open sourcing this project because we'd love your help. Collecting these ads is challenging, and the more eyes on the problem the better.
-
-## Download and Try It
-
-* Download the [Facebook Political Ad Collector for Firefox](https://addons.mozilla.org/en-US/firefox/addon/facebook-ad-collector/)
-* Download the [Facebook Political Ad Collector for Chrome](https://chrome.google.com/webstore/detail/facebook-political-ad-col/enliecaalhkhhihcmnbjfmmjkljlcinl?hl=en)
 
 ## Run it on your own
 
@@ -59,3 +61,5 @@ Also, the rust backend needs a bit of love and care, and there is a bit of a mes
  - consider retaining utm params (i.e. a whitelisted set of parameters in links that are added by advertisers, not by FB and ipso facto are not personally identifiable, e.g. `utm_content`, etc., since those sometimes include useful metadata about the ad.)
  - consider turning off the panelist_ads table, etc. 
  - consider seeding the partisanship model in new languages with political tweets. 
+
+ </details>
